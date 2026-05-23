@@ -226,6 +226,17 @@ function GuideView() {
           </div>
         ))}
       </div>
+
+      <div style={{ background: "#0a1628", border: "1px solid #06b6d444", borderRadius: 8, padding: 16, marginTop: 12 }}>
+        <div style={{ fontSize: 12, letterSpacing: 3, color: "#06b6d4", fontWeight: 700, marginBottom: 12, borderBottom: "1px solid #06b6d433", paddingBottom: 8 }}>CHOISIR SA PAIRE FOREX</div>
+        {[["1. SCORE","Prends le score le plus haut vs le plus bas","Achete le fort — vends le faible","#22c55e"],["2. REGIMES OPPOSES","Ex: USD SURCHAUFFE vs EUR RECESSION","Signal parfait — BC dans directions opposees","#f59e0b"],["3. ANTICIPATION","Taux egaux aujourdhui mais beats accumules","Marche anticipe — devise monte AVANT la decision BC","#38bdf8"],["REGLE FINALE","Score divergent + regimes opposes + anticipation","Les 3 alignes = trade maximum — 1 seul = attends","#4ade80"]].map(([r,sig,act,col]) => (
+          <div key={r} style={{ marginBottom: 8, padding: 10, background: "#070b14", borderRadius: 6, border: "1px solid #1e3a5f33" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: col, marginBottom: 3 }}>{r}</div>
+            <div style={{ fontSize: 10, color: "#06b6d4", marginBottom: 2 }}>{sig}</div>
+            <div style={{ fontSize: 10, color: "#94a3b8" }}>{act}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
