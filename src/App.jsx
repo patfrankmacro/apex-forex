@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 const INDS = [
   { id: "mfg",   label: "PMI Manuf",    thresh: 2.0,  rev: false, w: 0.10 },
@@ -253,10 +253,10 @@ function GuideView() {
 }
 
 function CalView() {
-  const [events, setEvents] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const MAP = {USD:"United States",EUR:"Euro Zone",CAD:"Canada",CHF:"Switzerland",AUD:"Australia",JPY:"Japan",GBP:"United Kingdom",NZD:"New Zealand",CNY:"China"};
-  React.useEffect(() => {
+  useEffect(() => {
     fetch("https://nfs.faireconomy.media/ff_calendar_thisweek.json")
       .then(r=>r.json()).then(d=>{
         const filtered = d.filter(e=>e.impact==="High" && Object.values(MAP).includes(e.country));
