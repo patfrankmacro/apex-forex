@@ -252,6 +252,49 @@ function GuideView() {
   );
 }
 
+function CalView() {
+  const [events, setEvents] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const MAP = {USD:"United States",EUR:"Euro Zone",CAD:"Canada",CHF:"Switzerland",AUD:"Australia",JPY:"Japan",GBP:"United Kingdom",NZD:"New Zealand",CNY:"China"};
+  React.useEffect(() => {
+    fetch("https://nfs.faireconomy.media/ff_calendar_thisweek.json")
+      .then(r=>r.json()).then(d=>{
+        const filtered = d.filter(e=>e.impact==="High" && Object.values(MAP).includes(e.country));
+        setEvents(filtered); setLoading(false);
+      }).catch(()=>setLoading(false));
+  },[]);
+  const getCode = country => Object.keys(MAP).find(k=>MAP[k]===country)||"";
+  const fmt = date => { const d=new Date(date); return d.toLocaleDateString("fr-CA",{weekday:"short",month:"short",day:"numeric"})+" "+d.toLocaleTimeString("fr-CA",{hour:"2-digit",minute:"2-digit"}); };
+  return (
+    <div style={{padding:16}}>
+      <div style={{background:"#0a1628",border:"1px solid #38bdf844",borderRadius:8,padding:16}}>
+        <div style={{fontSize:12,letterSpacing:3,color:"#38bdf8",fontWeight:700,marginBottom:12,borderBottom:"1px solid #38bdf833",paddingBottom:8}}>CALENDRIER — EVENEMENTS HIGH IMPACT</div>
+        {loading && <div style={{color:"#475569",fontSize:11}}>Chargement...</div>}
+        {!loading && events.length===0 && <div style={{color:"#475569",fontSize:11}}>Aucun evenement HIGH cette semaine</div>}
+        {events.map((e,i)=>{
+          const code=getCode(e.country);
+          const curr=CURR.find(c=>c.code===code);
+          return(
+            <div key={i} style={{marginBottom:8,padding:10,background:"#070b14",borderRadius:6,border:"1px solid #ef444433"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                  <span style={{fontSize:16}}>{curr?curr.flag:""}</span>
+                  <span style={{fontSize:11,fontWeight:700,color:"#ef4444"}}>{code}</span>
+                  <span style={{fontSize:10,color:"#e2f0ff"}}>{e.title}</span>
+                </div>
+                <span style={{fontSize:9,color:"#475569"}}>{fmt(e.date)}</span>
+              </div>
+              <div style={{display:"flex",gap:12}}>
+                {e.forecast&&<span style={{fontSize:9,color:"#38bdf8"}}>Prev: {e.forecast}</span>}
+                {e.previous&&<span style={{fontSize:9,color:"#f59e0b"}}>Precedent: {e.previous}</span>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 export default function App() {
   const [data, setData] = useState(() => { try { const s = localStorage.getItem("apexdata"); return s ? JSON.parse(s) : mkData(); } catch { return mkData(); } });
   const [view, setView] = useState("table");
@@ -294,6 +337,7 @@ export default function App() {
           <button style={tab(view==="trade")}  onClick={() => setView("trade")}>TRADE</button>
           <button style={tab(view==="data")}   onClick={() => setView("data")}>DONNEES ↗</button>
           <button style={tab(view==="guide")}  onClick={() => setView("guide")}>GUIDE</button>
+          <button style={tab(view==="cal")} onClick={() => setView("cal")}>CALENDRIER</button>
           <button onClick={resetData} style={{ padding: "6px 12px", fontSize: 11, fontFamily: "monospace", cursor: "pointer", borderRadius: 4, border: "1px solid #7f1d1d", background: "transparent", color: "#ef4444" }}>RESET</button>
         </div>
       </div>
@@ -446,6 +490,7 @@ export default function App() {
         </div>
       )}
       {view==="guide" && <GuideView />}
+      {view==="cal" && <CalView />}
     </div>
   );
 }
