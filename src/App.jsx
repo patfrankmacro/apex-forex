@@ -83,6 +83,16 @@ function getStr(score) {
   if (score <= -0.10) return { label: "MODERE", color: "#fca5a5", bg: "#991b1b" };
   return                     { label: "NEUTRE", color: "#fbbf24", bg: "#1f2937" };
 }
+function getRegime(data, code) {
+  const pmi = (getSurprise(INDS.find(i=>i.id==="mfg"), data[code]["mfg"]) || 0) + (getSurprise(INDS.find(i=>i.id==="svc"), data[code]["svc"]) || 0);
+  const inf = (getSurprise(INDS.find(i=>i.id==="cpi"), data[code]["cpi"]) || 0) + (getSurprise(INDS.find(i=>i.id==="core"), data[code]["core"]) || 0);
+  const pmiUp = pmi > 0, infUp = inf > 0;
+  if (pmiUp && !infUp)  return { label: "GOLDILOCKS", color: "#22c55e" };
+  if (pmiUp && infUp)   return { label: "SURCHAUFFE", color: "#f59e0b" };
+  if (!pmiUp && infUp)  return { label: "STAGFLATION", color: "#ef4444" };
+  if (!pmiUp && !infUp) return { label: "RECESSION",   color: "#94a3b8" };
+  return { label: "INCONNU", color: "#475569" };
+}
 
 function Inp({ code, id, field, data, setCell }) {
   const cell = data[code][id];
@@ -377,6 +387,7 @@ export default function App() {
                 <div style={{ fontSize: 28, fontWeight: 700, color: "#22c55e", letterSpacing: 3 }}>{best.code}</div>
                 <div style={{ fontSize: 13, color: "#4ade80", fontWeight: 700 }}>{best.score>=0?"+":""}{best.score.toFixed(2)}</div>
                 <div style={{ fontSize: 10, color: "#86efac", marginTop: 4 }}>{getStr(best.score).label}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: getRegime(data, best.code).color }}>{getRegime(data, best.code).label}</div>
               </div>
               <div style={{ textAlign: "center", padding: "10px 6px" }}>
                 <div style={{ fontSize: 9, color: "#64748b", marginBottom: 6 }}>DIVERGENCE</div>
@@ -391,6 +402,7 @@ export default function App() {
                 <div style={{ fontSize: 28, fontWeight: 700, color: "#ef4444", letterSpacing: 3 }}>{worst.code}</div>
                 <div style={{ fontSize: 13, color: "#f87171", fontWeight: 700 }}>{worst.score.toFixed(2)}</div>
                 <div style={{ fontSize: 10, color: "#fca5a5", marginTop: 4 }}>{getStr(worst.score).label}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, marginTop: 4, color: getRegime(data, worst.code).color }}>{getRegime(data, worst.code).label}</div>
               </div>
             </div>
             <div style={{ background: "#070b14", border: "1px solid #1e3a5f", borderRadius: 6, padding: 12 }}>
