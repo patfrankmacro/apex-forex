@@ -253,45 +253,40 @@ function GuideView() {
 }
 
 function CalView() {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const MAP = {USD:"United States",EUR:"Euro Zone",CAD:"Canada",CHF:"Switzerland",AUD:"Australia",JPY:"Japan",GBP:"United Kingdom",NZD:"New Zealand",CNY:"China"};
-  useEffect(() => {
-    fetch("https://nfs.faireconomy.media/ff_calendar_thisweek.json")
-      .then(r=>r.json()).then(d=>{
-        const filtered = d.filter(e=>e.impact==="High" && Object.values(MAP).includes(e.country));
-        setEvents(filtered); setLoading(false);
-      }).catch(()=>setLoading(false));
-  },[]);
-  const getCode = country => Object.keys(MAP).find(k=>MAP[k]===country)||"";
-  const fmt = date => { const d=new Date(date); return d.toLocaleDateString("fr-CA",{weekday:"short",month:"short",day:"numeric"})+" "+d.toLocaleTimeString("fr-CA",{hour:"2-digit",minute:"2-digit"}); };
+  const SECTIONS = [
+    { title: "CALENDRIER", color: "#38bdf8", links: [
+      { label: "Babypips Economic Calendar", url: "https://www.babypips.com/economic-calendar", desc: "Evenements HIGH impact de la semaine" },
+    ]},
+    { title: "ANALYSE FX", color: "#a855f7", links: [
+      { label: "ING Think FX", url: "https://think.ing.com/market/fx/", desc: "Analyse macro FX quotidienne" },
+      { label: "Sucden Financial Daily FX", url: "https://www.sucdenfinancial.com/en/market-insights/fx-outlook/daily-fx-analysis/", desc: "Analyse technique et fondamentale" },
+      { label: "InvestingLive Asia Pacific", url: "https://investinglive.com", desc: "News FX Asia Pacific" },
+    ]},
+    { title: "SENTIMENT & FORCE", color: "#22c55e", links: [
+      { label: "Babypips Market Milk", url: "https://marketmilk.babypips.com/currency-strength", desc: "Force relative des devises" },
+      { label: "Myfxbook Outlook", url: "https://www.myfxbook.com/community/outlook", desc: "Sentiment du marche retail" },
+    ]},
+    { title: "COT & POSITIONNEMENT", color: "#f59e0b", links: [
+      { label: "Tradingster COT", url: "https://www.tradingster.com/cot", desc: "Positions des institutionnels" },
+    ]},
+    { title: "TAUX & ANTICIPATION", color: "#ef4444", links: [
+      { label: "Polymarket Interest Rate", url: "https://polymarket.com/fr/predictions/interest-rate", desc: "Probabilites de changement de taux" },
+    ]},
+  ];
   return (
     <div style={{padding:16}}>
-      <div style={{background:"#0a1628",border:"1px solid #38bdf844",borderRadius:8,padding:16}}>
-        <div style={{fontSize:12,letterSpacing:3,color:"#38bdf8",fontWeight:700,marginBottom:12,borderBottom:"1px solid #38bdf833",paddingBottom:8}}>CALENDRIER — EVENEMENTS HIGH IMPACT</div>
-        {loading && <div style={{color:"#475569",fontSize:11}}>Chargement...</div>}
-        {!loading && events.length===0 && <div style={{color:"#475569",fontSize:11}}>Aucun evenement HIGH cette semaine</div>}
-        {events.map((e,i)=>{
-          const code=getCode(e.country);
-          const curr=CURR.find(c=>c.code===code);
-          return(
-            <div key={i} style={{marginBottom:8,padding:10,background:"#070b14",borderRadius:6,border:"1px solid #ef444433"}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
-                <div style={{display:"flex",gap:8,alignItems:"center"}}>
-                  <span style={{fontSize:16}}>{curr?curr.flag:""}</span>
-                  <span style={{fontSize:11,fontWeight:700,color:"#ef4444"}}>{code}</span>
-                  <span style={{fontSize:10,color:"#e2f0ff"}}>{e.title}</span>
-                </div>
-                <span style={{fontSize:9,color:"#475569"}}>{fmt(e.date)}</span>
-              </div>
-              <div style={{display:"flex",gap:12}}>
-                {e.forecast&&<span style={{fontSize:9,color:"#38bdf8"}}>Prev: {e.forecast}</span>}
-                {e.previous&&<span style={{fontSize:9,color:"#f59e0b"}}>Precedent: {e.previous}</span>}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {SECTIONS.map(s => (
+        <div key={s.title} style={{background:"#0a1628",border:"1px solid "+s.color+"44",borderRadius:8,padding:16,marginBottom:12}}>
+          <div style={{fontSize:12,letterSpacing:3,color:s.color,fontWeight:700,marginBottom:12,borderBottom:"1px solid "+s.color+"33",paddingBottom:8}}>{s.title}</div>
+          {s.links.map(l => (
+            <a key={l.label} href={l.url} target="_blank" rel="noopener noreferrer"
+              style={{display:"flex",flexDirection:"column",padding:"10px 12px",borderRadius:6,background:"#070b14",border:"1px solid "+s.color+"22",marginBottom:8,textDecoration:"none"}}>
+              <span style={{fontSize:11,fontWeight:700,color:s.color,marginBottom:3}}>{l.label} ↗</span>
+              <span style={{fontSize:10,color:"#64748b"}}>{l.desc}</span>
+            </a>
+          ))}
+        </div>
+      ))}
     </div>
   );
 }
@@ -337,7 +332,7 @@ export default function App() {
           <button style={tab(view==="trade")}  onClick={() => setView("trade")}>TRADE</button>
           <button style={tab(view==="data")}   onClick={() => setView("data")}>DONNEES ↗</button>
           <button style={tab(view==="guide")}  onClick={() => setView("guide")}>GUIDE</button>
-          <button style={tab(view==="cal")} onClick={() => setView("cal")}>CALENDRIER</button>
+          <button style={tab(view==="cal")} onClick={() => setView("cal")}>RESSOURCES</button>
           <button onClick={resetData} style={{ padding: "6px 12px", fontSize: 11, fontFamily: "monospace", cursor: "pointer", borderRadius: 4, border: "1px solid #7f1d1d", background: "transparent", color: "#ef4444" }}>RESET</button>
         </div>
       </div>
