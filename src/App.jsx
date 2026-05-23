@@ -210,7 +210,7 @@ function GuideView() {
 
       <div style={{ background: "#0a1628", border: "1px solid #a855f744", borderRadius: 8, padding: 16, marginTop: 12 }}>
         <div style={{ fontSize: 12, letterSpacing: 3, color: "#a855f7", fontWeight: 700, marginBottom: 12, borderBottom: "1px solid #a855f733", paddingBottom: 8 }}>REGIME MACRO</div>
-        {[["GOLDILOCKS","PMI fort + CPI bas","BC neutre — devises fortes montent","#22c55e"],["SURCHAUFFE","PMI fort + CPI haut","BC hawkish — taux montent — devise monte","#f59e0b"],["STAGFLATION","PMI faible + CPI haut","BC coincee — evite ce trade","#ef4444"],["RECESSION","PMI faible + CPI bas","BC dovish — taux baissent — devise baisse","#94a3b8"]].map(([r,sig,act,col]) => (
+        {[["GOLDILOCKS","PMI fort + CPI bas + Chomage bas","BC neutre — devises fortes montent","#22c55e"],["SURCHAUFFE","PMI fort + CPI haut + Chomage bas","BC hawkish — taux montent — devise monte","#f59e0b"],["STAGFLATION","PMI faible + CPI haut + Chomage haut","BC coincee — evite ce trade","#ef4444"],["RECESSION","PMI faible + CPI bas + Chomage haut","BC dovish — taux baissent — devise baisse","#94a3b8"]].map(([r,sig,act,col]) => (
           <div key={r} style={{ marginBottom: 8, padding: 10, background: "#070b14", borderRadius: 6, border: "1px solid #1e3a5f33" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: col, marginBottom: 3 }}>{r}</div>
             <div style={{ fontSize: 10, color: "#38bdf8", marginBottom: 2 }}>{sig}</div>
@@ -218,7 +218,7 @@ function GuideView() {
           </div>
         ))}
         <div style={{ fontSize: 12, letterSpacing: 3, color: "#a855f7", fontWeight: 700, margin: "14px 0 10px", borderBottom: "1px solid #a855f733", paddingBottom: 8 }}>IMAGE GLOBALE + DECISION</div>
-        {[["HAWKISH CLAIR","Core CPI beat + Chomage bas + PMI fort","BC monte les taux — achete la devise","#22c55e"],["DOVISH CLAIR","Core CPI miss + Chomage haut + PMI faible","BC baisse les taux — vends la devise","#ef4444"],["MIXTE","Signaux contradictoires","Core CPI tranche — si beat reste hawkish","#f59e0b"],["3 contre 3","Aucune majorite claire","Ne trade pas cette devise","#64748b"]].map(([r,sig,act,col]) => (
+        {[["HAWKISH CLAIR","Core CPI beat + Chomage bas + PMI fort","BC monte les taux — achete la devise","#22c55e"],["DOVISH CLAIR","Core CPI miss + Chomage haut + PMI faible","BC baisse les taux — vends la devise","#ef4444"],["MIXTE","Ex: CPI beat MAIS PMI faible ou chomage monte","Core CPI tranche — beat = hawkish / miss = dovish","#f59e0b"],["3 contre 3","3 indicateurs hawkish vs 3 indicateurs dovish","Ne trade pas — attends le prochain rapport","#64748b"]].map(([r,sig,act,col]) => (
           <div key={r} style={{ marginBottom: 8, padding: 10, background: "#070b14", borderRadius: 6, border: "1px solid #1e3a5f33" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: col, marginBottom: 3 }}>{r}</div>
             <div style={{ fontSize: 10, color: "#38bdf8", marginBottom: 2 }}>{sig}</div>
