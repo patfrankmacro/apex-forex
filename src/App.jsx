@@ -290,6 +290,7 @@ export default function App() {
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button style={tab(view==="table")}  onClick={() => setView("table")}>TABLEAU</button>
           <button style={tab(view==="rank")}   onClick={() => setView("rank")}>CLASSEMENT</button>
+          <button style={tab(view==="regime")} onClick={() => setView("regime")}>REGIMES</button>
           <button style={tab(view==="trade")}  onClick={() => setView("trade")}>TRADE</button>
           <button style={tab(view==="data")}   onClick={() => setView("data")}>DONNEES ↗</button>
           <button style={tab(view==="guide")}  onClick={() => setView("guide")}>GUIDE</button>
@@ -419,6 +420,31 @@ export default function App() {
       )}
 
       {view==="data"  && <DataView />}
+      {view==="regime" && (
+        <div style={{ padding: 16 }}>
+          {CURR.map(c => { const r=getRegime(data,c.code); const impl={GOLDILOCKS:{bc:"Neutre — surveille inflation",dev:"Stable — depend des autres",col:"#22c55e"},SURCHAUFFE:{bc:"Hawkish — va monter les taux",dev:"Forte — capitaux entrent",col:"#f59e0b"},STAGFLATION:{bc:"Coincee — ne peut ni monter ni baisser",dev:"Incertaine — evite",col:"#ef4444"},RECESSION:{bc:"Dovish — va baisser les taux",dev:"Faible — capitaux sortent",col:"#94a3b8"},INCONNU:{bc:"Donnees insuffisantes",dev:"Entrez les donnees dans le tableau",col:"#475569"}}[r.label]||{bc:"?",dev:"?",col:"#475569"}; return (
+            <div key={c.code} style={{ background: "#0a1628", border: "1px solid "+r.color+"44", borderRadius: 8, padding: 12, marginBottom: 8 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 20 }}>{c.flag}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#e2f0ff" }}>{c.code}</span>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: r.color, background: r.color+"22", padding: "3px 10px", borderRadius: 4 }}>{r.label}</div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <div style={{ flex: 1, background: "#070b14", borderRadius: 6, padding: "6px 10px", minWidth: 120 }}>
+                  <div style={{ fontSize: 8, color: "#475569", marginBottom: 2 }}>BANQUE CENTRALE</div>
+                  <div style={{ fontSize: 10, color: impl.col }}>{impl.bc}</div>
+                </div>
+                <div style={{ flex: 1, background: "#070b14", borderRadius: 6, padding: "6px 10px", minWidth: 120 }}>
+                  <div style={{ fontSize: 8, color: "#475569", marginBottom: 2 }}>DEVISE</div>
+                  <div style={{ fontSize: 10, color: impl.col }}>{impl.dev}</div>
+                </div>
+              </div>
+            </div>
+          );})}
+        </div>
+      )}
       {view==="guide" && <GuideView />}
     </div>
   );
