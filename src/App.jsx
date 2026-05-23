@@ -171,6 +171,7 @@ function GuideView() {
     { title: "CHOMAGE %", sub: "Cherche Unemployment Rate sur Trading Economics", desc: "Moins de chomage = gens travaillent = prix montent = BC monte les taux.", good: "Chiffre publie PLUS BAS que prevu = economie forte", bad: "Chiffre publie PLUS HAUT que prevu = economie faible", pct: "20%" },
     { title: "PMI SERVICES", sub: "Cherche Services PMI sur Trading Economics", desc: "Est-ce que restaurants, hotels, transports tournent bien? 75% de l economie.", good: "Chiffre publie PLUS HAUT que prevu = demande forte = BC hawkish", bad: "Chiffre publie PLUS BAS que prevu = demande faible = BC dovish", pct: "15%" },
     { title: "PMI MANUF", sub: "Cherche Manufacturing PMI sur Trading Economics", desc: "Est-ce que les usines produisent bien? Premier signal d un ralentissement.", good: "Chiffre publie PLUS HAUT que prevu = production forte", bad: "Chiffre publie PLUS BAS que prevu = ralentissement industriel", pct: "10%" },
+    { title: "TAUX %", sub: "Cherche Interest Rate sur Trading Economics", desc: "Taux actuel de la BC. Ne cherche pas une surprise — compare 2 pays. La devise avec le taux le plus haut attire les capitaux etrangers.", good: "Taux plus haut que le pays adverse = capitaux entrent = devise forte", bad: "Taux plus bas que le pays adverse = capitaux sortent = devise faible", pct: "5%" },
   ];
   return (
     <div style={{ padding: 16 }}>
