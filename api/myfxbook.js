@@ -1,30 +1,47 @@
+let cachedSession = null;
+let sessionExpiry = 0;
+
+async function getSession() {
+  const now = Date.now();
+  if (cachedSession && now < sessionExpiry) return cachedSession;
+  
+  const r = await fetch(`https://www.myfxbook.com/api/login.json?email=${encodeURIComponent("patrice-bonneau@outlook.com")}&password=${encodeURIComponent("Fucktoi69$")}`);
+  const d = await r.json();
+  
+  if (!d.error && d.session) {
+    cachedSession = d.session;
+    sessionExpiry = now + 6 * 60 * 60 * 1000; // 6 heures
+    return cachedSession;
+  }
+  return null;
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Cache-Control", "no-store");
-  const { email, password, session } = req.query;
 
   try {
-    if (email && password) {
-      // Login direct + outlook en un seul appel
-      const r1 = await fetch(`https://www.myfxbook.com/api/login.json?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
-      const d1 = await r1.json();
-      if (d1.error) return res.json(d1);
-
-      // Utiliser le session brut directement sans toucher à l'encodage
-      const rawSession = d1.session;
-      const r2 = await fetch(`https://www.myfxbook.com/api/get-community-outlook.json?session=${rawSession}`);
-      const d2 = await r2.json();
-      return res.json(d2);
+    let session = await getSession();
+    
+    if (!session) {
+      return res.json({ error: true, message: "Login failed" });
     }
 
-    if (session) {
-      const r = await fetch(`https://www.myfxbook.com/api/get-community-outlook.json?session=${session}`);
-      const d = await r.json();
-      return res.json(d);
+    const r = await fetch(`https://www.myfxbook.com/api/get-community-outlook.json?session=${session}`);
+    const d = await r.json();
+
+    // Si session expiree, relogin et retry
+    if (d.error) {
+      cachedSession = null;
+      sessionExpiry = 0;
+      session = await getSession();
+      if (!session) return res.json({ error: true, message: "Re-login failed" });
+      const r2 = await fetch(`https://www.myfxbook.com/api/get-community-outlook.json?session=${session}`);
+      return res.json(await r2.json());
     }
 
-    res.json({error:true, message:"Missing params"});
+    return res.json(d);
   } catch(e) {
-    res.json({error:true, message:e.message});
+    res.json({ error: true, message: e.message });
   }
 }

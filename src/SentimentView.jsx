@@ -157,9 +157,10 @@ async function fetchCOT(code) {
 export default function SentimentView() {
   const [retail, setRetail]   = useState({});
   const [cot, setCot]         = useState({});
-  const [status, setStatus]   = useState("idle");
-  const [lastUp, setLastUp]   = useState(null);
-  const [cotDate, setCotDate] = useState(null);
+  const [status, setStatus]     = useState("idle");
+  const [cotStatus, setCotStatus] = useState("idle");
+  const [lastUp, setLastUp]     = useState(null);
+  const [cotDate, setCotDate]   = useState(null);
 
   const loadRetail = useCallback(async () => {
     setStatus("loading");
@@ -172,11 +173,15 @@ export default function SentimentView() {
   }, []);
 
   const loadCOT = useCallback(async () => {
-    const codes = [...new Set(Object.values(CFTC))];
-    const res = {};
-    await Promise.all(codes.map(async c => { res[c] = await fetchCOT(c); }));
-    setCot(res);
-    setCotDate(new Date().toLocaleDateString("fr-CA"));
+    setCotStatus("loading");
+    try {
+      const codes = [...new Set(Object.values(CFTC))];
+      const res = {};
+      await Promise.all(codes.map(async c => { res[c] = await fetchCOT(c); }));
+      setCot(res);
+      setCotDate(new Date().toLocaleDateString("fr-CA"));
+      setCotStatus("ok");
+    } catch { setCotStatus("error"); }
   }, []);
 
   useEffect(() => {
@@ -214,8 +219,12 @@ export default function SentimentView() {
           </div>
         </div>
         <div style={{display:"flex",gap:6}}>
-          <button onClick={loadRetail} style={{padding:"4px 8px",fontSize:9,fontFamily:"monospace",cursor:"pointer",borderRadius:4,border:"1px solid #1e3a5f",background:"transparent",color:"#64748b"}}>↻ RETAIL</button>
-          <button onClick={loadCOT}    style={{padding:"4px 8px",fontSize:9,fontFamily:"monospace",cursor:"pointer",borderRadius:4,border:"1px solid #1e3a5f",background:"transparent",color:"#64748b"}}>↻ COT</button>
+          <button onClick={loadRetail} style={{padding:"4px 10px",fontSize:9,fontFamily:"monospace",cursor:"pointer",borderRadius:4,border:"1px solid "+(status==="loading"?"#38bdf8":status==="error"?"#ef4444":status==="ok"?"#22c55e":"#1e3a5f"),background:status==="loading"?"#38bdf820":status==="error"?"#7f1d1d33":status==="ok"?"#14532d33":"transparent",color:status==="loading"?"#38bdf8":status==="error"?"#f87171":status==="ok"?"#4ade80":"#64748b"}}>
+            {status==="loading"?"⟳ RETAIL...":status==="error"?"✗ RETAIL":status==="ok"?"✓ RETAIL":"↻ RETAIL"}
+          </button>
+          <button onClick={loadCOT} style={{padding:"4px 10px",fontSize:9,fontFamily:"monospace",cursor:"pointer",borderRadius:4,border:"1px solid "+(cotStatus==="loading"?"#38bdf8":cotStatus==="error"?"#ef4444":cotStatus==="ok"?"#22c55e":"#1e3a5f"),background:cotStatus==="loading"?"#38bdf820":cotStatus==="error"?"#7f1d1d33":cotStatus==="ok"?"#14532d33":"transparent",color:cotStatus==="loading"?"#38bdf8":cotStatus==="error"?"#f87171":cotStatus==="ok"?"#4ade80":"#64748b"}}>
+            {cotStatus==="loading"?"⟳ COT...":cotStatus==="error"?"✗ COT":cotStatus==="ok"?"✓ COT":"↻ COT"}
+          </button>
         </div>
       </div>
 
