@@ -188,9 +188,20 @@ export default function SentimentView() {
     loadRetail();
     loadCOT();
     const ri = setInterval(loadRetail, 60*60*1000);
+    // COT refresh: vendredi 20h30 UTC (publication CFTC) + samedi matin verification
+    let lastCotLoad = null;
     const ci = setInterval(() => {
       const n = new Date();
-      if (n.getUTCDay()===5 && n.getUTCHours()===20 && n.getUTCMinutes()>=30) loadCOT();
+      const day = n.getUTCDay();
+      const hour = n.getUTCHours();
+      const min = n.getUTCMinutes();
+      const dateKey = n.toISOString().slice(0,10);
+      // Vendredi apres 20h30 UTC ou samedi avant 6h UTC
+      const isCotTime = (day===5 && (hour>20 || (hour===20 && min>=30))) || (day===6 && hour<6);
+      if (isCotTime && lastCotLoad !== dateKey) {
+        lastCotLoad = dateKey;
+        loadCOT();
+      }
     }, 60000);
     return () => { clearInterval(ri); clearInterval(ci); };
   }, [loadRetail, loadCOT]);
