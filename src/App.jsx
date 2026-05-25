@@ -105,14 +105,11 @@ async function fetchCOTApp(code){
 }
 async function fetchRetailApp(){
   try{
-    const r1=await fetch("/api/myfxbook?email="+encodeURIComponent(MFX_EMAIL)+"&password="+encodeURIComponent(MFX_PASS));
-    const d1=await r1.json();
-    if(d1.error)return{};
-    const r2=await fetch("/api/myfxbook?session="+d1.session);
-    const d2=await r2.json();
-    if(d2.error)return{};
+    const r=await fetch("/api/myfxbook?email="+encodeURIComponent(MFX_EMAIL)+"&password="+encodeURIComponent(MFX_PASS));
+    const d=await r.json();
+    if(d.error||!d.symbols)return{};
     const map={};
-    d2.symbols.forEach(s=>{map[s.name]=s;});
+    d.symbols.forEach(s=>{map[s.name]=s;});
     return map;
   }catch(e){return{};}
 }
@@ -134,7 +131,7 @@ const REGIMES = {
   GOLDILOCKS:  { label: "GOLDILOCKS",  icon: "◆", color: "#00ff88", bg: "#001a0d", border: "#00ff88", bcBias: "NEUTRE → HAWKISH modéré", tauxDir: "Stables ou légère hausse", deviseDir: "HAUSSE — croissance sans inflation = idéal", action: "ACHÈTE — setup institutionnel idéal", short: "Croissance ↑  Inflation ↓" },
   SURCHAUFFE:  { label: "SURCHAUFFE",  icon: "▲", color: "#ffd700", bg: "#1a1500", border: "#ffd700", bcBias: "HAWKISH — hausse des taux imminente", tauxDir: "Hausse des taux imminente", deviseDir: "HAUSSE court terme — surveille retournement", action: "ACHÈTE — surveille le pic", short: "Croissance ↑  Inflation ↑" },
   STAGFLATION: { label: "STAGFLATION", icon: "■", color: "#ff3b3b", bg: "#1a0000", border: "#ff3b3b", bcBias: "COINCÉE — ne peut pas agir", tauxDir: "Taux bloqués — BC prise en étau", deviseDir: "BAISSE — pire scénario macro", action: "VENDS — évite le long à tout prix", short: "Croissance ↓  Inflation ↑" },
-  RECESSION:   { label: "RÉCESSION",   icon: "▼", color: "#ff7a00", bg: "#1a0800", border: "#ff7a00", bcBias: "DOVISH — baisse des taux imminente", tauxDir: "Baisse des taux imminente", deviseDir: "BAISSE — capitaux fuient l'économie", action: "VENDS — short setup institutionnel", short: "Croissance ↓  Inflation ↓" },
+  RECESSION:   { label: "RECESSION",   icon: "▼", color: "#ff7a00", bg: "#1a0800", border: "#ff7a00", bcBias: "DOVISH — baisse des taux imminente", tauxDir: "Baisse des taux imminente", deviseDir: "BAISSE — capitaux fuient l'économie", action: "VENDS — short setup institutionnel", short: "Croissance ↓  Inflation ↓" },
 };
 
 function FlagImg({ code, size=20 }) {
@@ -239,7 +236,7 @@ function getRegime(data, code) {
 }
 
 function getStrength(score, regime) {
-  const weakRegimes = ["STAGFLATION","RÉCESSION"];
+  const weakRegimes = ["STAGFLATION","RECESSION"];
   const strongRegimes = ["GOLDILOCKS","SURCHAUFFE"];
   const regLabel = regime?.label || "";
   // Si régime faible → toujours rouge peu importe le score
@@ -310,7 +307,7 @@ function RegimeCard({ curr, data }) {
   const score = calcScore(data, curr.code);
   const infScore = calcInflationScore(data, curr.code);
   const growScore = calcGrowthScore(data, curr.code);
-  const st = getStrength(score);
+  const st = getStrength(score, regime);
   const hasDat = hasData(data, curr.code);
   const R = regime || { color: TEXT_DIM, bg: BG2, border: BORDER, label: "—", icon: "○" };
   return (
@@ -639,7 +636,7 @@ function GuideView() {
           { label:"GOLDILOCKS", color:"#00ff88", combo:"Services PMI high + Inflation low + Unemployment low", bc:"BC neutre — devises fortes montent" },
           { label:"SURCHAUFFE", color:"#ffd700", combo:"Services PMI high + Inflation high + Unemployment low", bc:"BC hawkish — taux montent — devise monte" },
           { label:"STAGFLATION", color:"#ff3b3b", combo:"Services PMI low + Inflation high + Unemployment high", bc:"BC coincée — évite ce trade" },
-          { label:"RÉCESSION", color:"#ff7a00", combo:"Services PMI low + Inflation low + Unemployment high", bc:"BC dovish — taux baissent — devise baisse" },
+          { label:"RECESSION", color:"#ff7a00", combo:"Services PMI low + Inflation low + Unemployment high", bc:"BC dovish — taux baissent — devise baisse" },
         ].map(R => (
           <div key={R.label} style={{ marginBottom:8, padding:"12px 14px", background:BG, borderRadius:3, border:`1px solid ${R.color}22`, borderLeft:`3px solid ${R.color}` }}>
             <div style={{ fontSize:12, fontWeight:700, color:R.color, marginBottom:6, letterSpacing:1 }}>{R.label}</div>
@@ -731,9 +728,9 @@ function CalView() {
 // ============================================================
 
 const VALID_DIVERGENCE = [
-  ["GOLDILOCKS","RÉCESSION"],["RÉCESSION","GOLDILOCKS"],
+  ["GOLDILOCKS","RECESSION"],["RECESSION","GOLDILOCKS"],
   ["GOLDILOCKS","STAGFLATION"],["STAGFLATION","GOLDILOCKS"],
-  ["SURCHAUFFE","RÉCESSION"],["RÉCESSION","SURCHAUFFE"],
+  ["SURCHAUFFE","RECESSION"],["RECESSION","SURCHAUFFE"],
   ["SURCHAUFFE","STAGFLATION"],["STAGFLATION","SURCHAUFFE"],
 ];
 
@@ -1051,7 +1048,7 @@ export default function App() {
     }
   }
 
-  const REGIME_RANK = { "GOLDILOCKS":3, "SURCHAUFFE":2, "RÉCESSION":-2, "STAGFLATION":-3 };
+  const REGIME_RANK = { "GOLDILOCKS":3, "SURCHAUFFE":2, "RECESSION":-2, "STAGFLATION":-3 };
   const ranked = useMemo(() =>
     CURR.map(c => ({...c, score:calcScore(data,c.code)})).sort((a,b)=>{
       const rA = getRegime(data,a.code);
@@ -1292,7 +1289,7 @@ function HeatmapView({ data }) {
           {CURR.map(c => {
             const score = calcScore(data, c.code);
             const reg = getRegime(data, c.code);
-            const st = getStrength(score);
+            const st = getStrength(score, regime);
             return (
               <tr key={c.code}>
                 <td style={{ padding: "8px 14px", background: BG2, borderLeft: `3px solid ${reg ? reg.color : BORDER}` }}>
