@@ -148,7 +148,7 @@ async function fetchCOT(code) {
       net: Math.round(nets[0]),
       longPos: Math.round(parseFloat(rows[0].noncomm_positions_long_all||0)),
       shortPos: Math.round(parseFloat(rows[0].noncomm_positions_short_all||0)),
-      max52: Math.max(...nets.slice(0,26)), min52: Math.min(...nets.slice(0,26)),
+      max52: Math.max(...nets), min52: Math.min(...nets),
       date: rows[0].report_date_as_yyyy_mm_dd?.slice(0,10) || "—",
     };
   } catch { return null; }

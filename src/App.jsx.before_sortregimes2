@@ -228,49 +228,6 @@ function calcScore(data, code) {
   const w = BC_WEIGHTS[code] || { inf: 0.5, grow: 0.5 }; return (grow ?? 0) * w.grow + (inf ?? 0) * w.inf;
 }
 
-function explainRegime(data, code, regime) {
-  if (!regime || !data[code]) return "";
-  const target = BC_TARGETS[code] || 2.0;
-  const coreNow = toN(data[code]["core"].now);
-  const svcNow  = toN(data[code]["svc"].now);
-  const unempNow = toN(data[code]["unemp"].now);
-  const rateNow = toN(data[code]["rate"].now);
-  const bc = (CURR.find(c=>c.code===code)?.bc) || "BC";
-
-  const infTxt = coreNow !== null ? 
-    (coreNow > target + 0.5 ? `inflation HAUTE (core ${coreNow}% vs target ${target}%)` :
-     coreNow > target + 0.2 ? `inflation au-dessus du target (core ${coreNow}% vs ${target}%)` :
-     coreNow < target - 0.5 ? `inflation BASSE (core ${coreNow}% sous target ${target}%)` :
-     coreNow < target - 0.2 ? `inflation sous target (core ${coreNow}% vs ${target}%)` :
-     `inflation à target (core ${coreNow}%)`) : "";
-
-  const growTxt = svcNow !== null ?
-    (svcNow >= 55 ? `croissance forte (Services PMI ${svcNow})` :
-     svcNow >= 52 ? `croissance solide (Services PMI ${svcNow})` :
-     svcNow >= 50 ? `croissance stable (Services PMI ${svcNow})` :
-     svcNow >= 47 ? `croissance qui ralentit (Services PMI ${svcNow} en contraction légère)` :
-     `croissance faible (Services PMI ${svcNow} en contraction)`) : "";
-
-  const unempTxt = unempNow !== null ?
-    (unempNow < 4 ? `marché du travail tendu (chômage ${unempNow}%)` :
-     unempNow < 5 ? `chômage stable à ${unempNow}%` :
-     `chômage élevé à ${unempNow}%`) : "";
-
-  if (regime.label === "SURCHAUFFE") {
-    return `Avec ${infTxt} et ${growTxt}, la ${bc} est en mode HAWKISH. ${unempTxt}. Les taux à ${rateNow}% sont maintenus hauts car l'économie résiste. → Devise FORTE sur le différentiel de taux : capitaux attirés.`;
-  }
-  if (regime.label === "GOLDILOCKS") {
-    return `Avec ${infTxt} et ${growTxt}, la ${bc} est dans sa ZONE DE CONFORT (pas de pression à bouger). ${unempTxt}. Taux à ${rateNow}%. → Devise haussière sans risque immédiat. Setup institutionnel idéal.`;
-  }
-  if (regime.label === "STAGFLATION") {
-    return `${bc} PRISE AU PIÈGE : ${infTxt} l'empêche de baisser, mais ${growTxt} l'empêche de monter. ${unempTxt}. Taux à ${rateNow}%. → Devise FAIBLE malgré taux hauts. ⚠ Pire scénario macro.`;
-  }
-  if (regime.label === "RECESSION") {
-    return `Avec ${infTxt} et ${growTxt}, la ${bc} va devoir BAISSER les taux. ${unempTxt}. Taux à ${rateNow}%. → Devise sous pression : capitaux qui fuient l'économie en ralentissement.`;
-  }
-  return "";
-}
-
 function interpretIndicator(id, now, code) {
   if (now === null || now === undefined) return "";
   const target = BC_TARGETS[code] || 2.0;
@@ -505,10 +462,6 @@ function RegimeCard({ curr, data }) {
                 </div>
               );
             })}
-          </div>
-          <div style={{ padding:"12px 14px", background:BG, borderRadius:3, border:`1px solid ${R.border}44`, marginBottom:10 }}>
-            <div style={{ fontSize:8, color:R.color, fontWeight:700, letterSpacing:2, marginBottom:6 }}>🎯 POURQUOI {R.label} ?</div>
-            <div style={{ fontSize:11, color:TEXT, fontWeight:400, lineHeight:1.6 }}>{explainRegime(data, curr.code, R)}</div>
           </div>
           <div style={{ padding:"10px 14px", background:R.bg, borderRadius:3, border:`1px solid ${R.border}66` }}>
             <div style={{ fontSize:8, color:R.color, fontWeight:700, letterSpacing:2, marginBottom:4 }}>ACTION INSTITUTIONNELLE</div>
@@ -1345,7 +1298,7 @@ export default function App() {
       {view==="regimes" && (
         <div style={{ padding:12 }}>
           <div style={{ fontSize:8, color:TEXT_DIM, letterSpacing:2, marginBottom:10 }}>CLIQUE POUR VOIR L'ANALYSE COMPLÈTE</div>
-          {(()=>{const ORDER={GOLDILOCKS:1,SURCHAUFFE:2,STAGFLATION:3,RECESSION:4};return [...CURR].sort((a,b)=>{const rA=getRegime(data,a.code),rB=getRegime(data,b.code);const oA=rA?ORDER[rA.label]:99,oB=rB?ORDER[rB.label]:99;if(oA!==oB)return oA-oB;return calcScore(data,b.code)-calcScore(data,a.code);}).map(c=><RegimeCard key={c.code} data={data} curr={c} />);})()}
+          {CURR.map(c=><RegimeCard key={c.code} data={data} curr={c} />)}
         </div>
       )}
 

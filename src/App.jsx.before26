@@ -13,18 +13,6 @@ const INDS = [
 ];
 
 const BC_TARGETS = { USD:2.0, EUR:2.0, CAD:2.0, CHF:1.0, AUD:2.5, JPY:2.0, GBP:2.0, NZD:2.0, CNY:3.0 };
-const BC_WEIGHTS = {
-  USD: { inf: 0.50, grow: 0.50 },
-  EUR: { inf: 0.70, grow: 0.30 },
-  GBP: { inf: 0.65, grow: 0.35 },
-  CHF: { inf: 0.70, grow: 0.30 },
-  CAD: { inf: 0.60, grow: 0.40 },
-  JPY: { inf: 0.40, grow: 0.60 },
-  AUD: { inf: 0.45, grow: 0.55 },
-  NZD: { inf: 0.65, grow: 0.35 },
-  CNY: { inf: 0.50, grow: 0.50 },
-};
-
 
 const CURR = [
   { code: "USD", flag: "🇺🇸", label: "États-Unis",  bc: "Fed" },
@@ -112,7 +100,7 @@ async function fetchCOTApp(code){
     const rows=await(await fetch(url)).json();
     if(!rows||!rows.length)return null;
     const nets=rows.map(r=>parseFloat(r.noncomm_positions_long_all||0)-parseFloat(r.noncomm_positions_short_all||0));
-    return{net:Math.round(nets[0]),max52:Math.max(...nets.slice(0,26)),min52:Math.min(...nets.slice(0,26))};
+    return{net:Math.round(nets[0]),max52:Math.max(...nets),min52:Math.min(...nets)};
   }catch(e){return null;}
 }
 async function fetchRetailApp(){
@@ -140,10 +128,10 @@ const TE_LINKS = {
 };
 
 const REGIMES = {
-  GOLDILOCKS:  { label: "GOLDILOCKS",  icon: "◆", color: "#00ff88", bg: "#001a0d", border: "#00ff88", bcBias: "NEUTRE → HAWKISH modéré", tauxDir: "Stables ou légère hausse", deviseDir: "HAUSSE — croissance sans inflation = idéal", action: "Marché anticipe : BC reste pat (zone de confort) → ACHÈTE — devise stable, setup idéal · ⚠ Risque faible, surveiller chocs externes", short: "Croissance ↑  Inflation ↓" },
-  SURCHAUFFE:  { label: "SURCHAUFFE",  icon: "▲", color: "#ffd700", bg: "#1a1500", border: "#ffd700", bcBias: "HAWKISH — hausse des taux imminente", tauxDir: "Hausse des taux imminente", deviseDir: "HAUSSE court terme — surveille retournement", action: "Marché anticipe : baisses repoussées (higher for longer) → ACHÈTE — devise forte sur différentiel de taux · ⚠ Risque : pic de cycle, retournement si inflation chute", short: "Croissance ↑  Inflation ↑" },
-  STAGFLATION: { label: "STAGFLATION", icon: "■", color: "#ff3b3b", bg: "#1a0000", border: "#ff3b3b", bcBias: "COINCÉE — ne peut pas agir", tauxDir: "Taux bloqués — BC prise en étau", deviseDir: "BAISSE — pire scénario macro", action: "Marché anticipe : BC piégée, ne peut ni monter ni baisser → ÉVITE le long — devise faible malgré taux hauts · ⚠ Risque : carry trade vulnérable au moindre choc", short: "Croissance ↓  Inflation ↑" },
-  RECESSION:   { label: "RECESSION",   icon: "▼", color: "#ff7a00", bg: "#1a0800", border: "#ff7a00", bcBias: "DOVISH — baisse des taux imminente", tauxDir: "Baisse des taux imminente", deviseDir: "BAISSE — capitaux fuient l'économie", action: "Marché anticipe : baisses de taux à venir → VENDS — devise sous pression, capitaux qui fuient · ⚠ Risque : si BC repousse baisses, rebond technique", short: "Croissance ↓  Inflation ↓" },
+  GOLDILOCKS:  { label: "GOLDILOCKS",  icon: "◆", color: "#00ff88", bg: "#001a0d", border: "#00ff88", bcBias: "NEUTRE → HAWKISH modéré", tauxDir: "Stables ou légère hausse", deviseDir: "HAUSSE — croissance sans inflation = idéal", action: "ACHÈTE — setup institutionnel idéal", short: "Croissance ↑  Inflation ↓" },
+  SURCHAUFFE:  { label: "SURCHAUFFE",  icon: "▲", color: "#ffd700", bg: "#1a1500", border: "#ffd700", bcBias: "HAWKISH — hausse des taux imminente", tauxDir: "Hausse des taux imminente", deviseDir: "HAUSSE court terme — surveille retournement", action: "ACHÈTE — surveille le pic", short: "Croissance ↑  Inflation ↑" },
+  STAGFLATION: { label: "STAGFLATION", icon: "■", color: "#ff3b3b", bg: "#1a0000", border: "#ff3b3b", bcBias: "COINCÉE — ne peut pas agir", tauxDir: "Taux bloqués — BC prise en étau", deviseDir: "BAISSE — pire scénario macro", action: "VENDS — évite le long à tout prix", short: "Croissance ↓  Inflation ↑" },
+  RECESSION:   { label: "RECESSION",   icon: "▼", color: "#ff7a00", bg: "#1a0800", border: "#ff7a00", bcBias: "DOVISH — baisse des taux imminente", tauxDir: "Baisse des taux imminente", deviseDir: "BAISSE — capitaux fuient l'économie", action: "VENDS — short setup institutionnel", short: "Croissance ↓  Inflation ↓" },
 };
 
 function FlagImg({ code, size=20 }) {
@@ -225,82 +213,7 @@ function calcScore(data, code) {
   const inf = calcInflationScore(data, code);
   const grow = calcGrowthScore(data, code);
   if (inf === null && grow === null) return 0;
-  const w = BC_WEIGHTS[code] || { inf: 0.5, grow: 0.5 }; return (grow ?? 0) * w.grow + (inf ?? 0) * w.inf;
-}
-
-function explainRegime(data, code, regime) {
-  if (!regime || !data[code]) return "";
-  const target = BC_TARGETS[code] || 2.0;
-  const coreNow = toN(data[code]["core"].now);
-  const svcNow  = toN(data[code]["svc"].now);
-  const unempNow = toN(data[code]["unemp"].now);
-  const rateNow = toN(data[code]["rate"].now);
-  const bc = (CURR.find(c=>c.code===code)?.bc) || "BC";
-
-  const infTxt = coreNow !== null ? 
-    (coreNow > target + 0.5 ? `inflation HAUTE (core ${coreNow}% vs target ${target}%)` :
-     coreNow > target + 0.2 ? `inflation au-dessus du target (core ${coreNow}% vs ${target}%)` :
-     coreNow < target - 0.5 ? `inflation BASSE (core ${coreNow}% sous target ${target}%)` :
-     coreNow < target - 0.2 ? `inflation sous target (core ${coreNow}% vs ${target}%)` :
-     `inflation à target (core ${coreNow}%)`) : "";
-
-  const growTxt = svcNow !== null ?
-    (svcNow >= 55 ? `croissance forte (Services PMI ${svcNow})` :
-     svcNow >= 52 ? `croissance solide (Services PMI ${svcNow})` :
-     svcNow >= 50 ? `croissance stable (Services PMI ${svcNow})` :
-     svcNow >= 47 ? `croissance qui ralentit (Services PMI ${svcNow} en contraction légère)` :
-     `croissance faible (Services PMI ${svcNow} en contraction)`) : "";
-
-  const unempTxt = unempNow !== null ?
-    (unempNow < 4 ? `marché du travail tendu (chômage ${unempNow}%)` :
-     unempNow < 5 ? `chômage stable à ${unempNow}%` :
-     `chômage élevé à ${unempNow}%`) : "";
-
-  if (regime.label === "SURCHAUFFE") {
-    return `Avec ${infTxt} et ${growTxt}, la ${bc} est en mode HAWKISH. ${unempTxt}. Les taux à ${rateNow}% sont maintenus hauts car l'économie résiste. → Devise FORTE sur le différentiel de taux : capitaux attirés.`;
-  }
-  if (regime.label === "GOLDILOCKS") {
-    return `Avec ${infTxt} et ${growTxt}, la ${bc} est dans sa ZONE DE CONFORT (pas de pression à bouger). ${unempTxt}. Taux à ${rateNow}%. → Devise haussière sans risque immédiat. Setup institutionnel idéal.`;
-  }
-  if (regime.label === "STAGFLATION") {
-    return `${bc} PRISE AU PIÈGE : ${infTxt} l'empêche de baisser, mais ${growTxt} l'empêche de monter. ${unempTxt}. Taux à ${rateNow}%. → Devise FAIBLE malgré taux hauts. ⚠ Pire scénario macro.`;
-  }
-  if (regime.label === "RECESSION") {
-    return `Avec ${infTxt} et ${growTxt}, la ${bc} va devoir BAISSER les taux. ${unempTxt}. Taux à ${rateNow}%. → Devise sous pression : capitaux qui fuient l'économie en ralentissement.`;
-  }
-  return "";
-}
-
-function interpretIndicator(id, now, code) {
-  if (now === null || now === undefined) return "";
-  const target = BC_TARGETS[code] || 2.0;
-  if (id === "cpi" || id === "core") {
-    if (now > target + 0.5)  return "→ HAUTE";
-    if (now > target + 0.2)  return "→ AU-DESSUS";
-    if (now < target - 0.5)  return "→ BASSE";
-    if (now < target - 0.2)  return "→ SOUS TARGET";
-    return "→ À TARGET";
-  }
-  if (id === "svc" || id === "mfg") {
-    if (now >= 55) return "→ expansion forte ✓";
-    if (now >= 52) return "→ expansion ✓";
-    if (now >= 50) return "→ stable au seuil";
-    if (now >= 47) return "→ contraction légère";
-    return "→ contraction ✗";
-  }
-  if (id === "unemp") {
-    if (now < 4)  return "→ très bas ✓";
-    if (now < 5)  return "→ stable ✓";
-    if (now < 6)  return "→ élevé";
-    return "→ très élevé ⚠";
-  }
-  if (id === "rate") {
-    if (now >= 4) return "→ maintenue haute";
-    if (now >= 2) return "→ niveau neutre";
-    if (now > 0)  return "→ accommodante";
-    return "→ ultra-basse";
-  }
-  return "";
+  return (grow ?? 0) * 0.5 + (inf ?? 0) * 0.5;
 }
 
 function getRegime(data, code) {
@@ -308,35 +221,18 @@ function getRegime(data, code) {
   const infScore = calcInflationScore(data, code);
   const growScore = calcGrowthScore(data, code);
   const svcNow = toN(data[code]["svc"].now);
+  const svcContraction = svcNow !== null && svcNow < 50;
   const coreNow = toN(data[code]["core"].now);
   const target = BC_TARGETS[code] || 2.0;
-
-  // Inflation 3 niveaux (logique institutionnelle)
-  const infHigh   = coreNow !== null && coreNow > target + 0.3;
-  const infLow    = coreNow !== null && coreNow < target - 0.3;
-  const infAtTarget = !infHigh && !infLow;
-
-  // Croissance 3 niveaux
-  const svcContraction = svcNow !== null && svcNow < 50;
-  const growUp   = !svcContraction && (growScore !== null && growScore > 0.05);
+  const inflationHigh = coreNow !== null && coreNow > target + 0.3;
+  const growUp = !svcContraction && (growScore !== null && growScore > 0.05);
   const growDown = svcContraction || (growScore !== null && growScore < -0.05);
-  const growNeutral = !growUp && !growDown;
-
-  // Matrice 3x3 = 9 cas
-  // Inflation HAUTE
-  if (infHigh && growUp)      return REGIMES.SURCHAUFFE;
-  if (infHigh && growNeutral) return REGIMES.SURCHAUFFE;
-  if (infHigh && growDown)    return REGIMES.STAGFLATION;
-  // Inflation A L'OBJECTIF (zone confort BC)
-  if (infAtTarget && growUp)      return REGIMES.GOLDILOCKS;
-  if (infAtTarget && growNeutral) return REGIMES.GOLDILOCKS;
-  if (infAtTarget && growDown)    return REGIMES.RECESSION;
-  // Inflation BASSE (BC doit stimuler)
-  if (infLow && growUp)      return REGIMES.GOLDILOCKS;
-  if (infLow && growNeutral) return REGIMES.GOLDILOCKS;
-  if (infLow && growDown)    return REGIMES.RECESSION;
-
-  return null;
+  const infUp = inflationHigh && (infScore !== null && infScore > 0.0);
+  const infDown = !inflationHigh || (infScore !== null && infScore < 0.0);
+  if (growUp && infUp)   return REGIMES.SURCHAUFFE;
+  if (growUp && infDown) return REGIMES.GOLDILOCKS;
+  if (growDown && inflationHigh) return REGIMES.STAGFLATION;
+  if (growDown && infDown) return REGIMES.RECESSION;
 }
 
 function getStrength(score, regime) {
@@ -479,8 +375,9 @@ function RegimeCard({ curr, data }) {
                 <div key={id} style={{ display:"flex", gap:8, marginBottom:6, padding:"6px 8px", background:BG2, borderRadius:2, borderLeft:`2px solid ${col}55` }}>
                   <div style={{ flex:1 }}>
                     <span style={{ color:TEXT, fontWeight:600, fontSize:10 }}>{ind.label}: {now}{ind.unit}</span>
-                    <span style={{ color:col, fontSize:10, fontWeight:600, marginLeft:6 }}>{interpretIndicator(id, now, curr.code)}</span>
-                    {exp!==null&&<span style={{ color:TEXT_DIM, fontSize:8, marginLeft:6 }}>(target {(BC_TARGETS[curr.code]||2.0)}%)</span>}
+                    {exp!==null&&<span style={{ color:TEXT_DIM, fontSize:9 }}> (exp:{exp}) </span>}
+                    {s!==null&&s!==0&&<span style={{ color:col, fontSize:9, fontWeight:700 }}>{beat?"BEAT ✓":"MISS ✗"} ({s>0?"+":""}{s.toFixed(2)})</span>}
+                    {s===0&&<span style={{ color:"#888899", fontSize:9 }}> NEUTRE</span>}
                   </div>
                 </div>
               );
@@ -499,16 +396,14 @@ function RegimeCard({ curr, data }) {
                 <div key={id} style={{ display:"flex", gap:8, marginBottom:6, padding:"6px 8px", background:BG2, borderRadius:2, borderLeft:`2px solid ${col}55` }}>
                   <div style={{ flex:1 }}>
                     <span style={{ color:TEXT, fontWeight:600, fontSize:10 }}>{ind.label}: {now}{ind.unit}</span>
-                    <span style={{ color:col, fontSize:10, fontWeight:600, marginLeft:6 }}>{interpretIndicator(id, now, curr.code)}</span>
-                    {id==="rate"&&prior!==null&&prior!==now&&<span style={{ color:TEXT_DIM, fontSize:8, marginLeft:6 }}>(préc:{prior}%)</span>}
+                    {id==="rate"&&prior!==null&&<span style={{ color:TEXT_DIM, fontSize:9 }}> (préc:{prior}%) </span>}
+                    {id!=="rate"&&exp!==null&&<span style={{ color:TEXT_DIM, fontSize:9 }}> (exp:{exp}) </span>}
+                    {s!==null&&s!==0&&<span style={{ color:col, fontSize:9, fontWeight:700 }}>{beat?"BEAT ✓":"MISS ✗"} ({s>0?"+":""}{s.toFixed(2)})</span>}
+                    {s===0&&<span style={{ color:"#888899", fontSize:9 }}> NEUTRE</span>}
                   </div>
                 </div>
               );
             })}
-          </div>
-          <div style={{ padding:"12px 14px", background:BG, borderRadius:3, border:`1px solid ${R.border}44`, marginBottom:10 }}>
-            <div style={{ fontSize:8, color:R.color, fontWeight:700, letterSpacing:2, marginBottom:6 }}>🎯 POURQUOI {R.label} ?</div>
-            <div style={{ fontSize:11, color:TEXT, fontWeight:400, lineHeight:1.6 }}>{explainRegime(data, curr.code, R)}</div>
           </div>
           <div style={{ padding:"10px 14px", background:R.bg, borderRadius:3, border:`1px solid ${R.border}66` }}>
             <div style={{ fontSize:8, color:R.color, fontWeight:700, letterSpacing:2, marginBottom:4 }}>ACTION INSTITUTIONNELLE</div>
@@ -1068,7 +963,7 @@ export default function App() {
           const rows = await (await fetch(url)).json();
           if (!rows?.length) return [code, null];
           const nets = rows.map(r => parseFloat(r.noncomm_positions_long_all||0) - parseFloat(r.noncomm_positions_short_all||0));
-          return [code, { net: Math.round(nets[0]), max52: Math.max(...nets.slice(0,26)), min52: Math.min(...nets.slice(0,26)) }];
+          return [code, { net: Math.round(nets[0]), max52: Math.max(...nets), min52: Math.min(...nets) }];
         } catch { return [code, null]; }
       }));
       const map = {};
@@ -1345,7 +1240,7 @@ export default function App() {
       {view==="regimes" && (
         <div style={{ padding:12 }}>
           <div style={{ fontSize:8, color:TEXT_DIM, letterSpacing:2, marginBottom:10 }}>CLIQUE POUR VOIR L'ANALYSE COMPLÈTE</div>
-          {(()=>{const ORDER={GOLDILOCKS:1,SURCHAUFFE:2,STAGFLATION:3,RECESSION:4};return [...CURR].sort((a,b)=>{const rA=getRegime(data,a.code),rB=getRegime(data,b.code);const oA=rA?ORDER[rA.label]:99,oB=rB?ORDER[rB.label]:99;if(oA!==oB)return oA-oB;return calcScore(data,b.code)-calcScore(data,a.code);}).map(c=><RegimeCard key={c.code} data={data} curr={c} />);})()}
+          {CURR.map(c=><RegimeCard key={c.code} data={data} curr={c} />)}
         </div>
       )}
 

@@ -13,6 +13,18 @@ const INDS = [
 ];
 
 const BC_TARGETS = { USD:2.0, EUR:2.0, CAD:2.0, CHF:1.0, AUD:2.5, JPY:2.0, GBP:2.0, NZD:2.0, CNY:3.0 };
+const UNEMP_TARGETS = {
+  USD: 4.1,
+  EUR: 6.8,
+  GBP: 4.3,
+  CHF: 2.3,
+  CAD: 5.8,
+  JPY: 2.5,
+  AUD: 4.3,
+  NZD: 4.3,
+  CNY: 5.2,
+};
+
 const BC_WEIGHTS = {
   USD: { inf: 0.50, grow: 0.50 },
   EUR: { inf: 0.70, grow: 0.30 },
@@ -251,10 +263,16 @@ function explainRegime(data, code, regime) {
      svcNow >= 47 ? `croissance qui ralentit (Services PMI ${svcNow} en contraction légère)` :
      `croissance faible (Services PMI ${svcNow} en contraction)`) : "";
 
+  const cibleUnemp = UNEMP_TARGETS[code] || 4.5;
+  const unempPrior = toN(data[code]["unemp"].prior);
+  const unempDir = (unempNow !== null && unempPrior !== null && unempNow !== unempPrior)
+    ? (unempNow > unempPrior ? ` en hausse (${unempPrior}→${unempNow}) ⚠` : ` en baisse (${unempPrior}→${unempNow}) ✓`)
+    : "";
   const unempTxt = unempNow !== null ?
-    (unempNow < 4 ? `marché du travail tendu (chômage ${unempNow}%)` :
-     unempNow < 5 ? `chômage stable à ${unempNow}%` :
-     `chômage élevé à ${unempNow}%`) : "";
+    (unempNow < cibleUnemp - 0.5 ? `chômage très bas à ${unempNow}% (cible ${cibleUnemp}%)${unempDir}` :
+     unempNow < cibleUnemp + 0.3 ? `chômage stable à ${unempNow}% (cible ${cibleUnemp}%)${unempDir}` :
+     unempNow < cibleUnemp + 1.0 ? `chômage élevé à ${unempNow}% (cible ${cibleUnemp}%)${unempDir}` :
+     `chômage très élevé à ${unempNow}% (cible ${cibleUnemp}%)${unempDir}`) : "";
 
   if (regime.label === "SURCHAUFFE") {
     return `Avec ${infTxt} et ${growTxt}, la ${bc} est en mode HAWKISH. ${unempTxt}. Les taux à ${rateNow}% sont maintenus hauts car l'économie résiste. → Devise FORTE sur le différentiel de taux : capitaux attirés.`;
@@ -289,10 +307,12 @@ function interpretIndicator(id, now, code) {
     return "→ contraction ✗";
   }
   if (id === "unemp") {
-    if (now < 4)  return "→ très bas ✓";
-    if (now < 5)  return "→ stable ✓";
-    if (now < 6)  return "→ élevé";
-    return "→ très élevé ⚠";
+    const cible = UNEMP_TARGETS[code] || 4.5;
+    const ecart = now - cible;
+    if (ecart < -0.5)      return "→ très bas (cible " + cible + "%) ✓";
+    if (ecart < 0.3)       return "→ stable (cible " + cible + "%) ✓";
+    if (ecart < 1.0)       return "→ élevé (cible " + cible + "%)";
+    return "→ très élevé (cible " + cible + "%) ⚠";
   }
   if (id === "rate") {
     if (now >= 4) return "→ maintenue haute";
