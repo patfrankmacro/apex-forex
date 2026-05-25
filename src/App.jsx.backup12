@@ -137,13 +137,6 @@ const REGIMES = {
   RECESSION:   { label: "RÉCESSION",   icon: "▼", color: "#ff7a00", bg: "#1a0800", border: "#ff7a00", bcBias: "DOVISH — baisse des taux imminente", tauxDir: "Baisse des taux imminente", deviseDir: "BAISSE — capitaux fuient l'économie", action: "VENDS — short setup institutionnel", short: "Croissance ↓  Inflation ↓" },
 };
 
-function FlagImg({ code, size=20 }) {
-  const map = { "🇺🇸":"US","🇪🇺":"EU","🇨🇦":"CA","🇨🇭":"CH","🇦🇺":"AU","🇯🇵":"JP","🇬🇧":"GB","🇳🇿":"NZ","🇨🇳":"CN",
-    "USD":"US","EUR":"EU","CAD":"CA","CHF":"CH","AUD":"AU","JPY":"JP","GBP":"GB","NZD":"NZ","CNY":"CN" };
-  const cc = map[code] || code;
-  return <img src={`https://flagcdn.com/w40/${cc.toLowerCase()}.png`} width={size} height={size*0.75} style={{borderRadius:2,objectFit:"cover",verticalAlign:"middle"}} alt={code} />;
-}
-
 const BG = "#050508", BG2 = "#08080f", BG3 = "#0c0c18";
 const BORDER = "#1a1a2e", TEXT = "#c8d4f0", TEXT_DIM = "#4a5070", ACCENT = "#00aaff";
 
@@ -238,23 +231,7 @@ function getRegime(data, code) {
   if (growDown && infDown) return REGIMES.RECESSION;
 }
 
-function getStrength(score, regime) {
-  const weakRegimes = ["STAGFLATION","RÉCESSION"];
-  const strongRegimes = ["GOLDILOCKS","SURCHAUFFE"];
-  const regLabel = regime?.label || "";
-  // Si régime faible → toujours rouge peu importe le score
-  if (weakRegimes.includes(regLabel)) {
-    if (score <= -0.30 || score >= 0.30) return { label: "FAIBLE ↓", color: "#ff3b3b", bg: "#1a0000" };
-    if (score <= -0.08 || score >= 0.08) return { label: "MODÉRÉ ↓", color: "#ff8888", bg: "#110000" };
-    return { label: "FAIBLE ↓", color: "#ff3b3b", bg: "#1a0000" };
-  }
-  // Si régime fort → toujours vert
-  if (strongRegimes.includes(regLabel)) {
-    if (score >= 0.30)  return { label: "FORT ↑",   color: "#00ff88", bg: "#001a0d" };
-    if (score >= 0.08)  return { label: "MODÉRÉ ↑", color: "#66ffbb", bg: "#002211" };
-    return { label: "MODÉRÉ ↑", color: "#66ffbb", bg: "#002211" };
-  }
-  // Pas de régime — score seul
+function getStrength(score) {
   if (score >= 0.30)  return { label: "FORT ↑",   color: "#00ff88", bg: "#001a0d" };
   if (score >= 0.08)  return { label: "MODÉRÉ ↑", color: "#66ffbb", bg: "#002211" };
   if (score <= -0.30) return { label: "FAIBLE ↓", color: "#ff3b3b", bg: "#1a0000" };
@@ -296,8 +273,7 @@ function Inp({ code, id, field, data, setCell }) {
 }
 
 function ScoreBar({ score, color }) {
-  
-return (
+  return (
     <div style={{ width:"100%", height:3, background:"#0a0a14", borderRadius:2 }}>
       <div style={{ width:Math.min(Math.abs(score)*100,100)+"%", height:"100%", background:color, borderRadius:2 }} />
     </div>
@@ -319,7 +295,7 @@ function RegimeCard({ curr, data }) {
         style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px",
           background: regime ? R.bg : BG2, cursor: hasDat ? "pointer" : "default",
           borderLeft:`3px solid ${R.color}` }}>
-        <span style={{ fontSize:16, minWidth:22 }}><FlagImg code={curr.code} size={18} /></span>
+        <span style={{ fontSize:16, minWidth:22 }}>{curr.flag}</span>
         <div style={{ flex:1 }}>
           <div style={{ fontWeight:600, color:TEXT, fontSize:12, letterSpacing:2, fontFamily:"'IBM Plex Mono'" }}>{curr.code}</div>
           <div style={{ fontSize:9, color:TEXT_DIM }}>{curr.bc} · {curr.label}</div>
@@ -445,7 +421,7 @@ function TradeCard({ strong, weak, div, regS, regW, perfect, sentSig }) {
             {isBothEx && <span style={{ fontSize:8, color:"#00ff88", border:"1px solid #00ff8844", borderRadius:2, padding:"2px 7px", letterSpacing:1 }}>🔥 SETUP PARFAIT</span>}
           </div>
           <div style={{ fontSize:9, color:TEXT_DIM }}>
-            <FlagImg code={strong.code} size={16} /> {strong.code} <span style={{ color:regS?.color }}>{regS?.label}</span> {"vs"} <FlagImg code={weak.code} size={16} /> {weak.code} <span style={{ color:regW?.color }}>{regW?.label}</span>
+            {strong.flag} {strong.code} <span style={{ color:regS?.color }}>{regS?.label}</span> {"vs"} {weak.flag} {weak.code} <span style={{ color:regW?.color }}>{regW?.label}</span>
           </div>
         </div>
         <div style={{ textAlign:"right" }}>
@@ -464,7 +440,7 @@ function TradeCard({ strong, weak, div, regS, regW, perfect, sentSig }) {
             {[{curr:strong,reg:regS,side:"LONG — ACHÈTE"},{curr:weak,reg:regW,side:"SHORT — VENDS"}].map(({curr,reg,side})=>(
               <div key={curr.code} style={{ padding:10, background:reg?.bg||BG, borderRadius:4, border:`1px solid ${reg?.border||BORDER}44` }}>
                 <div style={{ fontSize:8, color:reg?.color||TEXT_DIM, letterSpacing:2, marginBottom:6 }}>{side}</div>
-                <div style={{ fontSize:15, fontWeight:700, color:TEXT }}><FlagImg code={curr.code} size={18} /> {curr.code}</div>
+                <div style={{ fontSize:15, fontWeight:700, color:TEXT }}>{curr.flag} {curr.code}</div>
                 <div style={{ fontSize:11, color:reg?.color||TEXT_DIM, marginTop:4, fontWeight:700 }}>{reg?.icon} {reg?.label}</div>
                 <div style={{ fontSize:9, color:TEXT_DIM, marginTop:2 }}>Score: {curr.score>=0?"+":""}{curr.score.toFixed(3)}</div>
               </div>
@@ -510,7 +486,7 @@ function TradeCard({ strong, weak, div, regS, regW, perfect, sentSig }) {
                 {[{curr:strong,cot:strongCOT},{curr:weak,cot:weakCOT}].map(({curr,cot})=>(
                   <div key={curr.code}>
                     <div style={{ fontSize:8, color:"#475569", marginBottom:3 }}>
-                      <FlagImg code={curr.code} size={18} /> {curr.code} — P{cot?.pct}%
+                      {curr.flag} {curr.code} — P{cot?.pct}%
                     </div>
                     <div style={{ height:5, background:"#1e3a5f", borderRadius:2, position:"relative", marginBottom:3 }}>
                       <div style={{ position:"absolute", left:0, width:"10%", height:"100%", background:"#4ade8033" }}/>
@@ -572,12 +548,12 @@ function DataView() {
                 border: selected===c.code?`1px solid ${ACCENT}`:`1px solid ${BORDER}`,
                 background: selected===c.code?`${ACCENT}20`:BG,
                 color: selected===c.code?ACCENT:TEXT_DIM, fontFamily:"'IBM Plex Mono'" }}>
-              <FlagImg code={c.code} size={16} /> {c.code}
+              {c.flag} {c.code}
             </button>
           ))}
         </div>
         <div style={{ padding:12, background:BG, borderRadius:3, border:`1px solid ${BORDER}` }}>
-          <div style={{ fontSize:12, fontWeight:700, color:TEXT, marginBottom:12, fontFamily:"'IBM Plex Mono'" }}><FlagImg code={curr.code} size={18} /> {curr.code} — {curr.label} ({curr.bc})</div>
+          <div style={{ fontSize:12, fontWeight:700, color:TEXT, marginBottom:12, fontFamily:"'IBM Plex Mono'" }}>{curr.flag} {curr.code} — {curr.label} ({curr.bc})</div>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(160px, 1fr))", gap:8 }}>
             {INDS.map(ind => (
               <a key={ind.id} href={`${TE}/${TE_LINKS[curr.code][ind.id]}`} target="_blank" rel="noopener noreferrer"
@@ -725,281 +701,12 @@ function CalView() {
   );
 }
 
-
-// ============================================================
-// TRADE APEX — Confluence Macro + COT + Retail
-// ============================================================
-
-const VALID_DIVERGENCE = [
-  ["GOLDILOCKS","RÉCESSION"],["RÉCESSION","GOLDILOCKS"],
-  ["GOLDILOCKS","STAGFLATION"],["STAGFLATION","GOLDILOCKS"],
-  ["SURCHAUFFE","RÉCESSION"],["RÉCESSION","SURCHAUFFE"],
-  ["SURCHAUFFE","STAGFLATION"],["STAGFLATION","SURCHAUFFE"],
-];
-
-function isValidMacroDivergence(rBase, rQuote) {
-  if (!rBase || !rQuote) return false;
-  return VALID_DIVERGENCE.some(([a,b]) => a === rBase.label && b === rQuote.label);
-}
-
-function getMacroDirection(rBase, rQuote) {
-  const strong = ["GOLDILOCKS","SURCHAUFFE"];
-  if (strong.includes(rBase.label)) return "LONG";
-  return "SHORT";
-}
-
-function getMacroPts(rBase, rQuote) {
-  const scoreMap = { GOLDILOCKS:100, SURCHAUFFE:80, RECESSION:-80, STAGFLATION:-100 };
-  const b = scoreMap[rBase.label] || 0;
-  const q = scoreMap[rQuote.label] || 0;
-  return Math.abs(b - q);
-}
-
-function getApexSignalStrength(macroPts, cotStrength, retailStrength) {
-  const strongLevels = ["EXTREME","FORT"];
-  const cotStrong = strongLevels.includes(cotStrength);
-  const retailStrong = strongLevels.includes(retailStrength);
-  const bothExtreme = cotStrength === "EXTREME" && retailStrength === "EXTREME";
-  if (bothExtreme && macroPts >= 160)
-    return { label:"🔥🔥🔥 APEX PARFAIT", color:"#00ff88", bg:"#001a0d", priority:4 };
-  if (bothExtreme)
-    return { label:"🔥🔥 APEX FORT", color:"#22c55e", bg:"#052010", priority:3 };
-  if (cotStrong && retailStrong)
-    return { label:"🔥 APEX CONFIRMÉ", color:"#4ade80", bg:"#0a2e18", priority:2 };
-  return { label:"↑↓ APEX BIAIS", color:"#86efac", bg:"#0d1f14", priority:1 };
-}
-
-function TradeApex({ data, cotData, retailData }) {
-  const trades = [];
-
-  SENT_PAIRS.forEach(({ name, base, quote }) => {
-    const rBase  = getRegime(data, base);
-    const rQuote = getRegime(data, quote);
-    if (!rBase || !rQuote) return;
-    if (!isValidMacroDivergence(rBase, rQuote)) return;
-
-    const direction = getMacroDirection(rBase, rQuote);
-    const macroPts  = getMacroPts(rBase, rQuote);
-
-    // COT
-    const CFTC_MAP = {EUR:"099741",GBP:"096742",JPY:"097741",CAD:"090741",AUD:"232741",CHF:"092741",USD:"098662",NZD:"112741"};
-    const bCotRaw  = cotData[CFTC_MAP[base]];
-    const qCotRaw  = cotData[CFTC_MAP[quote]];
-    if (!bCotRaw || !qCotRaw) return;
-
-    const cotRange_b = bCotRaw.max52 - bCotRaw.min52;
-    const cotRange_q = qCotRaw.max52 - qCotRaw.min52;
-    const bPct = cotRange_b === 0 ? 50 : Math.round(((bCotRaw.net - bCotRaw.min52) / cotRange_b) * 100);
-    const qPct = cotRange_q === 0 ? 50 : Math.round(((qCotRaw.net - qCotRaw.min52) / cotRange_q) * 100);
-    const cotSpread = bPct - qPct;
-    const cotAbs = Math.abs(cotSpread);
-    const cotBias = cotSpread > 0 ? "HAUSSIER" : "BAISSIER";
-    const cotStrength = cotAbs >= 60 ? "EXTREME" : cotAbs >= 40 ? "FORT" : cotAbs >= 20 ? "MODERE" : "NUL";
-
-    // Vérifier alignement COT avec direction
-    const cotAligned = (direction === "LONG" && cotBias === "HAUSSIER") ||
-                       (direction === "SHORT" && cotBias === "BAISSIER");
-    if (!cotAligned) return;
-
-    // Retail
-    const rData = retailData[name];
-    let retailBias = "N/A", retailStrength = "N/A", lp = 0, sp = 0;
-    const hasRetail = !!rData;
-    if (hasRetail) {
-      lp = rData.longPercentage; sp = rData.shortPercentage;
-      if      (lp >= 75) { retailBias = "BAISSIER"; retailStrength = "EXTREME"; }
-      else if (sp >= 75) { retailBias = "HAUSSIER"; retailStrength = "EXTREME"; }
-      else if (lp >= 65) { retailBias = "BAISSIER"; retailStrength = "FORT"; }
-      else if (sp >= 65) { retailBias = "HAUSSIER"; retailStrength = "FORT"; }
-      else if (lp >= 55) { retailBias = "BAISSIER"; retailStrength = "MODERE"; }
-      else if (sp >= 55) { retailBias = "HAUSSIER"; retailStrength = "MODERE"; }
-      else               { retailBias = "NEUTRE";   retailStrength = "NUL"; }
-      // Vérifier alignement Retail (contrarian) avec direction
-      const retailAligned = (direction === "LONG" && retailBias === "HAUSSIER") ||
-                            (direction === "SHORT" && retailBias === "BAISSIER");
-      if (!retailAligned || retailStrength === "NUL") return;
-    }
-
-    const sig = getApexSignalStrength(macroPts, cotStrength, retailStrength);
-
-    const baseFlag = CURR.find(c => c.code === base)?.flag || "";
-    const quoteFlag = CURR.find(c => c.code === quote)?.flag || "";
-
-    trades.push({
-      name, base, quote, baseFlag, quoteFlag,
-      direction, macroPts, rBase, rQuote,
-      cotBias, cotStrength, bPct, qPct, cotSpread,
-      retailBias, retailStrength, lp, sp,
-      sig,
-    });
-  });
-
-  trades.sort((a, b) => b.sig.priority - a.sig.priority || b.macroPts - a.macroPts);
-
-  return (
-    <div style={{padding:12}}>
-      <div style={{background:"#050810",border:"1px solid #00ff8844",borderRadius:8,padding:"10px 14px",marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-        <div>
-          <div style={{fontSize:11,letterSpacing:3,color:"#00ff88",fontWeight:700}}>⚡ TRADE APEX — CONFLUENCE 3/3</div>
-          <div style={{fontSize:8,color:"#4a5070",marginTop:2}}>Macro divergence + COT instits + Retail contrarian</div>
-        </div>
-        <div style={{fontSize:20,fontWeight:700,color:"#00ff88"}}>{trades.length}</div>
-      </div>
-
-      {trades.length === 0 && (
-        <div style={{padding:16,background:"#08080f",borderRadius:8,border:"1px solid #1a1a2e"}}>
-          <div style={{fontSize:12,color:"#4a5070",marginBottom:8,textAlign:"center"}}>Aucun signal APEX actif</div>
-          <div style={{fontSize:9,color:"#00aaff",marginBottom:4}}>DEBUG:</div>
-          <div style={{fontSize:8,color:"#4a5070",lineHeight:2}}>
-            Paires analysées: {SENT_PAIRS.length}<br/>
-            COT keys: {Object.keys(cotData).length}<br/>
-            Retail keys: {Object.keys(retailData).length}<br/>
-            Data devises: {Object.keys(data).filter(k=>hasData(data,k)).join(", ") || "AUCUNE"}<br/>
-            {SENT_PAIRS.slice(0,3).map(p=>{
-              const rB = getRegime(data,p.base);
-              const rQ = getRegime(data,p.quote);
-              return p.name+": "+( rB?rB.label:"noReg")+" vs "+(rQ?rQ.label:"noReg");
-            }).join(" | ")}
-          </div>
-        </div>
-      )}
-
-      {trades.map(t => (
-        <div key={t.name} style={{background:"#08080f",border:"1px solid "+t.sig.color+"55",borderRadius:10,padding:14,marginBottom:12,animation:"fadeIn 0.3s ease"}}>
-
-          {/* Header */}
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-            <div style={{fontSize:16,fontWeight:700,color:"#c8d4f0",letterSpacing:1}}>
-              <FlagImg code={t.base} size={18} /><FlagImg code={t.quote} size={18} /> {t.base}/{t.quote}
-            </div>
-            <div style={{textAlign:"right"}}>
-              <div style={{fontSize:11,fontWeight:700,color:t.sig.color,background:t.sig.bg,padding:"4px 10px",borderRadius:4}}>{t.sig.label}</div>
-              <div style={{fontSize:9,color: t.direction==="LONG"?"#00ff88":"#ef4444",marginTop:3,fontWeight:700,letterSpacing:2}}>
-                {t.direction} {t.base}/{t.quote}
-              </div>
-            </div>
-          </div>
-
-          {/* 3 confirmations */}
-          <div style={{display:"flex",flexDirection:"column",gap:6}}>
-
-            {/* 1 - MACRO */}
-            <div style={{background:"#0c0c18",borderRadius:6,padding:"8px 10px",borderLeft:"3px solid #00aaff"}}>
-              <div style={{fontSize:8,color:"#00aaff",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 1 — MACRO DIVERGENCE</div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr auto 1fr",gap:6,alignItems:"center"}}>
-                <div style={{background:t.rBase.bg,borderRadius:4,padding:"6px 8px",border:"1px solid "+t.rBase.border+"55"}}>
-                  <div style={{fontSize:9,color:"#c8d4f0",fontWeight:700}}><FlagImg code={t.base} size={14} /> {t.base}</div>
-                  <div style={{fontSize:10,color:t.rBase.color,fontWeight:700}}>{t.rBase.icon} {t.rBase.label}</div>
-                </div>
-                <div style={{fontSize:9,color:"#4a5070",textAlign:"center"}}>vs<br/><span style={{color:"#00aaff",fontWeight:700}}>+{t.macroPts}pts</span></div>
-                <div style={{background:t.rQuote.bg,borderRadius:4,padding:"6px 8px",border:"1px solid "+t.rQuote.border+"55"}}>
-                  <div style={{fontSize:9,color:"#c8d4f0",fontWeight:700}}><FlagImg code={t.quote} size={14} /> {t.quote}</div>
-                  <div style={{fontSize:10,color:t.rQuote.color,fontWeight:700}}>{t.rQuote.icon} {t.rQuote.label}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* 2 - COT */}
-            <div style={{background:"#0c0c18",borderRadius:6,padding:"8px 10px",borderLeft:"3px solid "+(t.cotBias==="HAUSSIER"?"#4ade80":"#f87171")}}>
-              <div style={{fontSize:8,color:"#94a3b8",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 2 — COT INSTITUTIONNELS</div>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <div style={{fontSize:9,color:"#94a3b8"}}>
-                  <FlagImg code={t.base} size={12} /> P{t.bPct}% &nbsp;vs&nbsp; <FlagImg code={t.quote} size={12} /> P{t.qPct}%
-                  <span style={{color:"#4a5070",marginLeft:6}}>spread {t.cotSpread>0?"+":""}{t.cotSpread}</span>
-                </div>
-                <div style={{fontSize:10,fontWeight:700,color:t.cotBias==="HAUSSIER"?"#4ade80":"#f87171"}}>
-                  {t.cotBias} — {t.cotStrength}
-                </div>
-              </div>
-            </div>
-
-            {/* 3 - RETAIL */}
-            <div style={{background:"#0c0c18",borderRadius:6,padding:"8px 10px",borderLeft:"3px solid "+(t.retailBias==="HAUSSIER"?"#4ade80":"#f87171")}}>
-              <div style={{fontSize:8,color:"#94a3b8",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 3 — RETAIL CONTRARIAN</div>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
-                <div style={{fontSize:8,color:"#4a5070"}}>
-                  LONG {t.lp}% &nbsp;·&nbsp; SHORT {t.sp}%
-                </div>
-                <div style={{fontSize:10,fontWeight:700,color:t.retailBias==="HAUSSIER"?"#4ade80":"#f87171"}}>
-                  Contrarian {t.retailBias} — {t.retailStrength}
-                </div>
-              </div>
-              <div style={{height:4,background:"#f87171",borderRadius:2,overflow:"hidden"}}>
-                <div style={{width:t.lp+"%",height:"100%",background:"#4ade80"}}/>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Conclusion */}
-          <div style={{marginTop:8,background:t.sig.bg,border:"1px solid "+t.sig.color+"44",borderRadius:6,padding:"10px 12px",textAlign:"center"}}>
-            <div style={{fontSize:12,color:t.sig.color,fontWeight:700,letterSpacing:1}}>
-              {t.direction === "LONG" ? "🚀" : "📉"} {t.direction} {t.base}/{t.quote} — CONFLUENCE TOTALE
-            </div>
-            <div style={{fontSize:8,color:"#4a5070",marginTop:3}}>
-              Macro +{t.macroPts}pts · COT {t.cotStrength} · Retail {t.retailStrength}
-            </div>
-          </div>
-
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default function App() {
   const [data, setData] = useState(mkData());
   const [view, setView] = useState("table");
   const [sentRetail, setSentRetail] = useState({});
   const [sentCot, setSentCot] = useState({});
   const [connected, setConnected] = useState(false);
-  const [apexCot, setApexCot]       = useState({});
-  const [apexRetail, setApexRetail] = useState({});
-
-  // Fetch COT + Retail pour TradeApex
-  useEffect(() => {
-    const COT_CODES = ["099741","096742","097741","090741","232741","092741","098662","112741"];
-    const loadCOT = async () => {
-      const res = await Promise.all(COT_CODES.map(async code => {
-        try {
-          const url = "https://publicreporting.cftc.gov/resource/6dca-aqww.json?cftc_contract_market_code="+code+"&$order=report_date_as_yyyy_mm_dd DESC&$limit=55";
-          const rows = await (await fetch(url)).json();
-          if (!rows?.length) return [code, null];
-          const nets = rows.map(r => parseFloat(r.noncomm_positions_long_all||0) - parseFloat(r.noncomm_positions_short_all||0));
-          return [code, { net: Math.round(nets[0]), max52: Math.max(...nets), min52: Math.min(...nets) }];
-        } catch { return [code, null]; }
-      }));
-      const map = {};
-      res.forEach(([code, val]) => { if (val) map[code] = val; });
-      setApexCot(map);
-    };
-    loadCOT();
-    // Refresh COT chaque vendredi 21h30 EST (publication CFTC) + vérif toutes les heures
-    const cotInterval = setInterval(() => {
-      const n = new Date();
-      const day = n.getUTCDay(); // 5 = vendredi
-      const hour = n.getUTCHours();
-      const min = n.getUTCMinutes();
-      // Vendredi entre 20h30 et 23h UTC (publication CFTC ~20h30 UTC)
-      if (day === 5 && hour >= 20 && hour <= 23) loadCOT();
-      // Aussi refresh le samedi matin pour être sûr
-      if (day === 6 && hour >= 0 && hour <= 2) loadCOT();
-    }, 60 * 60 * 1000); // vérif toutes les heures
-    const loadMFX = async () => {
-      try {
-        // Un seul appel — login + outlook côté serveur
-        const r = await fetch("/api/myfxbook?email="+encodeURIComponent("patrice-bonneau@outlook.com")+"&password="+encodeURIComponent("Fucktoi69$")+"&t="+Date.now());
-        const d = await r.json();
-        if (d.error || !d.symbols) return;
-        const map = {};
-        d.symbols.forEach(s => { map[s.name] = s; });
-        if (Object.keys(map).length > 0) setApexRetail(map);
-      } catch(e) {}
-    };
-    loadMFX();
-    const mfxInterval = setInterval(loadMFX, 30 * 60 * 1000);
-    return () => { clearInterval(mfxInterval); clearInterval(cotInterval); };
-  }, []);
 
   useEffect(() => {
     const dataRef = ref(db, "apexdata");
@@ -1051,16 +758,8 @@ export default function App() {
     }
   }
 
-  const REGIME_RANK = { "GOLDILOCKS":3, "SURCHAUFFE":2, "RÉCESSION":-2, "STAGFLATION":-3 };
   const ranked = useMemo(() =>
-    CURR.map(c => ({...c, score:calcScore(data,c.code)})).sort((a,b)=>{
-      const rA = getRegime(data,a.code);
-      const rB = getRegime(data,b.code);
-      const rankA = rA ? (REGIME_RANK[rA.label] ?? 0) : 0;
-      const rankB = rB ? (REGIME_RANK[rB.label] ?? 0) : 0;
-      if (rankB !== rankA) return rankB - rankA;
-      return b.score - a.score;
-    })
+    CURR.map(c => ({...c, score:calcScore(data,c.code)})).sort((a,b)=>b.score-a.score)
   ,[data]);
 
   const withData = ranked.filter(c => hasData(data,c.code));
@@ -1137,7 +836,7 @@ export default function App() {
       </div>
       <div style={{ background:"#06060e", borderBottom:`1px solid ${BORDER}`, padding:"6px 16px", display:"flex", gap:12, overflowX:"auto" }}>
         {ranked.map(c => {
-          const st=getStrength(c.score, getRegime(data,c.code)), reg=getRegime(data,c.code);
+          const st=getStrength(c.score), reg=getRegime(data,c.code);
           return (
             <div key={c.code} style={{ display:"flex", flexDirection:"column", alignItems:"center", minWidth:44, gap:2 }}>
               <span style={{ fontSize:8, color:st.color, fontWeight:700, letterSpacing:1 }}>{c.code}</span>
@@ -1177,11 +876,11 @@ export default function App() {
             </thead>
             <tbody>
               {ranked.map((c,ri)=>{
-                const st=getStrength(c.score, getRegime(data,c.code)), reg=getRegime(data,c.code);
+                const st=getStrength(c.score), reg=getRegime(data,c.code);
                 return (
                   <tr key={c.code} style={{ background:ri%2===0?"#07070e":"transparent" }}>
                     <td style={{ padding:"5px 12px", border:`1px solid ${BORDER}`, fontWeight:600, whiteSpace:"nowrap", borderLeft:`3px solid ${reg?reg.color+"88":BORDER}` }}>
-                      <FlagImg code={c.code} size={18} />
+                      <span style={{ marginRight:6 }}>{c.flag}</span>
                       <span style={{ fontSize:12, letterSpacing:2, color:TEXT }}>{c.code}</span>
                       <span style={{ fontSize:8, color:TEXT_DIM, marginLeft:4 }}>#{ri+1}</span>
                     </td>
@@ -1213,12 +912,12 @@ export default function App() {
         <div style={{ padding:16 }}>
           <div style={{ fontSize:9, color:TEXT_DIM, letterSpacing:2, marginBottom:12 }}>CLASSEMENT MACRO — FORT → FAIBLE</div>
           {ranked.map((c,i)=>{
-            const st=getStrength(c.score, getRegime(data,c.code)), reg=getRegime(data,c.code);
+            const st=getStrength(c.score), reg=getRegime(data,c.code);
             const infS=calcInflationScore(data,c.code), growS=calcGrowthScore(data,c.code);
             return (
               <div key={c.code} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6, padding:"10px 14px", background:BG2, borderRadius:4, border:`1px solid ${reg?reg.border+"33":BORDER}`, borderLeft:`3px solid ${st.color}` }}>
                 <span style={{ fontSize:14, fontWeight:700, color:TEXT_DIM, minWidth:24 }}>#{i+1}</span>
-                <FlagImg code={c.code} size={20} />
+                <span style={{ fontSize:16 }}>{c.flag}</span>
                 <div style={{ minWidth:90 }}>
                   <div style={{ fontWeight:700, color:TEXT, letterSpacing:2, fontSize:12 }}>{c.code}</div>
                   {reg&&<div style={{ fontSize:8, color:reg.color }}>{reg.icon} {reg.label}</div>}
@@ -1248,7 +947,16 @@ export default function App() {
       )}
 
       {view==="trade" && (
-        <TradeApex data={data} cotData={apexCot} retailData={apexRetail} />
+        <div style={{ padding:16 }}>
+          {allPairs.length===0
+            ? <div style={{ padding:40, textAlign:"center", color:TEXT_DIM, fontSize:12, border:`1px solid ${BORDER}`, borderRadius:4 }}>Aucune divergence — entre les données dans le tableau</div>
+            : <>
+                <div style={{ fontSize:9, color:ACCENT, letterSpacing:3, fontWeight:700, marginBottom:4 }}>PAIRES HAUTE PROBABILITÉ</div>
+                <div style={{ fontSize:8, color:TEXT_DIM, marginBottom:12 }}>Trié par divergence · Setup parfait = régimes opposés</div>
+                {allPairs.map((p,idx)=><TradeCard key={idx} strong={p.strong} weak={p.weak} div={p.div} regS={p.regS} regW={p.regW} perfect={p.perfect} />)}
+              </>
+          }
+        </div>
       )}
 
       {view==="data"    && <DataView />}
@@ -1296,7 +1004,7 @@ function HeatmapView({ data }) {
             return (
               <tr key={c.code}>
                 <td style={{ padding: "8px 14px", background: BG2, borderLeft: `3px solid ${reg ? reg.color : BORDER}` }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: TEXT, fontFamily: "'IBM Plex Mono'" }}><FlagImg code={c.code} size={16} /> {c.code}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: TEXT, fontFamily: "'IBM Plex Mono'" }}>{c.flag} {c.code}</div>
                   <div style={{ fontSize: 9, color: TEXT_DIM }}>{c.bc}</div>
                 </td>
                 {INDS.map(ind => {

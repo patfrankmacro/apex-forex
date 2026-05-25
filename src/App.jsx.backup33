@@ -888,12 +888,12 @@ function TradeApex({ data, cotData, retailData }) {
               <div style={{fontSize:8,color:"#00aaff",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 1 — MACRO DIVERGENCE</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr auto 1fr",gap:6,alignItems:"center"}}>
                 <div style={{background:t.rBase.bg,borderRadius:4,padding:"6px 8px",border:"1px solid "+t.rBase.border+"55"}}>
-                  <div style={{fontSize:9,color:"#c8d4f0",fontWeight:700}}><FlagImg code={t.base} size={14} /> {t.base}</div>
+                  <div style={{fontSize:9,color:"#c8d4f0",fontWeight:700}}>{t.baseFlag} {t.base}</div>
                   <div style={{fontSize:10,color:t.rBase.color,fontWeight:700}}>{t.rBase.icon} {t.rBase.label}</div>
                 </div>
                 <div style={{fontSize:9,color:"#4a5070",textAlign:"center"}}>vs<br/><span style={{color:"#00aaff",fontWeight:700}}>+{t.macroPts}pts</span></div>
                 <div style={{background:t.rQuote.bg,borderRadius:4,padding:"6px 8px",border:"1px solid "+t.rQuote.border+"55"}}>
-                  <div style={{fontSize:9,color:"#c8d4f0",fontWeight:700}}><FlagImg code={t.quote} size={14} /> {t.quote}</div>
+                  <div style={{fontSize:9,color:"#c8d4f0",fontWeight:700}}>{t.quoteFlag} {t.quote}</div>
                   <div style={{fontSize:10,color:t.rQuote.color,fontWeight:700}}>{t.rQuote.icon} {t.rQuote.label}</div>
                 </div>
               </div>
@@ -904,7 +904,7 @@ function TradeApex({ data, cotData, retailData }) {
               <div style={{fontSize:8,color:"#94a3b8",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 2 — COT INSTITUTIONNELS</div>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <div style={{fontSize:9,color:"#94a3b8"}}>
-                  <FlagImg code={t.base} size={12} /> P{t.bPct}% &nbsp;vs&nbsp; <FlagImg code={t.quote} size={12} /> P{t.qPct}%
+                  {t.baseFlag} P{t.bPct}% &nbsp;vs&nbsp; {t.quoteFlag} P{t.qPct}%
                   <span style={{color:"#4a5070",marginLeft:6}}>spread {t.cotSpread>0?"+":""}{t.cotSpread}</span>
                 </div>
                 <div style={{fontSize:10,fontWeight:700,color:t.cotBias==="HAUSSIER"?"#4ade80":"#f87171"}}>
@@ -1181,7 +1181,7 @@ export default function App() {
                 return (
                   <tr key={c.code} style={{ background:ri%2===0?"#07070e":"transparent" }}>
                     <td style={{ padding:"5px 12px", border:`1px solid ${BORDER}`, fontWeight:600, whiteSpace:"nowrap", borderLeft:`3px solid ${reg?reg.color+"88":BORDER}` }}>
-                      <FlagImg code={c.code} size={18} />
+                      <span style={{ marginRight:6 }}>{c.flag}</span>
                       <span style={{ fontSize:12, letterSpacing:2, color:TEXT }}>{c.code}</span>
                       <span style={{ fontSize:8, color:TEXT_DIM, marginLeft:4 }}>#{ri+1}</span>
                     </td>
@@ -1218,7 +1218,7 @@ export default function App() {
             return (
               <div key={c.code} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6, padding:"10px 14px", background:BG2, borderRadius:4, border:`1px solid ${reg?reg.border+"33":BORDER}`, borderLeft:`3px solid ${st.color}` }}>
                 <span style={{ fontSize:14, fontWeight:700, color:TEXT_DIM, minWidth:24 }}>#{i+1}</span>
-                <FlagImg code={c.code} size={20} />
+                <span style={{ fontSize:16 }}>{c.flag}</span>
                 <div style={{ minWidth:90 }}>
                   <div style={{ fontWeight:700, color:TEXT, letterSpacing:2, fontSize:12 }}>{c.code}</div>
                   {reg&&<div style={{ fontSize:8, color:reg.color }}>{reg.icon} {reg.label}</div>}

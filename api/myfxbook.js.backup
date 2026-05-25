@@ -1,0 +1,13 @@
+export default async function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  const { email, password, session } = req.query;
+  let url;
+  if (session) {
+    url = `https://www.myfxbook.com/api/get-community-outlook.json?session=${encodeURIComponent(session)}`;
+  } else {
+    url = `https://www.myfxbook.com/api/login.json?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+  }
+  const r = await fetch(url);
+  const d = await r.json();
+  res.json(d);
+}
