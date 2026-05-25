@@ -252,10 +252,9 @@ function explainRegime(data, code, regime) {
      `croissance faible (Services PMI ${svcNow} en contraction)`) : "";
 
   const unempTxt = unempNow !== null ?
-    (unempNow < 4 ? `marché du travail très tendu (chômage ${unempNow}%)${unempDir}` :
-     unempNow < 5 ? `marché du travail tendu (chômage ${unempNow}%)${unempDir}` :
-     unempNow < 7 ? `chômage modéré à ${unempNow}%${unempDir}` :
-     `chômage élevé à ${unempNow}%${unempDir}`) : "";
+    (unempNow < 4 ? `marché du travail tendu (chômage ${unempNow}%)` :
+     unempNow < 5 ? `chômage stable à ${unempNow}%` :
+     `chômage élevé à ${unempNow}%`) : "";
 
   if (regime.label === "SURCHAUFFE") {
     return `Avec ${infTxt} et ${growTxt}, la ${bc} est en mode HAWKISH. ${unempTxt}. Les taux à ${rateNow}% sont maintenus hauts car l'économie résiste. → Devise FORTE sur le différentiel de taux : capitaux attirés.`;
@@ -291,9 +290,9 @@ function interpretIndicator(id, now, code) {
   }
   if (id === "unemp") {
     if (now < 4)  return "→ très bas ✓";
-    if (now < 5)  return "→ bas ✓";
-    if (now < 7)  return "→ modéré";
-    return "→ élevé ⚠";
+    if (now < 5)  return "→ stable ✓";
+    if (now < 6)  return "→ élevé";
+    return "→ très élevé ⚠";
   }
   if (id === "rate") {
     if (now >= 4) return "→ maintenue haute";
