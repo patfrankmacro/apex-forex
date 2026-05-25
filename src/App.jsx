@@ -142,7 +142,7 @@ const TE_LINKS = {
 const REGIMES = {
   GOLDILOCKS:  { label: "GOLDILOCKS",  icon: "◆", color: "#00ff88", bg: "#001a0d", border: "#00ff88", bcBias: "NEUTRE → HAWKISH modéré", tauxDir: "Stables ou légère hausse", deviseDir: "HAUSSE — croissance sans inflation = idéal", action: "Marché anticipe : BC reste pat (zone de confort) → ACHÈTE — devise stable, setup idéal · ⚠ Risque faible, surveiller chocs externes", short: "Croissance ↑  Inflation ↓" },
   SURCHAUFFE:  { label: "SURCHAUFFE",  icon: "▲", color: "#ffd700", bg: "#1a1500", border: "#ffd700", bcBias: "HAWKISH — hausse des taux imminente", tauxDir: "Hausse des taux imminente", deviseDir: "HAUSSE court terme — surveille retournement", action: "Marché anticipe : baisses repoussées (higher for longer) → ACHÈTE — devise forte sur différentiel de taux · ⚠ Risque : pic de cycle, retournement si inflation chute", short: "Croissance ↑  Inflation ↑" },
-  STAGFLATION: { label: "STAGFLATION", icon: "■", color: "#ff3b3b", bg: "#1a0000", border: "#ff3b3b", bcBias: "COINCÉE — ne peut pas agir", tauxDir: "Taux bloqués — BC prise en étau", deviseDir: "BAISSE — pire scénario macro", action: "Marché anticipe : BC piégée, ne peut ni monter ni baisser → ÉVITE le long — devise faible malgré taux hauts · ⚠ Risque : carry trade vulnérable au moindre choc", short: "Croissance ↓  Inflation ↑" },
+  STAGFLATION: { label: "STAGFLATION", icon: "■", color: "#ff3b3b", bg: "#1a0000", border: "#ff3b3b", bcBias: "COINCÉE — ne peut pas agir", tauxDir: "Taux bloqués — BC prise en étau", deviseDir: "BAISSE — pire scénario macro", action: "Marché anticipe : BC piégée, ne peut ni monter ni baisser → ÉVITE le long — devise sous pression structurelle · ⚠ Risque : carry trade vulnérable au moindre choc", short: "Croissance ↓  Inflation ↑" },
   RECESSION:   { label: "RECESSION",   icon: "▼", color: "#ff7a00", bg: "#1a0800", border: "#ff7a00", bcBias: "DOVISH — baisse des taux imminente", tauxDir: "Baisse des taux imminente", deviseDir: "BAISSE — capitaux fuient l'économie", action: "Marché anticipe : baisses de taux à venir → VENDS — devise sous pression, capitaux qui fuient · ⚠ Risque : si BC repousse baisses, rebond technique", short: "Croissance ↓  Inflation ↓" },
 };
 
@@ -176,7 +176,7 @@ function mkData() {
   return d;
 }
 
-function toN(v) { const n = parseFloat(v); return isNaN(n) ? null : n; }
+function toN(v) { if (v === null || v === undefined || v === '') return null; const n = parseFloat(String(v).replace(',', '.')); return isNaN(n) ? null : n; }
 
 function getSurprise(ind, cell) {
   if (ind.id === "rate") {
@@ -233,71 +233,131 @@ function explainRegime(data, code, regime) {
   const target = BC_TARGETS[code] || 2.0;
   const coreNow = toN(data[code]["core"].now);
   const svcNow  = toN(data[code]["svc"].now);
-  const unempNow = toN(data[code]["unemp"].now);
+  const unempNow   = toN(data[code]["unemp"].now);
+  const unempPrior = toN(data[code]["unemp"].prior);
   const rateNow = toN(data[code]["rate"].now);
   const bc = (CURR.find(c=>c.code===code)?.bc) || "BC";
+  // Direction chômage — hausse = mauvais, baisse = bon
+  const unempDir = "";
 
-  const infTxt = coreNow !== null ? 
-    (coreNow > target + 0.5 ? `inflation HAUTE (core ${coreNow}% vs target ${target}%)` :
-     coreNow > target + 0.2 ? `inflation au-dessus du target (core ${coreNow}% vs ${target}%)` :
-     coreNow < target - 0.5 ? `inflation BASSE (core ${coreNow}% sous target ${target}%)` :
-     coreNow < target - 0.2 ? `inflation sous target (core ${coreNow}% vs ${target}%)` :
-     `inflation à target (core ${coreNow}%)`) : "";
+  const coreExp = toN(data[code]["core"].exp);
+  const coreVsExp = (coreNow !== null && coreExp !== null && Math.abs(coreNow - coreExp) > 0.05)
+    ? `, vs exp ${coreExp}%` : "";
+  const coreImpact = (coreNow !== null && coreExp !== null && Math.abs(coreNow - coreExp) > 0.05)
+    ? (coreNow > coreExp
+        ? ` → pression hawkish accrue, BC forcée de garder taux hauts`
+        : ` → désinflation surprend, BC peut baisser plus tôt`)
+    : "";
+  const infTxt = coreNow !== null ?
+    (coreNow > target + 0.5 ? `inflation HAUTE (core ${coreNow}%${coreVsExp}, target ${target}%)` :
+     coreNow > target + 0.2 ? `inflation au-dessus du target (core ${coreNow}%${coreVsExp}, target ${target}%)` :
+     coreNow < target - 0.5 ? `inflation BASSE (core ${coreNow}%${coreVsExp}, target ${target}%)` :
+     coreNow < target - 0.2 ? `inflation sous target (core ${coreNow}%${coreVsExp}, target ${target}%)` :
+     `inflation à target (core ${coreNow}%${coreVsExp})`) : "";
 
+  const svcExp = toN(data[code]["svc"].exp);
+  const svcDir = (svcNow !== null && svcExp !== null && Math.abs(svcNow - svcExp) > 0.5)
+    ? `, vs exp ${svcExp}` : "";
+  const svcImpact = svcNow !== null
+    ? (svcNow < 50 && svcExp !== null && svcNow < svcExp
+        ? ` → contraction + surprise négative, récession qui s'accélère`
+        : svcNow < 50 && svcExp !== null && svcNow > svcExp
+        ? ` → contraction mais moins pire qu'attendu, léger soulagement`
+        : svcNow >= 50 && svcExp !== null && svcNow > svcExp
+        ? ` → expansion + surprise positive, économie résiste`
+        : "")
+    : "";
   const growTxt = svcNow !== null ?
-    (svcNow >= 55 ? `croissance forte (Services PMI ${svcNow})` :
-     svcNow >= 52 ? `croissance solide (Services PMI ${svcNow})` :
-     svcNow >= 50 ? `croissance stable (Services PMI ${svcNow})` :
-     svcNow >= 47 ? `croissance qui ralentit (Services PMI ${svcNow} en contraction légère)` :
-     `croissance faible (Services PMI ${svcNow} en contraction)`) : "";
+    (svcNow >= 55 ? `croissance forte (Services PMI ${svcNow}${svcDir})` :
+     svcNow >= 52 ? `croissance solide (Services PMI ${svcNow}${svcDir})` :
+     svcNow >= 50 ? `croissance stable (Services PMI ${svcNow}${svcDir})` :
+     svcNow >= 47 ? `croissance qui ralentit (Services PMI ${svcNow} en contraction légère${svcDir})` :
+     `croissance faible (Services PMI ${svcNow} en contraction${svcDir})`) : "";
 
-  const unempTxt = unempNow !== null ?
-    (unempNow < 4 ? `marché du travail très tendu (chômage ${unempNow}%)${unempDir}` :
-     unempNow < 5 ? `marché du travail tendu (chômage ${unempNow}%)${unempDir}` :
-     unempNow < 7 ? `chômage modéré à ${unempNow}%${unempDir}` :
-     `chômage élevé à ${unempNow}%${unempDir}`) : "";
+  const unempExp = toN(data[code]["unemp"].exp);
+  const unempRef = unempExp !== null ? unempExp : unempPrior;
+  const unempExp2 = toN(data[code]["unemp"].exp);
+  const unempArr = (unempNow !== null && unempExp2 !== null && Math.abs(unempNow - unempExp2) > 0.05)
+    ? (unempNow > unempExp2 ? " ↓" : " ↑") : " →";
+  const unempExpTxt = (unempExp2 !== null && unempNow !== null && Math.abs(unempNow - unempExp2) > 0.05)
+    ? ` (exp ${unempExp2}, now ${unempNow}${unempArr})` : "";
+  const unempImpact = unempNow !== null && unempExp2 !== null && Math.abs(unempNow - unempExp2) > 0.05
+    ? (unempNow > unempExp2
+        ? ` → marché du travail se détériore, pression dovish sur ${bc}`
+        : ` → marché du travail solide, soutient la devise`)
+    : "";
+  const unempTxt = unempNow !== null
+    ? `chômage ${unempNow}%${unempExpTxt}${unempImpact}`
+    : "";
 
   if (regime.label === "SURCHAUFFE") {
-    return `Avec ${infTxt} et ${growTxt}, la ${bc} est en mode HAWKISH. ${unempTxt}. Les taux à ${rateNow}% sont maintenus hauts car l'économie résiste. → Devise FORTE sur le différentiel de taux : capitaux attirés.`;
+    return `Avec ${infTxt}${coreImpact} et ${growTxt}${svcImpact}, la ${bc} est en mode HAWKISH. ${unempTxt}. Taux à ${rateNow}% maintenus hauts. → Devise FORTE sur le différentiel de taux : capitaux attirés.`;
   }
   if (regime.label === "GOLDILOCKS") {
-    return `Avec ${infTxt} et ${growTxt}, la ${bc} est dans sa ZONE DE CONFORT (pas de pression à bouger). ${unempTxt}. Taux à ${rateNow}%. → Devise haussière sans risque immédiat. Setup institutionnel idéal.`;
+    return `Avec ${infTxt}${coreImpact} et ${growTxt}${svcImpact}, la ${bc} est dans sa ZONE DE CONFORT. ${unempTxt}. Taux à ${rateNow}%. → Devise haussière sans risque immédiat. Setup institutionnel idéal.`;
   }
   if (regime.label === "STAGFLATION") {
-    return `${bc} PRISE AU PIÈGE : ${infTxt} l'empêche de baisser, mais ${growTxt} l'empêche de monter. ${unempTxt}. Taux à ${rateNow}%. → Devise FAIBLE malgré taux hauts. ⚠ Pire scénario macro.`;
+    const tauxCtx = rateNow >= 3.5 ? "malgré taux restrictifs"
+      : rateNow >= 2.0 ? "dans un contexte de taux neutres"
+      : "malgré taux accommodants";
+    return `${bc} PRISE AU PIÈGE : ${infTxt} l'empêche de baisser${coreImpact}. ${growTxt}${svcImpact} l'empêche de monter. ${unempTxt}. Taux à ${rateNow}%. → Devise FAIBLE ${tauxCtx}. ⚠ Pire scénario macro.`;
   }
   if (regime.label === "RECESSION") {
-    return `Avec ${infTxt} et ${growTxt}, la ${bc} va devoir BAISSER les taux. ${unempTxt}. Taux à ${rateNow}%. → Devise sous pression : capitaux qui fuient l'économie en ralentissement.`;
+    const recAction = rateNow <= 0.5
+      ? `la ${bc} maintient une politique très accommodante — peu de marge pour baisser davantage`
+      : rateNow <= 1.5
+      ? `la ${bc} va maintenir ou baisser légèrement les taux`
+      : `la ${bc} va devoir BAISSER les taux`;
+    return `Avec ${infTxt}${coreImpact} et ${growTxt}${svcImpact}, ${recAction}. ${unempTxt}. Taux à ${rateNow}%. → Devise sous pression : capitaux qui fuient.`;
   }
   return "";
 }
 
-function interpretIndicator(id, now, code) {
+function interpretIndicator(id, now, code, exp=null) {
   if (now === null || now === undefined) return "";
   const target = BC_TARGETS[code] || 2.0;
   if (id === "cpi" || id === "core") {
-    if (now > target + 0.5)  return "→ HAUTE";
-    if (now > target + 0.2)  return "→ AU-DESSUS";
-    if (now < target - 0.5)  return "→ BASSE";
-    if (now < target - 0.2)  return "→ SOUS TARGET";
-    return "→ À TARGET";
+    const arr = (exp !== null && Math.abs(now - exp) > 0.05)
+      ? (now > exp ? " ↑" : " ↓") : " →";
+    const expTxt = exp !== null
+      ? ` (target ${target}%, exp ${exp}, now ${now}${arr})`
+      : ` (target ${target}%)`;
+    if (now > target + 0.5)  return `→ HAUTE${expTxt}`;
+    if (now > target + 0.2)  return `→ AU-DESSUS${expTxt}`;
+    if (now < target - 0.5)  return `→ BASSE${expTxt}`;
+    if (now < target - 0.2)  return `→ SOUS TARGET${expTxt}`;
+    return `→ À TARGET${expTxt}`;
   }
   if (id === "svc" || id === "mfg") {
-    if (now >= 55) return "→ expansion forte ✓";
-    if (now >= 52) return "→ expansion ✓";
-    if (now >= 50) return "→ stable au seuil";
-    if (now >= 47) return "→ contraction légère";
-    return "→ contraction ✗";
+    const seuil = now >= 50 ? "au-dessus 50 ✅" : "sous 50 ⚠";
+    const arr = (exp !== null && Math.abs(now - exp) > 0.5)
+      ? (now > exp ? " ↑" : " ↓") : " →";
+    const expTxt = exp !== null ? ` (exp ${exp}, now ${now}${arr}, ${seuil})` : ` (${seuil})`;
+    if (now >= 55) return `→ expansion forte ✓${expTxt}`;
+    if (now >= 52) return `→ expansion ✓${expTxt}`;
+    if (now >= 50) return `→ stable au seuil${expTxt}`;
+    if (now >= 47) return `→ contraction légère${expTxt}`;
+    return `→ contraction ✗${expTxt}`;
   }
   if (id === "unemp") {
-    if (now < 4)  return "→ très bas ✓";
-    if (now < 5)  return "→ bas ✓";
-    if (now < 7)  return "→ modéré";
-    return "→ élevé ⚠";
+    const arr = (exp !== null && Math.abs(now - exp) > 0.05) ? (now > exp ? " ↓" : " ↑") : " →";
+    const expTxt = (exp !== null && Math.abs(now - exp) > 0.05) ? ` (exp ${exp}, now ${now}${arr})` : "";
+    if (now > exp + 0.05) return `→ en hausse ⚠${expTxt}`;
+    if (now < exp - 0.05) return `→ en baisse ✓${expTxt}`;
+    return "→ stable";
   }
   if (id === "rate") {
-    if (now >= 4) return "→ maintenue haute";
-    if (now >= 2) return "→ niveau neutre";
+    const arr = (exp !== null && Math.abs(now - exp) > 0.05)
+      ? (now > exp ? " ↑" : " ↓") : " →";
+    const expTxt = exp !== null && Math.abs(now - exp) > 0.05
+      ? ` (exp ${exp}, now ${now}${arr})` : "";
+    const neutral = { USD:2.5, EUR:2.0, GBP:2.5, CHF:0.5, CAD:2.5, JPY:0.5, AUD:2.5, NZD:2.5, CNY:3.0 };
+    const r = neutral[code] || 2.5;
+    if (now >= r + 1.5) return `→ très restrictive${expTxt}`;
+    if (now >= r + 0.5) return `→ restrictive${expTxt}`;
+    if (now >= r - 0.5) return `→ neutre${expTxt}`;
+    if (now >= r - 1.5) return `→ accommodante${expTxt}`;
+    return `→ très accommodante${expTxt}`;
     if (now > 0)  return "→ accommodante";
     return "→ ultra-basse";
   }
@@ -480,8 +540,8 @@ function RegimeCard({ curr, data }) {
                 <div key={id} style={{ display:"flex", gap:8, marginBottom:6, padding:"6px 8px", background:BG2, borderRadius:2, borderLeft:`2px solid ${col}55` }}>
                   <div style={{ flex:1 }}>
                     <span style={{ color:TEXT, fontWeight:600, fontSize:10 }}>{ind.label}: {now}{ind.unit}</span>
-                    <span style={{ color:col, fontSize:10, fontWeight:600, marginLeft:6 }}>{interpretIndicator(id, now, curr.code)}</span>
-                    {exp!==null&&<span style={{ color:TEXT_DIM, fontSize:8, marginLeft:6 }}>(target {(BC_TARGETS[curr.code]||2.0)}%)</span>}
+                    <span style={{ color:col, fontSize:10, fontWeight:600, marginLeft:6 }}>{interpretIndicator(id, now, curr.code, curr.code && data[curr.code] && data[curr.code][id] ? toN(data[curr.code][id].exp) : null)}</span>
+
                   </div>
                 </div>
               );
@@ -500,7 +560,7 @@ function RegimeCard({ curr, data }) {
                 <div key={id} style={{ display:"flex", gap:8, marginBottom:6, padding:"6px 8px", background:BG2, borderRadius:2, borderLeft:`2px solid ${col}55` }}>
                   <div style={{ flex:1 }}>
                     <span style={{ color:TEXT, fontWeight:600, fontSize:10 }}>{ind.label}: {now}{ind.unit}</span>
-                    <span style={{ color:col, fontSize:10, fontWeight:600, marginLeft:6 }}>{interpretIndicator(id, now, curr.code)}</span>
+                    <span style={{ color:col, fontSize:10, fontWeight:600, marginLeft:6 }}>{interpretIndicator(id, now, curr.code, curr.code && data[curr.code] && data[curr.code][id] ? toN(data[curr.code][id].exp) : null)}</span>
                     {id==="rate"&&prior!==null&&prior!==now&&<span style={{ color:TEXT_DIM, fontSize:8, marginLeft:6 }}>(préc:{prior}%)</span>}
                   </div>
                 </div>
