@@ -833,162 +833,257 @@ function GuideView() {
         </div>
       </div>
 
-      {/* ========== GESTION DE RISQUE — SCALING ========== */}
-      <div style={{ background:BG2, border:"1px solid #00aaff44", borderRadius:4, padding:14, marginBottom:10 }}>
-        <div style={{ fontSize:9, letterSpacing:3, color:"#00aaff", fontWeight:700, marginBottom:14, borderBottom:"1px solid #00aaff22", paddingBottom:8 }}>
-          💰 GESTION DE RISQUE — APPROCHE INSTITUTIONNELLE
+      {/* ========== GESTION DE RISQUE — SWING TRADER ========== */}
+      <div style={{ background:BG2, border:"1px solid #00ff8844", borderRadius:4, padding:14, marginBottom:10 }}>
+        <div style={{ fontSize:9, letterSpacing:3, color:"#00ff88", fontWeight:700, marginBottom:14, borderBottom:"1px solid #00ff8822", paddingBottom:8 }}>
+          💰 GESTION DE RISQUE — SWING TRADER
         </div>
 
-        {/* Règle 1% */}
-        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, border:"1px solid #00ff8822", borderLeft:"3px solid #00ff88" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#00ff88", marginBottom:6 }}>RÈGLE #1 — 1% PAR TRADE</div>
-          <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8 }}>
-            Ne jamais risquer plus de <span style={{color:"#00ff88",fontWeight:700}}>1% du capital</span> par trade.<br/>
-            Sur $10,000 → risque max = $100 par position.<br/>
-            <span style={{color:"#4a5070"}}>10 pertes consécutives = -9.6% seulement. Survivable.</span>
+        {/* LE PRINCIPE */}
+        <div style={{ marginBottom:14, padding:14, background:"#001a0d", borderRadius:4, border:"2px solid #00ff8866" }}>
+          <div style={{ fontSize:10, color:"#00ff88", fontWeight:700, marginBottom:8, letterSpacing:2 }}>⚡ LE PRINCIPE</div>
+          <div style={{ fontSize:11, color:TEXT, lineHeight:1.8 }}>
+            <span style={{color:"#00ff88",fontWeight:700}}>Ton job n'est pas de gagner de l'argent.</span><br/>
+            <span style={{color:"#00ff88",fontWeight:700}}>C'est de rester dans le jeu assez longtemps pour que ton edge fonctionne.</span>
           </div>
-          <div style={{ marginTop:8, padding:"6px 10px", background:"#00ff8811", borderRadius:3, fontSize:9, color:"#00ff88" }}>
-            📐 Taille = (Capital × 1%) ÷ (Stop en pips × Valeur pip)
-          </div>
-        </div>
-
-        {/* Budget journalier */}
-        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, border:"1px solid #ffd70022", borderLeft:"3px solid #ffd700" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#ffd700", marginBottom:6 }}>RÈGLE #2 — BUDGET JOURNALIER 3%</div>
-          <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8 }}>
-            Stop trading si pertes journalières atteignent <span style={{color:"#ffd700",fontWeight:700}}>3% du capital</span>.<br/>
-            Sur $10,000 → max -$300/jour avant d'arrêter.<br/>
-            <span style={{color:"#4a5070"}}>Pas de revenge trading. Ferme le terminal. Reviens demain.</span>
-          </div>
-          <div style={{ marginTop:6, display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:6 }}>
-            {[["CONSERVATEUR","0.5%","1.5%"],["STANDARD","1%","3%"],["CONFIRMÉ","2%","5%"]].map(([n,t,j])=>(
-              <div key={n} style={{ padding:"6px 8px", background:"#ffd70011", borderRadius:3, textAlign:"center" }}>
-                <div style={{ fontSize:8, color:"#ffd700", fontWeight:700 }}>{n}</div>
-                <div style={{ fontSize:9, color:TEXT_DIM, marginTop:2 }}>Trade: {t}</div>
-                <div style={{ fontSize:9, color:TEXT_DIM }}>Jour: {j}</div>
-              </div>
-            ))}
+          <div style={{ marginTop:8, fontSize:9, color:TEXT_DIM, lineHeight:1.6 }}>
+            70-80% des traders retail perdent. Pas parce qu'ils sont mauvais — parce qu'ils risquent trop par trade et explosent avant que la statistique joue en leur faveur.
           </div>
         </div>
 
-        {/* Circuit breaker */}
-        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, border:"1px solid #ff444422", borderLeft:"3px solid #ff4444" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#ff4444", marginBottom:6 }}>RÈGLE #3 — CIRCUIT BREAKER 10%</div>
-          <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8 }}>
-            Si le compte baisse de <span style={{color:"#ff4444",fontWeight:700}}>10% depuis le départ</span> → pause totale.<br/>
-            Analyse chaque trade perdant. Identifie le problème.<br/>
-            <span style={{color:"#4a5070"}}>Ne reprends que quand tu sais POURQUOI tu as perdu.</span>
+        {/* RÈGLE 1% */}
+        <div style={{ marginBottom:12, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #00ff88" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#00ff88", marginBottom:8 }}>1️⃣ RISQUE 1-2% PAR TRADE</div>
+          
+          <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:8 }}>
+            Sur $10,000 → tu risques <span style={{color:"#00ff88",fontWeight:700}}>$100 max par trade</span> (1%).<br/>
+            Swing trader expérimenté peut monter jusqu'à <span style={{color:"#00ff88"}}>2% ($200)</span>.
           </div>
-          <div style={{ marginTop:8 }}>
-            {[["−10%","Arrêt + review obligatoire"],["−20%","Arrêt + retour démo 2 semaines"],["−30%","Danger — pertes asymétriques → +43% pour récupérer"],["−50%","Catastrophe — need +100% pour revenir"]].map(([pct,msg])=>(
-              <div key={pct} style={{ display:"flex", gap:10, marginBottom:4, padding:"4px 8px", background:"#ff444411", borderRadius:3 }}>
-                <div style={{ fontSize:9, fontWeight:700, color:"#ff4444", minWidth:40 }}>{pct}</div>
-                <div style={{ fontSize:9, color:TEXT_DIM }}>{msg}</div>
-              </div>
-            ))}
+
+          <div style={{ padding:10, background:"#00ff8811", borderRadius:3, marginBottom:8 }}>
+            <div style={{ fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:6 }}>POURQUOI 1% ?</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              Tu vas perdre 10 trades de suite un jour. Statistique normale.<br/>
+              <span style={{color:"#00ff88"}}>À 1%</span> → tu perds 9.6%. Tu continues à trader.<br/>
+              <span style={{color:"#ff6666"}}>À 5%</span> → tu perds 40%. Il te faut +67% pour revenir.<br/>
+              <span style={{color:"#ff4444"}}>À 10%</span> → tu perds 65%. Game over.
+            </div>
+          </div>
+
+          <div style={{ padding:"8px 10px", background:"#0a0a14", borderRadius:3, border:"1px dashed #00ff8844" }}>
+            <div style={{ fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:4 }}>📐 CALCULER TA TAILLE</div>
+            <div style={{ fontSize:10, color:TEXT, fontFamily:"monospace", marginBottom:4 }}>
+              Lots = $Risque ÷ (Stop pips × $/pip)
+            </div>
+            <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.6 }}>
+              Ex : $100 risque, stop 50 pips, EUR/USD<br/>
+              → $100 ÷ (50 × $10) = <span style={{color:"#00ff88"}}>0.20 lots</span>
+            </div>
           </div>
         </div>
 
-        {/* Scaling Up — Pyramiding */}
-        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, border:"1px solid #00aaff22", borderLeft:"3px solid #00aaff" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#00aaff", marginBottom:6 }}>📈 SCALING UP — PYRAMIDING INSTITUTIONNEL</div>
-          <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8, marginBottom:8 }}>
-            Ajouter à une position <span style={{color:"#00aaff",fontWeight:700}}>déjà gagnante</span>. Jamais sur une position perdante.<br/>
-            Taille décroissante : chaque ajout est plus petit que le précédent.<br/>
-            <span style={{color:"#4a5070"}}>Structure institutionnelle : ton meilleur prix porte la plus grosse position.</span>
+        {/* LE STOP D'ABORD */}
+        <div style={{ marginBottom:12, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #ffd700" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#ffd700", marginBottom:8 }}>2️⃣ LE STOP D'ABORD, LA TAILLE APRÈS</div>
+          
+          <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:8 }}>
+            <span style={{color:"#ff4444",fontWeight:700}}>❌ ERREUR :</span> "Je veux trader 1 lot, mon stop est où ça rentre"<br/>
+            <span style={{color:"#00ff88",fontWeight:700}}>✅ BON :</span> "Mon stop est sous le support, donc ma taille est X"
           </div>
-          <div style={{ marginBottom:8 }}>
-            {[
-              ["ENTRÉE #1","Pleine taille (ex: 0.10 lots)","Stop structurel sous le niveau","Capital à risque: 1%"],
-              ["AJOUT #2","Taille réduite (ex: 0.07 lots)","Déplace stop à l'entrée #1 (breakeven)","Capital à risque: 0.7%"],
-              ["AJOUT #3","Petite taille (ex: 0.03 lots)","Déplace stop à l'ajout #2","Capital à risque: 0.3%"],
-            ].map(([step,size,stop,risk])=>(
-              <div key={step} style={{ marginBottom:6, padding:"8px 10px", background:"#00aaff0d", borderRadius:3, borderLeft:"2px solid #00aaff44" }}>
-                <div style={{ fontSize:10, fontWeight:700, color:"#00aaff", marginBottom:3 }}>{step} — {size}</div>
-                <div style={{ fontSize:8, color:TEXT_DIM }}>Stop: {stop}</div>
-                <div style={{ fontSize:8, color:"#4a5070" }}>{risk}</div>
-              </div>
-            ))}
-          </div>
-          <div style={{ padding:"6px 10px", background:"#00aaff11", borderRadius:3, fontSize:9, color:"#00aaff" }}>
-            ⚠ Uniquement en <span style={{fontWeight:700}}>marché tendanciel</span> confirmé. Jamais en range ou avant news.
+
+          <div style={{ padding:10, background:"#ffd70011", borderRadius:3 }}>
+            <div style={{ fontSize:9, color:"#ffd700", fontWeight:700, marginBottom:6 }}>OÙ PLACER LE STOP</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              <span style={{color:"#ffd700"}}>LONG :</span> Sous le swing low ou le support structurel<br/>
+              <span style={{color:"#ffd700"}}>SHORT :</span> Au-dessus du swing high ou de la résistance<br/>
+              <span style={{color:"#ffd700"}}>BUFFER :</span> Ajoute 0.5× ATR pour absorber le bruit<br/>
+              <br/>
+              <span style={{color:"#ff6666",fontWeight:700}}>JAMAIS</span> sur un chiffre rond (1.3000) — tout le monde a son stop là, le marché vient le chercher.
+            </div>
           </div>
         </div>
 
-        {/* Scale-Out */}
-        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, border:"1px solid #a78bfa22", borderLeft:"3px solid #a78bfa" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#a78bfa", marginBottom:6 }}>📉 SCALE-OUT — SÉCURISER EN SWING</div>
-          <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8, marginBottom:8 }}>
-            Fermer des portions à des niveaux techniques. Laisser un <span style={{color:"#a78bfa",fontWeight:700}}>runner</span> courir.<br/>
-            <span style={{color:"#4a5070"}}>Décider du plan AVANT d'entrer. Jamais sous émotion.</span>
+        {/* R:R */}
+        <div style={{ marginBottom:12, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #a78bfa" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#a78bfa", marginBottom:8 }}>3️⃣ R:R MINIMUM 2:1 EN SWING</div>
+          
+          <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:8 }}>
+            Si tu risques 50 pips → target minimum <span style={{color:"#a78bfa",fontWeight:700}}>100 pips</span>.<br/>
+            Idéal en swing : <span style={{color:"#a78bfa",fontWeight:700}}>2:1 à 3:1</span>.
           </div>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginBottom:8 }}>
-            {[
-              ["50/50","Ferme 50% au 1er niveau — Runner avec stop breakeven","Débutant"],
-              ["TIERS","Ferme 1/3 · 1/3 · runner — Sur 3 niveaux techniques","Intermédiaire"],
-              ["PARTIEL LARGE","Ferme 75% tôt — Petit runner pour l'extension","Prudent"],
-              ["RUNNER LONG","Ferme 25% tôt — Gros runner pour la tendance","Tendanciel"],
-            ].map(([name,desc,level])=>(
-              <div key={name} style={{ padding:"8px 10px", background:"#a78bfa0d", borderRadius:3 }}>
-                <div style={{ fontSize:10, fontWeight:700, color:"#a78bfa" }}>{name}</div>
-                <div style={{ fontSize:8, color:TEXT_DIM, marginTop:3 }}>{desc}</div>
-                <div style={{ fontSize:8, color:"#4a5070", marginTop:2 }}>{level}</div>
-              </div>
-            ))}
-          </div>
-          <div style={{ padding:"6px 10px", background:"#a78bfa11", borderRadius:3, fontSize:9, color:"#a78bfa" }}>
-            💡 "Risk-free" après breakeven = vrai sur le cash, mais le runner peut donner back 100 pips d'unrealized P&L. Ce n'est pas gratuit.
+
+          <div style={{ padding:10, background:"#a78bfa11", borderRadius:3 }}>
+            <div style={{ fontSize:9, color:"#a78bfa", fontWeight:700, marginBottom:6 }}>LA LOGIQUE</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              <span style={{color:"#a78bfa"}}>R:R 2:1</span> → tu peux perdre 60% du temps et rester rentable<br/>
+              <span style={{color:"#a78bfa"}}>R:R 3:1</span> → win rate de 30-40% suffit<br/>
+              <span style={{color:"#ff6666"}}>R:R 1:1</span> → il te faut {">"}50% de win rate juste pour break-even<br/>
+              <br/>
+              <span style={{color:"#a78bfa",fontWeight:700}}>Le swing trader gagne par la taille des wins, pas la fréquence.</span>
+            </div>
           </div>
         </div>
 
-        {/* ATR Sizing */}
-        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, border:"1px solid #f9731622", borderLeft:"3px solid #f97316" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#f97316", marginBottom:6 }}>📊 SIZING PAR ATR — SWING TRADER</div>
-          <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8, marginBottom:8 }}>
-            Le stop doit s'adapter à la volatilité réelle de la paire, pas à un chiffre fixe.<br/>
-            <span style={{color:"#f97316",fontWeight:700}}>ATR(14) sur ton timeframe</span> = mesure du bruit normal.
+        {/* TRAILING STOP */}
+        <div style={{ marginBottom:12, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #00aaff" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#00aaff", marginBottom:8 }}>4️⃣ TRAILING STOP — PROTÉGER LES GAINS</div>
+          
+          <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:8 }}>
+            Le stop monte (LONG) ou descend (SHORT) avec le prix.<br/>
+            <span style={{color:"#ff4444",fontWeight:700}}>Jamais l'inverse</span> — pas de "give room" à un loser.
           </div>
-          <div style={{ marginBottom:6 }}>
-            {[
-              ["Stop initial","Bas du wick structurel − (0.5 × ATR)","Sous le niveau, hors du bruit"],
-              ["Ajout #2","Entrée + 1× ATR","Confirmation de momentum"],
-              ["Ajout #3","Ajout #2 + 1× ATR","Tendance confirmée"],
-              ["Scale-out #1","Entrée + 1× ATR","Premier profit partiel"],
-              ["Runner target","Entrée + 2-3× ATR","Objectif tendanciel"],
-            ].map(([step,formula,desc])=>(
-              <div key={step} style={{ display:"flex", gap:8, marginBottom:5, padding:"5px 8px", background:"#f9731611", borderRadius:3 }}>
-                <div style={{ fontSize:9, fontWeight:700, color:"#f97316", minWidth:90 }}>{step}</div>
-                <div style={{ fontSize:8, color:"#e2e8f0", flex:1 }}>{formula}</div>
-                <div style={{ fontSize:8, color:"#4a5070" }}>{desc}</div>
-              </div>
-            ))}
+
+          <div style={{ marginBottom:8, padding:10, background:"#00aaff11", borderRadius:3 }}>
+            <div style={{ fontSize:9, color:"#00aaff", fontWeight:700, marginBottom:6 }}>MÉTHODE STRUCTURELLE (recommandée)</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              À chaque nouveau swing low qui se forme (en LONG) → remonte le stop juste en dessous.<br/>
+              Le marché te dit où mettre le stop. Tu ne devines pas.
+            </div>
+          </div>
+
+          <div style={{ padding:10, background:"#00aaff11", borderRadius:3 }}>
+            <div style={{ fontSize:9, color:"#00aaff", fontWeight:700, marginBottom:6 }}>MÉTHODE ATR (Chandelier Exit)</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              Stop = Plus haut atteint − (3 × ATR)<br/>
+              Sur TradingView : indicateur "Chandelier Exit" intégré.<br/>
+              <span style={{color:"#00aaff"}}>Settings swing : 22 périodes, multiplicateur 3.0</span>
+            </div>
           </div>
         </div>
 
-        {/* Checklist */}
-        <div style={{ padding:12, background:BG, borderRadius:3, border:"1px solid #00ff8822", borderLeft:"3px solid #00ff88" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#00ff88", marginBottom:8 }}>✅ CHECKLIST AVANT CHAQUE TRADE</div>
+        {/* BREAKEVEN — LE VRAI COÛT */}
+        <div style={{ marginBottom:12, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #ffd700" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#ffd700", marginBottom:8 }}>5️⃣ STOP AU BREAKEVEN — PAS SI "GRATUIT"</div>
+          
+          <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:8 }}>
+            Quand le trade est à <span style={{color:"#ffd700"}}>+1R en profit</span> (= ton risque atteint en gain), tu peux déplacer le stop à l'entrée.
+          </div>
+
+          <div style={{ padding:10, background:"#1a1500", borderRadius:3, border:"1px solid #ffd70044" }}>
+            <div style={{ fontSize:9, color:"#ffd700", fontWeight:700, marginBottom:6 }}>⚠ LE MYTHE DU "RISK-FREE TRADE"</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              Si tu as +100 pips d'unrealized et le prix revient à ton entrée → <span style={{color:"#ff6666"}}>tu donnes 100 pips back</span>.<br/>
+              C'est une <span style={{color:"#ff6666",fontWeight:700}}>perte d'opportunité réelle</span>, même si pas en cash.<br/>
+              <br/>
+              <span style={{color:"#ffd700"}}>Tu achètes de la tranquillité d'esprit, pas un trade gratuit.</span><br/>
+              Si ça t'aide à tenir la position sans paniquer → ça en vaut le coût.
+            </div>
+          </div>
+        </div>
+
+        {/* SCALE-OUT */}
+        <div style={{ marginBottom:12, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #4ade80" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#4ade80", marginBottom:8 }}>6️⃣ SCALE-OUT 50/50 — LE COMPROMIS SWING</div>
+          
+          <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:8 }}>
+            À <span style={{color:"#4ade80"}}>+1R de profit</span> → ferme 50% de la position.<br/>
+            Déplace le stop des 50% restants au <span style={{color:"#4ade80"}}>breakeven</span>.<br/>
+            Laisse courir le runner avec trailing stop structural.
+          </div>
+
+          <div style={{ padding:10, background:"#4ade8011", borderRadius:3, marginBottom:8 }}>
+            <div style={{ fontSize:9, color:"#4ade80", fontWeight:700, marginBottom:6 }}>EXEMPLE CONCRET</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              Tu shortes EUR/USD à 1.1700 — Stop 1.1800 — Target 1.1400<br/>
+              0.20 lots, risque $100<br/>
+              <br/>
+              Prix à 1.1600 (+100 pips, +1R) :<br/>
+              → Ferme 0.10 lots = <span style={{color:"#4ade80"}}>+$50 sécurisé</span><br/>
+              → Stop du runner remonte à 1.1700 (breakeven)<br/>
+              → Laisse courir vers 1.1400<br/>
+              <br/>
+              Si ça touche 1.1400 → <span style={{color:"#4ade80"}}>+$50 + $150 = $200 total</span>
+            </div>
+          </div>
+
+          <div style={{ padding:"8px 10px", background:"#0a0a14", borderRadius:3 }}>
+            <div style={{ fontSize:9, color:"#4ade80", fontWeight:700, marginBottom:4 }}>LE COÛT (sois honnête)</div>
+            <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.6 }}>
+              Si le trade va jusqu'au target initial avec full position → tu aurais fait $300.<br/>
+              Avec scale-out 50/50 → tu fais $200.<br/>
+              <span style={{color:"#4ade80"}}>Tu sacrifies $100 de upside pour réduire le risque de give-back.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* PYRAMIDING */}
+        <div style={{ marginBottom:12, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #f97316" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#f97316", marginBottom:8 }}>7️⃣ PYRAMIDING — AJOUTER AUX WINNERS</div>
+          
+          <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:8 }}>
+            Ajouter à une position <span style={{color:"#00ff88",fontWeight:700}}>déjà en profit</span> dans une tendance forte.<br/>
+            <span style={{color:"#ff4444",fontWeight:700}}>JAMAIS</span> ajouter à un loser (= averaging down = mort).
+          </div>
+
+          <div style={{ padding:10, background:"#f9731611", borderRadius:3, marginBottom:8 }}>
+            <div style={{ fontSize:9, color:"#f97316", fontWeight:700, marginBottom:6 }}>RÈGLE D'OR : TAILLE DÉCROISSANTE</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              <span style={{color:"#f97316"}}>Entrée #1 :</span> 100% taille (ex: 0.10 lots) — meilleur prix<br/>
+              <span style={{color:"#f97316"}}>Ajout #2 :</span> 70% (ex: 0.07 lots) — après cassure swing high<br/>
+              <span style={{color:"#f97316"}}>Ajout #3 :</span> 30% (ex: 0.03 lots) — après confirmation<br/>
+              <br/>
+              À chaque ajout : <span style={{color:"#f97316",fontWeight:700}}>remonte le stop de TOUTE la position</span>.
+            </div>
+          </div>
+
+          <div style={{ padding:"8px 10px", background:"#1a0a00", borderRadius:3, border:"1px solid #f9731644" }}>
+            <div style={{ fontSize:9, color:"#f97316", fontWeight:700, marginBottom:4 }}>⚠ CONDITIONS OBLIGATOIRES</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              ✓ Marché en <span style={{color:"#f97316"}}>tendance claire</span><br/>
+              ✓ Position déjà <span style={{color:"#f97316"}}>en profit</span><br/>
+              ✓ Niveaux d'ajout <span style={{color:"#f97316"}}>planifiés AVANT</span> d'entrer<br/>
+              ✓ Risque combiné reste <span style={{color:"#f97316"}}>{"<"} 2% du compte</span>
+            </div>
+          </div>
+        </div>
+
+        {/* CIRCUIT BREAKER */}
+        <div style={{ marginBottom:12, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #ff6666" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#ff6666", marginBottom:8 }}>8️⃣ CIRCUIT BREAKER — PROTÉGER LE COMPTE</div>
+          
+          <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:8 }}>
+            Si le compte perd <span style={{color:"#ff6666",fontWeight:700}}>10-15% depuis le pic</span> → pause totale.<br/>
+            Analyse chaque perte. Identifie le problème. Reviens seulement quand tu sais POURQUOI.
+          </div>
+
+          <div style={{ padding:10, background:"#1a0000", borderRadius:3, border:"1px solid #ff666644" }}>
+            <div style={{ fontSize:9, color:"#ff6666", fontWeight:700, marginBottom:6 }}>📉 LES MATHS DE LA RÉCUPÉRATION</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8, fontFamily:"monospace" }}>
+              −10% → besoin de <span style={{color:"#4ade80"}}>+11%</span> ✓ facile<br/>
+              −20% → besoin de <span style={{color:"#ffd700"}}>+25%</span> — difficile<br/>
+              −30% → besoin de <span style={{color:"#ff9966"}}>+43%</span> — très difficile<br/>
+              −50% → besoin de <span style={{color:"#ff6666"}}>+100%</span> — il faut DOUBLER<br/>
+              −80% → besoin de <span style={{color:"#ff4444"}}>+400%</span> — game over
+            </div>
+            <div style={{ fontSize:8, color:TEXT_DIM, marginTop:8, fontStyle:"italic" }}>
+              Plus le trou est profond, plus la sortie est exponentiellement difficile.
+            </div>
+          </div>
+        </div>
+
+        {/* CHECKLIST */}
+        <div style={{ padding:12, background:BG, borderRadius:3, border:"2px solid #00ff8866", borderLeft:"4px solid #00ff88" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#00ff88", marginBottom:10, letterSpacing:1 }}>✅ CHECKLIST AVANT CHAQUE TRADE</div>
           {[
-            ["Stop structurel identifié","Niveau technique réel, pas un chiffre rond"],
-            ["Taille calculée","(Capital × 1%) ÷ (Stop pips × Valeur pip)"],
-            ["R:R vérifié","Minimum 1.5:1 pour un swing trade"],
-            ["Budget journalier OK","Pas encore atteint 3% de pertes aujourd'hui"],
-            ["Plan de scaling écrit","Niveaux d'ajout ET de sortie définis à l'avance"],
-            ["Pas de news haute impact","Calendrier économique vérifié"],
-            ["Pas d'averaging down","Si le trade perd → stop. Pas d'ajout émotionnel"],
-          ].map(([check,detail])=>(
-            <div key={check} style={{ display:"flex", gap:8, marginBottom:6, padding:"5px 8px", background:"#00ff8808", borderRadius:3 }}>
-              <div style={{ fontSize:9, color:"#00ff88" }}>☐</div>
+            ["Stop placé sur niveau structurel","Swing low/high, support/résistance — pas un chiffre rond"],
+            ["Taille calculée à partir du stop","Lots = Risque ÷ (Stop pips × $/pip)"],
+            ["R:R minimum 2:1 vérifié","Target au moins 2× la distance du stop"],
+            ["Plan de gestion écrit","Trailing, scale-out, ou pyramiding — décidé AVANT"],
+            ["Pas de news haute impact imminente","Calendrier économique vérifié"],
+            ["Pas plus de 2% risque total","Toutes positions ouvertes combinées"],
+            ["Si trade perd → stop honoré","Pas de revanche, pas de give it room"],
+          ].map(([check,detail],i)=>(
+            <div key={i} style={{ display:"flex", gap:8, marginBottom:6, padding:"6px 8px", background:"#00ff8808", borderRadius:3 }}>
+              <div style={{ fontSize:10, color:"#00ff88" }}>☐</div>
               <div>
                 <div style={{ fontSize:9, fontWeight:700, color:TEXT }}>{check}</div>
-                <div style={{ fontSize:8, color:"#4a5070" }}>{detail}</div>
+                <div style={{ fontSize:8, color:"#4a5070", marginTop:1 }}>{detail}</div>
               </div>
             </div>
           ))}
         </div>
 
-      </div>
-    </div>
+      </div>    </div>
   );
 }
 
@@ -1547,7 +1642,7 @@ export default function App() {
 
   const TABS = [
     {id:"table",label:"TABLEAU"},{id:"rank",label:"RANG"},
-    {id:"regimes",label:"RÉGIMES"},{id:"tradecot",label:"TRADE COT"},{id:"trade",label:"COT + RETAIL"},
+    {id:"regimes",label:"RÉGIMES"},{id:"tradecot",label:"TRADE COT"},{id:"trade",label:"TRADE COT+RETAIL"},
     {id:"data",label:"DONNÉES ↗"},{id:"guide",label:"GUIDE"},{id:"heat",label:"HEATMAP"},{id:"sentiment",label:"SENTIMENT"},{id:"cal",label:"RESSOURCES"},
   ];
 
