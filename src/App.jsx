@@ -856,7 +856,7 @@ function GuideView() {
           <div style={{ fontSize:11, fontWeight:700, color:"#00ff88", marginBottom:8 }}>1️⃣ RISQUE 1% PAR TRADE — MAX</div>
           
           <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:8 }}>
-            Sur $10,000 → tu risques <span style={{color:"#00ff88",fontWeight:700}}>$100 max par trade</span> (1%).<br/>
+            Sur $100,000 → tu risques <span style={{color:"#00ff88",fontWeight:700}}>$1,000 max par trade</span> (1%).<br/>
             <span style={{color:"#ff6666"}}>Jamais plus.</span> Pas même 1.5%. Pas même "juste cette fois".
           </div>
 
@@ -876,8 +876,11 @@ function GuideView() {
               Lots = $Risque ÷ (Stop pips × $/pip)
             </div>
             <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.6 }}>
-              Ex : $100 risque, stop 50 pips, EUR/USD<br/>
-              → $100 ÷ (50 × $10) = <span style={{color:"#00ff88"}}>0.20 lots</span>
+              Ex : $1,000 risque, stop 50 pips, EUR/USD<br/>
+              → $1,000 ÷ (50 × $10) = <span style={{color:"#00ff88"}}>2.0 lots standards</span><br/>
+              <br/>
+              Stop 100 pips → $1,000 ÷ $1,000 = <span style={{color:"#00ff88"}}>1.0 lot</span><br/>
+              Stop 30 pips → $1,000 ÷ $300 = <span style={{color:"#00ff88"}}>3.3 lots</span>
             </div>
           </div>
         </div>
@@ -985,23 +988,23 @@ function GuideView() {
             <div style={{ fontSize:9, color:"#4ade80", fontWeight:700, marginBottom:6 }}>EXEMPLE CONCRET</div>
             <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
               Tu shortes EUR/USD à 1.1700 — Stop 1.1800 — Target 1.1400<br/>
-              0.20 lots, risque $100<br/>
+              2.0 lots standards, risque $1,000<br/>
               <br/>
               Prix à 1.1600 (+100 pips, +1R) :<br/>
-              → Ferme 0.10 lots = <span style={{color:"#4ade80"}}>+$50 sécurisé</span><br/>
-              → Stop du runner remonte à 1.1700 (breakeven)<br/>
+              → Ferme 1.0 lot = <span style={{color:"#4ade80"}}>+$1,000 sécurisé</span><br/>
+              → Stop du runner (1.0 lot) remonte à 1.1700 (breakeven)<br/>
               → Laisse courir vers 1.1400<br/>
               <br/>
-              Si ça touche 1.1400 → <span style={{color:"#4ade80"}}>+$50 + $150 = $200 total</span>
+              Si ça touche 1.1400 → <span style={{color:"#4ade80"}}>+$1,000 + $3,000 = $4,000 total</span>
             </div>
           </div>
 
           <div style={{ padding:"8px 10px", background:"#0a0a14", borderRadius:3 }}>
             <div style={{ fontSize:9, color:"#4ade80", fontWeight:700, marginBottom:4 }}>LE COÛT (sois honnête)</div>
             <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.6 }}>
-              Si le trade va jusqu'au target initial avec full position → tu aurais fait $300.<br/>
-              Avec scale-out 50/50 → tu fais $200.<br/>
-              <span style={{color:"#4ade80"}}>Tu sacrifies $100 de upside pour réduire le risque de give-back.</span>
+              Si full position jusqu'au target → tu aurais fait $6,000.<br/>
+              Avec scale-out 50/50 → tu fais $4,000.<br/>
+              <span style={{color:"#4ade80"}}>Tu sacrifies $2,000 de upside pour réduire le risque de give-back.</span>
             </div>
           </div>
         </div>
@@ -1018,9 +1021,10 @@ function GuideView() {
           <div style={{ padding:10, background:"#f9731611", borderRadius:3, marginBottom:8 }}>
             <div style={{ fontSize:9, color:"#f97316", fontWeight:700, marginBottom:6 }}>RÈGLE D'OR : TAILLE DÉCROISSANTE</div>
             <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
-              <span style={{color:"#f97316"}}>Entrée #1 :</span> 100% taille (ex: 0.10 lots) — meilleur prix<br/>
-              <span style={{color:"#f97316"}}>Ajout #2 :</span> 70% (ex: 0.07 lots) — après cassure swing high<br/>
-              <span style={{color:"#f97316"}}>Ajout #3 :</span> 30% (ex: 0.03 lots) — après confirmation<br/>
+              <span style={{color:"#f97316"}}>Entrée #1 :</span> 1.0 lot (risque $500) — meilleur prix<br/>
+              <span style={{color:"#f97316"}}>Ajout #2 :</span> 0.7 lot (risque $300) — après cassure swing high<br/>
+              <span style={{color:"#f97316"}}>Ajout #3 :</span> 0.3 lot (risque $200) — après confirmation<br/>
+              <span style={{color:"#f97316"}}>Total :</span> 2.0 lots, risque combiné <span style={{color:"#00ff88"}}>$1,000 (1%)</span><br/>
               <br/>
               À chaque ajout : <span style={{color:"#f97316",fontWeight:700}}>remonte le stop de TOUTE la position</span>.
             </div>
@@ -1037,9 +1041,76 @@ function GuideView() {
           </div>
         </div>
 
+        {/* HOUSE MONEY — STRATÉGIE INSTITUTIONNELLE */}
+        <div style={{ marginBottom:12, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #d946ef" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#d946ef", marginBottom:8 }}>8️⃣ HOUSE MONEY — STRATÉGIE INSTITUTIONNELLE</div>
+          
+          <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:8 }}>
+            Aussi appelée <span style={{color:"#d946ef",fontWeight:700}}>"Profit Compounding"</span>.<br/>
+            Tu sépares mentalement ton capital initial de tes profits accumulés.
+          </div>
+
+          <div style={{ padding:10, background:"#d946ef11", borderRadius:3, marginBottom:8 }}>
+            <div style={{ fontSize:9, color:"#d946ef", fontWeight:700, marginBottom:6 }}>LE CONCEPT</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              <span style={{color:"#d946ef"}}>Capital de départ ($100,000)</span> → protégé strictement à 1% = $1,000/trade<br/>
+              <span style={{color:"#d946ef"}}>Profits accumulés</span> → "argent de la maison" — boost possible sur setups A+<br/>
+              <br/>
+              Utilisé par les fonds spéculatifs pour augmenter l'exposition <span style={{color:"#d946ef"}}>sans toucher au capital noyau</span>.
+            </div>
+          </div>
+
+          <div style={{ padding:10, background:"#d946ef11", borderRadius:3, marginBottom:8 }}>
+            <div style={{ fontSize:9, color:"#d946ef", fontWeight:700, marginBottom:6 }}>EXEMPLE CONCRET (sur $100k de départ)</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              Après 3 mois → compte à <span style={{color:"#4ade80"}}>$110,000</span><br/>
+              <br/>
+              <span style={{color:"#d946ef"}}>Capital initial :</span> $100,000 — risque 1% = $1,000/trade<br/>
+              <span style={{color:"#d946ef"}}>Profits :</span> $10,000 — "house money" disponible<br/>
+              <br/>
+              Sur un setup <span style={{color:"#00ff88"}}>APEX PARFAIT 3/3</span> :<br/>
+              → Tu peux risquer $1,000 (capital) + $500 (50% des profits) = <span style={{color:"#d946ef"}}>$1,500 max</span><br/>
+              → Soit ~1.36% du total mais <span style={{color:"#d946ef"}}>uniquement sur ton meilleur edge</span>
+            </div>
+          </div>
+
+          <div style={{ padding:10, background:"#d946ef11", borderRadius:3, marginBottom:8 }}>
+            <div style={{ fontSize:9, color:"#d946ef", fontWeight:700, marginBottom:6 }}>RÈGLES STRICTES</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              ✓ Uniquement sur setups <span style={{color:"#00ff88"}}>confluence maximale</span> (APEX PARFAIT)<br/>
+              ✓ Maximum <span style={{color:"#d946ef"}}>50% des profits</span> en boost — jamais plus<br/>
+              ✓ Si tu perds le boost → <span style={{color:"#ff6666"}}>retour immédiat à 1% strict</span><br/>
+              ✓ Recalcule chaque mois (les profits évoluent)<br/>
+              ✓ Si compte revient au capital initial → <span style={{color:"#ff6666"}}>boost désactivé</span>
+            </div>
+          </div>
+
+          <div style={{ padding:10, background:"#1a0d1a", borderRadius:3, border:"1px solid #d946ef44" }}>
+            <div style={{ fontSize:9, color:"#d946ef", fontWeight:700, marginBottom:6 }}>⚠ LE PIÈGE PSYCHOLOGIQUE</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              "L'argent du profit reste TON argent." Les neurosciences le prouvent : <span style={{color:"#ff6666"}}>perdre $5,000 de profits fait aussi mal que perdre $5,000 de capital</span>.<br/>
+              <br/>
+              <span style={{color:"#ffd700",fontWeight:700}}>Drift dangereux :</span> tu commences à 1.5%, puis 2%, puis "juste cette fois 3%"... tu reviens à la case départ.
+            </div>
+          </div>
+
+          <div style={{ marginTop:8, padding:"8px 10px", background:"#0a0a14", borderRadius:3, border:"1px dashed #d946ef66" }}>
+            <div style={{ fontSize:9, color:"#d946ef", fontWeight:700, marginBottom:4 }}>💡 ALTERNATIVE SIMPLE (recommandée)</div>
+            <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.7 }}>
+              Reste à <span style={{color:"#00ff88",fontWeight:700}}>1% strict du capital TOTAL</span>. Le composé fait le travail :<br/>
+              <br/>
+              $100,000 → 1% = $1,000/trade<br/>
+              $130,000 → 1% = $1,300/trade (+30%)<br/>
+              $200,000 → 1% = $2,000/trade (+100%)<br/>
+              <br/>
+              <span style={{color:"#00ff88"}}>Tu gagnes plus en absolu sans changer ta règle.</span> C'est la magie du composé.
+            </div>
+          </div>
+        </div>
+
         {/* CIRCUIT BREAKER */}
         <div style={{ marginBottom:12, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #ff6666" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#ff6666", marginBottom:8 }}>8️⃣ CIRCUIT BREAKER — PROTÉGER LE COMPTE</div>
+          <div style={{ fontSize:11, fontWeight:700, color:"#ff6666", marginBottom:8 }}>9️⃣ CIRCUIT BREAKER — PROTÉGER LE COMPTE</div>
           
           <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:8 }}>
             Si le compte perd <span style={{color:"#ff6666",fontWeight:700}}>10-15% depuis le pic</span> → pause totale.<br/>
