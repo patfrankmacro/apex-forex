@@ -853,11 +853,11 @@ function GuideView() {
 
         {/* RÈGLE 1% */}
         <div style={{ marginBottom:12, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #00ff88" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#00ff88", marginBottom:8 }}>1️⃣ RISQUE 1-2% PAR TRADE</div>
+          <div style={{ fontSize:11, fontWeight:700, color:"#00ff88", marginBottom:8 }}>1️⃣ RISQUE 1% PAR TRADE — MAX</div>
           
           <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:8 }}>
             Sur $10,000 → tu risques <span style={{color:"#00ff88",fontWeight:700}}>$100 max par trade</span> (1%).<br/>
-            Swing trader expérimenté peut monter jusqu'à <span style={{color:"#00ff88"}}>2% ($200)</span>.
+            <span style={{color:"#ff6666"}}>Jamais plus.</span> Pas même 1.5%. Pas même "juste cette fois".
           </div>
 
           <div style={{ padding:10, background:"#00ff8811", borderRadius:3, marginBottom:8 }}>
@@ -1032,7 +1032,7 @@ function GuideView() {
               ✓ Marché en <span style={{color:"#f97316"}}>tendance claire</span><br/>
               ✓ Position déjà <span style={{color:"#f97316"}}>en profit</span><br/>
               ✓ Niveaux d'ajout <span style={{color:"#f97316"}}>planifiés AVANT</span> d'entrer<br/>
-              ✓ Risque combiné reste <span style={{color:"#f97316"}}>{"<"} 2% du compte</span>
+              ✓ Risque combiné reste <span style={{color:"#f97316"}}>{"<"} 1% du compte</span>
             </div>
           </div>
         </div>
@@ -1070,7 +1070,7 @@ function GuideView() {
             ["R:R minimum 2:1 vérifié","Target au moins 2× la distance du stop"],
             ["Plan de gestion écrit","Trailing, scale-out, ou pyramiding — décidé AVANT"],
             ["Pas de news haute impact imminente","Calendrier économique vérifié"],
-            ["Pas plus de 2% risque total","Toutes positions ouvertes combinées"],
+            ["Pas plus de 1% risque total","Toutes positions ouvertes combinées"],
             ["Si trade perd → stop honoré","Pas de revanche, pas de give it room"],
           ].map(([check,detail],i)=>(
             <div key={i} style={{ display:"flex", gap:8, marginBottom:6, padding:"6px 8px", background:"#00ff8808", borderRadius:3 }}>
