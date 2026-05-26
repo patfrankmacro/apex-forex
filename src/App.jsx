@@ -244,10 +244,7 @@ function explainRegime(data, code, regime) {
   const coreVsExp = (coreNow !== null && coreExp !== null && Math.abs(coreNow - coreExp) > 0.05)
     ? `, vs exp ${coreExp}%` : "";
   const coreImpact = (coreNow !== null && coreExp !== null && Math.abs(coreNow - coreExp) > 0.05)
-    ? (coreNow > coreExp
-        ? ` → pression hawkish accrue, BC forcée de garder taux hauts`
-        : ` → désinflation surprend, BC peut baisser plus tôt`)
-    : "";
+    ? (coreNow > coreExp ? ` → pression hawkish accrue` : ` → désinflation surprend`) : "";
   const infTxt = coreNow !== null ?
     (coreNow > target + 0.5 ? `inflation HAUTE (core ${coreNow}%${coreVsExp}, target ${target}%)` :
      coreNow > target + 0.2 ? `inflation au-dessus du target (core ${coreNow}%${coreVsExp}, target ${target}%)` :
@@ -258,15 +255,7 @@ function explainRegime(data, code, regime) {
   const svcExp = toN(data[code]["svc"].exp);
   const svcDir = (svcNow !== null && svcExp !== null && Math.abs(svcNow - svcExp) > 0.5)
     ? `, vs exp ${svcExp}` : "";
-  const svcImpact = svcNow !== null
-    ? (svcNow < 50 && svcExp !== null && svcNow < svcExp
-        ? ` → contraction + surprise négative, récession qui s'accélère`
-        : svcNow < 50 && svcExp !== null && svcNow > svcExp
-        ? ` → contraction mais moins pire qu'attendu, léger soulagement`
-        : svcNow >= 50 && svcExp !== null && svcNow > svcExp
-        ? ` → expansion + surprise positive, économie résiste`
-        : "")
-    : "";
+  const svcImpact = svcNow !== null ? (svcNow < 50 && svcExp !== null && svcNow < svcExp ? ` → contraction+surprise négative` : svcNow < 50 && svcExp !== null && svcNow > svcExp ? ` → contraction moins pire qu'attendu` : svcNow >= 50 && svcExp !== null && svcNow > svcExp ? ` → expansion+surprise positive` : "") : "";
   const growTxt = svcNow !== null ?
     (svcNow >= 55 ? `croissance forte (Services PMI ${svcNow}${svcDir})` :
      svcNow >= 52 ? `croissance solide (Services PMI ${svcNow}${svcDir})` :
@@ -291,16 +280,16 @@ function explainRegime(data, code, regime) {
     : "";
 
   if (regime.label === "SURCHAUFFE") {
-    return `Avec ${infTxt}${coreImpact} et ${growTxt}${svcImpact}, la ${bc} est en mode HAWKISH. ${unempTxt}. Taux à ${rateNow}% maintenus hauts. → Devise FORTE sur le différentiel de taux : capitaux attirés.`;
+    return `Avec ${infTxt} et ${growTxt}, la ${bc} est en mode HAWKISH${coreImpact}. ${unempTxt}. Taux à ${rateNow}% maintenus hauts${svcImpact}. → Devise FORTE sur le différentiel de taux : capitaux attirés.`;
   }
   if (regime.label === "GOLDILOCKS") {
-    return `Avec ${infTxt}${coreImpact} et ${growTxt}${svcImpact}, la ${bc} est dans sa ZONE DE CONFORT. ${unempTxt}. Taux à ${rateNow}%. → Devise haussière sans risque immédiat. Setup institutionnel idéal.`;
+    return `Avec ${infTxt} et ${growTxt}, la ${bc} est dans sa ZONE DE CONFORT${svcImpact}. ${unempTxt}. Taux à ${rateNow}%. → Devise haussière sans risque immédiat. Setup institutionnel idéal.`;
   }
   if (regime.label === "STAGFLATION") {
     const tauxCtx = rateNow >= 3.5 ? "malgré taux restrictifs"
       : rateNow >= 2.0 ? "dans un contexte de taux neutres"
       : "malgré taux accommodants";
-    return `${bc} PRISE AU PIÈGE : ${infTxt} l'empêche de baisser${coreImpact}. ${growTxt}${svcImpact} l'empêche de monter. ${unempTxt}. Taux à ${rateNow}%. → Devise FAIBLE ${tauxCtx}. ⚠ Pire scénario macro.`;
+    return `${bc} PRISE AU PIÈGE : ${infTxt}${coreImpact} l'empêche de baisser, mais ${growTxt}${svcImpact} l'empêche de monter. ${unempTxt}. Taux à ${rateNow}%. → Devise FAIBLE ${tauxCtx}. ⚠ Pire scénario macro.`;
   }
   if (regime.label === "RECESSION") {
     const recAction = rateNow <= 0.5
@@ -308,7 +297,7 @@ function explainRegime(data, code, regime) {
       : rateNow <= 1.5
       ? `la ${bc} va maintenir ou baisser légèrement les taux`
       : `la ${bc} va devoir BAISSER les taux`;
-    return `Avec ${infTxt}${coreImpact} et ${growTxt}${svcImpact}, ${recAction}. ${unempTxt}. Taux à ${rateNow}%. → Devise sous pression : capitaux qui fuient.`;
+    return `Avec ${infTxt} et ${growTxt}, ${recAction}. ${unempTxt}. Taux à ${rateNow}%. → Devise sous pression${coreImpact}${svcImpact}. Capitaux qui fuient l'économie en ralentissement.`;
   }
   return "";
 }
@@ -1455,7 +1444,7 @@ function HeatmapView({ data }) {
           {CURR.map(c => {
             const score = calcScore(data, c.code);
             const reg = getRegime(data, c.code);
-            const st = getStrength(score, regime);
+            const st = getStrength(score, reg);
             return (
               <tr key={c.code}>
                 <td style={{ padding: "8px 14px", background: BG2, borderLeft: `3px solid ${reg ? reg.color : BORDER}` }}>

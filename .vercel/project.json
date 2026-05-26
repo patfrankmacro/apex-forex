@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_DJWJQLkyPGZAxhdGx1lcUDGvJ6qB",
+  "orgId": "team_aSCcWCWmtJaWVhIW0B9DUuJM",
+  "projectName": "apex-forex",
+  "settings": {
+    "createdAt": 1779493970064,
+    "framework": "vite",
+    "devCommand": null,
+    "installCommand": null,
+    "buildCommand": null,
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "24.x"
+  }
+}
