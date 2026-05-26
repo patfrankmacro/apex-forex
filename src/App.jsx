@@ -832,6 +832,162 @@ function GuideView() {
           <span style={{ color:TEXT_DIM }}>Ex: Inflation attendu 2.50%, actual 2.52% → neutre, pas un beat.</span>
         </div>
       </div>
+
+      {/* ========== GESTION DE RISQUE — SCALING ========== */}
+      <div style={{ background:BG2, border:"1px solid #00aaff44", borderRadius:4, padding:14, marginBottom:10 }}>
+        <div style={{ fontSize:9, letterSpacing:3, color:"#00aaff", fontWeight:700, marginBottom:14, borderBottom:"1px solid #00aaff22", paddingBottom:8 }}>
+          💰 GESTION DE RISQUE — APPROCHE INSTITUTIONNELLE
+        </div>
+
+        {/* Règle 1% */}
+        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, border:"1px solid #00ff8822", borderLeft:"3px solid #00ff88" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#00ff88", marginBottom:6 }}>RÈGLE #1 — 1% PAR TRADE</div>
+          <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8 }}>
+            Ne jamais risquer plus de <span style={{color:"#00ff88",fontWeight:700}}>1% du capital</span> par trade.<br/>
+            Sur $10,000 → risque max = $100 par position.<br/>
+            <span style={{color:"#4a5070"}}>10 pertes consécutives = -9.6% seulement. Survivable.</span>
+          </div>
+          <div style={{ marginTop:8, padding:"6px 10px", background:"#00ff8811", borderRadius:3, fontSize:9, color:"#00ff88" }}>
+            📐 Taille = (Capital × 1%) ÷ (Stop en pips × Valeur pip)
+          </div>
+        </div>
+
+        {/* Budget journalier */}
+        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, border:"1px solid #ffd70022", borderLeft:"3px solid #ffd700" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#ffd700", marginBottom:6 }}>RÈGLE #2 — BUDGET JOURNALIER 3%</div>
+          <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8 }}>
+            Stop trading si pertes journalières atteignent <span style={{color:"#ffd700",fontWeight:700}}>3% du capital</span>.<br/>
+            Sur $10,000 → max -$300/jour avant d'arrêter.<br/>
+            <span style={{color:"#4a5070"}}>Pas de revenge trading. Ferme le terminal. Reviens demain.</span>
+          </div>
+          <div style={{ marginTop:6, display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:6 }}>
+            {[["CONSERVATEUR","0.5%","1.5%"],["STANDARD","1%","3%"],["CONFIRMÉ","2%","5%"]].map(([n,t,j])=>(
+              <div key={n} style={{ padding:"6px 8px", background:"#ffd70011", borderRadius:3, textAlign:"center" }}>
+                <div style={{ fontSize:8, color:"#ffd700", fontWeight:700 }}>{n}</div>
+                <div style={{ fontSize:9, color:TEXT_DIM, marginTop:2 }}>Trade: {t}</div>
+                <div style={{ fontSize:9, color:TEXT_DIM }}>Jour: {j}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Circuit breaker */}
+        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, border:"1px solid #ff444422", borderLeft:"3px solid #ff4444" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#ff4444", marginBottom:6 }}>RÈGLE #3 — CIRCUIT BREAKER 10%</div>
+          <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8 }}>
+            Si le compte baisse de <span style={{color:"#ff4444",fontWeight:700}}>10% depuis le départ</span> → pause totale.<br/>
+            Analyse chaque trade perdant. Identifie le problème.<br/>
+            <span style={{color:"#4a5070"}}>Ne reprends que quand tu sais POURQUOI tu as perdu.</span>
+          </div>
+          <div style={{ marginTop:8 }}>
+            {[["−10%","Arrêt + review obligatoire"],["−20%","Arrêt + retour démo 2 semaines"],["−30%","Danger — pertes asymétriques → +43% pour récupérer"],["−50%","Catastrophe — need +100% pour revenir"]].map(([pct,msg])=>(
+              <div key={pct} style={{ display:"flex", gap:10, marginBottom:4, padding:"4px 8px", background:"#ff444411", borderRadius:3 }}>
+                <div style={{ fontSize:9, fontWeight:700, color:"#ff4444", minWidth:40 }}>{pct}</div>
+                <div style={{ fontSize:9, color:TEXT_DIM }}>{msg}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Scaling Up — Pyramiding */}
+        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, border:"1px solid #00aaff22", borderLeft:"3px solid #00aaff" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#00aaff", marginBottom:6 }}>📈 SCALING UP — PYRAMIDING INSTITUTIONNEL</div>
+          <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8, marginBottom:8 }}>
+            Ajouter à une position <span style={{color:"#00aaff",fontWeight:700}}>déjà gagnante</span>. Jamais sur une position perdante.<br/>
+            Taille décroissante : chaque ajout est plus petit que le précédent.<br/>
+            <span style={{color:"#4a5070"}}>Structure institutionnelle : ton meilleur prix porte la plus grosse position.</span>
+          </div>
+          <div style={{ marginBottom:8 }}>
+            {[
+              ["ENTRÉE #1","Pleine taille (ex: 0.10 lots)","Stop structurel sous le niveau","Capital à risque: 1%"],
+              ["AJOUT #2","Taille réduite (ex: 0.07 lots)","Déplace stop à l'entrée #1 (breakeven)","Capital à risque: 0.7%"],
+              ["AJOUT #3","Petite taille (ex: 0.03 lots)","Déplace stop à l'ajout #2","Capital à risque: 0.3%"],
+            ].map(([step,size,stop,risk])=>(
+              <div key={step} style={{ marginBottom:6, padding:"8px 10px", background:"#00aaff0d", borderRadius:3, borderLeft:"2px solid #00aaff44" }}>
+                <div style={{ fontSize:10, fontWeight:700, color:"#00aaff", marginBottom:3 }}>{step} — {size}</div>
+                <div style={{ fontSize:8, color:TEXT_DIM }}>Stop: {stop}</div>
+                <div style={{ fontSize:8, color:"#4a5070" }}>{risk}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ padding:"6px 10px", background:"#00aaff11", borderRadius:3, fontSize:9, color:"#00aaff" }}>
+            ⚠ Uniquement en <span style={{fontWeight:700}}>marché tendanciel</span> confirmé. Jamais en range ou avant news.
+          </div>
+        </div>
+
+        {/* Scale-Out */}
+        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, border:"1px solid #a78bfa22", borderLeft:"3px solid #a78bfa" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#a78bfa", marginBottom:6 }}>📉 SCALE-OUT — SÉCURISER EN SWING</div>
+          <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8, marginBottom:8 }}>
+            Fermer des portions à des niveaux techniques. Laisser un <span style={{color:"#a78bfa",fontWeight:700}}>runner</span> courir.<br/>
+            <span style={{color:"#4a5070"}}>Décider du plan AVANT d'entrer. Jamais sous émotion.</span>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginBottom:8 }}>
+            {[
+              ["50/50","Ferme 50% au 1er niveau — Runner avec stop breakeven","Débutant"],
+              ["TIERS","Ferme 1/3 · 1/3 · runner — Sur 3 niveaux techniques","Intermédiaire"],
+              ["PARTIEL LARGE","Ferme 75% tôt — Petit runner pour l'extension","Prudent"],
+              ["RUNNER LONG","Ferme 25% tôt — Gros runner pour la tendance","Tendanciel"],
+            ].map(([name,desc,level])=>(
+              <div key={name} style={{ padding:"8px 10px", background:"#a78bfa0d", borderRadius:3 }}>
+                <div style={{ fontSize:10, fontWeight:700, color:"#a78bfa" }}>{name}</div>
+                <div style={{ fontSize:8, color:TEXT_DIM, marginTop:3 }}>{desc}</div>
+                <div style={{ fontSize:8, color:"#4a5070", marginTop:2 }}>{level}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ padding:"6px 10px", background:"#a78bfa11", borderRadius:3, fontSize:9, color:"#a78bfa" }}>
+            💡 "Risk-free" après breakeven = vrai sur le cash, mais le runner peut donner back 100 pips d'unrealized P&L. Ce n'est pas gratuit.
+          </div>
+        </div>
+
+        {/* ATR Sizing */}
+        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, border:"1px solid #f9731622", borderLeft:"3px solid #f97316" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#f97316", marginBottom:6 }}>📊 SIZING PAR ATR — SWING TRADER</div>
+          <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8, marginBottom:8 }}>
+            Le stop doit s'adapter à la volatilité réelle de la paire, pas à un chiffre fixe.<br/>
+            <span style={{color:"#f97316",fontWeight:700}}>ATR(14) sur ton timeframe</span> = mesure du bruit normal.
+          </div>
+          <div style={{ marginBottom:6 }}>
+            {[
+              ["Stop initial","Bas du wick structurel − (0.5 × ATR)","Sous le niveau, hors du bruit"],
+              ["Ajout #2","Entrée + 1× ATR","Confirmation de momentum"],
+              ["Ajout #3","Ajout #2 + 1× ATR","Tendance confirmée"],
+              ["Scale-out #1","Entrée + 1× ATR","Premier profit partiel"],
+              ["Runner target","Entrée + 2-3× ATR","Objectif tendanciel"],
+            ].map(([step,formula,desc])=>(
+              <div key={step} style={{ display:"flex", gap:8, marginBottom:5, padding:"5px 8px", background:"#f9731611", borderRadius:3 }}>
+                <div style={{ fontSize:9, fontWeight:700, color:"#f97316", minWidth:90 }}>{step}</div>
+                <div style={{ fontSize:8, color:"#e2e8f0", flex:1 }}>{formula}</div>
+                <div style={{ fontSize:8, color:"#4a5070" }}>{desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Checklist */}
+        <div style={{ padding:12, background:BG, borderRadius:3, border:"1px solid #00ff8822", borderLeft:"3px solid #00ff88" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#00ff88", marginBottom:8 }}>✅ CHECKLIST AVANT CHAQUE TRADE</div>
+          {[
+            ["Stop structurel identifié","Niveau technique réel, pas un chiffre rond"],
+            ["Taille calculée","(Capital × 1%) ÷ (Stop pips × Valeur pip)"],
+            ["R:R vérifié","Minimum 1.5:1 pour un swing trade"],
+            ["Budget journalier OK","Pas encore atteint 3% de pertes aujourd'hui"],
+            ["Plan de scaling écrit","Niveaux d'ajout ET de sortie définis à l'avance"],
+            ["Pas de news haute impact","Calendrier économique vérifié"],
+            ["Pas d'averaging down","Si le trade perd → stop. Pas d'ajout émotionnel"],
+          ].map(([check,detail])=>(
+            <div key={check} style={{ display:"flex", gap:8, marginBottom:6, padding:"5px 8px", background:"#00ff8808", borderRadius:3 }}>
+              <div style={{ fontSize:9, color:"#00ff88" }}>☐</div>
+              <div>
+                <div style={{ fontSize:9, fontWeight:700, color:TEXT }}>{check}</div>
+                <div style={{ fontSize:8, color:"#4a5070" }}>{detail}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+      </div>
     </div>
   );
 }
@@ -921,6 +1077,131 @@ function getApexSignalStrength(macroPts, cotStrength, retailStrength) {
   return { label:"↑↓ APEX BIAIS", color:"#86efac", bg:"#0d1f14", priority:1 };
 }
 
+// ============================================================
+// TRADE COT — Confluence Macro + COT uniquement (sans retail)
+// ============================================================
+function TradeCOT({ data, cotData }) {
+  const trades = [];
+
+  SENT_PAIRS.forEach(({ name, base, quote }) => {
+    const rBase  = getRegime(data, base);
+    const rQuote = getRegime(data, quote);
+    if (!rBase || !rQuote) return;
+    if (!isValidMacroDivergence(rBase, rQuote)) return;
+
+    const direction = getMacroDirection(rBase, rQuote);
+    const macroPts  = getMacroPts(rBase, rQuote);
+
+    const CFTC_MAP = {EUR:"099741",GBP:"096742",JPY:"097741",CAD:"090741",AUD:"232741",CHF:"092741",USD:"098662",NZD:"112741"};
+    const bCotRaw  = cotData[CFTC_MAP[base]];
+    const qCotRaw  = cotData[CFTC_MAP[quote]];
+    if (!bCotRaw || !qCotRaw) return;
+
+    const cotRange_b = bCotRaw.max52 - bCotRaw.min52;
+    const cotRange_q = qCotRaw.max52 - qCotRaw.min52;
+    const bPct = cotRange_b === 0 ? 50 : Math.round(((bCotRaw.net - bCotRaw.min52) / cotRange_b) * 100);
+    const qPct = cotRange_q === 0 ? 50 : Math.round(((qCotRaw.net - qCotRaw.min52) / cotRange_q) * 100);
+    const cotSpread = bPct - qPct;
+    const cotAbs = Math.abs(cotSpread);
+    const cotBias = cotSpread > 0 ? "HAUSSIER" : "BAISSIER";
+    const cotStrength = cotAbs >= 60 ? "EXTREME" : cotAbs >= 40 ? "FORT" : cotAbs >= 20 ? "MODERE" : "NUL";
+
+    const cotAligned = (direction === "LONG" && cotBias === "HAUSSIER") ||
+                       (direction === "SHORT" && cotBias === "BAISSIER");
+    if (!cotAligned) return;
+
+    const sigCot = cotStrength === "EXTREME"
+      ? { label:"🔥🔥 COT FORT", color:"#22c55e", bg:"#052010", priority:3 }
+      : cotStrength === "FORT"
+      ? { label:"🔥 COT CONFIRMÉ", color:"#4ade80", bg:"#0a2e18", priority:2 }
+      : { label:"↑↓ COT BIAIS", color:"#86efac", bg:"#0d1f14", priority:1 };
+
+    trades.push({
+      name, base, quote,
+      direction, macroPts, rBase, rQuote,
+      cotBias, cotStrength, bPct, qPct, cotSpread,
+      sig: sigCot,
+    });
+  });
+
+  trades.sort((a, b) => b.sig.priority - a.sig.priority || b.macroPts - a.macroPts);
+
+  return (
+    <div style={{padding:12}}>
+      <div style={{background:"#050810",border:"1px solid #00aaff44",borderRadius:8,padding:"10px 14px",marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div>
+          <div style={{fontSize:11,letterSpacing:3,color:"#00aaff",fontWeight:700}}>📊 TRADE COT — CONFLUENCE 2/3</div>
+          <div style={{fontSize:8,color:"#4a5070",marginTop:2}}>Macro divergence + COT institutionnels (sans retail)</div>
+        </div>
+        <div style={{fontSize:20,fontWeight:700,color:"#00aaff"}}>{trades.length}</div>
+      </div>
+
+      {trades.length === 0 && (
+        <div style={{padding:16,background:"#08080f",borderRadius:8,border:"1px solid #1a1a2e",textAlign:"center"}}>
+          <div style={{fontSize:12,color:"#4a5070",marginBottom:8}}>Aucun signal COT actif</div>
+          <div style={{fontSize:9,color:"#4a5070"}}>Macro divergence + alignement COT requis</div>
+        </div>
+      )}
+
+      {trades.map((t, i) => (
+        <div key={i} style={{marginBottom:12,background:"#08080f",borderRadius:8,border:"1px solid #1a1a2e",padding:10}}>
+
+          {/* Header */}
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+            <div style={{fontSize:13,fontWeight:700,color:"#e2e8f0",letterSpacing:1}}>
+              <FlagImg code={t.base} size={16} /> {t.base} / <FlagImg code={t.quote} size={16} /> {t.quote}
+            </div>
+            <div style={{fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:4,background:t.direction==="LONG"?"#052010":"#1a0808",color:t.direction==="LONG"?"#4ade80":"#f87171",border:"1px solid "+(t.direction==="LONG"?"#4ade8055":"#f8717155")}}>
+              {t.direction === "LONG" ? "▲ LONG" : "▼ SHORT"}
+            </div>
+          </div>
+
+          {/* 1 - MACRO */}
+          <div style={{background:"#0a0a1a",borderRadius:6,padding:"8px 10px",marginBottom:6,borderLeft:"3px solid #00aaff"}}>
+            <div style={{fontSize:8,color:"#00aaff",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 1 — MACRO DIVERGENCE</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr auto 1fr",gap:6,alignItems:"center"}}>
+              <div style={{background:t.rBase.bg,borderRadius:4,padding:"6px 8px",border:"1px solid "+t.rBase.border+"55"}}>
+                <div style={{fontSize:9,color:"#c8d4f0",fontWeight:700}}><FlagImg code={t.base} size={14} /> {t.base}</div>
+                <div style={{fontSize:10,color:t.rBase.color,fontWeight:700}}>{t.rBase.icon} {t.rBase.label}</div>
+              </div>
+              <div style={{fontSize:9,color:"#4a5070",textAlign:"center"}}>vs<br/><span style={{color:"#00aaff",fontWeight:700}}>+{t.macroPts}pts</span></div>
+              <div style={{background:t.rQuote.bg,borderRadius:4,padding:"6px 8px",border:"1px solid "+t.rQuote.border+"55"}}>
+                <div style={{fontSize:9,color:"#c8d4f0",fontWeight:700}}><FlagImg code={t.quote} size={14} /> {t.quote}</div>
+                <div style={{fontSize:10,color:t.rQuote.color,fontWeight:700}}>{t.rQuote.icon} {t.rQuote.label}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* 2 - COT */}
+          <div style={{background:"#0c0c18",borderRadius:6,padding:"8px 10px",borderLeft:"3px solid "+(t.cotBias==="HAUSSIER"?"#4ade80":"#f87171")}}>
+            <div style={{fontSize:8,color:"#94a3b8",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 2 — COT INSTITUTIONNELS</div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div style={{fontSize:9,color:"#94a3b8"}}>
+                <FlagImg code={t.base} size={12} /> P{t.bPct}% &nbsp;vs&nbsp; <FlagImg code={t.quote} size={12} /> P{t.qPct}%
+                <span style={{color:"#4a5070",marginLeft:6}}>spread {t.cotSpread>0?"+":""}{t.cotSpread}</span>
+              </div>
+              <div style={{fontSize:10,fontWeight:700,color:t.cotBias==="HAUSSIER"?"#4ade80":"#f87171"}}>
+                {t.cotBias} — {t.cotStrength}
+              </div>
+            </div>
+          </div>
+
+          {/* Conclusion */}
+          <div style={{marginTop:8,background:t.sig.bg,border:"1px solid "+t.sig.color+"44",borderRadius:6,padding:"10px 12px",textAlign:"center"}}>
+            <div style={{fontSize:12,color:t.sig.color,fontWeight:700,letterSpacing:1}}>
+              {t.direction === "LONG" ? "🚀" : "📉"} {t.direction} {t.base}/{t.quote} — COT + MACRO
+            </div>
+            <div style={{fontSize:8,color:"#4a5070",marginTop:3}}>
+              Macro +{t.macroPts}pts · COT {t.cotStrength} · Retail non filtré
+            </div>
+          </div>
+
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function TradeApex({ data, cotData, retailData }) {
   const trades = [];
 
@@ -959,17 +1240,17 @@ function TradeApex({ data, cotData, retailData }) {
     const hasRetail = !!rData;
     if (hasRetail) {
       lp = rData.longPercentage; sp = rData.shortPercentage;
-      if      (lp >= 75) { retailBias = "BAISSIER"; retailStrength = "EXTREME"; }
-      else if (sp >= 75) { retailBias = "HAUSSIER"; retailStrength = "EXTREME"; }
-      else if (lp >= 65) { retailBias = "BAISSIER"; retailStrength = "FORT"; }
-      else if (sp >= 65) { retailBias = "HAUSSIER"; retailStrength = "FORT"; }
+      if      (lp >= 80) { retailBias = "BAISSIER"; retailStrength = "EXTREME"; }
+      else if (sp >= 80) { retailBias = "HAUSSIER"; retailStrength = "EXTREME"; }
+      else if (lp >= 70) { retailBias = "BAISSIER"; retailStrength = "FORT"; }
+      else if (sp >= 70) { retailBias = "HAUSSIER"; retailStrength = "FORT"; }
       else if (lp >= 55) { retailBias = "BAISSIER"; retailStrength = "MODERE"; }
       else if (sp >= 55) { retailBias = "HAUSSIER"; retailStrength = "MODERE"; }
       else               { retailBias = "NEUTRE";   retailStrength = "NUL"; }
       // Vérifier alignement Retail (contrarian) avec direction
       const retailAligned = (direction === "LONG" && retailBias === "HAUSSIER") ||
                             (direction === "SHORT" && retailBias === "BAISSIER");
-      if (!retailAligned || retailStrength === "NUL") return;
+      if (!retailAligned || retailStrength === "NUL" || retailStrength === "MODERE") return;
     }
 
     const sig = getApexSignalStrength(macroPts, cotStrength, retailStrength);
@@ -1266,7 +1547,7 @@ export default function App() {
 
   const TABS = [
     {id:"table",label:"TABLEAU"},{id:"rank",label:"RANG"},
-    {id:"regimes",label:"RÉGIMES"},{id:"trade",label:"TRADES"},
+    {id:"regimes",label:"RÉGIMES"},{id:"tradecot",label:"TRADE COT"},{id:"trade",label:"COT + RETAIL"},
     {id:"data",label:"DONNÉES ↗"},{id:"guide",label:"GUIDE"},{id:"heat",label:"HEATMAP"},{id:"sentiment",label:"SENTIMENT"},{id:"cal",label:"RESSOURCES"},
   ];
 
@@ -1397,6 +1678,10 @@ export default function App() {
           <div style={{ fontSize:8, color:TEXT_DIM, letterSpacing:2, marginBottom:10 }}>CLIQUE POUR VOIR L'ANALYSE COMPLÈTE</div>
           {(()=>{const ORDER={GOLDILOCKS:1,SURCHAUFFE:2,STAGFLATION:3,RECESSION:4};return [...CURR].sort((a,b)=>{const rA=getRegime(data,a.code),rB=getRegime(data,b.code);const oA=rA?ORDER[rA.label]:99,oB=rB?ORDER[rB.label]:99;if(oA!==oB)return oA-oB;return calcScore(data,b.code)-calcScore(data,a.code);}).map(c=><RegimeCard key={c.code} data={data} curr={c} />);})()}
         </div>
+      )}
+
+      {view==="tradecot" && (
+        <TradeCOT data={data} cotData={apexCot} />
       )}
 
       {view==="trade" && (
