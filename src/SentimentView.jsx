@@ -311,22 +311,22 @@ export default function SentimentView() {
 
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:5}}>
                 <div>
-                  <div style={{fontSize:7,color:"#475569",marginBottom:2}}><FlagImg code={base} size={16} /> {base} — P{bCur?.pct}%</div>
+                  <div style={{fontSize:7,color:"#475569",marginBottom:2}}><FlagImg code={base} size={16} /> {base} <span style={{color:bCur?.bias==="HAUSSIER"?"#4ade80":"#f87171",marginLeft:3}}>{(bCur?.signal||"—").replace("_"," ")}</span></div>
                   <div style={{height:4,background:"#1e3a5f",borderRadius:2,position:"relative"}}>
                     <div style={{position:"absolute",left:0,width:"10%",height:"100%",background:"#4ade8055"}}/>
                     <div style={{position:"absolute",right:0,width:"10%",height:"100%",background:"#f8717155"}}/>
                     <div style={{position:"absolute",left:(bCur?.pct||50)+"%",top:-1,width:2,height:6,background:bCur?.bias==="HAUSSIER"?"#4ade80":"#f87171",transform:"translateX(-50%)"}}/>
                   </div>
-                  {bCur&&<div style={{fontSize:7,color:"#475569",marginTop:2}}>Net: {bCur.net>=0?"+":""}{bCur.net.toLocaleString()}</div>}
+                  {bCur&&<div style={{fontSize:7,color:"#475569",marginTop:2}}>Chg semaine: {bCur.chgNet>=0?"+":""}{bCur.chgNet?.toLocaleString()||"—"}</div>}
                 </div>
                 <div>
-                  <div style={{fontSize:7,color:"#475569",marginBottom:2}}><FlagImg code={quote} size={16} /> {quote} — P{qCur?.pct}%</div>
+                  <div style={{fontSize:7,color:"#475569",marginBottom:2}}><FlagImg code={quote} size={16} /> {quote} <span style={{color:qCur?.bias==="HAUSSIER"?"#4ade80":"#f87171",marginLeft:3}}>{(qCur?.signal||"—").replace("_"," ")}</span></div>
                   <div style={{height:4,background:"#1e3a5f",borderRadius:2,position:"relative"}}>
                     <div style={{position:"absolute",left:0,width:"10%",height:"100%",background:"#4ade8055"}}/>
                     <div style={{position:"absolute",right:0,width:"10%",height:"100%",background:"#f8717155"}}/>
                     <div style={{position:"absolute",left:(qCur?.pct||50)+"%",top:-1,width:2,height:6,background:qCur?.bias==="HAUSSIER"?"#4ade80":"#f87171",transform:"translateX(-50%)"}}/>
                   </div>
-                  {qCur&&<div style={{fontSize:7,color:"#475569",marginTop:2}}>Net: {qCur.net>=0?"+":""}{qCur.net.toLocaleString()}</div>}
+                  {qCur&&<div style={{fontSize:7,color:"#475569",marginTop:2}}>Chg semaine: {qCur.chgNet>=0?"+":""}{qCur.chgNet?.toLocaleString()||"—"}</div>}
                 </div>
               </div>
 
