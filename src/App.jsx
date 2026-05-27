@@ -1082,7 +1082,7 @@ function GuideView() {
           <div style={{ fontSize:11, fontWeight:700, color:"#a855f7", marginBottom:10 }}>🔬 LES 3 INGRÉDIENTS DU SYSTÈME APEX</div>
           {[
             ["1️⃣ MACRO DIVERGENCE","Les 2 pays ont des régimes économiques opposés (ex: GOLDILOCKS vs RECESSION)","Plus la divergence est grande, plus le signal est fort","#00ff88"],
-            ["2️⃣ COT — INSTITUTIONNELS","Les grandes banques et fonds positionnent dans la même direction","Mesuré sur 52 semaines — percentile de positionnement net","#00aaff"],
+            ["2️⃣ COT — INSTITUTIONNELS","Les grandes banques et fonds positionnent dans la même direction","Changement hebdomadaire Leveraged Funds (hedge funds + CTAs) — TFF Report CFTC · mis à jour chaque vendredi","#00aaff"],
             ["3️⃣ RETAIL CONTRARIAN","Les traders particuliers ont statistiquement tort aux extrêmes","70%+ retail dans un sens → les institutionnels feront l'inverse","#f97316"],
           ].map(([title,desc,detail,color])=>(
             <div key={title} style={{ marginBottom:8, padding:"8px 10px", background:BG2, borderRadius:3, borderLeft:"2px solid "+color+"66" }}>
