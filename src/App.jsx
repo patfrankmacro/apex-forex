@@ -1991,3 +1991,391 @@ function JournalView() {
 }
 
 
+
+export default function App() {
+  const [data, setData] = useState(mkData());
+  const [view, setView] = useState("table");
+  const [sentRetail, setSentRetail] = useState({});
+  const [sentCot, setSentCot] = useState({});
+  const [connected, setConnected] = useState(false);
+  const [apexCot, setApexCot]       = useState({});
+  const [apexRetail, setApexRetail] = useState({});
+
+  // Fetch COT + Retail pour TradeApex
+  useEffect(() => {
+    const COT_CODES = ["099741","096742","097741","090741","232741","092741","098662","112741"];
+    const loadCOT = async () => {
+      const res = await Promise.all(COT_CODES.map(async code => {
+        try {
+          const url = "https://publicreporting.cftc.gov/resource/6dca-aqww.json?cftc_contract_market_code="+code+"&$order=report_date_as_yyyy_mm_dd DESC&$limit=55";
+          const rows = await (await fetch(url)).json();
+          if (!rows?.length) return [code, null];
+          const nets = rows.map(r => parseFloat(r.noncomm_positions_long_all||0) - parseFloat(r.noncomm_positions_short_all||0));
+          return [code, { net: Math.round(nets[0]), max52: Math.max(...nets.slice(0,26)), min52: Math.min(...nets.slice(0,26)) }];
+        } catch { return [code, null]; }
+      }));
+      const map = {};
+      res.forEach(([code, val]) => { if (val) map[code] = val; });
+      setApexCot(map);
+    };
+    loadCOT();
+    // Refresh COT chaque vendredi 21h30 EST (publication CFTC) + vérif toutes les heures
+    const cotInterval = setInterval(() => {
+      const n = new Date();
+      const day = n.getUTCDay(); // 5 = vendredi
+      const hour = n.getUTCHours();
+      const min = n.getUTCMinutes();
+      // Vendredi entre 20h30 et 23h UTC (publication CFTC ~20h30 UTC)
+      if (day === 5 && hour >= 20 && hour <= 23) loadCOT();
+      // Aussi refresh le samedi matin pour être sûr
+      if (day === 6 && hour >= 0 && hour <= 2) loadCOT();
+    }, 60 * 60 * 1000); // vérif toutes les heures
+    const loadMFX = async () => {
+      try {
+        // Un seul appel — login + outlook côté serveur
+        const r = await fetch("/api/myfxbook?email="+encodeURIComponent("patrice-bonneau@outlook.com")+"&password="+encodeURIComponent("Fucktoi69$")+"&t="+Date.now());
+        const d = await r.json();
+        if (d.error || !d.symbols) return;
+        const map = {};
+        d.symbols.forEach(s => { map[s.name] = s; });
+        if (Object.keys(map).length > 0) setApexRetail(map);
+      } catch(e) {}
+    };
+    loadMFX();
+    const mfxInterval = setInterval(loadMFX, 30 * 60 * 1000);
+    return () => { clearInterval(mfxInterval); clearInterval(cotInterval); };
+  }, []);
+
+  useEffect(() => {
+    const dataRef = ref(db, "apexdata");
+    const unsub = onValue(dataRef, (snapshot) => {
+      const val = snapshot.val();
+      if (val) {
+        const base = mkData();
+        CURR.forEach(c => {
+          if (val[c.code]) {
+            INDS.forEach(i => {
+              if (val[c.code][i.id]) base[c.code][i.id] = val[c.code][i.id];
+            });
+          }
+        });
+        setData(base);
+      }
+      setConnected(true);
+    }, () => setConnected(false));
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    async function loadSent() {
+      const retail = await fetchRetailApp();
+      setSentRetail(retail);
+      const codes = [...new Set(Object.values(CFTC_CODES))];
+      const cotRes = {};
+      await Promise.all(codes.map(async code => { cotRes[code] = await fetchCOTApp(code); }));
+      setSentCot(cotRes);
+    }
+    loadSent();
+    const ri = setInterval(loadSent, 60*60*1000);
+    return () => clearInterval(ri);
+  }, []);
+
+  function setCell(code, id, field, val) {
+    setData(p => {
+      const n = {...p}; n[code] = {...p[code]}; n[code][id] = {...p[code][id],[field]:val};
+      set(ref(db, `apexdata/${code}/${id}`), n[code][id]).catch(console.error);
+      return n;
+    });
+  }
+
+  function resetData() {
+    if (confirm("Effacer toutes les données pour TOUS les utilisateurs?")) {
+      const d = mkData();
+      set(ref(db, "apexdata"), d).catch(console.error);
+      setData(d);
+    }
+  }
+
+  const REGIME_RANK = { "GOLDILOCKS":3, "SURCHAUFFE":2, "RECESSION":-2, "STAGFLATION":-3 };
+  const ranked = useMemo(() =>
+    CURR.map(c => ({...c, score:calcScore(data,c.code)})).sort((a,b)=>{
+      const rA = getRegime(data,a.code);
+      const rB = getRegime(data,b.code);
+      const rankA = rA ? (REGIME_RANK[rA.label] ?? 0) : 0;
+      const rankB = rB ? (REGIME_RANK[rB.label] ?? 0) : 0;
+      if (rankB !== rankA) return rankB - rankA;
+      return b.score - a.score;
+    })
+  ,[data]);
+
+  const withData = ranked.filter(c => hasData(data,c.code));
+
+  const allPairs = useMemo(() => {
+    const pairs = [];
+    for (let i=0;i<withData.length;i++) for (let j=i+1;j<withData.length;j++) {
+      const a=withData[i],b=withData[j];
+      const strong=a.score>=b.score?a:b, weak=a.score>=b.score?b:a;
+      const div=strong.score-weak.score;
+      if (div<0.08) continue;
+      const regS=getRegime(data,strong.code), regW=getRegime(data,weak.code);
+      const perfect=regS&&regW&&["GOLDILOCKS","SURCHAUFFE"].includes(regS.label)&&["RECESSION","STAGFLATION"].includes(regW.label);
+      // Filtre strict: seulement bonne économie vs mauvaise économie
+      if (!regS || !regW) continue;
+      if (!["GOLDILOCKS","SURCHAUFFE"].includes(regS.label)) continue;
+      if (!["RECESSION","STAGFLATION"].includes(regW.label)) continue;
+      // ── CROISEMENT MACRO + SENTIMENT ──────────────────────────────────
+      const sentPair = SENT_PAIRS.find(p =>
+        (p.base===strong.code && p.quote===weak.code) ||
+        (p.base===weak.code   && p.quote===strong.code)
+      );
+      let sentSig = null;
+      if (sentPair) {
+        const rA   = analyzeRetailS(sentRetail[sentPair.name]);
+        const bCur = analyzeCurrencyS(sentCot[CFTC_CODES[sentPair.base]]);
+        const qCur = analyzeCurrencyS(sentCot[CFTC_CODES[sentPair.quote]]);
+        const pCot = analyzePairCOTS(bCur, qCur);
+        const raw  = buildSignalS(rA, pCot);
+        if (raw.valid) {
+          const strongIsBase = sentPair.base === strong.code;
+          // Direction sentiment doit correspondre à la direction macro
+          const aligned = (raw.bias==="HAUSSIER" && strongIsBase) ||
+                          (raw.bias==="BAISSIER" && !strongIsBase);
+          if (aligned) sentSig = {...raw, strongIsBase};
+        }
+      }
+      if (!sentSig) continue; // Seulement paires avec DOUBLE confirmation
+      pairs.push({strong,weak,div,regS,regW,perfect,sentSig});
+    }
+    return pairs.sort((a,b)=>(b.div+(b.perfect?0.5:0))-(a.div+(a.perfect?0.5:0)));
+  },[data,withData,sentRetail,sentCot]);
+
+  const tabStyle = active => ({
+    padding:"5px 10px", fontSize:10, fontFamily:"'IBM Plex Mono',monospace",
+    cursor:"pointer", borderRadius:2, letterSpacing:1,
+    border: active?`1px solid ${ACCENT}66`:`1px solid ${BORDER}`,
+    background: active?`${ACCENT}15`:"transparent",
+    color: active?ACCENT:TEXT_DIM,
+  });
+
+  const TABS = [
+    {id:"table",label:"TABLEAU"},{id:"rank",label:"RANG"},
+    {id:"regimes",label:"RÉGIMES"},{id:"tradecot",label:"TRADE COT+MACRO"},{id:"trade",label:"TRADE COT+MACRO+RETAIL"},{id:"journal",label:"JOURNAL"},
+    {id:"data",label:"DONNÉES ↗"},{id:"guide",label:"GUIDE"},{id:"heat",label:"HEATMAP"},{id:"sentiment",label:"SENTIMENT"},{id:"cal",label:"RESSOURCES"},
+  ];
+
+  return (
+    <div style={{ minHeight:"100vh", background:BG, fontFamily:"'IBM Plex Mono',monospace", color:TEXT, fontSize:12 }}>
+      <style>{css}</style>
+      <div style={{ background:BG2, borderBottom:`1px solid ${BORDER}`, padding:"10px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:8 }}>
+        <div>
+          <div style={{ fontSize:13, fontWeight:700, letterSpacing:3, color:ACCENT, fontFamily:"'IBM Plex Mono'" }}>PAT & FRANK MACRO FX</div>
+          <div style={{ fontSize:8, color:TEXT_DIM, letterSpacing:3 }}>ANALYSE INSTITUTIONNELLE — BIAIS BANQUE CENTRALE</div>
+          <div style={{ display:"flex", alignItems:"center", gap:5, marginTop:3 }}>
+            <div style={{ width:6, height:6, borderRadius:"50%", background:connected?"#00ff88":"#ff3b3b", animation:connected?"pulse 2s infinite":"none" }} />
+            <span style={{ fontSize:7, color:connected?"#00ff88":"#ff3b3b", letterSpacing:1 }}>{connected?"SYNC TEMPS RÉEL":"CONNEXION..."}</span>
+          </div>
+        </div>
+        <div style={{ display:"flex", gap:4, flexWrap:"wrap", alignItems:"center" }}>
+          {TABS.map(t=><button key={t.id} style={tabStyle(view===t.id)} onClick={()=>setView(t.id)}>{t.label}</button>)}
+        </div>
+      </div>
+      <div style={{ background:"#06060e", borderBottom:`1px solid ${BORDER}`, padding:"6px 16px", display:"flex", gap:12, overflowX:"auto" }}>
+        {ranked.map(c => {
+          const st=getStrength(c.score, getRegime(data,c.code)), reg=getRegime(data,c.code);
+          return (
+            <div key={c.code} style={{ display:"flex", flexDirection:"column", alignItems:"center", minWidth:44, gap:2 }}>
+              <span style={{ fontSize:8, color:st.color, fontWeight:700, letterSpacing:1 }}>{c.code}</span>
+              <div style={{ width:38, height:2, background:"#0a0a18", borderRadius:1 }}>
+                <div style={{ width:Math.min(Math.abs(c.score)*100,100)+"%", height:"100%", background:st.color, borderRadius:1 }} />
+              </div>
+              <span style={{ fontSize:7, color:TEXT_DIM }}>{c.score>=0?"+":""}{c.score.toFixed(2)}</span>
+              {reg&&<span style={{ fontSize:7, color:reg.color }}>{reg.icon}</span>}
+            </div>
+          );
+        })}
+      </div>
+
+      {view==="table" && (
+        <div style={{ overflowX:"auto", padding:12 }}>
+          <div style={{ fontSize:8, color:TEXT_DIM, marginBottom:8, letterSpacing:1 }}>PRIOR → EXP → NOW · Vert=BEAT · Rouge=MISS · Gris=NEUTRE · Tier1: Inflation/Core · Tier2: Unemployment/Services PMI</div>
+          <table style={{ borderCollapse:"collapse", minWidth:980 }}>
+            <thead>
+              <tr>
+                <th style={{ background:BG2, padding:"6px 12px", fontSize:9, color:ACCENT, border:`1px solid ${BORDER}`, textAlign:"left", minWidth:110, letterSpacing:2 }}>DEVISE</th>
+                {INDS.map(ind=>(
+                  <th key={ind.id} colSpan={3} style={{ background:BG2, padding:"6px 8px", fontSize:9, color:ind.tier===1?"#ff9966":ind.tier===2?"#66aaff":TEXT_DIM, border:`1px solid ${BORDER}`, textAlign:"center", letterSpacing:1 }}>
+                    {ind.label}<span style={{ display:"block", fontSize:7, color:TEXT_DIM }}>T{ind.tier}</span>
+                  </th>
+                ))}
+                <th style={{ background:BG2, padding:"6px 10px", fontSize:9, color:ACCENT, border:`1px solid ${BORDER}`, textAlign:"center", minWidth:70 }}>SCORE</th>
+                <th style={{ background:BG2, padding:"6px 10px", fontSize:9, color:ACCENT, border:`1px solid ${BORDER}`, textAlign:"center", minWidth:90 }}>RÉGIME</th>
+              </tr>
+              <tr>
+                <th style={{ background:BG3, border:`1px solid ${BORDER}` }} />
+                {INDS.map(ind=>["Prior","Exp","Now"].map(f=>(
+                  <th key={ind.id+f} style={{ background:BG3, padding:"2px 4px", fontSize:7, color:TEXT_DIM, border:`1px solid ${BORDER}`, textAlign:"center" }}>{f}</th>
+                )))}
+                <th style={{ background:BG3, border:`1px solid ${BORDER}` }} />
+                <th style={{ background:BG3, border:`1px solid ${BORDER}` }} />
+              </tr>
+            </thead>
+            <tbody>
+              {ranked.map((c,ri)=>{
+                const st=getStrength(c.score, getRegime(data,c.code)), reg=getRegime(data,c.code);
+                return (
+                  <tr key={c.code} style={{ background:ri%2===0?"#07070e":"transparent" }}>
+                    <td style={{ padding:"5px 12px", border:`1px solid ${BORDER}`, fontWeight:600, whiteSpace:"nowrap", borderLeft:`3px solid ${reg?reg.color+"88":BORDER}` }}>
+                      <FlagImg code={c.code} size={18} />
+                      <span style={{ fontSize:12, letterSpacing:2, color:TEXT }}>{c.code}</span>
+                      <span style={{ fontSize:8, color:TEXT_DIM, marginLeft:4 }}>#{ri+1}</span>
+                    </td>
+                    {INDS.map(ind=>["prior","exp","now"].map(field=>(
+                      <td key={ind.id+field} style={{ padding:"4px 4px", border:`1px solid ${BORDER}`, textAlign:"center" }}>
+                        <Inp code={c.code} id={ind.id} field={field} data={data} setCell={setCell} />
+                      </td>
+                    )))}
+                    <td style={{ padding:"5px 8px", border:`1px solid ${BORDER}`, textAlign:"center" }}>
+                      <div style={{ fontSize:13, fontWeight:700, color:st.color, fontFamily:"'IBM Plex Mono'" }}>{c.score>=0?"+":""}{c.score.toFixed(3)}</div>
+                      <ScoreBar score={c.score} color={st.color} />
+                    </td>
+                    <td style={{ padding:"5px 8px", border:`1px solid ${BORDER}`, textAlign:"center" }}>
+                      {reg?(
+                        <div style={{ background:reg.bg, border:`1px solid ${reg.border}44`, borderRadius:2, padding:"3px 6px", fontSize:9, fontWeight:700, color:reg.color, letterSpacing:1 }}>
+                          {reg.icon} {reg.label}
+                        </div>
+                      ):<span style={{ fontSize:9, color:TEXT_DIM }}>—</span>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {view==="rank" && (
+        <div style={{ padding:16 }}>
+          <div style={{ fontSize:9, color:TEXT_DIM, letterSpacing:2, marginBottom:12 }}>CLASSEMENT MACRO — FORT → FAIBLE</div>
+          {ranked.map((c,i)=>{
+            const st=getStrength(c.score, getRegime(data,c.code)), reg=getRegime(data,c.code);
+            const infS=calcInflationScore(data,c.code), growS=calcGrowthScore(data,c.code);
+            return (
+              <div key={c.code} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6, padding:"10px 14px", background:BG2, borderRadius:4, border:`1px solid ${reg?reg.border+"33":BORDER}`, borderLeft:`3px solid ${st.color}` }}>
+                <span style={{ fontSize:14, fontWeight:700, color:TEXT_DIM, minWidth:24 }}>#{i+1}</span>
+                <FlagImg code={c.code} size={20} />
+                <div style={{ minWidth:90 }}>
+                  <div style={{ fontWeight:700, color:TEXT, letterSpacing:2, fontSize:12 }}>{c.code}</div>
+                  {reg&&<div style={{ fontSize:8, color:reg.color }}>{reg.icon} {reg.label}</div>}
+                </div>
+                <div style={{ flex:1 }}>
+                  <div style={{ height:6, background:"#0a0a14", borderRadius:3, overflow:"hidden" }}>
+                    <div style={{ width:Math.min(Math.abs(c.score)*100,100)+"%", height:"100%", background:st.color, borderRadius:3 }} />
+                  </div>
+                  <div style={{ display:"flex", gap:12, marginTop:4 }}>
+                    {infS!==null&&<span style={{ fontSize:8, color:TEXT_DIM }}>INF: <span style={{ color:infS>0.05?"#00ff88":infS<-0.05?"#ff3b3b":"#888899" }}>{infS>=0?"+":""}{(infS*100).toFixed(0)}%</span></span>}
+                    {growS!==null&&<span style={{ fontSize:8, color:TEXT_DIM }}>GROW: <span style={{ color:growS>0.05?"#66ff99":growS<-0.05?"#ff6666":"#888899" }}>{growS>=0?"+":""}{(growS*100).toFixed(0)}%</span></span>}
+                  </div>
+                </div>
+                <span style={{ fontSize:14, fontWeight:700, color:st.color, minWidth:60, textAlign:"right" }}>{c.score>=0?"+":""}{c.score.toFixed(3)}</span>
+                <div style={{ background:st.bg, border:`1px solid ${st.color}44`, borderRadius:2, padding:"3px 8px", fontSize:9, fontWeight:700, color:st.color, minWidth:70, textAlign:"center" }}>{st.label}</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {view==="regimes" && (
+        <div style={{ padding:12 }}>
+          <div style={{ fontSize:8, color:TEXT_DIM, letterSpacing:2, marginBottom:10 }}>CLIQUE POUR VOIR L'ANALYSE COMPLÈTE</div>
+          {(()=>{const ORDER={GOLDILOCKS:1,SURCHAUFFE:2,STAGFLATION:3,RECESSION:4};return [...CURR].sort((a,b)=>{const rA=getRegime(data,a.code),rB=getRegime(data,b.code);const oA=rA?ORDER[rA.label]:99,oB=rB?ORDER[rB.label]:99;if(oA!==oB)return oA-oB;return calcScore(data,b.code)-calcScore(data,a.code);}).map(c=><RegimeCard key={c.code} data={data} curr={c} />);})()}
+        </div>
+      )}
+
+      {view==="tradecot" && (
+        <TradeCOT data={data} cotData={apexCot} />
+      )}
+
+      {view==="trade" && (
+        <TradeApex data={data} cotData={apexCot} retailData={apexRetail} />
+      )}
+
+      {view==="data"    && <DataView />}
+      {view==="guide"   && <GuideView />}
+      {view==="heat" && <HeatmapView data={data} />}
+      {view==="sentiment" && <SentimentView />}
+      {view==="cal"     && <CalView />}
+    </div>
+  );
+}
+
+function HeatmapView({ data }) {
+  function getCellColor(ind, cell) {
+    const s = getSurprise(ind, cell);
+    if (s === null) return { bg: "#0a0a14", color: "#333" };
+    const m = getMag(ind, s);
+    if (m === 0) return { bg: "#0a0a18", color: "#666" };
+    if (m > 0.6) return { bg: "#00ff8833", color: "#00ff88" };
+    if (m > 0) return { bg: "#00ff8815", color: "#66ffbb" };
+    if (m < -0.6) return { bg: "#ff3b3b33", color: "#ff3b3b" };
+    return { bg: "#ff3b3b15", color: "#ff8888" };
+  }
+  return (
+    <div style={{ padding: 16, overflowX: "auto" }}>
+      <div style={{ fontSize: 9, color: TEXT_DIM, letterSpacing: 2, marginBottom: 12 }}>HEATMAP MATRICIELLE · 9 DEVISES × 6 INDICATEURS · INTENSITÉ = MAGNITUDE DE SURPRISE</div>
+      <table style={{ borderCollapse: "separate", borderSpacing: 2, minWidth: 900 }}>
+        <thead>
+          <tr>
+            <th style={{ padding: "10px 14px", textAlign: "left", fontSize: 10, color: ACCENT, letterSpacing: 2, minWidth: 110 }}>DEVISE</th>
+            {INDS.map(ind => (
+              <th key={ind.id} style={{ padding: "10px 8px", fontSize: 9, color: ind.tier === 1 ? "#ff9966" : ind.tier === 2 ? "#66aaff" : TEXT_DIM, letterSpacing: 1, textAlign: "center", minWidth: 100 }}>
+                {ind.label}
+                <div style={{ fontSize: 7, color: TEXT_DIM, marginTop: 2 }}>T{ind.tier}</div>
+              </th>
+            ))}
+            <th style={{ padding: "10px 14px", fontSize: 10, color: ACCENT, letterSpacing: 2 }}>SCORE</th>
+            <th style={{ padding: "10px 14px", fontSize: 10, color: ACCENT, letterSpacing: 2 }}>RÉGIME</th>
+          </tr>
+        </thead>
+        <tbody>
+          {CURR.map(c => {
+            const score = calcScore(data, c.code);
+            const reg = getRegime(data, c.code);
+            const st = getStrength(score, reg);
+            return (
+              <tr key={c.code}>
+                <td style={{ padding: "8px 14px", background: BG2, borderLeft: `3px solid ${reg ? reg.color : BORDER}` }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: TEXT, fontFamily: "'IBM Plex Mono'" }}><FlagImg code={c.code} size={16} /> {c.code}</div>
+                  <div style={{ fontSize: 9, color: TEXT_DIM }}>{c.bc}</div>
+                </td>
+                {INDS.map(ind => {
+                  const cell = data[c.code][ind.id];
+                  const s = getSurprise(ind, cell);
+                  const cs = getCellColor(ind, cell);
+                  const now = toN(cell.now);
+                  return (
+                    <td key={ind.id} style={{ background: cs.bg, padding: "10px 6px", textAlign: "center", minWidth: 100 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: cs.color, fontFamily: "'IBM Plex Mono'" }}>
+                        {s === null ? "—" : (s > 0 ? "+" : "") + s.toFixed(2)}
+                      </div>
+                      <div style={{ fontSize: 9, color: TEXT_DIM, marginTop: 2 }}>{now !== null ? now + ind.unit : ""}</div>
+                    </td>
+                  );
+                })}
+                <td style={{ background: st.bg, padding: "10px 14px", textAlign: "center" }}>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: st.color, fontFamily: "'IBM Plex Mono'" }}>{score >= 0 ? "+" : ""}{score.toFixed(2)}</div>
+                </td>
+                <td style={{ padding: "10px 14px", textAlign: "center" }}>
+                  {reg ? (
+                    <div style={{ background: reg.bg, border: `1px solid ${reg.border}66`, color: reg.color, padding: "4px 10px", fontSize: 10, fontWeight: 700, letterSpacing: 1, borderRadius: 2 }}>
+                      {reg.icon} {reg.label}
+                    </div>
+                  ) : <span style={{ color: TEXT_DIM, fontSize: 10 }}>—</span>}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
