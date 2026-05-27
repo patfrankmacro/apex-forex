@@ -302,6 +302,33 @@ function explainRegime(data, code, regime) {
   return "";
 }
 
+function getPMIWarning(data, code) {
+  const svcNow   = toN(data[code]["svc"].now);
+  const svcPrior = toN(data[code]["svc"].prior);
+  const svcExp   = toN(data[code]["svc"].exp);
+  if (svcNow === null) return null;
+  const warnings = [];
+  // Trajectoire descendante vers 50
+  if (svcNow >= 50 && svcNow < 52) {
+    if (svcPrior !== null && svcPrior > svcNow) {
+      const drop = (svcPrior - svcNow).toFixed(1);
+      warnings.push(`⚠ PMI Services en décélération (${svcPrior} → ${svcNow}, −${drop}pts) — surveiller passage sous 50`);
+    }
+    if (svcExp !== null && svcNow < svcExp) {
+      warnings.push(`⚠ PMI Services sous les attentes (exp ${svcExp}, now ${svcNow}) — demande plus faible que prévu`);
+    }
+  }
+  // PMI fort mais qui ralentit significativement
+  if (svcNow >= 52 && svcPrior !== null && svcPrior - svcNow >= 2) {
+    warnings.push(`⚠ PMI Services en fort ralentissement (${svcPrior} → ${svcNow}) — surveiller la tendance`);
+  }
+  // PMI qui accélère vers 50 (positif)
+  if (svcNow >= 48 && svcNow < 50 && svcPrior !== null && svcNow > svcPrior) {
+    warnings.push(`📈 PMI Services en amélioration (${svcPrior} → ${svcNow}) — approche du seuil 50, potentiel retournement`);
+  }
+  return warnings.length > 0 ? warnings : null;
+}
+
 function interpretIndicator(id, now, code, exp=null) {
   if (now === null || now === undefined) return "";
   const target = BC_TARGETS[code] || 2.0;
@@ -560,10 +587,22 @@ function RegimeCard({ curr, data }) {
             <div style={{ fontSize:8, color:R.color, fontWeight:700, letterSpacing:2, marginBottom:6 }}>🎯 POURQUOI {R.label} ?</div>
             <div style={{ fontSize:11, color:TEXT, fontWeight:400, lineHeight:1.6 }}>{explainRegime(data, curr.code, R)}</div>
           </div>
-          <div style={{ padding:"10px 14px", background:R.bg, borderRadius:3, border:`1px solid ${R.border}66` }}>
+          <div style={{ padding:"10px 14px", background:R.bg, borderRadius:3, border:`1px solid ${R.border}66`, marginBottom:8 }}>
             <div style={{ fontSize:8, color:R.color, fontWeight:700, letterSpacing:2, marginBottom:4 }}>ACTION INSTITUTIONNELLE</div>
             <div style={{ fontSize:13, color:R.color, fontWeight:700, fontFamily:"'IBM Plex Mono'" }}>{R.action}</div>
           </div>
+          {(()=>{
+            const warns = getPMIWarning(data, curr.code);
+            if (!warns) return null;
+            return (
+              <div style={{ padding:"10px 12px", background:"#1a1000", borderRadius:3, border:"1px solid #ffd70044" }}>
+                <div style={{ fontSize:8, color:"#ffd700", fontWeight:700, letterSpacing:2, marginBottom:6 }}>📡 TRAJECTOIRE — SIGNAL AVANCÉ</div>
+                {warns.map((w,i) => (
+                  <div key={i} style={{ fontSize:9, color:"#ffd700", lineHeight:1.6, marginBottom:i<warns.length-1?4:0 }}>{w}</div>
+                ))}
+              </div>
+            );
+          })()}
         </div>
       )}
     </div>
@@ -1657,7 +1696,8 @@ function JournalView() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     date:"", pair:"", direction:"LONG", regime_base:"", regime_quote:"",
-    cot:"", retail:"", entry:"", sl:"", tp:"", exit:"",
+    cot_dir:"", cot_strength:"", retail_dir:"", retail_pct:"",
+    entry:"", sl:"", tp:"", exit:"",
     result_pips:"", result_usd:"", status:"OUVERT", note:""
   });
   const [showForm, setShowForm] = useState(false);
@@ -1692,7 +1732,7 @@ function JournalView() {
       const newKey = `trade_${Date.now()}`;
       set(ref(db, `journal/${trader}/${newKey}`), tradeData);
     }
-    setForm({date:"",pair:"",direction:"LONG",regime_base:"",regime_quote:"",cot:"",retail:"",entry:"",sl:"",tp:"",exit:"",result_pips:"",result_usd:"",status:"OUVERT",note:""});
+    setForm({date:"",pair:"",direction:"LONG",regime_base:"",regime_quote:"",cot_dir:"",cot_strength:"",retail_dir:"",retail_pct:"",entry:"",sl:"",tp:"",exit:"",result_pips:"",result_usd:"",status:"OUVERT",note:""});
     setShowForm(false);
   };
 
@@ -1793,7 +1833,7 @@ function JournalView() {
       </div>
 
       {/* BOUTON NOUVEAU TRADE */}
-      <button onClick={()=>{setShowForm(true);setEditKey(null);setForm({date:"",pair:"",direction:"LONG",regime_base:"",regime_quote:"",cot:"",retail:"",entry:"",sl:"",tp:"",exit:"",result_pips:"",result_usd:"",status:"OUVERT",note:""}); }}
+      <button onClick={()=>{setShowForm(true);setEditKey(null);setForm({date:"",pair:"",direction:"LONG",regime_base:"",regime_quote:"",cot_dir:"",cot_strength:"",retail_dir:"",retail_pct:"",entry:"",sl:"",tp:"",exit:"",result_pips:"",result_usd:"",status:"OUVERT",note:""}); }}
         style={{width:"100%",padding:"10px",background:"#001a0d",border:"1px solid #00ff8844",borderRadius:6,color:"#00ff88",fontSize:11,fontWeight:700,cursor:"pointer",marginBottom:12,letterSpacing:2}}>
         + ENREGISTRER UN TRADE — {trader}
       </button>
@@ -1835,22 +1875,120 @@ function JournalView() {
                 {REGIMES_LIST.map(r=><option key={r} value={r}>{r}</option>)}
               </select>
             </div>
-            <div><label style={labelStyle}>COT SIGNAL</label>
-              <select value={form.cot} onChange={e=>setForm(f=>({...f,cot:e.target.value}))} style={inputStyle}>
-                <option value="">—</option>
-                <option value="EXTREME">EXTREME</option>
-                <option value="FORT">FORT</option>
-                <option value="MODERE">MODERE</option>
-              </select>
+            {/* COT */}
+            <div style={{gridColumn:"1 / -1"}}>
+              <div style={{background:"#0a0a1a",borderRadius:6,padding:10,borderLeft:"3px solid #00aaff",marginBottom:4}}>
+                <div style={{fontSize:8,color:"#00aaff",fontWeight:700,letterSpacing:2,marginBottom:8}}>📈 COT — INSTITUTIONNELS</div>
+                <div style={{marginBottom:8}}>
+                  <label style={labelStyle}>DIRECTION DES INSTITUTIONNELS SUR LA PAIRE</label>
+                  <div style={{display:"flex",gap:6}}>
+                    {["HAUSSIER","BAISSIER"].map(d=>(
+                      <button key={d} onClick={()=>setForm(f=>({...f,cot_dir:d}))}
+                        style={{flex:1,padding:"8px",fontSize:10,cursor:"pointer",borderRadius:3,
+                          fontFamily:"'IBM Plex Mono',monospace",fontWeight:700,
+                          border:form.cot_dir===d?"1px solid "+(d==="HAUSSIER"?"#4ade8088":"#f8717188"):"1px solid #1a1a2e",
+                          background:form.cot_dir===d?(d==="HAUSSIER"?"#4ade8020":"#f8717120"):"#0c0c18",
+                          color:form.cot_dir===d?(d==="HAUSSIER"?"#4ade80":"#f87171"):"#4a5070"}}>
+                        {d==="HAUSSIER"?"▲ HAUSSIER":"▼ BAISSIER"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div style={{marginBottom:form.cot_dir?8:0}}>
+                  <label style={labelStyle}>FORCE DU SIGNAL COT</label>
+                  <div style={{display:"flex",gap:4}}>
+                    {["—","EXTREME","FORT","MODERE"].map(s=>(
+                      <button key={s} onClick={()=>setForm(f=>({...f,cot_strength:s==="—"?"":s}))}
+                        style={{flex:1,padding:"6px 4px",fontSize:9,cursor:"pointer",borderRadius:3,
+                          fontFamily:"'IBM Plex Mono',monospace",fontWeight:700,
+                          border:(form.cot_strength||"—")===s?"1px solid #00aaff88":"1px solid #1a1a2e",
+                          background:(form.cot_strength||"—")===s?"#00aaff20":"#0c0c18",
+                          color:(form.cot_strength||"—")===s?"#00aaff":"#4a5070"}}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {form.cot_dir && (
+                  <div style={{padding:"6px 8px",background:"#050508",borderRadius:3,fontSize:9,marginTop:6}}>
+                    <span style={{color:"#4a5070"}}>RÉSUMÉ : </span>
+                    <span style={{color:form.cot_dir==="HAUSSIER"?"#4ade80":"#f87171",fontWeight:700}}>
+                      {form.cot_dir==="HAUSSIER"?"▲":"▼"} {form.cot_dir} {form.cot_strength}
+                    </span>
+                    <span style={{color:"#4a5070"}}> — instits {form.cot_dir==="HAUSSIER"?"LONG":"SHORT"} sur la paire</span>
+                  </div>
+                )}
+              </div>
             </div>
-            <div><label style={labelStyle}>RETAIL SIGNAL</label>
-              <select value={form.retail} onChange={e=>setForm(f=>({...f,retail:e.target.value}))} style={inputStyle}>
-                <option value="">—</option>
-                <option value="EXTREME">EXTREME</option>
-                <option value="FORT">FORT</option>
-                <option value="MODERE">MODERE</option>
-                <option value="N/A">N/A</option>
-              </select>
+
+            {/* RETAIL */}
+            <div style={{gridColumn:"1 / -1"}}>
+              <div style={{background:"#0a0a1a",borderRadius:6,padding:10,borderLeft:"3px solid #f97316"}}>
+                <div style={{fontSize:8,color:"#f97316",fontWeight:700,letterSpacing:2,marginBottom:8}}>📊 RETAIL CONTRARIAN — MYFXBOOK</div>
+                <div style={{marginBottom:8}}>
+                  <label style={labelStyle}>% RETAIL DANS UNE DIRECTION</label>
+                  <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                    <input type="number" min="1" max="100" value={form.retail_pct||""}
+                      onChange={e=>setForm(f=>({...f,retail_pct:e.target.value}))}
+                      placeholder="78"
+                      style={{width:80,padding:"6px 8px",background:"#0c0c18",border:"1px solid #f9731644",
+                        borderRadius:3,color:"#f97316",fontSize:16,fontWeight:700,
+                        fontFamily:"'IBM Plex Mono',monospace",textAlign:"center",outline:"none"}}/>
+                    <span style={{fontSize:14,color:"#f97316",fontWeight:700}}>%</span>
+                  </div>
+                </div>
+                <div style={{marginBottom:8}}>
+                  <label style={labelStyle}>OÙ EST LE RETAIL ? (leur direction)</label>
+                  <div style={{display:"flex",gap:6}}>
+                    {["LONG","SHORT"].map(d=>(
+                      <button key={d} onClick={()=>setForm(f=>({...f,retail_dir:d}))}
+                        style={{flex:1,padding:"8px",fontSize:10,cursor:"pointer",borderRadius:3,
+                          fontFamily:"'IBM Plex Mono',monospace",fontWeight:700,
+                          border:form.retail_dir===d?"1px solid "+(d==="LONG"?"#4ade8088":"#f8717188"):"1px solid #1a1a2e",
+                          background:form.retail_dir===d?(d==="LONG"?"#4ade8020":"#f8717120"):"#0c0c18",
+                          color:form.retail_dir===d?(d==="LONG"?"#4ade80":"#f87171"):"#4a5070"}}>
+                        {d==="LONG"?"▲ LONG":"▼ SHORT"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {form.retail_pct && form.retail_dir && (()=>{
+                  const pct = parseFloat(form.retail_pct||0);
+                  const contra = form.retail_dir==="LONG"?"BAISSIER":"HAUSSIER";
+                  const contraColor = contra==="HAUSSIER"?"#4ade80":"#f87171";
+                  const longPct = form.retail_dir==="LONG"?pct:100-pct;
+                  const shortPct = form.retail_dir==="SHORT"?pct:100-pct;
+                  return (
+                    <div>
+                      <div style={{marginBottom:8}}>
+                        <div style={{display:"flex",justifyContent:"space-between",fontSize:8,marginBottom:3}}>
+                          <span style={{color:"#4ade80"}}>LONG {longPct.toFixed(0)}%</span>
+                          <span style={{color:"#f87171"}}>SHORT {shortPct.toFixed(0)}%</span>
+                        </div>
+                        <div style={{height:6,background:"#f87171",borderRadius:3,overflow:"hidden"}}>
+                          <div style={{width:longPct+"%",height:"100%",background:"#4ade80"}}/>
+                        </div>
+                      </div>
+                      <div style={{padding:"8px 10px",background:"#1a0a00",border:"1px solid #f9731644",borderRadius:4}}>
+                        <div style={{fontSize:8,color:"#f97316",fontWeight:700,marginBottom:4}}>⚡ SIGNAL CONTRARIAN</div>
+                        <div style={{display:"flex",alignItems:"center",gap:10}}>
+                          <div style={{fontSize:9,color:"#4a5070",lineHeight:1.5}}>
+                            {pct}% retail {form.retail_dir}<br/>
+                            <span style={{color:"#f97316"}}>→ ils vont se faire liquider</span>
+                          </div>
+                          <div style={{fontSize:20,color:"#333"}}>→</div>
+                          <div>
+                            <div style={{fontSize:14,fontWeight:700,color:contraColor}}>
+                              {contra==="HAUSSIER"?"▲":"▼"} {contra}
+                            </div>
+                            <div style={{fontSize:8,color:"#f97316"}}>signal contrarian</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
             </div>
             <div><label style={labelStyle}>ENTRÉE</label>
               <input type="number" step="0.00001" value={form.entry} onChange={e=>setForm(f=>({...f,entry:e.target.value}))} style={inputStyle} placeholder="1.08500"/>
@@ -1939,11 +2077,34 @@ function JournalView() {
                 {t.result_pips && <div style={{fontSize:9,color:"#4a5070"}}>{parseFloat(t.result_pips)>=0?"+":""}{t.result_pips} pips</div>}
               </div>
             </div>
-            <div style={{display:"flex",gap:6,marginBottom:8,flexWrap:"wrap"}}>
-              {t.regime_base && t.regime_base!=="—" && <span style={{fontSize:8,color:REGIME_COLORS[t.regime_base]||"#4a5070",border:"1px solid "+(REGIME_COLORS[t.regime_base]||"#4a5070")+"44",padding:"2px 6px",borderRadius:3}}>{t.regime_base}</span>}
-              {t.regime_quote && t.regime_quote!=="—" && <span style={{fontSize:8,color:REGIME_COLORS[t.regime_quote]||"#4a5070",border:"1px solid "+(REGIME_COLORS[t.regime_quote]||"#4a5070")+"44",padding:"2px 6px",borderRadius:3}}>vs {t.regime_quote}</span>}
-              {t.cot && <span style={{fontSize:8,color:"#00aaff",border:"1px solid #00aaff33",padding:"2px 6px",borderRadius:3}}>COT {t.cot}</span>}
-              {t.retail && t.retail!=="N/A" && <span style={{fontSize:8,color:"#f97316",border:"1px solid #f9731633",padding:"2px 6px",borderRadius:3}}>RETAIL {t.retail}</span>}
+            {/* CONFLUENCES */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:8}}>
+              {/* MACRO */}
+              <div style={{padding:"6px 8px",background:"#00ff8812",borderRadius:4,border:"1px solid #00ff8833",textAlign:"center"}}>
+                <div style={{fontSize:7,color:"#00ff88",fontWeight:700,letterSpacing:1,marginBottom:3}}>MACRO</div>
+                {t.regime_base && t.regime_base!=="—" && <div style={{fontSize:9,color:REGIME_COLORS[t.regime_base]||"#4a5070",fontWeight:700}}>{t.regime_base.slice(0,4)}</div>}
+                {t.regime_quote && t.regime_quote!=="—" && <div style={{fontSize:8,color:REGIME_COLORS[t.regime_quote]||"#4a5070"}}>vs {t.regime_quote.slice(0,4)}</div>}
+              </div>
+              {/* COT */}
+              <div style={{padding:"6px 8px",background:"#00aaff12",borderRadius:4,border:"1px solid #00aaff33",textAlign:"center"}}>
+                <div style={{fontSize:7,color:"#00aaff",fontWeight:700,letterSpacing:1,marginBottom:3}}>COT INSTITS</div>
+                {t.cot_dir && <div style={{fontSize:10,color:t.cot_dir==="HAUSSIER"?"#4ade80":"#f87171",fontWeight:700}}>{t.cot_dir==="HAUSSIER"?"▲":"▼"} {t.cot_dir}</div>}
+                {t.cot_strength && <div style={{fontSize:8,color:"#00aaff"}}>{t.cot_strength}</div>}
+              </div>
+              {/* RETAIL */}
+              <div style={{padding:"6px 8px",background:"#f9731612",borderRadius:4,border:"1px solid #f9731633",textAlign:"center"}}>
+                <div style={{fontSize:7,color:"#f97316",fontWeight:700,letterSpacing:1,marginBottom:3}}>RETAIL</div>
+                {t.retail_pct && t.retail_dir && (()=>{
+                  const contra = t.retail_dir==="LONG"?"▼ BAIS":"▲ HAUS";
+                  const contraColor = t.retail_dir==="LONG"?"#f87171":"#4ade80";
+                  return (
+                    <div>
+                      <div style={{fontSize:9,color:"#4a5070"}}>{t.retail_pct}% {t.retail_dir}</div>
+                      <div style={{fontSize:9,color:contraColor,fontWeight:700}}>→ {contra}</div>
+                    </div>
+                  );
+                })()}
+              </div>
             </div>
             {(t.entry||t.sl||t.tp) && (
               <div style={{display:"flex",gap:12,marginBottom:8,fontSize:8,color:"#4a5070"}}>
