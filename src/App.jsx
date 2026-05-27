@@ -2572,7 +2572,13 @@ export default function App() {
             </thead>
             <tbody>
               {ranked.map((c,ri)=>{
-                const st=getStrength(c.score, getRegime(data,c.code)), reg=getRegime(data,c.code);
+                const reg=getRegime(data,c.code);
+            const scoreColor = c.score >= 0.3?"#00ff88":c.score >= 0.1?"#66ffaa":c.score >= 0?"#aaffcc":c.score >= -0.1?"#ffaaaa":c.score >= -0.3?"#ff6666":"#cc2200";
+            const st = {
+              color: scoreColor,
+              label: c.score >= 0.1 ? "FORT ↑" : c.score <= -0.1 ? "FAIBLE ↓" : "NEUTRE →",
+              labelColor: c.score >= 0.1 ? "#00ff88" : c.score <= -0.1 ? "#cc2200" : "#888899"
+            };
                 return (
                   <tr key={c.code} style={{ background:ri%2===0?"#07070e":"transparent" }}>
                     <td style={{ padding:"5px 12px", border:`1px solid ${BORDER}`, fontWeight:600, whiteSpace:"nowrap", borderLeft:`3px solid ${reg?reg.color+"88":BORDER}` }}>
@@ -2608,7 +2614,13 @@ export default function App() {
         <div style={{ padding:16 }}>
           <div style={{ fontSize:9, color:TEXT_DIM, letterSpacing:2, marginBottom:12 }}>CLASSEMENT MACRO — FORT → FAIBLE</div>
           {ranked.map((c,i)=>{
-            const st=getStrength(c.score, getRegime(data,c.code)), reg=getRegime(data,c.code);
+            const reg=getRegime(data,c.code);
+            const scoreColor = c.score >= 0.3?"#00ff88":c.score >= 0.1?"#66ffaa":c.score >= 0?"#aaffcc":c.score >= -0.1?"#ffaaaa":c.score >= -0.3?"#ff6666":"#cc2200";
+            const st = {
+              color: scoreColor,
+              label: c.score >= 0.1 ? "FORT ↑" : c.score <= -0.1 ? "FAIBLE ↓" : "NEUTRE →",
+              labelColor: c.score >= 0.1 ? "#00ff88" : c.score <= -0.1 ? "#cc2200" : "#888899"
+            };
             const infS=calcInflationScore(data,c.code), growS=calcGrowthScore(data,c.code);
             return (
               <div key={c.code} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6, padding:"10px 14px", background:BG2, borderRadius:4, border:`1px solid ${reg?reg.border+"33":BORDER}`, borderLeft:`3px solid ${st.color}` }}>
