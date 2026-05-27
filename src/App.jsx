@@ -41,16 +41,28 @@ const CURR = [
 const PAIR_ORDER = ["EUR","GBP","AUD","NZD","USD","CAD","CHF","JPY","CNY"];
 
 const SENT_PAIRS=[
+  // MAJEURES (USD)
   {name:"EURUSD",base:"EUR",quote:"USD"},{name:"GBPUSD",base:"GBP",quote:"USD"},
   {name:"USDJPY",base:"USD",quote:"JPY"},{name:"USDCAD",base:"USD",quote:"CAD"},
   {name:"AUDUSD",base:"AUD",quote:"USD"},{name:"NZDUSD",base:"NZD",quote:"USD"},
-  {name:"USDCHF",base:"USD",quote:"CHF"},{name:"GBPJPY",base:"GBP",quote:"JPY"},
-  {name:"EURJPY",base:"EUR",quote:"JPY"},{name:"AUDJPY",base:"AUD",quote:"JPY"},
-  {name:"EURAUD",base:"EUR",quote:"AUD"},{name:"GBPAUD",base:"GBP",quote:"AUD"},
-  {name:"EURGBP",base:"EUR",quote:"GBP"},{name:"AUDNZD",base:"AUD",quote:"NZD"},
-  {name:"CHFJPY",base:"CHF",quote:"JPY"},{name:"GBPCAD",base:"GBP",quote:"CAD"},
-  {name:"EURCAD",base:"EUR",quote:"CAD"},{name:"AUDCAD",base:"AUD",quote:"CAD"},
-  {name:"NZDJPY",base:"NZD",quote:"JPY"},
+  {name:"USDCHF",base:"USD",quote:"CHF"},
+  // CROISÉES EUR
+  {name:"EURJPY",base:"EUR",quote:"JPY"},{name:"EURGBP",base:"EUR",quote:"GBP"},
+  {name:"EURCHF",base:"EUR",quote:"CHF"},{name:"EURAUD",base:"EUR",quote:"AUD"},
+  {name:"EURCAD",base:"EUR",quote:"CAD"},{name:"EURNZD",base:"EUR",quote:"NZD"},
+  // CROISÉES GBP
+  {name:"GBPJPY",base:"GBP",quote:"JPY"},{name:"GBPCHF",base:"GBP",quote:"CHF"},
+  {name:"GBPAUD",base:"GBP",quote:"AUD"},{name:"GBPCAD",base:"GBP",quote:"CAD"},
+  {name:"GBPNZD",base:"GBP",quote:"NZD"},
+  // CROISÉES AUD
+  {name:"AUDJPY",base:"AUD",quote:"JPY"},{name:"AUDCHF",base:"AUD",quote:"CHF"},
+  {name:"AUDCAD",base:"AUD",quote:"CAD"},{name:"AUDNZD",base:"AUD",quote:"NZD"},
+  // CROISÉES NZD
+  {name:"NZDJPY",base:"NZD",quote:"JPY"},{name:"NZDCHF",base:"NZD",quote:"CHF"},
+  {name:"NZDCAD",base:"NZD",quote:"CAD"},
+  // CROISÉES CAD/CHF
+  {name:"CADJPY",base:"CAD",quote:"JPY"},{name:"CADCHF",base:"CAD",quote:"CHF"},
+  {name:"CHFJPY",base:"CHF",quote:"JPY"},
 ];
 const CFTC_CODES={EUR:"099741",GBP:"096742",JPY:"097741",CAD:"090741",AUD:"232741",CHF:"092741",USD:"098662",NZD:"112741"};
 const MFX_EMAIL="patrice-bonneau@outlook.com";
