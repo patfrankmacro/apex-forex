@@ -93,6 +93,18 @@ function analyzePairCOT(baseCur, quoteCur) {
 function buildSignal(rA, pCot) {
   if (!rA || !pCot) return { label:"— DONNÉES INCOMPLÈTES", color:"#475569", bg:"#1e3a5f22", action:"En attente des données", valid:false };
   if (rA.bias === "NEUTRE" && pCot.bias === "NEUTRE") return { label:"— NEUTRE", color:"#fbbf24", bg:"#1f2937", action:"Aucun positionnement marqué", valid:false };
+  // FILTRE STRICT: Leveraged Funds doivent être en divergence (base et quote opposées)
+  const bSig = pCot.base && pCot.base.signal;
+  const qSig = pCot.quote && pCot.quote.signal;
+  const bDir = bSig && bSig.includes("HAUSSIER") ? "HAUSSIER" : bSig && bSig.includes("BAISSIER") ? "BAISSIER" : "NEUTRE";
+  const qDir = qSig && qSig.includes("HAUSSIER") ? "HAUSSIER" : qSig && qSig.includes("BAISSIER") ? "BAISSIER" : "NEUTRE";
+  if (bDir === qDir || bDir === "NEUTRE" || qDir === "NEUTRE") {
+    return { label:"— PAS DE DIVERGENCE COT", color:"#64748b", bg:"#1e3a5f22", action:"Les 2 devises vont dans la même direction", valid:false };
+  }
+  // FILTRE STRICT: Retail doit être 70%+ contrarian (FORT ou EXTREME)
+  if (rA.strength !== "EXTREME" && rA.strength !== "FORT") {
+    return { label:"— RETAIL FAIBLE", color:"#64748b", bg:"#1e3a5f22", action:"Retail pas assez extrême (<70%)", valid:false };
+  }
 
   const diverge = rA.bias !== "NEUTRE" && pCot.bias !== "NEUTRE" && rA.bias === pCot.bias;
   // ATTENTION: contrarian retail signifie:
