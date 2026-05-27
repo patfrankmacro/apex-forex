@@ -260,11 +260,8 @@ export default function SentimentView() {
 
       <div style={{background:"#0a1628",border:"1px solid #f59e0b44",borderRadius:6,padding:"8px 12px",marginBottom:10,fontSize:9,color:"#94a3b8",lineHeight:1.8}}>
         <span style={{color:"#f59e0b",fontWeight:700}}>LOGIQUE INSTITUTIONNELLE : </span>
-        Retail contrarian + COT Leveraged Funds (changement hebdo) +
-        <span style={{color:"#4ade80"}}> Signal valide = Retail (inversé) aligné avec COT</span>
-        <div style={{marginTop:4,color:"#475569"}}>
-          COT: {Object.keys(cot).length}/8 | Retail: {Object.keys(retail).length} paires chargées
-        </div>
+        Retail contrarian + COT compare les <b>2 devises</b> (base vs quote percentiles) +
+        <span style={{color:"#4ade80"}}> Signal valide = Retail (inversé) aligné avec spread COT</span>
       </div>
 
       {status==="error"&&(
