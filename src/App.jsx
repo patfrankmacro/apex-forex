@@ -307,7 +307,11 @@ function explainRegime(data, code, regime) {
     return `${bc} EN ZONE DE CONFORT — ${infTxt} → pas de pression pour agir. ${svcTxt}. ${unempTxt}. Taux : ${rateNow}%. → Croissance solide sans inflation dangereuse = setup institutionnel idéal. Les capitaux se positionnent sur cette devise pour la stabilité et la croissance.`;
   }
   if (regime.label === "STAGFLATION") {
-    return `${bc} COINCÉE — ${infTxt} ${infImpact}, MAIS ${svcTxt}. ${unempTxt}. Taux : ${rateNow}%. → Monter les taux tuerait l'économie déjà en contraction. Baisser les taux alimenterait l'inflation. Les institutionnels fuient cette devise — pire scénario macro possible.`;
+    // Construire texte CPI si différent de Core
+    const cpiTxt = cpiNow !== null && cpiExp !== null && Math.abs(cpiNow - cpiExp) > 0.05
+      ? ` (CPI ${cpiNow}% vs exp ${cpiExp}% → ${cpiNow > cpiExp ? "EN HAUSSE" : "EN BAISSE"})`
+      : "";
+    return `${bc} COINCÉE — ${infTxt}${cpiTxt} ${infImpact}, MAIS ${svcTxt}. ${unempTxt}. Taux : ${rateNow}%. → Monter les taux tuerait l'économie déjà en contraction. Baisser les taux alimenterait l'inflation. Les institutionnels fuient cette devise — pire scénario macro possible.`;
   }
   if (regime.label === "RECESSION") {
     return `${bc} VA BAISSER LES TAUX — ${infTxt} ${infImpact}. ${svcTxt}. ${unempTxt}. Taux : ${rateNow}%. → L'économie se contracte ET l'inflation cède → la ${bc} a toute la latitude pour stimuler. Les traders vendent cette devise MAINTENANT en anticipation des baisses de taux.`;
@@ -2448,16 +2452,8 @@ export default function App() {
     }
   }
 
-  const REGIME_RANK = { "GOLDILOCKS":3, "SURCHAUFFE":2, "RECESSION":-2, "STAGFLATION":-3 };
   const ranked = useMemo(() =>
-    CURR.map(c => ({...c, score:calcScore(data,c.code)})).sort((a,b)=>{
-      const rA = getRegime(data,a.code);
-      const rB = getRegime(data,b.code);
-      const rankA = rA ? (REGIME_RANK[rA.label] ?? 0) : 0;
-      const rankB = rB ? (REGIME_RANK[rB.label] ?? 0) : 0;
-      if (rankB !== rankA) return rankB - rankA;
-      return b.score - a.score;
-    })
+    CURR.map(cu => ({...cu, score:calcScore(data,cu.code)})).sort((a,b) => b.score - a.score)
   ,[data]);
 
   const withData = ranked.filter(c => hasData(data,c.code));
@@ -2549,7 +2545,7 @@ export default function App() {
 
       {view==="table" && (
         <div style={{ overflowX:"auto", padding:12 }}>
-          <div style={{ fontSize:8, color:TEXT_DIM, marginBottom:8, letterSpacing:1 }}>PRIOR → EXP → NOW · Vert=BEAT · Rouge=MISS · Gris=NEUTRE · Tier1: Inflation/Core · Tier2: Unemployment/Services PMI</div>
+          <div style={{ fontSize:8, color:TEXT_DIM, marginBottom:8, letterSpacing:1 }}>PRIOR → EXP → NOW · Vert=EN HAUSSE · Rouge=EN BAISSE · Gris=STABLE · Tier1: Inflation/Core · Tier2: Unemployment/Services PMI</div>
           <table style={{ borderCollapse:"collapse", minWidth:980 }}>
             <thead>
               <tr>
