@@ -57,17 +57,23 @@ function analyzeRetail(s) {
 
 function analyzeCurrency(d) {
   if (!d) return null;
-  const range = d.max52 - d.min52;
-  const pct = range === 0 ? 50 : Math.round(((d.net - d.min52) / range) * 100);
-  let bias, strength, extreme = false;
-  if (pct >= 90) { bias = "HAUSSIER"; strength = "EXTREME"; extreme = true; }
-  else if (pct <= 10) { bias = "BAISSIER"; strength = "EXTREME"; extreme = true; }
-  else if (pct >= 65) { bias = "HAUSSIER"; strength = "FORT"; }
-  else if (pct <= 35) { bias = "BAISSIER"; strength = "FORT"; }
-  else if (pct >= 55) { bias = "HAUSSIER"; strength = "MODERE"; }
-  else if (pct <= 45) { bias = "BAISSIER"; strength = "MODERE"; }
-  else { bias = "NEUTRE"; strength = "NUL"; }
-  return { bias, strength, extreme, pct, net:d.net, longPos:d.longPos, shortPos:d.shortPos, date:d.date };
+  // Basé sur le signal hebdomadaire Leveraged Funds
+  let bias, strength, extreme = false, pct;
+  switch(d.signal) {
+    case "HAUSSIER_FORT":
+      bias="HAUSSIER"; strength="FORT"; pct=85; break;
+    case "HAUSSIER":
+      bias="HAUSSIER"; strength="MODERE"; pct=65; break;
+    case "BAISSIER":
+      bias="BAISSIER"; strength="MODERE"; pct=35; break;
+    case "BAISSIER_FORT":
+      bias="BAISSIER"; strength="FORT"; pct=15; break;
+    default:
+      bias="NEUTRE"; strength="NUL"; pct=50;
+  }
+  return { bias, strength, extreme, pct,
+           chgNet:d.chgNet, chgLong:d.chgLong, chgShort:d.chgShort,
+           signal:d.signal, longPos:d.longPos, shortPos:d.shortPos, date:d.date };
 }
 
 function analyzePairCOT(baseCur, quoteCur) {
@@ -86,7 +92,7 @@ function analyzePairCOT(baseCur, quoteCur) {
   return {
     bias, strength, extreme, spread,
     base:baseCur, quote:quoteCur,
-    desc:`Base P${baseCur.pct}% vs Quote P${quoteCur.pct}% (spread ${spread>0?"+":""}${spread})`
+    desc:`${baseCur.signal?.replace("_"," ")||"—"} vs ${quoteCur.signal?.replace("_"," ")||"—"} (spread ${spread>0?"+":""}${spread}pts)`
   };
 }
 
