@@ -225,6 +225,10 @@ export default function SentimentView() {
     return () => { clearInterval(ri); clearInterval(ci); };
   }, [loadRetail, loadCOT]);
 
+  // Debug — combien de devises COT chargées
+  const cotLoaded = Object.keys(cot).length;
+  const retailLoaded = Object.keys(retail).length;
+
   const pairs = PAIRS.map(p => {
     const s    = retail[p.name];
     const rA   = analyzeRetail(s);
@@ -260,8 +264,13 @@ export default function SentimentView() {
 
       <div style={{background:"#0a1628",border:"1px solid #f59e0b44",borderRadius:6,padding:"8px 12px",marginBottom:10,fontSize:9,color:"#94a3b8",lineHeight:1.8}}>
         <span style={{color:"#f59e0b",fontWeight:700}}>LOGIQUE INSTITUTIONNELLE : </span>
-        Retail contrarian + COT compare les <b>2 devises</b> (base vs quote percentiles) +
-        <span style={{color:"#4ade80"}}> Signal valide = Retail (inversé) aligné avec spread COT</span>
+        Retail contrarian + COT Leveraged Funds hebdomadaire +
+        <span style={{color:"#4ade80"}}> Signal valide = Retail (inversé) aligné avec COT</span>
+        <div style={{marginTop:4,color:"#475569"}}>
+          COT chargé: {cotLoaded}/8 devises | Retail chargé: {retailLoaded} paires
+          {cotLoaded < 8 && <span style={{color:"#f59e0b"}}> ⟳ Chargement COT...</span>}
+          {retailLoaded === 0 && <span style={{color:"#f59e0b"}}> ⟳ Chargement Retail...</span>}
+        </div>
       </div>
 
       {status==="error"&&(
