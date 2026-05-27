@@ -2304,6 +2304,7 @@ export default function App() {
       {view==="heat" && <HeatmapView data={data} />}
       {view==="sentiment" && <SentimentView />}
       {view==="cal"     && <CalView />}
+      {view==="journal" && <JournalView />}
     </div>
   );
 }
