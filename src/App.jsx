@@ -2786,6 +2786,7 @@ export default function App() {
         </div>
       )}
 
+      {view==="trademacro" && <TradeMacro data={data} /> }
       {view==="tradecot" && (
         <TradeCOT data={data} cotData={apexCot} />
       )}
