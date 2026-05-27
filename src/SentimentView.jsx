@@ -67,7 +67,7 @@ function analyzeCurrency(d) {
   else if (pct >= 55) { bias = "HAUSSIER"; strength = "MODERE"; }
   else if (pct <= 45) { bias = "BAISSIER"; strength = "MODERE"; }
   else { bias = "NEUTRE"; strength = "NUL"; }
-  return { bias, strength, extreme, pct, net:d.net, longPos:d.longPos, shortPos:d.shortPos, date:d.date, signal:d.signal, chgLong:d.chgLong, chgShort:d.chgShort, chgNet:d.chgNet };
+  return { bias, strength, extreme, pct, net:d.net, longPos:d.longPos, shortPos:d.shortPos, date:d.date, signal:d.signal, chgLong:d.chgLong, chgShort:d.chgShort, chgNet:d.chgNet, switchType:d.switchType };
 }
 
 function analyzePairCOT(baseCur, quoteCur) {
@@ -247,10 +247,37 @@ export default function SentimentView() {
         </div>
       </div>
 
-      <div style={{background:"#0a1628",border:"1px solid #f59e0b44",borderRadius:6,padding:"8px 12px",marginBottom:10,fontSize:9,color:"#94a3b8",lineHeight:1.8}}>
-        <span style={{color:"#f59e0b",fontWeight:700}}>LOGIQUE INSTITUTIONNELLE : </span>
-        Retail contrarian + COT compare les <b>2 devises</b> (base vs quote percentiles) +
-        <span style={{color:"#4ade80"}}> Signal valide = Retail (inversé) aligné avec spread COT</span>
+      <div style={{background:"#0a1628",border:"1px solid #f59e0b44",borderRadius:6,padding:"10px 12px",marginBottom:10}}>
+        <div style={{fontSize:11,color:"#f59e0b",fontWeight:700,marginBottom:8,letterSpacing:1}}>💼 LEVERAGED FUNDS — QUI SONT-ILS ?</div>
+        <div style={{fontSize:9,color:"#cbd5e1",lineHeight:1.7,marginBottom:10}}>
+          Hedge funds, CTAs, fonds spéculatifs à effet de levier. Ils trade avec horizon <b>swing/court terme</b> — le même que nous.
+          Contrairement aux banques centrales (hedgers) ou aux Asset Managers (long terme), leurs mouvements reflètent la <b>spéculation pure</b>
+          sur les données macro de la semaine.
+        </div>
+
+        <div style={{fontSize:11,color:"#4ade80",fontWeight:700,marginBottom:8,letterSpacing:1}}>🎯 POURQUOI LES SUIVRE ?</div>
+        <div style={{fontSize:9,color:"#cbd5e1",lineHeight:1.7,marginBottom:10}}>
+          • <b>Même horizon</b> que swing trader (1-4 semaines)<br/>
+          • Ajustent positions <b>chaque semaine</b> selon CPI, PMI, taux directeurs<br/>
+          • <b>Action concrète</b> (pas paroles) — ils risquent leur argent réel<br/>
+          • Signal <b>frais hebdomadaire</b> — rapport CFTC publié chaque vendredi
+        </div>
+
+        <div style={{fontSize:11,color:"#38bdf8",fontWeight:700,marginBottom:8,letterSpacing:1}}>📊 COMMENT ILS TRADENT ?</div>
+        <div style={{fontSize:9,color:"#cbd5e1",lineHeight:1.7,marginBottom:10}}>
+          • Analysent <b>CPI, Core Inflation, PMI Services, Unemployment</b><br/>
+          • Anticipent décisions <b>banques centrales</b> (hausse/baisse taux)<br/>
+          • Ajustent positions <b>Long/Short chaque mardi</b> (snapshot CFTC)<br/>
+          • <b>Bougent les prix</b> par leurs flux massifs sur futures
+        </div>
+
+        <div style={{fontSize:11,color:"#a78bfa",fontWeight:700,marginBottom:8,letterSpacing:1}}>⚡ NOTRE STRATÉGIE</div>
+        <div style={{fontSize:9,color:"#cbd5e1",lineHeight:1.7}}>
+          <b>1.</b> On lit le changement hebdomadaire (chgLong / chgShort) — pas le total<br/>
+          <b>2.</b> On compare la <b>force relative</b> entre 2 devises (Nino)<br/>
+          <b>3.</b> Si une devise a un <span style={{color:"#fbbf24"}}>🔥 SWITCH</span> (changement de direction vs semaine précédente) = signal premium<br/>
+          <b>4.</b> Retail contrarian 70%+ aligné = validation finale
+        </div>
       </div>
 
       {status==="error"&&(
@@ -317,7 +344,7 @@ export default function SentimentView() {
                     <div style={{position:"absolute",right:0,width:"10%",height:"100%",background:"#f8717155"}}/>
                     <div style={{position:"absolute",left:(bCur?.pct||50)+"%",top:-1,width:2,height:6,background:bCur?.bias==="HAUSSIER"?"#4ade80":"#f87171",transform:"translateX(-50%)"}}/>
                   </div>
-                  {bCur&&<div style={{fontSize:7,color:"#475569",marginTop:2}}>Chg semaine: {bCur.chgNet>=0?"+":""}{bCur.chgNet?.toLocaleString()||"—"}</div>}
+                  {bCur&&<div style={{fontSize:7,color:"#475569",marginTop:2}}>Chg semaine: {bCur.chgNet>=0?"+":""}{bCur.chgNet?.toLocaleString()||"—"}{bCur.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:bCur.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:bCur.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontWeight:700}}>🔥 SWITCH</span>}</div>}
                 </div>
                 <div>
                   <div style={{fontSize:7,color:"#475569",marginBottom:2}}><FlagImg code={quote} size={16} /> {quote} <span style={{color:qCur?.bias==="HAUSSIER"?"#4ade80":"#f87171",marginLeft:3}}>{(qCur?.signal||"—").replace("_"," ")}</span></div>
@@ -326,7 +353,7 @@ export default function SentimentView() {
                     <div style={{position:"absolute",right:0,width:"10%",height:"100%",background:"#f8717155"}}/>
                     <div style={{position:"absolute",left:(qCur?.pct||50)+"%",top:-1,width:2,height:6,background:qCur?.bias==="HAUSSIER"?"#4ade80":"#f87171",transform:"translateX(-50%)"}}/>
                   </div>
-                  {qCur&&<div style={{fontSize:7,color:"#475569",marginTop:2}}>Chg semaine: {qCur.chgNet>=0?"+":""}{qCur.chgNet?.toLocaleString()||"—"}</div>}
+                  {qCur&&<div style={{fontSize:7,color:"#475569",marginTop:2}}>Chg semaine: {qCur.chgNet>=0?"+":""}{qCur.chgNet?.toLocaleString()||"—"}{qCur.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:qCur.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:qCur.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontWeight:700}}>🔥 SWITCH</span>}</div>}
                 </div>
               </div>
 

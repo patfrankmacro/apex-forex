@@ -1094,7 +1094,7 @@ function GuideView() {
           <div style={{ fontSize:11, fontWeight:700, color:"#a855f7", marginBottom:10 }}>🔬 LES 3 INGRÉDIENTS DU SYSTÈME APEX</div>
           {[
             ["1️⃣ MACRO DIVERGENCE","Les 2 pays ont des régimes économiques opposés (ex: GOLDILOCKS vs RECESSION)","Plus la divergence est grande, plus le signal est fort","#00ff88"],
-            ["2️⃣ COT — INSTITUTIONNELS","Les grandes banques et fonds positionnent dans la même direction","Changement hebdomadaire Leveraged Funds (hedge funds + CTAs) — TFF Report CFTC · mis à jour chaque vendredi","#00aaff"],
+            ["2️⃣ COT — LEVERAGED FUNDS","Hedge funds + CTAs ajustent leurs positions chaque semaine","Force relative entre 2 devises (logique Nino) — TFF Report CFTC · mis à jour chaque vendredi","#00aaff"],
             ["3️⃣ RETAIL CONTRARIAN","Les traders particuliers ont statistiquement tort aux extrêmes","70%+ retail dans un sens → les institutionnels feront l'inverse","#f97316"],
           ].map(([title,desc,detail,color])=>(
             <div key={title} style={{ marginBottom:8, padding:"8px 10px", background:BG2, borderRadius:3, borderLeft:"2px solid "+color+"66" }}>
@@ -1811,12 +1811,12 @@ function TradeCOT({ data, cotData }) {
                 <FlagImg code={t.base} size={12} /> <span style={{color:t.bCotRaw?.signal?.includes("HAUSSIER")?"#4ade80":"#f87171",marginLeft:3}}>
                   {(t.bCotRaw?.signal||"—").replace("_"," ")}
                 </span>
-                <span style={{color:"#4a5070",marginLeft:4}}>({t.bCotRaw?.chgNet>=0?"+":""}{(t.bCotRaw?.chgNet||0).toLocaleString()})</span>
+                <span style={{color:"#4a5070",marginLeft:4}}>({t.bCotRaw?.chgNet>=0?"+":""}{(t.bCotRaw?.chgNet||0).toLocaleString()})</span>{t.bCotRaw?.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:t.bCotRaw.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:t.bCotRaw.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontSize:8,fontWeight:700}}>🔥 SWITCH</span>}
                 &nbsp;vs&nbsp;
                 <FlagImg code={t.quote} size={12} /> <span style={{color:t.qCotRaw?.signal?.includes("HAUSSIER")?"#4ade80":"#f87171",marginLeft:3}}>
                   {(t.qCotRaw?.signal||"—").replace("_"," ")}
                 </span>
-                <span style={{color:"#4a5070",marginLeft:4}}>({t.qCotRaw?.chgNet>=0?"+":""}{(t.qCotRaw?.chgNet||0).toLocaleString()})</span>
+                <span style={{color:"#4a5070",marginLeft:4}}>({t.qCotRaw?.chgNet>=0?"+":""}{(t.qCotRaw?.chgNet||0).toLocaleString()})</span>{t.qCotRaw?.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:t.qCotRaw.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:t.qCotRaw.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontSize:8,fontWeight:700}}>🔥 SWITCH</span>}
               </div>
               <div style={{fontSize:10,fontWeight:700,color:t.cotBias==="HAUSSIER"?"#4ade80":"#f87171"}}>
                 {t.cotBias} — {t.cotStrength}
