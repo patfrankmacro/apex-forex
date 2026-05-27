@@ -1714,6 +1714,9 @@ function TradeCOT({ data, cotData }) {
     const cotBias = cotSpread > 0 ? "HAUSSIER" : "BAISSIER";
     const cotStrength = cotAbs >= 60 ? "EXTREME" : cotAbs >= 40 ? "FORT" : cotAbs >= 20 ? "MODERE" : "NUL";
 
+    const bDir = bCotRaw.signal && bCotRaw.signal.includes("HAUSSIER") ? "HAUSSIER" : bCotRaw.signal && bCotRaw.signal.includes("BAISSIER") ? "BAISSIER" : "NEUTRE";
+    const qDir = qCotRaw.signal && qCotRaw.signal.includes("HAUSSIER") ? "HAUSSIER" : qCotRaw.signal && qCotRaw.signal.includes("BAISSIER") ? "BAISSIER" : "NEUTRE";
+    if (bDir === qDir || bDir === "NEUTRE" || qDir === "NEUTRE") return;
     const cotAligned = (direction === "LONG" && cotBias === "HAUSSIER") ||
                        (direction === "SHORT" && cotBias === "BAISSIER");
     if (!cotAligned) return;
@@ -1858,6 +1861,9 @@ function TradeApex({ data, cotData, retailData }) {
     const cotStrength = cotAbs >= 60 ? "EXTREME" : cotAbs >= 40 ? "FORT" : cotAbs >= 20 ? "MODERE" : "NUL";
 
     // Vérifier alignement COT avec direction
+    const bDir = bCotRaw.signal && bCotRaw.signal.includes("HAUSSIER") ? "HAUSSIER" : bCotRaw.signal && bCotRaw.signal.includes("BAISSIER") ? "BAISSIER" : "NEUTRE";
+    const qDir = qCotRaw.signal && qCotRaw.signal.includes("HAUSSIER") ? "HAUSSIER" : qCotRaw.signal && qCotRaw.signal.includes("BAISSIER") ? "BAISSIER" : "NEUTRE";
+    if (bDir === qDir || bDir === "NEUTRE" || qDir === "NEUTRE") return;
     const cotAligned = (direction === "LONG" && cotBias === "HAUSSIER") ||
                        (direction === "SHORT" && cotBias === "BAISSIER");
     if (!cotAligned) return;
