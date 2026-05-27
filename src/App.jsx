@@ -1785,14 +1785,12 @@ function TradeCOT({ data, cotData }) {
             <div style={{fontSize:8,color:"#94a3b8",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 2 — COT INSTITUTIONNELS</div>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <div style={{fontSize:9,color:"#94a3b8"}}>
-                <FlagImg code={t.base} size={12} />
-                <span style={{color:t.bCotRaw?.signal?.includes("HAUSSIER")?"#4ade80":"#f87171",marginLeft:3}}>
+                <FlagImg code={t.base} size={12} /> <span style={{color:t.bCotRaw?.signal?.includes("HAUSSIER")?"#4ade80":"#f87171",marginLeft:3}}>
                   {(t.bCotRaw?.signal||"—").replace("_"," ")}
                 </span>
                 <span style={{color:"#4a5070",marginLeft:4}}>({t.bCotRaw?.chgNet>=0?"+":""}{(t.bCotRaw?.chgNet||0).toLocaleString()})</span>
                 &nbsp;vs&nbsp;
-                <FlagImg code={t.quote} size={12} />
-                <span style={{color:t.qCotRaw?.signal?.includes("HAUSSIER")?"#4ade80":"#f87171",marginLeft:3}}>
+                <FlagImg code={t.quote} size={12} /> <span style={{color:t.qCotRaw?.signal?.includes("HAUSSIER")?"#4ade80":"#f87171",marginLeft:3}}>
                   {(t.qCotRaw?.signal||"—").replace("_"," ")}
                 </span>
                 <span style={{color:"#4a5070",marginLeft:4}}>({t.qCotRaw?.chgNet>=0?"+":""}{(t.qCotRaw?.chgNet||0).toLocaleString()})</span>
@@ -2010,7 +2008,7 @@ function TradeApex({ data, cotData, retailData }) {
                 <div style={{fontSize:7,color:"#00aaff",fontWeight:700,marginBottom:3}}>✅ COT INSTITS</div>
                 <div style={{fontSize:9,color:t.cotBias==="HAUSSIER"?"#4ade80":"#f87171",fontWeight:700}}>{t.cotBias}</div>
                 <div style={{fontSize:8,color:"#94a3b8"}}>{t.cotStrength}</div>
-                <div style={{fontSize:7,color:"#4a5070",marginTop:2}}>P{t.bPct}% vs P{t.qPct}%</div>
+                <div style={{fontSize:7,color:"#4a5070",marginTop:2}}>{(t.bCotRaw?.signal||"—").replace("_"," ")} / {(t.qCotRaw?.signal||"—").replace("_"," ")}</div>
               </div>
               <div style={{padding:"6px 8px",background:"#f9731615",borderRadius:3,textAlign:"center",border:"1px solid #f9731633"}}>
                 <div style={{fontSize:7,color:"#f97316",fontWeight:700,marginBottom:3}}>✅ RETAIL</div>
