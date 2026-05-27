@@ -140,16 +140,32 @@ async function myfxLoadAll() {
 
 async function fetchCOT(code) {
   try {
-    const url = "https://publicreporting.cftc.gov/resource/6dca-aqww.json?cftc_contract_market_code=" + code + "&$order=report_date_as_yyyy_mm_dd DESC&$limit=55";
+    const url = "https://publicreporting.cftc.gov/resource/gpe5-46if.json?cftc_contract_market_code=" + code + "&$order=report_date_as_yyyy_mm_dd DESC&$limit=1";
     const rows = await (await fetch(url)).json();
     if (!rows?.length) return null;
-    const nets = rows.map(r => parseFloat(r.noncomm_positions_long_all||0) - parseFloat(r.noncomm_positions_short_all||0));
+    const row = rows[0];
+    const chgLong  = parseInt(row.change_in_lev_money_long||0);
+    const chgShort = parseInt(row.change_in_lev_money_short||0);
+    const chgNet   = chgLong - chgShort;
+    const levLong  = parseInt(row.lev_money_positions_long||0);
+    const levShort = parseInt(row.lev_money_positions_short||0);
+    // Signal basé sur le changement hebdomadaire
+    let signal = "NEUTRE";
+    if (chgLong>0 && chgShort<0) signal = "HAUSSIER_FORT";
+    else if (chgLong<0 && chgShort>0) signal = "BAISSIER_FORT";
+    else if (chgNet > 500) signal = "HAUSSIER";
+    else if (chgNet < -500) signal = "BAISSIER";
+    // Convertir signal en net/max52/min52 pour compatibilité avec analyzeCurrency
+    const pct = signal==="HAUSSIER_FORT"?85:signal==="HAUSSIER"?65:signal==="BAISSIER"?35:signal==="BAISSIER_FORT"?15:50;
+    // net fictif entre -100000 et +100000 pour forcer le percentile voulu
+    const fakeNet = (pct - 50) * 2000;
     return {
-      net: Math.round(nets[0]),
-      longPos: Math.round(parseFloat(rows[0].noncomm_positions_long_all||0)),
-      shortPos: Math.round(parseFloat(rows[0].noncomm_positions_short_all||0)),
-      max52: Math.max(...nets), min52: Math.min(...nets),
-      date: rows[0].report_date_as_yyyy_mm_dd?.slice(0,10) || "—",
+      net: fakeNet,
+      longPos: levLong,
+      shortPos: levShort,
+      chgLong, chgShort, chgNet, signal,
+      max52: 100000, min52: -100000,
+      date: row.report_date_as_yyyy_mm_dd?.slice(0,10) || "—",
     };
   } catch { return null; }
 }
