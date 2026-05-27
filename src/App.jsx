@@ -414,7 +414,10 @@ function getRegime(data, code) {
   const cpiBaisse  = cpiNow !== null && cpiExp !== null && cpiNow < cpiExp - 0.05;
 
   // Core prime sur CPI
-  const infHausse = coreHausse || (coreStable && cpiHausse);
+  // CPI seul sans Core = signal plus faible
+  // Hausse CPI doit être significative (> 0.15%) pour déclencher infHausse sans Core
+  const cpiHausseSig = cpiNow !== null && cpiExp !== null && cpiNow > cpiExp + 0.15;
+  const infHausse = coreHausse || (coreStable && cpiHausseSig);
   const infBaisse = coreBaisse || (coreStable && cpiBaisse);
 
   // ── 2. PMI SERVICES — RÈGLE ABSOLUE (seuil 50) ───────────
