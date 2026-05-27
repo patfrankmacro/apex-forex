@@ -69,8 +69,7 @@ function analyzeRetailS(s){
 }
 function analyzeCurrencyS(d){
   if(!d)return null;
-  const range=d.max52-d.min52;
-  const pct=range===0?50:Math.round(((d.net-d.min52)/range)*100);
+  const pct=d.signal==="HAUSSIER_FORT"?85:d.signal==="HAUSSIER"?65:d.signal==="BAISSIER"?35:d.signal==="BAISSIER_FORT"?15:50;
   if(pct>=90)return{bias:"HAUSSIER",strength:"EXTREME",pct};
   if(pct<=10)return{bias:"BAISSIER",strength:"EXTREME",pct};
   if(pct>=65)return{bias:"HAUSSIER",strength:"FORT",pct};
@@ -108,11 +107,22 @@ function buildSignalS(rA,pCot){
 }
 async function fetchCOTApp(code){
   try{
-    const url="https://publicreporting.cftc.gov/resource/6dca-aqww.json?cftc_contract_market_code="+code+"&$order=report_date_as_yyyy_mm_dd DESC&$limit=55";
+    const url="https://publicreporting.cftc.gov/resource/gpe5-46if.json?cftc_contract_market_code="+code+"&$order=report_date_as_yyyy_mm_dd DESC&$limit=55";
     const rows=await(await fetch(url)).json();
     if(!rows||!rows.length)return null;
-    const nets=rows.map(r=>parseFloat(r.noncomm_positions_long_all||0)-parseFloat(r.noncomm_positions_short_all||0));
-    return{net:Math.round(nets[0]),max52:Math.max(...nets.slice(0,26)),min52:Math.min(...nets.slice(0,26))};
+    const row=rows[0];
+    const chgLong=parseInt(row.change_in_lev_money_long||0);
+    const chgShort=parseInt(row.change_in_lev_money_short||0);
+    const chgNet=chgLong-chgShort;
+    const levLong=parseInt(row.lev_money_positions_long||0);
+    const levShort=parseInt(row.lev_money_positions_short||0);
+    const date=row.report_date_as_yyyy_mm_dd?.slice(0,10)||"";
+    let signal="NEUTRE";
+    if(chgLong>0&&chgShort<0)signal="HAUSSIER_FORT";
+    else if(chgLong<0&&chgShort>0)signal="BAISSIER_FORT";
+    else if(chgNet>500)signal="HAUSSIER";
+    else if(chgNet<-500)signal="BAISSIER";
+    return{chgLong,chgShort,chgNet,levLong,levShort,net:levLong-levShort,signal,date,max52:1,min52:-1};
   }catch(e){return null;}
 }
 async function fetchRetailApp(){
@@ -2498,11 +2508,22 @@ export default function App() {
     const loadCOT = async () => {
       const res = await Promise.all(COT_CODES.map(async code => {
         try {
-          const url = "https://publicreporting.cftc.gov/resource/6dca-aqww.json?cftc_contract_market_code="+code+"&$order=report_date_as_yyyy_mm_dd DESC&$limit=55";
+          const url = "https://publicreporting.cftc.gov/resource/gpe5-46if.json?cftc_contract_market_code="+code+"&$order=report_date_as_yyyy_mm_dd DESC&$limit=55";
           const rows = await (await fetch(url)).json();
           if (!rows?.length) return [code, null];
-          const nets = rows.map(r => parseFloat(r.noncomm_positions_long_all||0) - parseFloat(r.noncomm_positions_short_all||0));
-          return [code, { net: Math.round(nets[0]), max52: Math.max(...nets.slice(0,26)), min52: Math.min(...nets.slice(0,26)) }];
+          const row=rows[0];
+          const chgLong=parseInt(row.change_in_lev_money_long||0);
+          const chgShort=parseInt(row.change_in_lev_money_short||0);
+          const chgNet=chgLong-chgShort;
+          const levLong=parseInt(row.lev_money_positions_long||0);
+          const levShort=parseInt(row.lev_money_positions_short||0);
+          const date=row.report_date_as_yyyy_mm_dd?.slice(0,10)||"";
+          let signal="NEUTRE";
+          if(chgLong>0&&chgShort<0)signal="HAUSSIER_FORT";
+          else if(chgLong<0&&chgShort>0)signal="BAISSIER_FORT";
+          else if(chgNet>500)signal="HAUSSIER";
+          else if(chgNet<-500)signal="BAISSIER";
+          return [code,{chgLong,chgShort,chgNet,levLong,levShort,net:levLong-levShort,signal,date,max52:1,min52:-1}];
         } catch { return [code, null]; }
       }));
       const map = {};
