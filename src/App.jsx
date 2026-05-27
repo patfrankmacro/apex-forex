@@ -1707,10 +1707,8 @@ function TradeCOT({ data, cotData }) {
     const qCotRaw  = cotData[CFTC_MAP[quote]];
     if (!bCotRaw || !qCotRaw) return;
 
-    const cotRange_b = bCotRaw.max52 - bCotRaw.min52;
-    const cotRange_q = qCotRaw.max52 - qCotRaw.min52;
-    const bPct = cotRange_b === 0 ? 50 : Math.round(((bCotRaw.net - bCotRaw.min52) / cotRange_b) * 100);
-    const qPct = cotRange_q === 0 ? 50 : Math.round(((qCotRaw.net - qCotRaw.min52) / cotRange_q) * 100);
+    const bPct = bCotRaw.signal==="HAUSSIER_FORT"?85:bCotRaw.signal==="HAUSSIER"?65:bCotRaw.signal==="BAISSIER"?35:bCotRaw.signal==="BAISSIER_FORT"?15:50;
+    const qPct = qCotRaw.signal==="HAUSSIER_FORT"?85:qCotRaw.signal==="HAUSSIER"?65:qCotRaw.signal==="BAISSIER"?35:qCotRaw.signal==="BAISSIER_FORT"?15:50;
     const cotSpread = bPct - qPct;
     const cotAbs = Math.abs(cotSpread);
     const cotBias = cotSpread > 0 ? "HAUSSIER" : "BAISSIER";
@@ -1845,10 +1843,8 @@ function TradeApex({ data, cotData, retailData }) {
     const qCotRaw  = cotData[CFTC_MAP[quote]];
     if (!bCotRaw || !qCotRaw) return;
 
-    const cotRange_b = bCotRaw.max52 - bCotRaw.min52;
-    const cotRange_q = qCotRaw.max52 - qCotRaw.min52;
-    const bPct = cotRange_b === 0 ? 50 : Math.round(((bCotRaw.net - bCotRaw.min52) / cotRange_b) * 100);
-    const qPct = cotRange_q === 0 ? 50 : Math.round(((qCotRaw.net - qCotRaw.min52) / cotRange_q) * 100);
+    const bPct = bCotRaw.signal==="HAUSSIER_FORT"?85:bCotRaw.signal==="HAUSSIER"?65:bCotRaw.signal==="BAISSIER"?35:bCotRaw.signal==="BAISSIER_FORT"?15:50;
+    const qPct = qCotRaw.signal==="HAUSSIER_FORT"?85:qCotRaw.signal==="HAUSSIER"?65:qCotRaw.signal==="BAISSIER"?35:qCotRaw.signal==="BAISSIER_FORT"?15:50;
     const cotSpread = bPct - qPct;
     const cotAbs = Math.abs(cotSpread);
     const cotBias = cotSpread > 0 ? "HAUSSIER" : "BAISSIER";
