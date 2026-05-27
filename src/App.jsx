@@ -123,9 +123,13 @@ async function fetchCOTApp(code){
     const rows=await(await fetch(url)).json();
     if(!rows||!rows.length)return null;
     const row=rows[0];
+    const prev=rows[1]||{};
     const chgLong=parseInt(row.change_in_lev_money_long||0);
     const chgShort=parseInt(row.change_in_lev_money_short||0);
     const chgNet=chgLong-chgShort;
+    const prevChgLong=parseInt(prev.change_in_lev_money_long||0);
+    const prevChgShort=parseInt(prev.change_in_lev_money_short||0);
+    const prevChgNet=prevChgLong-prevChgShort;
     const levLong=parseInt(row.lev_money_positions_long||0);
     const levShort=parseInt(row.lev_money_positions_short||0);
     const date=row.report_date_as_yyyy_mm_dd?.slice(0,10)||"";
@@ -134,7 +138,11 @@ async function fetchCOTApp(code){
     else if(chgLong<0&&chgShort>0)signal="BAISSIER_FORT";
     else if(chgNet>500)signal="HAUSSIER";
     else if(chgNet<-500)signal="BAISSIER";
-    return{chgLong,chgShort,chgNet,levLong,levShort,net:levLong-levShort,signal,date,max52:1,min52:-1};
+    let switchType=null;
+    const diff=chgNet-prevChgNet;
+    if(diff>2000&&prevChgNet<=500&&chgNet>500)switchType="SWITCH_HAUSSIER";
+    else if(diff<-2000&&prevChgNet>=-500&&chgNet<-500)switchType="SWITCH_BAISSIER";
+    return{chgLong,chgShort,chgNet,prevChgNet,switchType,levLong,levShort,net:levLong-levShort,signal,date,max52:1,min52:-1};
   }catch(e){return null;}
 }
 async function fetchRetailApp(){
