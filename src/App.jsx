@@ -1082,7 +1082,7 @@ function GuideView() {
           <div style={{ fontSize:11, fontWeight:700, color:"#a855f7", marginBottom:10 }}>🔬 LES 3 INGRÉDIENTS DU SYSTÈME APEX</div>
           {[
             ["1️⃣ MACRO DIVERGENCE","Les 2 pays ont des régimes économiques opposés (ex: GOLDILOCKS vs RECESSION)","Plus la divergence est grande, plus le signal est fort","#00ff88"],
-            ["2️⃣ COT — INSTITUTIONNELS","Les grandes banques et fonds positionnent dans la même direction","Changement hebdomadaire Leveraged Funds (hedge funds + CTAs) — TFF Report CFTC","#00aaff"],
+            ["2️⃣ COT — INSTITUTIONNELS","Les grandes banques et fonds positionnent dans la même direction","Mesuré sur 52 semaines — percentile de positionnement net","#00aaff"],
             ["3️⃣ RETAIL CONTRARIAN","Les traders particuliers ont statistiquement tort aux extrêmes","70%+ retail dans un sens → les institutionnels feront l'inverse","#f97316"],
           ].map(([title,desc,detail,color])=>(
             <div key={title} style={{ marginBottom:8, padding:"8px 10px", background:BG2, borderRadius:3, borderLeft:"2px solid "+color+"66" }}>
@@ -1727,7 +1727,7 @@ function TradeCOT({ data, cotData }) {
     trades.push({
       name, base, quote,
       direction, macroPts, rBase, rQuote,
-      cotBias, cotStrength, bPct, qPct, cotSpread, cotDiv: getCOTDivergence(bCotRaw, qCotRaw),
+      cotBias, cotStrength, bPct, qPct, cotSpread,
       sig: sigCot,
     });
   });
@@ -1785,7 +1785,7 @@ function TradeCOT({ data, cotData }) {
             <div style={{fontSize:8,color:"#94a3b8",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 2 — COT INSTITUTIONNELS</div>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <div style={{fontSize:9,color:"#94a3b8"}}>
-                <FlagImg code={t.base} size={12} /> <span style={{color:t.cotDiv?.bDir==="HAUSSIER"?"#4ade80":"#f87171"}}>{t.cotDiv?.bSig?.replace("_"," ")||"—"}</span> ({t.cotDiv?.bChg>=0?"+":""}{t.cotDiv?.bChg?.toLocaleString()}) &nbsp;vs&nbsp; <FlagImg code={t.quote} size={12} /> <span style={{color:t.cotDiv?.qDir==="HAUSSIER"?"#4ade80":"#f87171"}}>{t.cotDiv?.qSig?.replace("_"," ")||"—"}</span> ({t.cotDiv?.qChg>=0?"+":""}{t.cotDiv?.qChg?.toLocaleString()})
+                <FlagImg code={t.base} size={12} /> P{t.bPct}% &nbsp;vs&nbsp; <FlagImg code={t.quote} size={12} /> P{t.qPct}%
                 <span style={{color:"#4a5070",marginLeft:6}}>spread {t.cotSpread>0?"+":""}{t.cotSpread}</span>
               </div>
               <div style={{fontSize:10,fontWeight:700,color:t.cotBias==="HAUSSIER"?"#4ade80":"#f87171"}}>
@@ -1882,7 +1882,7 @@ function TradeApex({ data, cotData, retailData }) {
     trades.push({
       name, base, quote, baseFlag, quoteFlag,
       direction, macroPts, rBase, rQuote,
-      cotBias, cotStrength, bPct, qPct, cotSpread, cotDiv: getCOTDivergence(bCotRaw, qCotRaw),
+      cotBias, cotStrength, bPct, qPct, cotSpread,
       retailBias, retailStrength, lp, sp,
       sig,
     });
@@ -1958,7 +1958,7 @@ function TradeApex({ data, cotData, retailData }) {
               <div style={{fontSize:8,color:"#94a3b8",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 2 — COT INSTITUTIONNELS</div>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <div style={{fontSize:9,color:"#94a3b8"}}>
-                  <FlagImg code={t.base} size={12} /> <span style={{color:t.cotDiv?.bDir==="HAUSSIER"?"#4ade80":"#f87171"}}>{t.cotDiv?.bSig?.replace("_"," ")||"—"}</span> ({t.cotDiv?.bChg>=0?"+":""}{t.cotDiv?.bChg?.toLocaleString()}) &nbsp;vs&nbsp; <FlagImg code={t.quote} size={12} /> <span style={{color:t.cotDiv?.qDir==="HAUSSIER"?"#4ade80":"#f87171"}}>{t.cotDiv?.qSig?.replace("_"," ")||"—"}</span> ({t.cotDiv?.qChg>=0?"+":""}{t.cotDiv?.qChg?.toLocaleString()})
+                  <FlagImg code={t.base} size={12} /> P{t.bPct}% &nbsp;vs&nbsp; <FlagImg code={t.quote} size={12} /> P{t.qPct}%
                   <span style={{color:"#4a5070",marginLeft:6}}>spread {t.cotSpread>0?"+":""}{t.cotSpread}</span>
                 </div>
                 <div style={{fontSize:10,fontWeight:700,color:t.cotBias==="HAUSSIER"?"#4ade80":"#f87171"}}>
@@ -2001,7 +2001,7 @@ function TradeApex({ data, cotData, retailData }) {
                 <div style={{fontSize:7,color:"#00aaff",fontWeight:700,marginBottom:3}}>✅ COT INSTITS</div>
                 <div style={{fontSize:9,color:t.cotBias==="HAUSSIER"?"#4ade80":"#f87171",fontWeight:700}}>{t.cotBias}</div>
                 <div style={{fontSize:8,color:"#94a3b8"}}>{t.cotStrength}</div>
-                <div style={{fontSize:7,color:"#4a5070",marginTop:2}}>{t.cotDiv?.bSig?.replace("_"," ")||"—"} / {t.cotDiv?.qSig?.replace("_"," ")||"—"}</div>
+                <div style={{fontSize:7,color:"#4a5070",marginTop:2}}>P{t.bPct}% vs P{t.qPct}%</div>
               </div>
               <div style={{padding:"6px 8px",background:"#f9731615",borderRadius:3,textAlign:"center",border:"1px solid #f9731633"}}>
                 <div style={{fontSize:7,color:"#f97316",fontWeight:700,marginBottom:3}}>✅ RETAIL</div>
