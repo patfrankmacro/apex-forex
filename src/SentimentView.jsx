@@ -57,23 +57,17 @@ function analyzeRetail(s) {
 
 function analyzeCurrency(d) {
   if (!d) return null;
-  // Basé sur le signal hebdomadaire Leveraged Funds
-  let bias, strength, extreme = false, pct;
-  switch(d.signal) {
-    case "HAUSSIER_FORT":
-      bias="HAUSSIER"; strength="FORT"; pct=85; break;
-    case "HAUSSIER":
-      bias="HAUSSIER"; strength="MODERE"; pct=65; break;
-    case "BAISSIER":
-      bias="BAISSIER"; strength="MODERE"; pct=35; break;
-    case "BAISSIER_FORT":
-      bias="BAISSIER"; strength="FORT"; pct=15; break;
-    default:
-      bias="NEUTRE"; strength="NUL"; pct=50;
-  }
-  return { bias, strength, extreme, pct,
-           chgNet:d.chgNet, chgLong:d.chgLong, chgShort:d.chgShort,
-           signal:d.signal, longPos:d.longPos, shortPos:d.shortPos, date:d.date };
+  const range = d.max52 - d.min52;
+  const pct = range === 0 ? 50 : Math.round(((d.net - d.min52) / range) * 100);
+  let bias, strength, extreme = false;
+  if (pct >= 90) { bias = "HAUSSIER"; strength = "EXTREME"; extreme = true; }
+  else if (pct <= 10) { bias = "BAISSIER"; strength = "EXTREME"; extreme = true; }
+  else if (pct >= 65) { bias = "HAUSSIER"; strength = "FORT"; }
+  else if (pct <= 35) { bias = "BAISSIER"; strength = "FORT"; }
+  else if (pct >= 55) { bias = "HAUSSIER"; strength = "MODERE"; }
+  else if (pct <= 45) { bias = "BAISSIER"; strength = "MODERE"; }
+  else { bias = "NEUTRE"; strength = "NUL"; }
+  return { bias, strength, extreme, pct, net:d.net, longPos:d.longPos, shortPos:d.shortPos, date:d.date };
 }
 
 function analyzePairCOT(baseCur, quoteCur) {
@@ -92,7 +86,7 @@ function analyzePairCOT(baseCur, quoteCur) {
   return {
     bias, strength, extreme, spread,
     base:baseCur, quote:quoteCur,
-    desc:`${baseCur.signal?.replace("_"," ")||"—"} vs ${quoteCur.signal?.replace("_"," ")||"—"} (spread ${spread>0?"+":""}${spread}pts)`
+    desc:`Base P${baseCur.pct}% vs Quote P${quoteCur.pct}% (spread ${spread>0?"+":""}${spread})`
   };
 }
 
@@ -146,27 +140,14 @@ async function myfxLoadAll() {
 
 async function fetchCOT(code) {
   try {
-    const url = "https://publicreporting.cftc.gov/resource/gpe5-46if.json?cftc_contract_market_code=" + code + "&$order=report_date_as_yyyy_mm_dd DESC&$limit=1";
+    const url = "https://publicreporting.cftc.gov/resource/6dca-aqww.json?cftc_contract_market_code=" + code + "&$order=report_date_as_yyyy_mm_dd DESC&$limit=55";
     const rows = await (await fetch(url)).json();
     if (!rows?.length) return null;
-    const row = rows[0];
-    const chgLong  = parseInt(row.change_in_lev_money_long||0);
-    const chgShort = parseInt(row.change_in_lev_money_short||0);
-    const chgNet   = chgLong - chgShort;
-    const levLong  = parseInt(row.lev_money_positions_long||0);
-    const levShort = parseInt(row.lev_money_positions_short||0);
-    let signal = "NEUTRE";
-    if(chgLong>0&&chgShort<0) signal="HAUSSIER_FORT";
-    else if(chgLong<0&&chgShort>0) signal="BAISSIER_FORT";
-    else if(chgNet>500) signal="HAUSSIER";
-    else if(chgNet<-500) signal="BAISSIER";
-    const pct = signal==="HAUSSIER_FORT"?85:signal==="HAUSSIER"?65:signal==="BAISSIER"?35:signal==="BAISSIER_FORT"?15:50;
-    const nets = [levLong - levShort]; // dummy pour compatibilité
+    const nets = rows.map(r => parseFloat(r.noncomm_positions_long_all||0) - parseFloat(r.noncomm_positions_short_all||0));
     return {
       net: Math.round(nets[0]),
-      longPos: levLong,
-      shortPos: levShort,
-      chgLong, chgShort, chgNet, signal,
+      longPos: Math.round(parseFloat(rows[0].noncomm_positions_long_all||0)),
+      shortPos: Math.round(parseFloat(rows[0].noncomm_positions_short_all||0)),
       max52: Math.max(...nets), min52: Math.min(...nets),
       date: rows[0].report_date_as_yyyy_mm_dd?.slice(0,10) || "—",
     };
@@ -176,10 +157,9 @@ async function fetchCOT(code) {
 export default function SentimentView() {
   const [retail, setRetail]   = useState({});
   const [cot, setCot]         = useState({});
-  const [status, setStatus]     = useState("idle");
-  const [cotStatus, setCotStatus] = useState("idle");
-  const [lastUp, setLastUp]     = useState(null);
-  const [cotDate, setCotDate]   = useState(null);
+  const [status, setStatus]   = useState("idle");
+  const [lastUp, setLastUp]   = useState(null);
+  const [cotDate, setCotDate] = useState(null);
 
   const loadRetail = useCallback(async () => {
     setStatus("loading");
@@ -192,35 +172,20 @@ export default function SentimentView() {
   }, []);
 
   const loadCOT = useCallback(async () => {
-    setCotStatus("loading");
-    try {
-      const codes = [...new Set(Object.values(CFTC))];
-      const res = {};
-      await Promise.all(codes.map(async c => { res[c] = await fetchCOT(c); }));
-      setCot(res);
-      setCotDate(new Date().toLocaleDateString("fr-CA"));
-      setCotStatus("ok");
-    } catch { setCotStatus("error"); }
+    const codes = [...new Set(Object.values(CFTC))];
+    const res = {};
+    await Promise.all(codes.map(async c => { res[c] = await fetchCOT(c); }));
+    setCot(res);
+    setCotDate(new Date().toLocaleDateString("fr-CA"));
   }, []);
 
   useEffect(() => {
     loadRetail();
     loadCOT();
     const ri = setInterval(loadRetail, 60*60*1000);
-    // COT refresh: vendredi 20h30 UTC (publication CFTC) + samedi matin verification
-    let lastCotLoad = null;
     const ci = setInterval(() => {
       const n = new Date();
-      const day = n.getUTCDay();
-      const hour = n.getUTCHours();
-      const min = n.getUTCMinutes();
-      const dateKey = n.toISOString().slice(0,10);
-      // Vendredi apres 20h30 UTC ou samedi avant 6h UTC
-      const isCotTime = (day===5 && (hour>20 || (hour===20 && min>=30))) || (day===6 && hour<6);
-      if (isCotTime && lastCotLoad !== dateKey) {
-        lastCotLoad = dateKey;
-        loadCOT();
-      }
+      if (n.getUTCDay()===5 && n.getUTCHours()===20 && n.getUTCMinutes()>=30) loadCOT();
     }, 60000);
     return () => { clearInterval(ri); clearInterval(ci); };
   }, [loadRetail, loadCOT]);
@@ -249,12 +214,8 @@ export default function SentimentView() {
           </div>
         </div>
         <div style={{display:"flex",gap:6}}>
-          <button onClick={loadRetail} style={{padding:"4px 10px",fontSize:9,fontFamily:"monospace",cursor:"pointer",borderRadius:4,border:"1px solid "+(status==="loading"?"#38bdf8":status==="error"?"#ef4444":status==="ok"?"#22c55e":"#1e3a5f"),background:status==="loading"?"#38bdf820":status==="error"?"#7f1d1d33":status==="ok"?"#14532d33":"transparent",color:status==="loading"?"#38bdf8":status==="error"?"#f87171":status==="ok"?"#4ade80":"#64748b"}}>
-            {status==="loading"?"⟳ RETAIL...":status==="error"?"✗ RETAIL":status==="ok"?"✓ RETAIL":"↻ RETAIL"}
-          </button>
-          <button onClick={loadCOT} style={{padding:"4px 10px",fontSize:9,fontFamily:"monospace",cursor:"pointer",borderRadius:4,border:"1px solid "+(cotStatus==="loading"?"#38bdf8":cotStatus==="error"?"#ef4444":cotStatus==="ok"?"#22c55e":"#1e3a5f"),background:cotStatus==="loading"?"#38bdf820":cotStatus==="error"?"#7f1d1d33":cotStatus==="ok"?"#14532d33":"transparent",color:cotStatus==="loading"?"#38bdf8":cotStatus==="error"?"#f87171":cotStatus==="ok"?"#4ade80":"#64748b"}}>
-            {cotStatus==="loading"?"⟳ COT...":cotStatus==="error"?"✗ COT":cotStatus==="ok"?"✓ COT":"↻ COT"}
-          </button>
+          <button onClick={loadRetail} style={{padding:"4px 8px",fontSize:9,fontFamily:"monospace",cursor:"pointer",borderRadius:4,border:"1px solid #1e3a5f",background:"transparent",color:"#64748b"}}>↻ RETAIL</button>
+          <button onClick={loadCOT}    style={{padding:"4px 8px",fontSize:9,fontFamily:"monospace",cursor:"pointer",borderRadius:4,border:"1px solid #1e3a5f",background:"transparent",color:"#64748b"}}>↻ COT</button>
         </div>
       </div>
 
@@ -375,10 +336,10 @@ export default function SentimentView() {
         <div style={{fontSize:8,color:"#f59e0b",fontWeight:700,marginBottom:4}}>MÉTHODE INSTITUTIONNELLE</div>
         <div style={{fontSize:8,color:"#64748b",lineHeight:1.9}}>
           1️⃣ Retail Myfxbook → inversion contrarian (foule = mauvaise direction)<br/>
-          2️⃣ COT CFTC → changement hebdomadaire Leveraged Funds (hedge funds)<br/>
+          2️⃣ COT CFTC → calculer percentile 52sem de CHAQUE devise séparément<br/>
           3️⃣ Spread = Base P% - Quote P% (positif = paire haussière)<br/>
           4️⃣ Signal valide = Retail (inversé) aligné avec spread COT<br/>
-          <span style={{color:"#f59e0b"}}>🔥🔥 Setup parfait = retail extrême + COT Leveraged Funds aligné</span>
+          <span style={{color:"#f59e0b"}}>🔥🔥 Setup parfait = retail extrême + spread COT extrême</span>
         </div>
       </div>
 
