@@ -1711,15 +1711,23 @@ function TradeCOT({ data, cotData }) {
     const qPct = qCotRaw.signal==="HAUSSIER_FORT"?85:qCotRaw.signal==="HAUSSIER"?65:qCotRaw.signal==="BAISSIER"?35:qCotRaw.signal==="BAISSIER_FORT"?15:50;
     const cotSpread = bPct - qPct;
     const cotAbs = Math.abs(cotSpread);
-    const cotBias = cotSpread > 0 ? "HAUSSIER" : "BAISSIER";
-    const cotStrength = cotAbs >= 60 ? "EXTREME" : cotAbs >= 40 ? "FORT" : cotAbs >= 20 ? "MODERE" : "NUL";
+    let cotBias = cotSpread > 0 ? "HAUSSIER" : "BAISSIER";
+    let cotStrength = cotAbs >= 60 ? "EXTREME" : cotAbs >= 40 ? "FORT" : cotAbs >= 20 ? "MODERE" : "NUL";
 
-    const bDir = bCotRaw.signal && bCotRaw.signal.includes("HAUSSIER") ? "HAUSSIER" : bCotRaw.signal && bCotRaw.signal.includes("BAISSIER") ? "BAISSIER" : "NEUTRE";
-    const qDir = qCotRaw.signal && qCotRaw.signal.includes("HAUSSIER") ? "HAUSSIER" : qCotRaw.signal && qCotRaw.signal.includes("BAISSIER") ? "BAISSIER" : "NEUTRE";
-    if (bDir === qDir || bDir === "NEUTRE" || qDir === "NEUTRE") return;
-    const cotAligned = (direction === "LONG" && cotBias === "HAUSSIER") ||
-                       (direction === "SHORT" && cotBias === "BAISSIER");
+    // LOGIQUE NINO — force relative entre 2 devises
+    const bChg = bCotRaw.chgNet || 0;
+    const qChg = qCotRaw.chgNet || 0;
+    const forceDiff = bChg - qChg;
+    const absForce = Math.abs(forceDiff);
+    // Minimum 1500 de différentiel pour être valide
+    if (absForce < 1500) return;
+    const cotDirNino = forceDiff > 0 ? "HAUSSIER" : "BAISSIER";
+    const cotAligned = (direction === "LONG" && cotDirNino === "HAUSSIER") ||
+                       (direction === "SHORT" && cotDirNino === "BAISSIER");
     if (!cotAligned) return;
+    // Force selon magnitude du différentiel
+    cotBias = cotDirNino;
+    cotStrength = absForce >= 6000 ? "EXTREME" : absForce >= 3000 ? "FORT" : "MODERE";
 
     const sigCot = cotStrength === "EXTREME"
       ? { label:"🔥🔥 COT FORT", color:"#22c55e", bg:"#052010", priority:3 }
@@ -1857,16 +1865,24 @@ function TradeApex({ data, cotData, retailData }) {
     const qPct = qCotRaw.signal==="HAUSSIER_FORT"?85:qCotRaw.signal==="HAUSSIER"?65:qCotRaw.signal==="BAISSIER"?35:qCotRaw.signal==="BAISSIER_FORT"?15:50;
     const cotSpread = bPct - qPct;
     const cotAbs = Math.abs(cotSpread);
-    const cotBias = cotSpread > 0 ? "HAUSSIER" : "BAISSIER";
-    const cotStrength = cotAbs >= 60 ? "EXTREME" : cotAbs >= 40 ? "FORT" : cotAbs >= 20 ? "MODERE" : "NUL";
+    let cotBias = cotSpread > 0 ? "HAUSSIER" : "BAISSIER";
+    let cotStrength = cotAbs >= 60 ? "EXTREME" : cotAbs >= 40 ? "FORT" : cotAbs >= 20 ? "MODERE" : "NUL";
 
     // Vérifier alignement COT avec direction
-    const bDir = bCotRaw.signal && bCotRaw.signal.includes("HAUSSIER") ? "HAUSSIER" : bCotRaw.signal && bCotRaw.signal.includes("BAISSIER") ? "BAISSIER" : "NEUTRE";
-    const qDir = qCotRaw.signal && qCotRaw.signal.includes("HAUSSIER") ? "HAUSSIER" : qCotRaw.signal && qCotRaw.signal.includes("BAISSIER") ? "BAISSIER" : "NEUTRE";
-    if (bDir === qDir || bDir === "NEUTRE" || qDir === "NEUTRE") return;
-    const cotAligned = (direction === "LONG" && cotBias === "HAUSSIER") ||
-                       (direction === "SHORT" && cotBias === "BAISSIER");
+    // LOGIQUE NINO — force relative entre 2 devises
+    const bChg = bCotRaw.chgNet || 0;
+    const qChg = qCotRaw.chgNet || 0;
+    const forceDiff = bChg - qChg;
+    const absForce = Math.abs(forceDiff);
+    // Minimum 1500 de différentiel pour être valide
+    if (absForce < 1500) return;
+    const cotDirNino = forceDiff > 0 ? "HAUSSIER" : "BAISSIER";
+    const cotAligned = (direction === "LONG" && cotDirNino === "HAUSSIER") ||
+                       (direction === "SHORT" && cotDirNino === "BAISSIER");
     if (!cotAligned) return;
+    // Force selon magnitude du différentiel
+    cotBias = cotDirNino;
+    cotStrength = absForce >= 6000 ? "EXTREME" : absForce >= 3000 ? "FORT" : "MODERE";
 
     // Retail
     const rData = retailData[name];
