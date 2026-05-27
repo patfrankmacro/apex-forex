@@ -140,10 +140,30 @@ const TE_LINKS = {
 };
 
 const REGIMES = {
-  GOLDILOCKS:  { label: "GOLDILOCKS",  icon: "◆", color: "#00ff88", bg: "#001a0d", border: "#00ff88", bcBias: "NEUTRE → HAWKISH modéré", tauxDir: "Stables ou légère hausse", deviseDir: "HAUSSE — croissance sans inflation = idéal", action: "Marché anticipe : BC reste pat (zone de confort) → ACHÈTE — devise stable, setup idéal · ⚠ Risque faible, surveiller chocs externes", short: "Croissance ↑  Inflation ↓" },
-  SURCHAUFFE:  { label: "SURCHAUFFE",  icon: "▲", color: "#ffd700", bg: "#1a1500", border: "#ffd700", bcBias: "HAWKISH — hausse des taux imminente", tauxDir: "Hausse des taux imminente", deviseDir: "HAUSSE court terme — surveille retournement", action: "Marché anticipe : baisses repoussées (higher for longer) → ACHÈTE — devise forte sur différentiel de taux · ⚠ Risque : pic de cycle, retournement si inflation chute", short: "Croissance ↑  Inflation ↑" },
-  STAGFLATION: { label: "STAGFLATION", icon: "■", color: "#ff3b3b", bg: "#1a0000", border: "#ff3b3b", bcBias: "COINCÉE — ne peut pas agir", tauxDir: "Taux bloqués — BC prise en étau", deviseDir: "BAISSE — pire scénario macro", action: "Marché anticipe : BC piégée, ne peut ni monter ni baisser → ÉVITE le long — devise sous pression structurelle · ⚠ Risque : carry trade vulnérable au moindre choc", short: "Croissance ↓  Inflation ↑" },
-  RECESSION:   { label: "RECESSION",   icon: "▼", color: "#ff7a00", bg: "#1a0800", border: "#ff7a00", bcBias: "DOVISH — baisse des taux imminente", tauxDir: "Baisse des taux imminente", deviseDir: "BAISSE — capitaux fuient l'économie", action: "Marché anticipe : baisses de taux à venir → VENDS — devise sous pression, capitaux qui fuient · ⚠ Risque : si BC repousse baisses, rebond technique", short: "Croissance ↓  Inflation ↓" },
+  GOLDILOCKS:  { label: "GOLDILOCKS",  icon: "◆", color: "#00ff88", bg: "#001a0d", border: "#00ff88",
+    bcBias: "NEUTRE — zone de confort idéale",
+    tauxDir: "Taux stables — BC surveille sans agir",
+    deviseDir: "HAUSSE stable — croissance sans pression inflationniste",
+    action: "Marché anticipe : BC en zone de confort → ACHÈTE — croissance forte + inflation sous contrôle = setup institutionnel idéal · Capitaux affluent vers cette économie saine",
+    short: "PMI > 50 + Inflation stable/baisse" },
+  SURCHAUFFE:  { label: "SURCHAUFFE",  icon: "▲", color: "#ffd700", bg: "#1a1500", border: "#ffd700",
+    bcBias: "HAWKISH — hausse des taux imminente ou en cours",
+    tauxDir: "Hausse des taux — différentiel attire les capitaux",
+    deviseDir: "HAUSSE forte — capitaux attirés par les taux élevés",
+    action: "Marché anticipe : BC va monter les taux → ACHÈTE — inflation en hausse + croissance forte = BC forcée d'agir · Traders positionnent AVANT la décision",
+    short: "PMI > 50 + Inflation EN HAUSSE" },
+  STAGFLATION: { label: "STAGFLATION", icon: "■", color: "#ff3b3b", bg: "#1a0000", border: "#ff3b3b",
+    bcBias: "COINCÉE — monter tue l'économie, baisser alimente l'inflation",
+    tauxDir: "Taux bloqués — BC sans marge de manœuvre",
+    deviseDir: "BAISSE — pire scénario macro, devise sous pression",
+    action: "Marché anticipe : BC piégée, ne peut pas agir → ÉVITE ou VENDS — inflation en hausse MAIS croissance en contraction · Pire configuration pour une devise",
+    short: "PMI < 50 + Inflation EN HAUSSE" },
+  RECESSION:   { label: "RECESSION",   icon: "▼", color: "#ff7a00", bg: "#1a0800", border: "#ff7a00",
+    bcBias: "DOVISH — baisses de taux imminentes",
+    tauxDir: "Baisse des taux — différentiel pousse les capitaux ailleurs",
+    deviseDir: "BAISSE — capitaux fuient vers économies plus fortes",
+    action: "Marché anticipe : BC va baisser les taux → VENDS — inflation en baisse + croissance en contraction = BC forcée de stimuler · Capitaux fuient cette économie",
+    short: "PMI < 50 + Inflation stable/baisse" },
 };
 
 function FlagImg({ code, size=20 }) {
@@ -230,74 +250,67 @@ function calcScore(data, code) {
 
 function explainRegime(data, code, regime) {
   if (!regime || !data[code]) return "";
-  const target = BC_TARGETS[code] || 2.0;
-  const coreNow = toN(data[code]["core"].now);
-  const svcNow  = toN(data[code]["svc"].now);
-  const unempNow   = toN(data[code]["unemp"].now);
-  const unempPrior = toN(data[code]["unemp"].prior);
+
+  const bc      = (CURR.find(cu=>cu.code===code)?.bc) || "BC";
   const rateNow = toN(data[code]["rate"].now);
-  const bc = (CURR.find(c=>c.code===code)?.bc) || "BC";
-  // Direction chômage — hausse = mauvais, baisse = bon
-  const unempDir = "";
 
-  const coreExp = toN(data[code]["core"].exp);
-  const coreVsExp = (coreNow !== null && coreExp !== null && Math.abs(coreNow - coreExp) > 0.05)
-    ? `, vs exp ${coreExp}%` : "";
-  const coreImpact = (coreNow !== null && coreExp !== null && Math.abs(coreNow - coreExp) > 0.05)
-    ? (coreNow > coreExp ? ` → pression hawkish accrue` : ` → désinflation surprend`) : "";
-  const infTxt = coreNow !== null ?
-    (coreNow > target + 0.5 ? `inflation HAUTE (core ${coreNow}%${coreVsExp}, target ${target}%)` :
-     coreNow > target + 0.2 ? `inflation au-dessus du target (core ${coreNow}%${coreVsExp}, target ${target}%)` :
-     coreNow < target - 0.5 ? `inflation BASSE (core ${coreNow}%${coreVsExp}, target ${target}%)` :
-     coreNow < target - 0.2 ? `inflation sous target (core ${coreNow}%${coreVsExp}, target ${target}%)` :
-     `inflation à target (core ${coreNow}%${coreVsExp})`) : "";
-
-  const svcExp = toN(data[code]["svc"].exp);
-  const svcDir = (svcNow !== null && svcExp !== null && Math.abs(svcNow - svcExp) > 0.5)
-    ? `, vs exp ${svcExp}` : "";
-  const svcImpact = svcNow !== null ? (svcNow < 50 && svcExp !== null && svcNow < svcExp ? ` → contraction+surprise négative` : svcNow < 50 && svcExp !== null && svcNow > svcExp ? ` → contraction moins pire qu'attendu` : svcNow >= 50 && svcExp !== null && svcNow > svcExp ? ` → expansion+surprise positive` : "") : "";
-  const growTxt = svcNow !== null ?
-    (svcNow >= 55 ? `croissance forte (Services PMI ${svcNow}${svcDir})` :
-     svcNow >= 52 ? `croissance solide (Services PMI ${svcNow}${svcDir})` :
-     svcNow >= 50 ? `croissance stable (Services PMI ${svcNow}${svcDir})` :
-     svcNow >= 47 ? `croissance qui ralentit (Services PMI ${svcNow} en contraction légère${svcDir})` :
-     `croissance faible (Services PMI ${svcNow} en contraction${svcDir})`) : "";
-
+  const coreNow  = toN(data[code]["core"].now);
+  const coreExp  = toN(data[code]["core"].exp);
+  const cpiNow   = toN(data[code]["cpi"].now);
+  const cpiExp   = toN(data[code]["cpi"].exp);
+  const svcNow   = toN(data[code]["svc"].now);
+  const svcExp   = toN(data[code]["svc"].exp);
+  const svcPrior = toN(data[code]["svc"].prior);
+  const unempNow = toN(data[code]["unemp"].now);
   const unempExp = toN(data[code]["unemp"].exp);
-  const unempRef = unempExp !== null ? unempExp : unempPrior;
-  const unempExp2 = toN(data[code]["unemp"].exp);
-  const unempArr = (unempNow !== null && unempExp2 !== null && Math.abs(unempNow - unempExp2) > 0.05)
-    ? (unempNow > unempExp2 ? " ↓" : " ↑") : " →";
-  const unempExpTxt = (unempExp2 !== null && unempNow !== null && Math.abs(unempNow - unempExp2) > 0.05)
-    ? ` (exp ${unempExp2}, now ${unempNow}${unempArr})` : "";
-  const unempImpact = unempNow !== null && unempExp2 !== null && Math.abs(unempNow - unempExp2) > 0.05
-    ? (unempNow > unempExp2
-        ? ` → marché du travail se détériore, pression dovish sur ${bc}`
-        : ` → marché du travail solide, soutient la devise`)
+
+  // ── TEXTES INFLATION ─────────────────────────────────────
+  const coreHausse = coreNow !== null && coreExp !== null && coreNow > coreExp + 0.05;
+  const coreBaisse = coreNow !== null && coreExp !== null && coreNow < coreExp - 0.05;
+  const cpiHausse  = cpiNow  !== null && cpiExp  !== null && cpiNow  > cpiExp  + 0.05;
+  const cpiBaisse  = cpiNow  !== null && cpiExp  !== null && cpiNow  < cpiExp  - 0.05;
+
+  const infDir = coreHausse ? "EN HAUSSE" : coreBaisse ? "EN BAISSE" : "STABLE";
+  const infTxt = coreNow !== null && coreExp !== null
+    ? `Core Inflation ${coreNow}% vs exp ${coreExp}% → ${infDir}`
     : "";
-  const unempTxt = unempNow !== null
-    ? `chômage ${unempNow}%${unempExpTxt}${unempImpact}`
+  const infImpact = coreHausse
+    ? `→ marché anticipe que la ${bc} va MONTER les taux`
+    : coreBaisse
+    ? `→ marché anticipe que la ${bc} va BAISSER les taux`
+    : `→ pas de pression sur la ${bc}`;
+
+  // ── TEXTES PMI ───────────────────────────────────────────
+  const svcZone = svcNow !== null ? (svcNow >= 50 ? "EXPANSION" : "CONTRACTION") : "";
+  const svcDir  = (svcNow !== null && svcPrior !== null)
+    ? (svcNow > svcPrior ? `en accélération (${svcPrior}→${svcNow})` : svcNow < svcPrior ? `en ralentissement (${svcPrior}→${svcNow})` : `stable (${svcNow})`)
+    : svcNow !== null ? `${svcNow}` : "";
+  const svcVsExp = (svcNow !== null && svcExp !== null && Math.abs(svcNow - svcExp) > 0.3)
+    ? `, vs exp ${svcExp}` : "";
+  const svcTxt = svcNow !== null
+    ? `PMI Services ${svcNow}${svcVsExp} → ${svcZone} ${svcDir}`
     : "";
+
+  // ── TEXTES CHÔMAGE ───────────────────────────────────────
+  const unempBaisse = unempNow !== null && unempExp !== null && unempNow < unempExp - 0.05;
+  const unempHausse = unempNow !== null && unempExp !== null && unempNow > unempExp + 0.05;
+  const unempTxt = unempNow !== null && unempExp !== null && Math.abs(unempNow - unempExp) > 0.05
+    ? `Chômage ${unempNow}% vs exp ${unempExp}% → ${unempBaisse
+        ? "EN BAISSE → plus d'emplois → plus de dépenses → pression inflationniste → signal hawkish"
+        : "EN HAUSSE → perte d'emplois → moins de dépenses → inflation sous pression → signal dovish"}`
+    : unempNow !== null ? `Chômage ${unempNow}% → stable` : "";
 
   if (regime.label === "SURCHAUFFE") {
-    return `Avec ${infTxt} et ${growTxt}, la ${bc} est en mode HAWKISH${coreImpact}. ${unempTxt}. Taux à ${rateNow}% maintenus hauts${svcImpact}. → Devise FORTE sur le différentiel de taux : capitaux attirés.`;
+    return `${bc} EN MODE HAWKISH — ${infTxt} ${infImpact}. ${svcTxt}. ${unempTxt}. Taux actuels : ${rateNow}%. → Les traders achètent la devise MAINTENANT en anticipation de la prochaine hausse de taux — les capitaux affluent vers les économies qui offrent un meilleur rendement.`;
   }
   if (regime.label === "GOLDILOCKS") {
-    return `Avec ${infTxt} et ${growTxt}, la ${bc} est dans sa ZONE DE CONFORT${svcImpact}. ${unempTxt}. Taux à ${rateNow}%. → Devise haussière sans risque immédiat. Setup institutionnel idéal.`;
+    return `${bc} EN ZONE DE CONFORT — ${infTxt} → pas de pression pour agir. ${svcTxt}. ${unempTxt}. Taux : ${rateNow}%. → Croissance solide sans inflation dangereuse = setup institutionnel idéal. Les capitaux se positionnent sur cette devise pour la stabilité et la croissance.`;
   }
   if (regime.label === "STAGFLATION") {
-    const tauxCtx = rateNow >= 3.5 ? "malgré taux restrictifs"
-      : rateNow >= 2.0 ? "dans un contexte de taux neutres"
-      : "malgré taux accommodants";
-    return `${bc} PRISE AU PIÈGE : ${infTxt}${coreImpact} l'empêche de baisser, mais ${growTxt}${svcImpact} l'empêche de monter. ${unempTxt}. Taux à ${rateNow}%. → Devise FAIBLE ${tauxCtx}. ⚠ Pire scénario macro.`;
+    return `${bc} COINCÉE — ${infTxt} ${infImpact}, MAIS ${svcTxt}. ${unempTxt}. Taux : ${rateNow}%. → Monter les taux tuerait l'économie déjà en contraction. Baisser les taux alimenterait l'inflation. Les institutionnels fuient cette devise — pire scénario macro possible.`;
   }
   if (regime.label === "RECESSION") {
-    const recAction = rateNow <= 0.5
-      ? `la ${bc} maintient une politique très accommodante — peu de marge pour baisser davantage`
-      : rateNow <= 1.5
-      ? `la ${bc} va maintenir ou baisser légèrement les taux`
-      : `la ${bc} va devoir BAISSER les taux`;
-    return `Avec ${infTxt} et ${growTxt}, ${recAction}. ${unempTxt}. Taux à ${rateNow}%. → Devise sous pression${coreImpact}${svcImpact}. Capitaux qui fuient l'économie en ralentissement.`;
+    return `${bc} VA BAISSER LES TAUX — ${infTxt} ${infImpact}. ${svcTxt}. ${unempTxt}. Taux : ${rateNow}%. → L'économie se contracte ET l'inflation cède → la ${bc} a toute la latitude pour stimuler. Les traders vendent cette devise MAINTENANT en anticipation des baisses de taux.`;
   }
   return "";
 }
@@ -333,34 +346,27 @@ function interpretIndicator(id, now, code, exp=null) {
   if (now === null || now === undefined) return "";
   const target = BC_TARGETS[code] || 2.0;
   if (id === "cpi" || id === "core") {
-    const arr = (exp !== null && Math.abs(now - exp) > 0.05)
-      ? (now > exp ? " ↑" : " ↓") : " →";
-    const expTxt = exp !== null
-      ? ` (target ${target}%, exp ${exp}, now ${now}${arr})`
-      : ` (target ${target}%)`;
-    if (now > target + 0.5)  return `→ HAUTE${expTxt}`;
-    if (now > target + 0.2)  return `→ AU-DESSUS${expTxt}`;
-    if (now < target - 0.5)  return `→ BASSE${expTxt}`;
-    if (now < target - 0.2)  return `→ SOUS TARGET${expTxt}`;
-    return `→ À TARGET${expTxt}`;
+    if (exp === null) return `→ ${now}% (target ${target}%)`;
+    const diff = now - exp;
+    const arr = diff > 0.05 ? " ↑" : diff < -0.05 ? " ↓" : " →";
+    if (diff > 0.05)  return `→ EN HAUSSE (exp ${exp}, now ${now}${arr}) — pression hawkish sur la BC`;
+    if (diff < -0.05) return `→ EN BAISSE (exp ${exp}, now ${now}${arr}) — pression dovish sur la BC`;
+    return `→ STABLE (exp ${exp}, now ${now}${arr}) — pas de signal`;
   }
   if (id === "svc" || id === "mfg") {
-    const seuil = now >= 50 ? "au-dessus 50 ✅" : "sous 50 ⚠";
-    const arr = (exp !== null && Math.abs(now - exp) > 0.5)
-      ? (now > exp ? " ↑" : " ↓") : " →";
-    const expTxt = exp !== null ? ` (exp ${exp}, now ${now}${arr}, ${seuil})` : ` (${seuil})`;
-    if (now >= 55) return `→ expansion forte ✓${expTxt}`;
-    if (now >= 52) return `→ expansion ✓${expTxt}`;
-    if (now >= 50) return `→ stable au seuil${expTxt}`;
-    if (now >= 47) return `→ contraction légère${expTxt}`;
-    return `→ contraction ✗${expTxt}`;
+    const zone = now >= 50 ? "EXPANSION ✅" : "CONTRACTION ⚠";
+    if (exp === null) return `→ ${zone} (${now})`;
+    const diff = now - exp;
+    const arr = diff > 0.5 ? " ↑" : diff < -0.5 ? " ↓" : " →";
+    const traj = diff > 0.5 ? "accélère" : diff < -0.5 ? "ralentit" : "stable vs exp";
+    return `→ ${zone} · ${traj} (exp ${exp}, now ${now}${arr})`;
   }
   if (id === "unemp") {
-    const arr = (exp !== null && Math.abs(now - exp) > 0.05) ? (now > exp ? " ↓" : " ↑") : " →";
-    const expTxt = (exp !== null && Math.abs(now - exp) > 0.05) ? ` (exp ${exp}, now ${now}${arr})` : "";
-    if (now > exp + 0.05) return `→ en hausse ⚠${expTxt}`;
-    if (now < exp - 0.05) return `→ en baisse ✓${expTxt}`;
-    return "→ stable";
+    if (exp === null) return `→ ${now}%`;
+    const diff = now - exp;
+    if (diff > 0.05)  return `→ EN HAUSSE ⚠ (exp ${exp}, now ${now} ↑) — moins d'emplois → moins de dépenses → dovish`;
+    if (diff < -0.05) return `→ EN BAISSE ✓ (exp ${exp}, now ${now} ↓) — plus d'emplois → plus de dépenses → hawkish`;
+    return `→ STABLE (exp ${exp}, now ${now})`;
   }
   if (id === "rate") {
     const arr = (exp !== null && Math.abs(now - exp) > 0.05)
@@ -816,12 +822,36 @@ function DataView() {
 
 function GuideView() {
   const indicators = [
-    { title:"CORE INFLATION", sub:"Core Inflation Rate — Trading Economics", desc:"Le plus important — la BC regarde ça en premier. Signal pur de l'inflation structurelle.", good:"PLUS HAUT que prévu → BC monte les taux → devise monte", bad:"PLUS BAS que prévu → BC baisse les taux → devise baisse", pct:"Tier 1 · 27.5%", color:"#ff6666" },
-    { title:"INFLATION", sub:"Inflation Rate — Trading Economics", desc:"Confirme le Core Inflation. Les 2 ensembles = signal hawkish très fort.", good:"Les 2 BEATS → signal hawkish très fort → ACHÈTE", bad:"Les 2 MISS → signal dovish très fort → VENDS", pct:"Tier 1 · 22.5%", color:"#ff9966" },
-    { title:"UNEMPLOYMENT RATE", sub:"Unemployment Rate — Trading Economics", desc:"INVERSE — chiffre BAS = bon. Dual mandate Fed/BoE. Moins de chômage = BC hawkish.", good:"PLUS BAS que prévu → économie forte → devise monte", bad:"PLUS HAUT que prévu → économie faible → devise baisse", pct:"Tier 2 · 20%", color:"#66aaff" },
-    { title:"SERVICES PMI", sub:"Services PMI — Trading Economics", desc:"70% de l'économie. Au-dessus de 50 = expansion. Le plus suivi par les institutionnels.", good:"PLUS HAUT que prévu → demande forte → hawkish", bad:"PLUS BAS que prévu → demande faible → dovish", pct:"Tier 2 · 17.5%", color:"#66ccff" },
-    { title:"MANUFACTURING PMI", sub:"Manufacturing PMI — Trading Economics", desc:"Premier signal d'un ralentissement industriel. Bon indicateur avancé.", good:"PLUS HAUT que prévu → production forte → expansion", bad:"PLUS BAS que prévu → ralentissement → signal négatif", pct:"Tier 3 · 7.5%", color:"#aaaacc" },
-    { title:"FUNDS RATE", sub:"Interest Rate — Trading Economics", desc:"Compare NOW vs PRIOR. La devise avec le taux le plus haut attire les capitaux.", good:"Hausse du taux → capitaux entrent → devise monte", bad:"Baisse du taux → capitaux sortent → devise baisse", pct:"Tier 3 · 5%", color:"#888899" },
+    { title:"CORE INFLATION", sub:"Core Inflation Rate — Trading Economics",
+      desc:"Le plus important — indicateur pur de l'inflation structurelle. La BC regarde ça en premier pour décider des taux.",
+      good:"EN HAUSSE vs exp → BC va monter les taux → capitaux entrent → devise monte",
+      bad:"EN BAISSE vs exp → BC va baisser les taux → capitaux sortent → devise baisse",
+      pct:"Tier 1 · 27.5%", color:"#ff6666" },
+    { title:"INFLATION (CPI)", sub:"Inflation Rate — Trading Economics",
+      desc:"Confirme le Core. Si les 2 sont en hausse vs exp = signal hawkish très puissant. Si les 2 baissent = signal dovish fort.",
+      good:"EN HAUSSE vs exp + Core EN HAUSSE → double confirmation hawkish",
+      bad:"EN BAISSE vs exp + Core EN BAISSE → double confirmation dovish",
+      pct:"Tier 1 · 22.5%", color:"#ff9966" },
+    { title:"UNEMPLOYMENT RATE", sub:"Unemployment Rate — Trading Economics",
+      desc:"LOGIQUE INVERSE — chômage EN BAISSE = bon pour l'économie. Plus d'emplois → plus de revenus → plus de dépenses → inflation monte → BC hawkish. Chômage EN HAUSSE = perte d'emplois → moins de dépenses → inflation baisse → BC dovish.",
+      good:"EN BAISSE vs exp → plus d'emplois → plus de dépenses → inflation monte → hawkish",
+      bad:"EN HAUSSE vs exp → perte d'emplois → moins de dépenses → inflation baisse → dovish",
+      pct:"Tier 2 · 20%", color:"#66aaff" },
+    { title:"SERVICES PMI", sub:"Services PMI — Trading Economics",
+      desc:"70% de l'économie. RÈGLE ABSOLUE : au-dessus de 50 = expansion, sous 50 = contraction. TRAJECTOIRE : PMI qui monte = accélération positive. PMI qui descend = ralentissement même si encore positif.",
+      good:"AU-DESSUS 50 ET EN HAUSSE vs prior → expansion qui accélère → croissance forte",
+      bad:"SOUS 50 OU EN BAISSE vers 50 → contraction ou ralentissement → croissance faible",
+      pct:"Tier 2 · 17.5%", color:"#66ccff" },
+    { title:"MANUFACTURING PMI", sub:"Manufacturing PMI — Trading Economics",
+      desc:"Indicateur avancé de l'activité industrielle. Signal précoce d'un retournement économique.",
+      good:"AU-DESSUS 50 ET EN HAUSSE → production qui accélère → signal d'expansion",
+      bad:"SOUS 50 OU EN BAISSE → ralentissement industriel → signal négatif",
+      pct:"Tier 3 · 7.5%", color:"#aaaacc" },
+    { title:"FUNDS RATE", sub:"Interest Rate — Trading Economics",
+      desc:"Le taux directeur de la BC. Compare NOW vs PRIOR. Le différentiel de taux entre 2 pays détermine où les capitaux vont.",
+      good:"EN HAUSSE vs prior → différentiel augmente → capitaux entrent → devise monte",
+      bad:"EN BAISSE vs prior → différentiel diminue → capitaux sortent → devise baisse",
+      pct:"Tier 3 · 5%", color:"#888899" },
   ];
   return (
     <div style={{ padding:16, fontFamily:"'IBM Plex Mono',monospace" }}>
@@ -840,20 +870,143 @@ function GuideView() {
           </div>
         ))}
       </div>
-      <div style={{ background:BG2, border:`1px solid #a855f733`, borderRadius:4, padding:14, marginBottom:10 }}>
-        <div style={{ fontSize:9, letterSpacing:3, color:"#a855f7", fontWeight:700, marginBottom:14, borderBottom:"1px solid #a855f722", paddingBottom:8 }}>RÉGIME MACRO</div>
-        {[
-          { label:"GOLDILOCKS", color:"#00ff88", combo:"Services PMI high + Inflation low + Unemployment low", bc:"BC neutre — devises fortes montent" },
-          { label:"SURCHAUFFE", color:"#ffd700", combo:"Services PMI high + Inflation high + Unemployment low", bc:"BC hawkish — taux montent — devise monte" },
-          { label:"STAGFLATION", color:"#ff3b3b", combo:"Services PMI low + Inflation high + Unemployment high", bc:"BC coincée — évite ce trade" },
-          { label:"RECESSION", color:"#ff7a00", combo:"Services PMI low + Inflation low + Unemployment high", bc:"BC dovish — taux baissent — devise baisse" },
-        ].map(R => (
-          <div key={R.label} style={{ marginBottom:8, padding:"12px 14px", background:BG, borderRadius:3, border:`1px solid ${R.color}22`, borderLeft:`3px solid ${R.color}` }}>
-            <div style={{ fontSize:12, fontWeight:700, color:R.color, marginBottom:6, letterSpacing:1 }}>{R.label}</div>
-            <div style={{ fontSize:12, color:R.color, marginBottom:5, fontWeight:500, opacity:0.85 }}>{R.combo}</div>
-            <div style={{ fontSize:10, color:TEXT_DIM }}>{R.bc}</div>
+      {/* LOGIQUE D'ANTICIPATION */}
+      <div style={{ background:BG2, border:"1px solid #a855f733", borderRadius:4, padding:14, marginBottom:10 }}>
+        <div style={{ fontSize:9, letterSpacing:3, color:"#a855f7", fontWeight:700, marginBottom:14, borderBottom:"1px solid #a855f722", paddingBottom:8 }}>
+          🧠 LOGIQUE D'ANTICIPATION INSTITUTIONNELLE
+        </div>
+        <div style={{ marginBottom:12, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #a855f7" }}>
+          <div style={{ fontSize:10, color:"#a855f7", fontWeight:700, marginBottom:8 }}>PRINCIPE FONDAMENTAL</div>
+          <div style={{ fontSize:9, color:TEXT, lineHeight:1.8 }}>
+            On ne trade pas ce qui s'est passé.<br/>
+            <span style={{color:"#a855f7",fontWeight:700}}>On anticipe ce que la banque centrale va faire ENSUITE.</span><br/><br/>
+            Chaque donnée économique est comparée à son <span style={{color:"#ffd700"}}>expectation (EXP)</span>.<br/>
+            La surprise vs expectation = signal d'anticipation pour les institutionnels.
           </div>
-        ))}
+        </div>
+
+        {/* INFLATION */}
+        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #ff6666" }}>
+          <div style={{ fontSize:10, color:"#ff6666", fontWeight:700, marginBottom:8 }}>📊 INFLATION vs EXPECTATION</div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+            <div style={{ padding:8, background:"#001a0d", borderRadius:3, border:"1px solid #00ff8833" }}>
+              <div style={{ fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:4 }}>EN HAUSSE (now {">"} exp)</div>
+              <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
+                → BC va MONTER les taux<br/>
+                → Capitaux entrent<br/>
+                → <span style={{color:"#00ff88"}}>Devise MONTE</span>
+              </div>
+            </div>
+            <div style={{ padding:8, background:"#1a0000", borderRadius:3, border:"1px solid #ff666633" }}>
+              <div style={{ fontSize:9, color:"#ff6666", fontWeight:700, marginBottom:4 }}>EN BAISSE (now {"<"} exp)</div>
+              <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
+                → BC va BAISSER les taux<br/>
+                → Capitaux sortent<br/>
+                → <span style={{color:"#ff6666"}}>Devise BAISSE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* PMI SERVICES */}
+        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #66ccff" }}>
+          <div style={{ fontSize:10, color:"#66ccff", fontWeight:700, marginBottom:8 }}>📈 PMI SERVICES — 2 DIMENSIONS</div>
+          <div style={{ marginBottom:8, padding:8, background:"#001020", borderRadius:3, border:"1px solid #66ccff33" }}>
+            <div style={{ fontSize:9, color:"#66ccff", fontWeight:700, marginBottom:4 }}>DIMENSION 1 — SEUIL 50 (règle absolue)</div>
+            <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
+              <span style={{color:"#00ff88"}}>{">"} 50 = EXPANSION</span> — économie en croissance → positif<br/>
+              <span style={{color:"#ff6666"}}>{"<"} 50 = CONTRACTION</span> — économie qui se contracte → négatif<br/>
+              <span style={{color:"#ffd700",fontWeight:700}}>Cette règle est absolue — peu importe le reste</span>
+            </div>
+          </div>
+          <div style={{ padding:8, background:"#001020", borderRadius:3, border:"1px solid #66ccff33" }}>
+            <div style={{ fontSize:9, color:"#66ccff", fontWeight:700, marginBottom:4 }}>DIMENSION 2 — TRAJECTOIRE (direction)</div>
+            <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
+              PMI 50 → 55 = <span style={{color:"#00ff88"}}>accélération forte → très positif</span><br/>
+              PMI 55 → 51 = <span style={{color:"#ffd700"}}>ralentissement → surveiller</span><br/>
+              PMI 48 → 49 = <span style={{color:"#ffd700"}}>contraction qui s'améliore → signal précoce</span><br/>
+              PMI 50 → 46 = <span style={{color:"#ff6666"}}>détérioration rapide → très négatif</span>
+            </div>
+          </div>
+        </div>
+
+        {/* CHÔMAGE */}
+        <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #66aaff" }}>
+          <div style={{ fontSize:10, color:"#66aaff", fontWeight:700, marginBottom:8 }}>👥 CHÔMAGE — LOGIQUE ÉCONOMIQUE COMPLÈTE</div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:8 }}>
+            <div style={{ padding:8, background:"#001a0d", borderRadius:3, border:"1px solid #00ff8833" }}>
+              <div style={{ fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:4 }}>EN BAISSE (now {"<"} exp) ✓</div>
+              <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
+                Plus d'emplois<br/>
+                → Plus de revenus<br/>
+                → Plus de dépenses<br/>
+                → Demande monte<br/>
+                → Inflation monte<br/>
+                → BC anticipe hausse taux<br/>
+                → <span style={{color:"#00ff88"}}>Devise FORTE — hawkish</span>
+              </div>
+            </div>
+            <div style={{ padding:8, background:"#1a0000", borderRadius:3, border:"1px solid #ff666633" }}>
+              <div style={{ fontSize:9, color:"#ff6666", fontWeight:700, marginBottom:4 }}>EN HAUSSE (now {">"} exp) ⚠</div>
+              <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
+                Perte d'emplois<br/>
+                → Moins de revenus<br/>
+                → Moins de dépenses<br/>
+                → Demande chute<br/>
+                → Inflation baisse<br/>
+                → BC va baisser les taux<br/>
+                → <span style={{color:"#ff6666"}}>Devise FAIBLE — dovish</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* LES 4 RÉGIMES */}
+        <div style={{ marginBottom:4, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #a855f7" }}>
+          <div style={{ fontSize:10, color:"#a855f7", fontWeight:700, marginBottom:10 }}>🎯 LES 4 RÉGIMES — ANTICIPATION</div>
+          {[
+            { label:"SURCHAUFFE", color:"#ffd700", bg:"#1a1500",
+              rule:"Inflation EN HAUSSE + PMI > 50",
+              chomage:"Chômage EN BAISSE = confirmation",
+              logic:"Tout accélère ensemble → BC va monter les taux BIENTÔT",
+              action:"Les traders achètent la devise MAINTENANT en anticipation de la hausse des taux",
+              devise:"FORTE ↑" },
+            { label:"GOLDILOCKS", color:"#00ff88", bg:"#001a0d",
+              rule:"Inflation STABLE/BAISSE + PMI > 50",
+              chomage:"Chômage STABLE/EN BAISSE = idéal",
+              logic:"Croissance sans pression inflationniste → BC en zone de confort",
+              action:"Capitaux affluent pour la stabilité et la croissance — meilleur setup long terme",
+              devise:"FORTE et STABLE ↑" },
+            { label:"STAGFLATION", color:"#ff3b3b", bg:"#1a0000",
+              rule:"Inflation EN HAUSSE + PMI < 50",
+              chomage:"Chômage EN HAUSSE = aggravation",
+              logic:"Inflation sans croissance → BC COINCÉE — monter = tuer l'économie, baisser = alimenter l'inflation",
+              action:"Les institutionnels fuient — pire scénario, BC sans outil efficace",
+              devise:"FAIBLE ↓" },
+            { label:"RECESSION", color:"#ff7a00", bg:"#1a0800",
+              rule:"Inflation STABLE/BAISSE + PMI < 50",
+              chomage:"Chômage EN HAUSSE = confirmation",
+              logic:"Économie en contraction + inflation qui cède → BC a la latitude pour baisser les taux",
+              action:"Les traders vendent MAINTENANT en anticipation des baisses de taux — capitaux fuient",
+              devise:"FAIBLE ↓" },
+          ].map(R=>(
+            <div key={R.label} style={{ marginBottom:8, padding:10, background:R.bg, borderRadius:3, border:`1px solid ${R.color}33`, borderLeft:`3px solid ${R.color}` }}>
+              <div style={{ fontSize:11, fontWeight:700, color:R.color, marginBottom:6 }}>{R.label} — Devise {R.devise}</div>
+              <div style={{ fontSize:9, color:TEXT, marginBottom:4 }}>
+                <span style={{color:R.color,fontWeight:700}}>Règle : </span>{R.rule}
+              </div>
+              <div style={{ fontSize:9, color:TEXT_DIM, marginBottom:4 }}>
+                <span style={{color:"#66aaff"}}>Chômage : </span>{R.chomage}
+              </div>
+              <div style={{ fontSize:9, color:TEXT_DIM, marginBottom:4 }}>
+                <span style={{color:"#a855f7"}}>Logique : </span>{R.logic}
+              </div>
+              <div style={{ fontSize:9, color:R.color, fontWeight:500 }}>
+                → {R.action}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
       <div style={{ background:BG2, border:`1px solid #a855f733`, borderRadius:4, padding:14, marginBottom:10 }}>
         <div style={{ fontSize:9, letterSpacing:3, color:"#a855f7", fontWeight:700, marginBottom:14, borderBottom:"1px solid #a855f722", paddingBottom:8 }}>IMAGE GLOBALE + DÉCISION</div>
@@ -1417,7 +1570,7 @@ function TradeCOT({ data, cotData }) {
       <div style={{background:"#050810",border:"1px solid #00aaff44",borderRadius:8,padding:"10px 14px",marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <div>
           <div style={{fontSize:11,letterSpacing:3,color:"#00aaff",fontWeight:700}}>📊 TRADE COT — CONFLUENCE 2/3</div>
-          <div style={{fontSize:8,color:"#4a5070",marginTop:2}}>Macro divergence + COT institutionnels (sans retail)</div>
+          <div style={{fontSize:8,color:"#4a5070",marginTop:2}}>Régimes opposés + COT institutionnels alignés — 2 confluences sur 3</div>
         </div>
         <div style={{fontSize:20,fontWeight:700,color:"#00aaff"}}>{trades.length}</div>
       </div>
@@ -1575,7 +1728,7 @@ function TradeApex({ data, cotData, retailData }) {
       <div style={{background:"#050810",border:"1px solid #00ff8844",borderRadius:8,padding:"10px 14px",marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <div>
           <div style={{fontSize:11,letterSpacing:3,color:"#00ff88",fontWeight:700}}>⚡ TRADE APEX — CONFLUENCE 3/3</div>
-          <div style={{fontSize:8,color:"#4a5070",marginTop:2}}>Macro divergence + COT instits + Retail contrarian</div>
+          <div style={{fontSize:8,color:"#4a5070",marginTop:2}}>Régimes opposés + COT alignés + Retail contrarian — 3 confluences sur 3</div>
         </div>
         <div style={{fontSize:20,fontWeight:700,color:"#00ff88"}}>{trades.length}</div>
       </div>
