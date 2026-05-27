@@ -388,56 +388,78 @@ function interpretIndicator(id, now, code, exp=null) {
 
 function getRegime(data, code) {
   if (!hasData(data, code)) return null;
-  const infScore = calcInflationScore(data, code);
-  const growScore = calcGrowthScore(data, code);
-  const svcNow = toN(data[code]["svc"].now);
-  const coreNow = toN(data[code]["core"].now);
-  const target = BC_TARGETS[code] || 2.0;
 
-  // Inflation 3 niveaux — direction prime sur niveau absolu
-  const coreExp2 = toN(data[code]["core"].exp);
-  const corePrior2 = toN(data[code]["core"].prior);
-  // Inflation structurellement haute = au-dessus target ET montante ou stable
-  const infRising = coreNow !== null && (
-    (coreExp2 !== null && coreNow >= coreExp2) ||
-    (corePrior2 !== null && coreNow >= corePrior2)
-  );
-  const infFalling = coreNow !== null && (
-    (coreExp2 !== null && coreNow < coreExp2) &&
-    (corePrior2 === null || coreNow <= corePrior2)
-  );
-  // infHigh = clairement au-dessus target ET pas en train de descendre
-  const infHigh   = coreNow !== null && coreNow > target + 0.3 && !infFalling;
-  // infLow = sous target OU inflation qui descend franchement
-  const infLow    = coreNow !== null && (
-    coreNow < target - 0.3 ||
-    (coreNow < target + 0.1 && infFalling)
-  );
-  const infAtTarget = !infHigh && !infLow;
+  // ══════════════════════════════════════════════════════════
+  // LOGIQUE D'ANTICIPATION INSTITUTIONNELLE — 3 PILIERS
+  // On anticipe ce que la BC va faire ENSUITE
+  // Chaque donnée comparée à son expectation (EXP)
+  // ══════════════════════════════════════════════════════════
 
-  // Croissance 3 niveaux
-  const svcContraction = svcNow !== null && svcNow < 50;
-  const growUp   = !svcContraction && (growScore !== null && growScore > 0.05);
-  const growDown = svcContraction || (growScore !== null && growScore < -0.05);
-  const growNeutral = !growUp && !growDown;
+  // ── 1. INFLATION vs EXPECTATION ──────────────────────────
+  // Core = signal structurel principal (BC regarde en priorité)
+  // CPI = confirmation si Core neutre
+  const coreNow  = toN(data[code]["core"].now);
+  const coreExp  = toN(data[code]["core"].exp);
+  const cpiNow   = toN(data[code]["cpi"].now);
+  const cpiExp   = toN(data[code]["cpi"].exp);
 
-  // Matrice 3x3 = 9 cas
-  // Inflation HAUTE
-  if (infHigh && growUp)      return REGIMES.SURCHAUFFE;
-  if (infHigh && growNeutral) return REGIMES.SURCHAUFFE;
-  if (infHigh && growDown)    return REGIMES.STAGFLATION;
-  // Inflation A L'OBJECTIF (zone confort BC)
-  if (infAtTarget && growUp)      return REGIMES.GOLDILOCKS;
-  if (infAtTarget && growNeutral) return REGIMES.GOLDILOCKS;
-  if (infAtTarget && growDown)    return REGIMES.RECESSION;
-  // Inflation BASSE (BC doit stimuler)
-  if (infLow && growUp)      return REGIMES.GOLDILOCKS;
-  if (infLow && growNeutral) return REGIMES.GOLDILOCKS;
-  if (infLow && growDown)    return REGIMES.RECESSION;
+  const coreHausse = coreNow !== null && coreExp !== null && coreNow > coreExp + 0.05;
+  const coreBaisse = coreNow !== null && coreExp !== null && coreNow < coreExp - 0.05;
+  const coreStable = !coreHausse && !coreBaisse;
+  const cpiHausse  = cpiNow !== null && cpiExp !== null && cpiNow > cpiExp + 0.05;
+  const cpiBaisse  = cpiNow !== null && cpiExp !== null && cpiNow < cpiExp - 0.05;
+
+  // Core prime sur CPI
+  const infHausse = coreHausse || (coreStable && cpiHausse);
+  const infBaisse = coreBaisse || (coreStable && cpiBaisse);
+
+  // ── 2. PMI SERVICES — RÈGLE ABSOLUE (seuil 50) ───────────
+  // Services = 70-80% de l économie → PRIME sur manufacturing
+  const svcNow   = toN(data[code]["svc"].now);
+  const svcPrior = toN(data[code]["svc"].prior);
+
+  const svcPositif  = svcNow !== null && svcNow > 50;
+  const svcNegatif  = svcNow !== null && svcNow < 50;
+  const svcRalentit = svcNow !== null && svcPrior !== null && svcNow < svcPrior;
+
+  // ── 3. CHÔMAGE vs EXPECTATION — CO-PILOTE BC ─────────────
+  // EN BAISSE = emplois + → dépenses + → inflation + → BC hawkish → devise FORTE
+  // EN HAUSSE = emplois - → dépenses - → inflation - → BC dovish → devise FAIBLE
+  const unempNow = toN(data[code]["unemp"].now);
+  const unempExp = toN(data[code]["unemp"].exp);
+
+  const unempHawkish = unempNow !== null && unempExp !== null && unempNow < unempExp - 0.05;
+  const unempDovish  = unempNow !== null && unempExp !== null && unempNow > unempExp + 0.05;
+
+  // ── 4. CROISSANCE = PMI Services + Chômage co-pilote ─────
+  let growthPos = false;
+  let growthNeg = false;
+
+  if (svcNegatif) {
+    // PMI < 50 = contraction → règle absolue NÉGATIVE
+    growthNeg = true;
+  } else if (svcPositif) {
+    // PMI > 50 = expansion
+    // EXCEPTION: chômage monte ET PMI ralentit = retournement précoce
+    if (unempDovish && svcRalentit) {
+      growthNeg = true;
+    } else {
+      growthPos = true;
+    }
+  } else {
+    // PMI exactement à 50 → chômage décide
+    growthNeg = unempDovish || svcRalentit;
+    growthPos = !growthNeg;
+  }
+
+  // ── 5. MATRICE 4 RÉGIMES — ANTICIPATION BC ───────────────
+  if (infHausse && growthPos)  return REGIMES.SURCHAUFFE;
+  if (!infHausse && growthPos) return REGIMES.GOLDILOCKS;
+  if (infHausse && growthNeg)  return REGIMES.STAGFLATION;
+  if (!infHausse && growthNeg) return REGIMES.RECESSION;
 
   return null;
 }
-
 function getStrength(score, regime) {
   const weakRegimes = ["STAGFLATION","RECESSION"];
   const strongRegimes = ["GOLDILOCKS","SURCHAUFFE"];
