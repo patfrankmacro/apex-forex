@@ -140,15 +140,28 @@ async function myfxLoadAll() {
 
 async function fetchCOT(code) {
   try {
-    const url = "https://publicreporting.cftc.gov/resource/6dca-aqww.json?cftc_contract_market_code=" + code + "&$order=report_date_as_yyyy_mm_dd DESC&$limit=55";
+    const url = "https://publicreporting.cftc.gov/resource/gpe5-46if.json?cftc_contract_market_code=" + code + "&$order=report_date_as_yyyy_mm_dd DESC&$limit=1";
     const rows = await (await fetch(url)).json();
     if (!rows?.length) return null;
-    const nets = rows.map(r => parseFloat(r.noncomm_positions_long_all||0) - parseFloat(r.noncomm_positions_short_all||0));
+    const row = rows[0];
+    const chgLong  = parseInt(row.change_in_lev_money_long||0);
+    const chgShort = parseInt(row.change_in_lev_money_short||0);
+    const chgNet   = chgLong - chgShort;
+    const levLong  = parseInt(row.lev_money_positions_long||0);
+    const levShort = parseInt(row.lev_money_positions_short||0);
+    let signal = "NEUTRE";
+    if(chgLong>0&&chgShort<0) signal="HAUSSIER_FORT";
+    else if(chgLong<0&&chgShort>0) signal="BAISSIER_FORT";
+    else if(chgNet>500) signal="HAUSSIER";
+    else if(chgNet<-500) signal="BAISSIER";
+    const pct = signal==="HAUSSIER_FORT"?85:signal==="HAUSSIER"?65:signal==="BAISSIER"?35:signal==="BAISSIER_FORT"?15:50;
+    const nets = [levLong - levShort]; // dummy pour compatibilité
     return {
       net: Math.round(nets[0]),
-      longPos: Math.round(parseFloat(rows[0].noncomm_positions_long_all||0)),
-      shortPos: Math.round(parseFloat(rows[0].noncomm_positions_short_all||0)),
-      max52: Math.max(...nets.slice(0,26)), min52: Math.min(...nets.slice(0,26)),
+      longPos: levLong,
+      shortPos: levShort,
+      chgLong, chgShort, chgNet, signal,
+      max52: Math.max(...nets), min52: Math.min(...nets),
       date: rows[0].report_date_as_yyyy_mm_dd?.slice(0,10) || "—",
     };
   } catch { return null; }
@@ -356,10 +369,10 @@ export default function SentimentView() {
         <div style={{fontSize:8,color:"#f59e0b",fontWeight:700,marginBottom:4}}>MÉTHODE INSTITUTIONNELLE</div>
         <div style={{fontSize:8,color:"#64748b",lineHeight:1.9}}>
           1️⃣ Retail Myfxbook → inversion contrarian (foule = mauvaise direction)<br/>
-          2️⃣ COT CFTC → calculer percentile 52sem de CHAQUE devise séparément<br/>
+          2️⃣ COT CFTC → changement hebdomadaire Leveraged Funds (hedge funds)<br/>
           3️⃣ Spread = Base P% - Quote P% (positif = paire haussière)<br/>
           4️⃣ Signal valide = Retail (inversé) aligné avec spread COT<br/>
-          <span style={{color:"#f59e0b"}}>🔥🔥 Setup parfait = retail extrême + spread COT extrême</span>
+          <span style={{color:"#f59e0b"}}>🔥🔥 Setup parfait = retail extrême + COT Leveraged Funds aligné</span>
         </div>
       </div>
 
