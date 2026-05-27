@@ -352,10 +352,10 @@ export default function SentimentView() {
         <div style={{fontSize:8,color:"#f59e0b",fontWeight:700,marginBottom:4}}>MÉTHODE INSTITUTIONNELLE</div>
         <div style={{fontSize:8,color:"#64748b",lineHeight:1.9}}>
           1️⃣ Retail Myfxbook → inversion contrarian (foule = mauvaise direction)<br/>
-          2️⃣ COT CFTC → calculer percentile 52sem de CHAQUE devise séparément<br/>
-          3️⃣ Spread = Base P% - Quote P% (positif = paire haussière)<br/>
+          2️⃣ COT CFTC → changement hebdomadaire Leveraged Funds (hedge funds + CTAs)<br/>
+          3️⃣ Signal = Base vs Quote (HAUSSIER FORT / HAUSSIER / BAISSIER / BAISSIER FORT)<br/>
           4️⃣ Signal valide = Retail (inversé) aligné avec spread COT<br/>
-          <span style={{color:"#f59e0b"}}>🔥🔥 Setup parfait = retail extrême + spread COT extrême</span>
+          <span style={{color:"#f59e0b"}}>🔥🔥 Setup parfait = retail extrême + Leveraged Funds signal fort opposé</span>
         </div>
       </div>
 
