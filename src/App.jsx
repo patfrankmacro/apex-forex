@@ -158,7 +158,7 @@ const REGIMES = {
     deviseDir: "BAISSE — pire scénario macro, devise sous pression",
     action: "Marché anticipe : BC piégée, ne peut pas agir → ÉVITE ou VENDS — inflation en hausse MAIS croissance en contraction · Pire configuration pour une devise",
     short: "PMI < 50 + Inflation EN HAUSSE" },
-  RECESSION:   { label: "RECESSION",   icon: "▼", color: "#ff7a00", bg: "#1a0800", border: "#ff7a00",
+  RECESSION:   { label: "RECESSION",   icon: "▼", color: "#cc2200", bg: "#1a0000", border: "#cc2200",
     bcBias: "DOVISH — baisses de taux imminentes",
     tauxDir: "Baisse des taux — différentiel pousse les capitaux ailleurs",
     deviseDir: "BAISSE — capitaux fuient vers économies plus fortes",
