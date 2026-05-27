@@ -388,9 +388,25 @@ function getRegime(data, code) {
   const coreNow = toN(data[code]["core"].now);
   const target = BC_TARGETS[code] || 2.0;
 
-  // Inflation 3 niveaux (logique institutionnelle)
-  const infHigh   = coreNow !== null && coreNow > target + 0.3;
-  const infLow    = coreNow !== null && coreNow < target - 0.3;
+  // Inflation 3 niveaux — direction prime sur niveau absolu
+  const coreExp2 = toN(data[code]["core"].exp);
+  const corePrior2 = toN(data[code]["core"].prior);
+  // Inflation structurellement haute = au-dessus target ET montante ou stable
+  const infRising = coreNow !== null && (
+    (coreExp2 !== null && coreNow >= coreExp2) ||
+    (corePrior2 !== null && coreNow >= corePrior2)
+  );
+  const infFalling = coreNow !== null && (
+    (coreExp2 !== null && coreNow < coreExp2) &&
+    (corePrior2 === null || coreNow <= corePrior2)
+  );
+  // infHigh = clairement au-dessus target ET pas en train de descendre
+  const infHigh   = coreNow !== null && coreNow > target + 0.3 && !infFalling;
+  // infLow = sous target OU inflation qui descend franchement
+  const infLow    = coreNow !== null && (
+    coreNow < target - 0.3 ||
+    (coreNow < target + 0.1 && infFalling)
+  );
   const infAtTarget = !infHigh && !infLow;
 
   // Croissance 3 niveaux
