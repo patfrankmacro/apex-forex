@@ -762,7 +762,7 @@ function TradeCard({ strong, weak, div, regS, regW, perfect, sentSig }) {
                 {[{curr:strong,cot:strongCOT},{curr:weak,cot:weakCOT}].map(({curr,cot})=>(
                   <div key={curr.code}>
                     <div style={{ fontSize:8, color:"#475569", marginBottom:3 }}>
-                      <FlagImg code={curr.code} size={18} /> {curr.code} — P{cot?.pct}%
+                      <FlagImg code={curr.code} size={18} /> {curr.code} — {cot?.bias} {cot?.strength}
                     </div>
                     <div style={{ height:5, background:"#1e3a5f", borderRadius:2, position:"relative", marginBottom:3 }}>
                       <div style={{ position:"absolute", left:0, width:"10%", height:"100%", background:"#4ade8033" }}/>
@@ -773,12 +773,12 @@ function TradeCard({ strong, weak, div, regS, regW, perfect, sentSig }) {
                     <div style={{ fontSize:8, color:cot?.bias==="HAUSSIER"?"#4ade80":"#f87171" }}>
                       {cot?.bias} — {cot?.strength}
                     </div>
-                    <div style={{ fontSize:7, color:"#475569", marginTop:1 }}>Net: {cot?.net>=0?"+":""}{cot?.net?.toLocaleString()}</div>
+                    <div style={{ fontSize:7, color:"#475569", marginTop:1 }}>Chg: {cot?.chgNet>=0?"+":""}{cot?.chgNet?.toLocaleString()}</div>
                   </div>
                 ))}
               </div>
               <div style={{ fontSize:8, color:"#64748b" }}>
-                Base P{strongCOT?.pct}% vs Quote P{weakCOT?.pct}% (spread {pCot.spread>0?"+":""}{pCot.spread}pts)
+                {strongCOT?.bias} {strongCOT?.strength} vs {weakCOT?.bias} {weakCOT?.strength} · spread {pCot.spread>0?"+":""}{pCot.spread}pts
               </div>
             </div>
           )}
