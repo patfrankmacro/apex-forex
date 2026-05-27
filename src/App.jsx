@@ -1545,6 +1545,138 @@ function getApexSignalStrength(macroPts, cotStrength, retailStrength) {
   return { label:"↑↓ APEX BIAIS", color:"#86efac", bg:"#0d1f14", priority:1 };
 }
 
+
+// ============================================================
+// TRADE MACRO — Divergence de régimes uniquement
+// ============================================================
+function TradeMacro({ data }) {
+  const trades = [];
+
+  SENT_PAIRS.forEach(({ name, base, quote }) => {
+    const rBase  = getRegime(data, base);
+    const rQuote = getRegime(data, quote);
+    if (!rBase || !rQuote) return;
+    if (!isValidMacroDivergence(rBase, rQuote)) return;
+
+    const direction = getMacroDirection(rBase, rQuote);
+    const macroPts  = getMacroPts(rBase, rQuote);
+
+    const scoreBase  = calcScore(data, base);
+    const scoreQuote = calcScore(data, quote);
+
+    // Signal strength basé sur divergence
+    const sig = macroPts >= 180
+      ? { label:"🔥🔥 DIVERGENCE EXTRÊME", color:"#00ff88", bg:"#001a0d", priority:3 }
+      : macroPts >= 160
+      ? { label:"🔥 DIVERGENCE FORTE", color:"#22c55e", bg:"#052010", priority:2 }
+      : { label:"↑↓ DIVERGENCE MODÉRÉE", color:"#86efac", bg:"#0d1f14", priority:1 };
+
+    trades.push({
+      name, base, quote,
+      direction, macroPts, rBase, rQuote,
+      scoreBase, scoreQuote, sig,
+    });
+  });
+
+  trades.sort((a, b) => b.sig.priority - a.sig.priority || b.macroPts - a.macroPts);
+
+  return (
+    <div style={{padding:12}}>
+      <div style={{background:"#050810",border:"1px solid #a855f744",borderRadius:8,padding:"10px 14px",marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div>
+          <div style={{fontSize:11,letterSpacing:3,color:"#a855f7",fontWeight:700}}>📊 TRADE MACRO — DIVERGENCE PURE</div>
+          <div style={{fontSize:8,color:"#4a5070",marginTop:2}}>Régimes opposés uniquement — 1 confluence sur 3</div>
+        </div>
+        <div style={{fontSize:20,fontWeight:700,color:"#a855f7"}}>{trades.length}</div>
+      </div>
+
+      {/* EXPLICATION */}
+      <div style={{background:"#0a0a14",border:"1px solid #a855f733",borderRadius:6,padding:10,marginBottom:12}}>
+        <div style={{fontSize:8,color:"#a855f7",fontWeight:700,letterSpacing:2,marginBottom:6}}>LOGIQUE</div>
+        <div style={{fontSize:9,color:"#4a5070",lineHeight:1.7}}>
+          Ce tab montre toutes les paires avec une <span style={{color:"#a855f7"}}>divergence macro</span> — 2 économies dans des régimes opposés.<br/>
+          <span style={{color:"#ffd700"}}>⚠ Signal de direction seulement</span> — utilise TRADE COT+MACRO pour confirmer avec les institutionnels.
+        </div>
+      </div>
+
+      {trades.length === 0 && (
+        <div style={{padding:16,background:"#08080f",borderRadius:8,border:"1px solid #1a1a2e",textAlign:"center"}}>
+          <div style={{fontSize:12,color:"#4a5070",marginBottom:8}}>Aucune divergence macro active</div>
+          <div style={{fontSize:9,color:"#4a5070"}}>Entrez les données économiques dans le tableau</div>
+        </div>
+      )}
+
+      {trades.map((t, i) => (
+        <div key={i} style={{marginBottom:12,background:"#08080f",borderRadius:8,border:"1px solid "+t.sig.color+"44",padding:10}}>
+
+          {/* Header */}
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+            <div style={{fontSize:14,fontWeight:700,color:"#e2e8f0",letterSpacing:1}}>
+              <FlagImg code={t.base} size={16}/> {t.base} / <FlagImg code={t.quote} size={16}/> {t.quote}
+            </div>
+            <div style={{fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:4,
+              background:t.direction==="LONG"?"#052010":"#1a0808",
+              color:t.direction==="LONG"?"#4ade80":"#f87171",
+              border:"1px solid "+(t.direction==="LONG"?"#4ade8055":"#f8717155")}}>
+              {t.direction === "LONG" ? "▲ LONG" : "▼ SHORT"}
+            </div>
+          </div>
+
+          {/* MACRO DIVERGENCE */}
+          <div style={{background:"#0a0a1a",borderRadius:6,padding:"8px 10px",marginBottom:8,borderLeft:"3px solid #a855f7"}}>
+            <div style={{fontSize:8,color:"#a855f7",letterSpacing:2,marginBottom:6,fontWeight:700}}>✅ DIVERGENCE MACRO</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr auto 1fr",gap:6,alignItems:"center"}}>
+              <div style={{background:t.rBase.bg,borderRadius:4,padding:"6px 8px",border:"1px solid "+t.rBase.border+"55"}}>
+                <div style={{fontSize:9,color:"#c8d4f0",fontWeight:700}}><FlagImg code={t.base} size={14}/> {t.base}</div>
+                <div style={{fontSize:11,color:t.rBase.color,fontWeight:700}}>{t.rBase.icon} {t.rBase.label}</div>
+                <div style={{fontSize:8,color:"#4a5070",marginTop:2}}>Score: {t.scoreBase>=0?"+":""}{t.scoreBase.toFixed(3)}</div>
+              </div>
+              <div style={{fontSize:9,color:"#4a5070",textAlign:"center"}}>
+                vs<br/>
+                <span style={{color:"#a855f7",fontWeight:700}}>+{t.macroPts}pts</span>
+              </div>
+              <div style={{background:t.rQuote.bg,borderRadius:4,padding:"6px 8px",border:"1px solid "+t.rQuote.border+"55"}}>
+                <div style={{fontSize:9,color:"#c8d4f0",fontWeight:700}}><FlagImg code={t.quote} size={14}/> {t.quote}</div>
+                <div style={{fontSize:11,color:t.rQuote.color,fontWeight:700}}>{t.rQuote.icon} {t.rQuote.label}</div>
+                <div style={{fontSize:8,color:"#4a5070",marginTop:2}}>Score: {t.scoreQuote>=0?"+":""}{t.scoreQuote.toFixed(3)}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Conclusion */}
+          <div style={{background:t.sig.bg,border:"1px solid "+t.sig.color+"44",borderRadius:6,padding:"10px 12px"}}>
+            <div style={{fontSize:12,color:t.sig.color,fontWeight:700,letterSpacing:1,textAlign:"center",marginBottom:4}}>
+              {t.direction === "LONG" ? "🚀" : "📉"} {t.direction} {t.base}/{t.quote}
+            </div>
+            <div style={{fontSize:9,color:t.sig.color,textAlign:"center",marginBottom:6}}>{t.sig.label}</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
+              <div style={{padding:"4px 6px",background:"#a855f715",borderRadius:3,textAlign:"center",border:"1px solid #a855f733"}}>
+                <div style={{fontSize:7,color:"#a855f7",fontWeight:700,marginBottom:2}}>MACRO</div>
+                <div style={{fontSize:9,color:"#c8d4f0",fontWeight:700}}>{t.rBase.icon} vs {t.rQuote.icon}</div>
+                <div style={{fontSize:7,color:"#4a5070"}}>+{t.macroPts}pts</div>
+              </div>
+              <div style={{padding:"4px 6px",background:"#1a1a2e",borderRadius:3,textAlign:"center",border:"1px solid #333"}}>
+                <div style={{fontSize:7,color:"#4a5070",fontWeight:700,marginBottom:2}}>COT</div>
+                <div style={{fontSize:9,color:"#4a5070"}}>Non vérifié</div>
+                <div style={{fontSize:7,color:"#4a5070"}}>—</div>
+              </div>
+              <div style={{padding:"4px 6px",background:"#1a1a2e",borderRadius:3,textAlign:"center",border:"1px solid #333"}}>
+                <div style={{fontSize:7,color:"#4a5070",fontWeight:700,marginBottom:2}}>RETAIL</div>
+                <div style={{fontSize:9,color:"#4a5070"}}>Non vérifié</div>
+                <div style={{fontSize:7,color:"#4a5070"}}>—</div>
+              </div>
+            </div>
+            <div style={{marginTop:8,padding:"6px 8px",background:"#0a0a14",borderRadius:3,textAlign:"center"}}>
+              <div style={{fontSize:8,color:"#ffd700"}}>⚠ Confirme avec TRADE COT+MACRO avant d'entrer</div>
+            </div>
+          </div>
+
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ============================================================
 // TRADE COT — Confluence Macro + COT uniquement (sans retail)
 // ============================================================
@@ -2510,7 +2642,7 @@ export default function App() {
 
   const TABS = [
     {id:"table",label:"TABLEAU"},{id:"rank",label:"RANG"},
-    {id:"regimes",label:"RÉGIMES"},{id:"tradecot",label:"TRADE COT+MACRO"},{id:"trade",label:"TRADE COT+MACRO+RETAIL"},{id:"journal",label:"JOURNAL"},
+    {id:"regimes",label:"RÉGIMES"},{id:"trademacro",label:"TRADE MACRO"},{id:"tradecot",label:"TRADE COT+MACRO"},{id:"trade",label:"TRADE COT+MACRO+RETAIL"},{id:"journal",label:"JOURNAL"},
     {id:"data",label:"DONNÉES ↗"},{id:"guide",label:"GUIDE"},{id:"heat",label:"HEATMAP"},{id:"sentiment",label:"SENTIMENT"},{id:"cal",label:"RESSOURCES"},
   ];
 
