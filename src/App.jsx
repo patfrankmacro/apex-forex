@@ -2355,4 +2355,346 @@ function HeatmapView({ data }) {
       </table>
     </div>
   );
+}// ============================================================
+// JOURNAL DE TRADE — PAT & FRANK — FIREBASE
+// ============================================================
+function JournalView() {
+  const [trader, setTrader] = useState("PAT");
+  const [trades, setTrades] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({
+    date:"", pair:"", direction:"LONG", regime_base:"", regime_quote:"",
+    cot:"", retail:"", entry:"", sl:"", tp:"", exit:"",
+    result_pips:"", result_usd:"", status:"OUVERT", note:""
+  });
+  const [showForm, setShowForm] = useState(false);
+  const [editKey, setEditKey] = useState(null);
+  const [filterStatus, setFilterStatus] = useState("TOUS");
+
+  // Firebase sync
+  useEffect(() => {
+    const journalRef = ref(db, `journal/${trader}`);
+    const unsub = onValue(journalRef, (snap) => {
+      const val = snap.val();
+      if (val) {
+        const list = Object.entries(val).map(([k,v]) => ({...v, _key:k}));
+        list.sort((a,b) => (b.date||"").localeCompare(a.date||""));
+        setTrades(list);
+      } else {
+        setTrades([]);
+      }
+      setLoading(false);
+    });
+    return () => unsub();
+  }, [trader]);
+
+  const submitTrade = () => {
+    if (!form.pair || !form.date) return;
+    const tradeData = {...form, updatedAt: Date.now()};
+    delete tradeData._key;
+    if (editKey) {
+      set(ref(db, `journal/${trader}/${editKey}`), tradeData);
+      setEditKey(null);
+    } else {
+      const newKey = `trade_${Date.now()}`;
+      set(ref(db, `journal/${trader}/${newKey}`), tradeData);
+    }
+    setForm({date:"",pair:"",direction:"LONG",regime_base:"",regime_quote:"",cot:"",retail:"",entry:"",sl:"",tp:"",exit:"",result_pips:"",result_usd:"",status:"OUVERT",note:""});
+    setShowForm(false);
+  };
+
+  const deleteTrade = (key) => {
+    if (!confirm("Supprimer ce trade ?")) return;
+    set(ref(db, `journal/${trader}/${key}`), null);
+  };
+
+  const editTrade = (t) => {
+    const {_key, updatedAt, ...rest} = t;
+    setForm(rest);
+    setEditKey(_key);
+    setShowForm(true);
+  };
+
+  const filtered = filterStatus === "TOUS" ? trades : trades.filter(t => t.status === filterStatus);
+
+  // STATS
+  const closed = trades.filter(t => t.status === "FERMÉ");
+  const wins = closed.filter(t => parseFloat(t.result_usd||0) > 0);
+  const losses = closed.filter(t => parseFloat(t.result_usd||0) < 0);
+  const winRate = closed.length > 0 ? Math.round((wins.length/closed.length)*100) : 0;
+  const totalPnL = closed.reduce((acc,t) => acc+parseFloat(t.result_usd||0), 0);
+  const avgWin = wins.length > 0 ? wins.reduce((a,t)=>a+parseFloat(t.result_usd||0),0)/wins.length : 0;
+  const avgLoss = losses.length > 0 ? Math.abs(losses.reduce((a,t)=>a+parseFloat(t.result_usd||0),0)/losses.length) : 0;
+  const rr = avgLoss > 0 ? (avgWin/avgLoss).toFixed(2) : "—";
+  const profitFactor = losses.length > 0 && avgLoss > 0
+    ? (wins.reduce((a,t)=>a+parseFloat(t.result_usd||0),0)/Math.abs(losses.reduce((a,t)=>a+parseFloat(t.result_usd||0),0))).toFixed(2)
+    : "—";
+
+  const PAIRS = ["EURUSD","GBPUSD","USDJPY","USDCAD","AUDUSD","NZDUSD","USDCHF","GBPJPY","EURJPY","AUDJPY","EURAUD","GBPAUD","EURGBP","AUDNZD","CHFJPY","GBPCAD","EURCAD","AUDCAD","NZDJPY"];
+  const REGIMES_LIST = ["—","GOLDILOCKS","SURCHAUFFE","STAGFLATION","RECESSION"];
+  const STATUSES = ["OUVERT","FERMÉ","BREAKEVEN","SL TOUCHÉ"];
+  const REGIME_COLORS = {GOLDILOCKS:"#00ff88",SURCHAUFFE:"#ffd700",STAGFLATION:"#ff3b3b",RECESSION:"#ff7a00","—":"#4a5070"};
+
+  const inputStyle = {width:"100%",padding:"6px 8px",background:"#0c0c18",border:"1px solid #1a1a2e",borderRadius:3,color:"#c8d4f0",fontSize:10,fontFamily:"'IBM Plex Mono',monospace",outline:"none"};
+  const labelStyle = {fontSize:8,color:"#4a5070",letterSpacing:1,marginBottom:3,display:"block"};
+
+  return (
+    <div style={{padding:12,fontFamily:"'IBM Plex Mono',monospace"}}>
+
+      {/* SÉLECTEUR PAT / FRANK */}
+      <div style={{display:"flex",gap:8,marginBottom:14}}>
+        {["PAT","FRANK"].map(name => (
+          <button key={name} onClick={()=>{setTrader(name);setShowForm(false);setFilterStatus("TOUS");}}
+            style={{flex:1,padding:"12px",fontSize:13,fontWeight:700,cursor:"pointer",borderRadius:6,letterSpacing:2,
+              border: trader===name?"2px solid #00aaff":"1px solid #1a1a2e",
+              background: trader===name?"#00aaff20":"#08080f",
+              color: trader===name?"#00aaff":"#4a5070"}}>
+            {name === "PAT" ? "👤 PAT" : "👤 FRANK"}
+            {trader===name && <span style={{display:"block",fontSize:8,color:"#00aaff66",marginTop:2,letterSpacing:1}}>JOURNAL ACTIF</span>}
+          </button>
+        ))}
+      </div>
+
+      {/* STATS DASHBOARD */}
+      <div style={{background:"#08080f",border:"1px solid #00ff8833",borderRadius:8,padding:14,marginBottom:12}}>
+        <div style={{fontSize:9,letterSpacing:3,color:"#00ff88",fontWeight:700,marginBottom:12,borderBottom:"1px solid #00ff8822",paddingBottom:8}}>
+          📊 STATS — {trader} · {closed.length} trades fermés
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:10}}>
+          {[
+            ["WIN RATE", winRate+"%", winRate>=55?"#00ff88":winRate>=45?"#ffd700":"#ff6666"],
+            ["TOTAL P&L", (totalPnL>=0?"+":"")+totalPnL.toFixed(0)+"$", totalPnL>=0?"#00ff88":"#ff6666"],
+            ["RATIO R:R", rr, parseFloat(rr)>=2?"#00ff88":parseFloat(rr)>=1.5?"#ffd700":"#ff6666"],
+            ["OUVERTS", trades.filter(t=>t.status==="OUVERT").length, "#00aaff"],
+            ["MOY WIN", wins.length>0?"+"+avgWin.toFixed(0)+"$":"—", "#4ade80"],
+            ["PROFIT F.", profitFactor, parseFloat(profitFactor)>=1.5?"#00ff88":"#ff6666"],
+          ].map(([label,val,color])=>(
+            <div key={label} style={{padding:"10px 8px",background:"#050508",borderRadius:4,textAlign:"center",border:"1px solid #1a1a2e"}}>
+              <div style={{fontSize:7,color:"#4a5070",letterSpacing:1,marginBottom:4}}>{label}</div>
+              <div style={{fontSize:14,fontWeight:700,color:color}}>{val}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* STATS PAR PAIRE */}
+        {closed.length > 0 && (
+          <div style={{padding:"8px 10px",background:"#050508",borderRadius:4,border:"1px solid #1a1a2e"}}>
+            <div style={{fontSize:8,color:"#4a5070",marginBottom:6,letterSpacing:1}}>PAR PAIRE</div>
+            {Object.entries(
+              closed.reduce((acc,t)=>{
+                if(!acc[t.pair]) acc[t.pair]={wins:0,total:0,pnl:0};
+                acc[t.pair].total++;
+                if(parseFloat(t.result_usd||0)>0) acc[t.pair].wins++;
+                acc[t.pair].pnl+=parseFloat(t.result_usd||0);
+                return acc;
+              },{})
+            ).sort((a,b)=>b[1].pnl-a[1].pnl).map(([pair,st])=>(
+              <div key={pair} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 0",borderBottom:"1px solid #0a0a14"}}>
+                <span style={{fontSize:9,color:"#c8d4f0",fontWeight:700}}>{pair}</span>
+                <span style={{fontSize:8,color:"#4a5070"}}>{st.wins}/{st.total}</span>
+                <span style={{fontSize:9,fontWeight:700,color:st.pnl>=0?"#00ff88":"#ff6666"}}>{st.pnl>=0?"+":""}{st.pnl.toFixed(0)}$</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* BOUTON NOUVEAU TRADE */}
+      <button onClick={()=>{setShowForm(true);setEditKey(null);setForm({date:"",pair:"",direction:"LONG",regime_base:"",regime_quote:"",cot:"",retail:"",entry:"",sl:"",tp:"",exit:"",result_pips:"",result_usd:"",status:"OUVERT",note:""}); }}
+        style={{width:"100%",padding:"10px",background:"#001a0d",border:"1px solid #00ff8844",borderRadius:6,color:"#00ff88",fontSize:11,fontWeight:700,cursor:"pointer",marginBottom:12,letterSpacing:2}}>
+        + ENREGISTRER UN TRADE — {trader}
+      </button>
+
+      {/* FORMULAIRE */}
+      {showForm && (
+        <div style={{background:"#08080f",border:"1px solid #00aaff44",borderRadius:8,padding:14,marginBottom:12,animation:"fadeIn 0.2s ease"}}>
+          <div style={{fontSize:10,color:"#00aaff",fontWeight:700,letterSpacing:2,marginBottom:12}}>
+            {editKey ? "✏ MODIFIER" : "📝 NOUVEAU TRADE"} — {trader}
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}}>
+            <div><label style={labelStyle}>DATE</label>
+              <input type="date" value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))} style={inputStyle}/>
+            </div>
+            <div><label style={labelStyle}>PAIRE</label>
+              <select value={form.pair} onChange={e=>setForm(f=>({...f,pair:e.target.value}))} style={inputStyle}>
+                <option value="">Choisir...</option>
+                {PAIRS.map(p=><option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
+            <div><label style={labelStyle}>DIRECTION</label>
+              <select value={form.direction} onChange={e=>setForm(f=>({...f,direction:e.target.value}))} style={inputStyle}>
+                <option value="LONG">▲ LONG</option>
+                <option value="SHORT">▼ SHORT</option>
+              </select>
+            </div>
+            <div><label style={labelStyle}>STATUT</label>
+              <select value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value}))} style={inputStyle}>
+                {STATUSES.map(s=><option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div><label style={labelStyle}>RÉGIME BASE</label>
+              <select value={form.regime_base} onChange={e=>setForm(f=>({...f,regime_base:e.target.value}))} style={inputStyle}>
+                {REGIMES_LIST.map(r=><option key={r} value={r}>{r}</option>)}
+              </select>
+            </div>
+            <div><label style={labelStyle}>RÉGIME QUOTE</label>
+              <select value={form.regime_quote} onChange={e=>setForm(f=>({...f,regime_quote:e.target.value}))} style={inputStyle}>
+                {REGIMES_LIST.map(r=><option key={r} value={r}>{r}</option>)}
+              </select>
+            </div>
+            <div><label style={labelStyle}>COT SIGNAL</label>
+              <select value={form.cot} onChange={e=>setForm(f=>({...f,cot:e.target.value}))} style={inputStyle}>
+                <option value="">—</option>
+                <option value="EXTREME">EXTREME</option>
+                <option value="FORT">FORT</option>
+                <option value="MODERE">MODERE</option>
+              </select>
+            </div>
+            <div><label style={labelStyle}>RETAIL SIGNAL</label>
+              <select value={form.retail} onChange={e=>setForm(f=>({...f,retail:e.target.value}))} style={inputStyle}>
+                <option value="">—</option>
+                <option value="EXTREME">EXTREME</option>
+                <option value="FORT">FORT</option>
+                <option value="MODERE">MODERE</option>
+                <option value="N/A">N/A</option>
+              </select>
+            </div>
+            <div><label style={labelStyle}>ENTRÉE</label>
+              <input type="number" step="0.00001" value={form.entry} onChange={e=>setForm(f=>({...f,entry:e.target.value}))} style={inputStyle} placeholder="1.08500"/>
+            </div>
+            <div><label style={labelStyle}>STOP LOSS</label>
+              <input type="number" step="0.00001" value={form.sl} onChange={e=>setForm(f=>({...f,sl:e.target.value}))} style={inputStyle} placeholder="1.07800"/>
+            </div>
+            <div><label style={labelStyle}>TARGET</label>
+              <input type="number" step="0.00001" value={form.tp} onChange={e=>setForm(f=>({...f,tp:e.target.value}))} style={inputStyle} placeholder="1.10000"/>
+            </div>
+            <div><label style={labelStyle}>PRIX SORTIE</label>
+              <input type="number" step="0.00001" value={form.exit} onChange={e=>setForm(f=>({...f,exit:e.target.value}))} style={inputStyle} placeholder="1.09500"/>
+            </div>
+            <div><label style={labelStyle}>RÉSULTAT PIPS</label>
+              <input type="number" value={form.result_pips} onChange={e=>setForm(f=>({...f,result_pips:e.target.value}))} style={inputStyle} placeholder="+85"/>
+            </div>
+            <div><label style={labelStyle}>RÉSULTAT $</label>
+              <input type="number" value={form.result_usd} onChange={e=>setForm(f=>({...f,result_usd:e.target.value}))} style={inputStyle} placeholder="+850"/>
+            </div>
+          </div>
+          <div style={{marginBottom:10}}>
+            <label style={labelStyle}>NOTE — RAISON DU TRADE</label>
+            <textarea value={form.note} onChange={e=>setForm(f=>({...f,note:e.target.value}))}
+              placeholder="Ex: EURUSD — GOLDILOCKS vs RECESSION, COT EXTREME, retail 78% short. Entrée retest support 1.0850."
+              style={{...inputStyle,height:80,resize:"vertical"}}/>
+          </div>
+          <div style={{display:"flex",gap:8}}>
+            <button onClick={submitTrade}
+              style={{flex:1,padding:"10px",background:"#001a0d",border:"1px solid #00ff8844",borderRadius:4,color:"#00ff88",fontSize:10,fontWeight:700,cursor:"pointer"}}>
+              {editKey ? "✓ MODIFIER" : "✓ ENREGISTRER"}
+            </button>
+            <button onClick={()=>{setShowForm(false);setEditKey(null);}}
+              style={{padding:"10px 16px",background:"transparent",border:"1px solid #1a1a2e",borderRadius:4,color:"#4a5070",fontSize:10,cursor:"pointer"}}>
+              ANNULER
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* FILTRES */}
+      <div style={{display:"flex",gap:6,marginBottom:10,flexWrap:"wrap"}}>
+        {["TOUS","OUVERT","FERMÉ","BREAKEVEN","SL TOUCHÉ"].map(s=>(
+          <button key={s} onClick={()=>setFilterStatus(s)}
+            style={{padding:"4px 10px",fontSize:9,cursor:"pointer",borderRadius:3,
+              border:filterStatus===s?"1px solid #00aaff66":"1px solid #1a1a2e",
+              background:filterStatus===s?"#00aaff15":"transparent",
+              color:filterStatus===s?"#00aaff":"#4a5070"}}>
+            {s} {s==="TOUS"?trades.length:trades.filter(t=>t.status===s).length}
+          </button>
+        ))}
+      </div>
+
+      {/* LOADING */}
+      {loading && (
+        <div style={{textAlign:"center",padding:24,color:"#4a5070",fontSize:10}}>
+          Chargement...
+        </div>
+      )}
+
+      {/* LISTE */}
+      {!loading && filtered.length===0 && (
+        <div style={{textAlign:"center",padding:32,color:"#4a5070",fontSize:10}}>
+          Aucun trade enregistré pour {trader}.<br/>
+          <span style={{fontSize:8}}>Clique sur "+ ENREGISTRER UN TRADE" pour commencer.</span>
+        </div>
+      )}
+
+      {filtered.map((t) => {
+        const pnl = parseFloat(t.result_usd||0);
+        const statusColor = t.status==="FERMÉ"?(pnl>0?"#00ff88":"#ff6666"):t.status==="OUVERT"?"#00aaff":t.status==="BREAKEVEN"?"#ffd700":"#ff6666";
+        return (
+          <div key={t._key} style={{background:"#08080f",border:"1px solid #1a1a2e",borderRadius:8,padding:12,marginBottom:8,borderLeft:"3px solid "+statusColor,animation:"fadeIn 0.2s ease"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+              <div>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+                  <span style={{fontSize:14,fontWeight:700,color:"#c8d4f0",letterSpacing:1}}>{t.pair}</span>
+                  <span style={{fontSize:9,fontWeight:700,color:t.direction==="LONG"?"#4ade80":"#f87171",padding:"2px 6px",background:t.direction==="LONG"?"#4ade8015":"#f8717115",borderRadius:3}}>
+                    {t.direction==="LONG"?"▲":"▼"} {t.direction}
+                  </span>
+                  <span style={{fontSize:8,color:statusColor,border:"1px solid "+statusColor+"44",padding:"2px 6px",borderRadius:3}}>{t.status}</span>
+                </div>
+                <div style={{fontSize:8,color:"#4a5070"}}>{t.date}</div>
+              </div>
+              <div style={{textAlign:"right"}}>
+                {t.result_usd && <div style={{fontSize:14,fontWeight:700,color:pnl>=0?"#00ff88":"#ff6666"}}>{pnl>=0?"+":""}{pnl.toFixed(0)}$</div>}
+                {t.result_pips && <div style={{fontSize:9,color:"#4a5070"}}>{parseFloat(t.result_pips)>=0?"+":""}{t.result_pips} pips</div>}
+              </div>
+            </div>
+            <div style={{display:"flex",gap:6,marginBottom:8,flexWrap:"wrap"}}>
+              {t.regime_base && t.regime_base!=="—" && <span style={{fontSize:8,color:REGIME_COLORS[t.regime_base]||"#4a5070",border:"1px solid "+(REGIME_COLORS[t.regime_base]||"#4a5070")+"44",padding:"2px 6px",borderRadius:3}}>{t.regime_base}</span>}
+              {t.regime_quote && t.regime_quote!=="—" && <span style={{fontSize:8,color:REGIME_COLORS[t.regime_quote]||"#4a5070",border:"1px solid "+(REGIME_COLORS[t.regime_quote]||"#4a5070")+"44",padding:"2px 6px",borderRadius:3}}>vs {t.regime_quote}</span>}
+              {t.cot && <span style={{fontSize:8,color:"#00aaff",border:"1px solid #00aaff33",padding:"2px 6px",borderRadius:3}}>COT {t.cot}</span>}
+              {t.retail && t.retail!=="N/A" && <span style={{fontSize:8,color:"#f97316",border:"1px solid #f9731633",padding:"2px 6px",borderRadius:3}}>RETAIL {t.retail}</span>}
+            </div>
+            {(t.entry||t.sl||t.tp) && (
+              <div style={{display:"flex",gap:12,marginBottom:8,fontSize:8,color:"#4a5070"}}>
+                {t.entry && <span>E: <span style={{color:"#c8d4f0"}}>{t.entry}</span></span>}
+                {t.sl && <span>SL: <span style={{color:"#ff6666"}}>{t.sl}</span></span>}
+                {t.tp && <span>TP: <span style={{color:"#00ff88"}}>{t.tp}</span></span>}
+                {t.exit && <span>Exit: <span style={{color:"#ffd700"}}>{t.exit}</span></span>}
+              </div>
+            )}
+            {t.note && (
+              <div style={{padding:"6px 8px",background:"#050508",borderRadius:3,fontSize:9,color:"#94a3b8",lineHeight:1.5,marginBottom:8,borderLeft:"2px solid #1a1a2e"}}>
+                {t.note}
+              </div>
+            )}
+            <div style={{display:"flex",gap:6}}>
+              <button onClick={()=>editTrade(t)}
+                style={{padding:"4px 10px",fontSize:8,cursor:"pointer",borderRadius:3,border:"1px solid #00aaff44",background:"transparent",color:"#00aaff"}}>
+                ✏ MODIFIER
+              </button>
+              <button onClick={()=>deleteTrade(t._key)}
+                style={{padding:"4px 10px",fontSize:8,cursor:"pointer",borderRadius:3,border:"1px solid #ff666644",background:"transparent",color:"#ff6666"}}>
+                ✕ SUPPRIMER
+              </button>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* EXPLICATION */}
+      <div style={{marginTop:16,padding:14,background:"#08080f",border:"1px solid #1a1a2e",borderRadius:8}}>
+        <div style={{fontSize:9,color:"#00aaff",fontWeight:700,letterSpacing:2,marginBottom:10,borderBottom:"1px solid #1a1a2e",paddingBottom:8}}>
+          📚 POURQUOI UN JOURNAL ?
+        </div>
+        <div style={{fontSize:9,color:"#4a5070",lineHeight:1.8}}>
+          <span style={{color:"#c8d4f0",fontWeight:700}}>Le journal est ton avantage statistique.</span> Sans données, tu trades sur des émotions. Avec données, tu trades sur des faits.<br/><br/>
+          <span style={{color:"#00ff88"}}>Win Rate :</span> Sous 40% = problème de sélection. Dessus mais perdant = problème de gestion.<br/>
+          <span style={{color:"#00aaff"}}>Ratio R:R :</span> 2:1 = 34% win rate suffit pour être rentable.<br/>
+          <span style={{color:"#ffd700"}}>Profit Factor :</span> Au-dessus de 1.5 = système viable.<br/>
+          <span style={{color:"#a855f7"}}>Par paire :</span> Le journal révèle ton vrai edge sur chaque paire.<br/><br/>
+          <span style={{color:"#c8d4f0",fontWeight:700}}>Objectif :</span> Après 50 trades, tu as assez de données pour optimiser avec précision mathématique.
+        </div>
+      </div>
+    </div>
+  );
 }
+
+
