@@ -86,7 +86,7 @@ function analyzePairCOT(baseCur, quoteCur) {
   return {
     bias, strength, extreme, spread,
     base:baseCur, quote:quoteCur,
-    desc:`Base P${baseCur.pct}% vs Quote P${quoteCur.pct}% (spread ${spread>0?"+":""}${spread})`
+    desc:`Force relative ${baseCur.chgNet>=0?"+":""}${baseCur.chgNet?.toLocaleString()||"—"} vs ${quoteCur.chgNet>=0?"+":""}${quoteCur.chgNet?.toLocaleString()||"—"}`
   };
 }
 
@@ -330,9 +330,9 @@ export default function SentimentView() {
 
             <div style={{background:"#070b14",borderRadius:6,padding:8,borderLeft:"2px solid "+(pCot?.bias==="HAUSSIER"?"#4ade80":pCot?.bias==="BAISSIER"?"#f87171":"#475569")}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-                <div style={{fontSize:8,color:"#475569",letterSpacing:1}}>COT INSTITS — {base} vs {quote}</div>
+                <div style={{fontSize:8,color:"#475569",letterSpacing:1}}>LEVERAGED FUNDS — {base} vs {quote}</div>
                 <div style={{fontSize:8,color:pCot?.bias==="HAUSSIER"?"#4ade80":"#f87171",fontWeight:700}}>
-                  Instits: {pCot?.bias} {pCot?.strength==="EXTREME"?"⚠":""}
+                  Leveraged Funds: {pCot?.bias} {pCot?.strength==="EXTREME"?"⚠":""}
                 </div>
               </div>
 
@@ -393,7 +393,7 @@ export default function SentimentView() {
           1️⃣ Retail Myfxbook → inversion contrarian (foule = mauvaise direction)<br/>
           2️⃣ COT CFTC → changement hebdomadaire Leveraged Funds (hedge funds + CTAs)<br/>
           3️⃣ Signal = Base vs Quote (HAUSSIER FORT / HAUSSIER / BAISSIER / BAISSIER FORT)<br/>
-          4️⃣ Signal valide = Retail (inversé) aligné avec spread COT<br/>
+          4️⃣ Signal valide = Retail (inversé) aligné avec force relative Leveraged Funds<br/>
           <span style={{color:"#f59e0b"}}>🔥🔥 Setup parfait = retail extrême + Leveraged Funds signal fort opposé</span>
         </div>
       </div>
