@@ -152,7 +152,7 @@ const REGIMES = {
     deviseDir: "HAUSSE forte — capitaux attirés par les taux élevés",
     action: "Marché anticipe : BC va monter les taux → ACHÈTE — inflation en hausse + croissance forte = BC forcée d'agir · Traders positionnent AVANT la décision",
     short: "PMI > 50 + Inflation EN HAUSSE" },
-  STAGFLATION: { label: "STAGFLATION", icon: "■", color: "#ff3b3b", bg: "#1a0000", border: "#ff3b3b",
+  STAGFLATION: { label: "STAGFLATION", icon: "■", color: "#ff6600", bg: "#1a0800", border: "#ff6600",
     bcBias: "COINCÉE — monter tue l'économie, baisser alimente l'inflation",
     tauxDir: "Taux bloqués — BC sans marge de manœuvre",
     deviseDir: "BAISSE — pire scénario macro, devise sous pression",
