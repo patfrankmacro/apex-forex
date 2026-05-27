@@ -1727,7 +1727,7 @@ function TradeCOT({ data, cotData }) {
     trades.push({
       name, base, quote,
       direction, macroPts, rBase, rQuote,
-      cotBias, cotStrength, bPct, qPct, cotSpread,
+      cotBias, cotStrength, bPct, qPct, cotSpread, bCotRaw, qCotRaw,
       sig: sigCot,
     });
   });
@@ -1785,8 +1785,17 @@ function TradeCOT({ data, cotData }) {
             <div style={{fontSize:8,color:"#94a3b8",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 2 — COT INSTITUTIONNELS</div>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <div style={{fontSize:9,color:"#94a3b8"}}>
-                <FlagImg code={t.base} size={12} /> P{t.bPct}% &nbsp;vs&nbsp; <FlagImg code={t.quote} size={12} /> P{t.qPct}%
-                <span style={{color:"#4a5070",marginLeft:6}}>spread {t.cotSpread>0?"+":""}{t.cotSpread}</span>
+                <FlagImg code={t.base} size={12} />
+                <span style={{color:t.bCotRaw?.signal?.includes("HAUSSIER")?"#4ade80":"#f87171",marginLeft:3}}>
+                  {(t.bCotRaw?.signal||"—").replace("_"," ")}
+                </span>
+                <span style={{color:"#4a5070",marginLeft:4}}>({t.bCotRaw?.chgNet>=0?"+":""}{(t.bCotRaw?.chgNet||0).toLocaleString()})</span>
+                &nbsp;vs&nbsp;
+                <FlagImg code={t.quote} size={12} />
+                <span style={{color:t.qCotRaw?.signal?.includes("HAUSSIER")?"#4ade80":"#f87171",marginLeft:3}}>
+                  {(t.qCotRaw?.signal||"—").replace("_"," ")}
+                </span>
+                <span style={{color:"#4a5070",marginLeft:4}}>({t.qCotRaw?.chgNet>=0?"+":""}{(t.qCotRaw?.chgNet||0).toLocaleString()})</span>
               </div>
               <div style={{fontSize:10,fontWeight:700,color:t.cotBias==="HAUSSIER"?"#4ade80":"#f87171"}}>
                 {t.cotBias} — {t.cotStrength}
@@ -1882,7 +1891,7 @@ function TradeApex({ data, cotData, retailData }) {
     trades.push({
       name, base, quote, baseFlag, quoteFlag,
       direction, macroPts, rBase, rQuote,
-      cotBias, cotStrength, bPct, qPct, cotSpread,
+      cotBias, cotStrength, bPct, qPct, cotSpread, bCotRaw, qCotRaw,
       retailBias, retailStrength, lp, sp,
       sig,
     });
