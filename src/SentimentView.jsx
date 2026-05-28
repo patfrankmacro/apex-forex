@@ -81,7 +81,7 @@ function analyzeCurrency(d) {
   else if (pct >= 55) { bias = "HAUSSIER"; strength = "MODERE"; }
   else if (pct <= 45) { bias = "BAISSIER"; strength = "MODERE"; }
   else { bias = "NEUTRE"; strength = "NUL"; }
-  return { bias, strength, extreme, pct, net:d.net, longPos:d.longPos, shortPos:d.shortPos, date:d.date, signal:d.signal, chgLong:d.chgLong, chgShort:d.chgShort, chgNet:d.chgNet, switchType:d.switchType };
+  return { bias, strength, extreme, pct, net:d.net, longPos:d.longPos, shortPos:d.shortPos, date:d.date, signal:d.signal, chgLong:d.chgLong, chgShort:d.chgShort, chgNet:d.chgNet, switchType:d.switchType, prevChgNet:d.prevChgNet };
 }
 
 function analyzePairCOT(baseCur, quoteCur) {
