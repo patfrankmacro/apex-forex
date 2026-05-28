@@ -2623,7 +2623,11 @@ export default function App() {
         const d = await r.json();
         if (d.error || !d.symbols) return;
         const map = {};
-        d.symbols.forEach(s => { map[s.name] = s; });
+        d.symbols.forEach(s => {
+          map[s.name] = s;
+          // Normaliser sans slash: "GBP/NZD" → "GBPNZD"
+          map[s.name.replace("/","")] = s;
+        });
         if (Object.keys(map).length > 0) setApexRetail(map);
       } catch(e) {}
     };
