@@ -316,6 +316,46 @@ export default function SentimentView() {
         </div>
       )}
 
+      {(() => {
+        // Calcul du biais Leveraged Funds par devise
+        const devises = Object.keys(CFTC);
+        const biais = devises.map(dev => {
+          const d = analyzeCurrency(cot[CFTC[dev]]);
+          return d ? { dev, chgNet: d.chgNet||0, switchType: d.switchType } : null;
+        }).filter(Boolean);
+        const forts = biais.filter(b => b.chgNet > 0).sort((a,b) => b.chgNet - a.chgNet);
+        const faibles = biais.filter(b => b.chgNet < 0).sort((a,b) => a.chgNet - b.chgNet);
+        if (forts.length === 0 && faibles.length === 0) return null;
+        return (
+          <div style={{background:"#0a1628",border:"1px solid #1e3a5f",borderRadius:8,padding:"12px 14px",marginBottom:12}}>
+            <div style={{fontSize:11,color:"#38bdf8",fontWeight:700,letterSpacing:1,marginBottom:10}}>📊 BIAIS LEVERAGED FUNDS — SEMAINE {cotDate||"—"}</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+              <div>
+                <div style={{fontSize:9,color:"#4ade80",fontWeight:700,marginBottom:6}}>🟢 ACHÈTENT</div>
+                {forts.map(b => (
+                  <div key={b.dev} style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:3}}>
+                    <span style={{fontSize:10,color:"#c8d4f0",fontWeight:700}}><FlagImg code={b.dev} size={14} /> {b.dev}</span>
+                    <span style={{fontSize:9,color:"#4ade80"}}>+{b.chgNet.toLocaleString()}{b.switchType==="SWITCH_HAUSSIER"?" 🔥":""}</span>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div style={{fontSize:9,color:"#f87171",fontWeight:700,marginBottom:6}}>🔴 VENDENT</div>
+                {faibles.map(b => (
+                  <div key={b.dev} style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:3}}>
+                    <span style={{fontSize:10,color:"#c8d4f0",fontWeight:700}}><FlagImg code={b.dev} size={14} /> {b.dev}</span>
+                    <span style={{fontSize:9,color:"#f87171"}}>{b.chgNet.toLocaleString()}{b.switchType==="SWITCH_BAISSIER"?" 🔥":""}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{fontSize:8,color:"#64748b",marginTop:10,paddingTop:8,borderTop:"1px solid #1e3a5f"}}>
+              → Meilleurs trades : acheter une 🟢 contre une 🔴 · 🔥 = switch cette semaine
+            </div>
+          </div>
+        );
+      })()}
+
       <div style={{fontSize:9,color:"#4ade80",letterSpacing:2,marginBottom:8,fontWeight:700}}>
         {validPairs.length} SIGNAL{validPairs.length>1?"AUX":""} VALIDE{validPairs.length>1?"S":""}
       </div>
