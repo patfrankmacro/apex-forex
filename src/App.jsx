@@ -2931,6 +2931,19 @@ export default function App() {
                     );
                   })}
                 </div>
+                {/* EXPLICATION DE LA LOGIQUE */}
+                <div style={{marginTop:12, padding:"10px 12px", background:"#0a1628", border:"1px solid #1e3a5f44", borderRadius:6}}>
+                  <div style={{fontSize:9, color:"#38bdf8", fontWeight:700, letterSpacing:1, marginBottom:8}}>💡 COMMENT LIRE CE TABLEAU</div>
+                  <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.7}}>
+                    Ce tableau combine <b style={{color:"#a78bfa"}}>2 forces</b> pour identifier les meilleurs setups :<br/>
+                    <b style={{color:"#4ade80"}}>1. MACRO divergente</b> — une devise <b>forte</b> (SURCHAUFFE/GOLDILOCKS) contre une <b>faible</b> (RECESSION/STAGFLATION). Les BCs vont dans des directions opposées.<br/>
+                    <b style={{color:"#4ade80"}}>2. LEVERAGED FUNDS alignés</b> — les institutionnels <b>achètent</b> la forte (chgNet positif) et <b>vendent</b> la faible (chgNet négatif). 🔥 = switch cette semaine.<br/>
+                    <b style={{color:"#fbbf24"}}>Score combiné</b> = |chgNet forte| + |chgNet faible|. Plus le score est élevé, plus le mouvement institutionnel est massif → meilleure probabilité.
+                  </div>
+                  <div style={{marginTop:8, padding:"6px 8px", background:"#001a0d", borderRadius:3, fontSize:8, color:"#4ade80"}}>
+                    ✓ Aller dans ANALYSE pour voir lesquels passent aussi le filtre RETAIL 70%+ contrarian (signal APEX 3/3)
+                  </div>
+                </div>
               </div>
             );
           })()}
