@@ -3015,7 +3015,7 @@ export default function App() {
               const cotOk=bIsFort&&qIsFort&&Math.abs(bCot.chgNet)>=3500&&Math.abs(qCot.chgNet)>=3500&&bDir!==qDir;
               const retailS=apexRetail[pair];
               const rA=retailS?analyzeRetailS(retailS):null;
-              const retailOk=rA&&rA.strength==="EXTREME"&&rA.bias===direction;
+              const retailOk=rA&&(rA.strength==="EXTREME"||rA.strength==="FORT")&&rA.bias===direction;
               const score3=(cotOk?1:0)+(retailOk?1:0)+1;
               opps.push({pair,base,quote,direction,rBase,rQuote,macroDiff,sBase,sQuote,bCot,qCot,cotOk,retailOk,rA,score3});
             });
@@ -3025,45 +3025,45 @@ export default function App() {
             return(
               <div>
                 <div style={{fontSize:10,color:"#fbbf24",fontWeight:700,marginBottom:8,letterSpacing:1}}>🎯 ÉTAPE 3 — OPPORTUNITÉS CONFIRMÉES</div>
-                {apex.length===0&&partial.length===0&&<div style={{padding:20,textAlign:"center",fontSize:10,color:"#475569",background:"#0a1628",borderRadius:8}}>Aucune opportunité cette semaine</div>}
+                {apex.length===0&&(
+                  <div style={{padding:20,textAlign:"center",background:"#0a1628",borderRadius:8,marginBottom:12}}>
+                    <div style={{fontSize:12,color:"#475569",marginBottom:6}}>⏳ Aucun signal APEX cette semaine</div>
+                    <div style={{fontSize:9,color:"#374151"}}>Attendre que les 3 forces s'alignent — ne pas forcer un trade</div>
+                  </div>
+                )}
                 {apex.map(o=>(
                   <div key={o.pair} style={{background:"#0a1628",border:`2px solid ${o.direction==="LONG"?"#4ade80":"#f87171"}`,borderRadius:8,padding:"10px 14px",marginBottom:10}}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
                       <span style={{fontSize:13,fontWeight:700,color:"#fff"}}><FlagImg code={o.base} size={16}/> {o.base}/{o.quote} <FlagImg code={o.quote} size={16}/></span>
-                      <span style={{fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:4,background:o.direction==="LONG"?"#14532d":"#7f1d1d",color:o.direction==="LONG"?"#4ade80":"#f87171"}}>🔥🔥🔥 {o.direction==="LONG"?"▲ LONG":"▼ SHORT"} APEX</span>
+                      <span style={{fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:4,background:o.direction==="LONG"?"#14532d":"#7f1d1d",color:o.direction==="LONG"?"#4ade80":"#f87171"}}>🔥🔥🔥 {o.direction==="LONG"?"▲ LONG":"▼ SHORT"} — APEX</span>
                     </div>
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:8}}>
                       <div style={{background:"#0c1a2e",borderRadius:4,padding:"6px 8px",textAlign:"center"}}>
-                        <div style={{fontSize:7,color:"#a78bfa",marginBottom:2}}>✅ MACRO</div>
+                        <div style={{fontSize:7,color:"#a78bfa",marginBottom:2,fontWeight:700}}>✅ 1 — MACRO</div>
                         <div style={{fontSize:8,color:o.rBase.color}}>{o.rBase.icon} {o.rBase.label}</div>
                         <div style={{fontSize:7,color:"#475569"}}>vs</div>
                         <div style={{fontSize:8,color:o.rQuote.color}}>{o.rQuote.icon} {o.rQuote.label}</div>
                         <div style={{fontSize:8,color:"#38bdf8",marginTop:2}}>écart {Math.abs(o.macroDiff).toFixed(2)}</div>
                       </div>
                       <div style={{background:"#0c1a2e",borderRadius:4,padding:"6px 8px",textAlign:"center"}}>
-                        <div style={{fontSize:7,color:"#4ade80",marginBottom:2}}>✅ COT LF</div>
+                        <div style={{fontSize:7,color:"#4ade80",marginBottom:2,fontWeight:700}}>✅ 2 — COT LF</div>
                         <div style={{fontSize:8,color:o.bCot.chgNet>0?"#4ade80":"#f87171"}}>{o.base} {o.bCot.chgNet>=0?"+":""}{o.bCot.chgNet.toLocaleString()}{o.bCot.switchType?" 🔥":""}</div>
+                        <div style={{fontSize:7,color:"#475569"}}>vs</div>
                         <div style={{fontSize:8,color:o.qCot.chgNet>0?"#4ade80":"#f87171"}}>{o.quote} {o.qCot.chgNet>=0?"+":""}{o.qCot.chgNet.toLocaleString()}{o.qCot.switchType?" 🔥":""}</div>
                       </div>
                       <div style={{background:"#0c1a2e",borderRadius:4,padding:"6px 8px",textAlign:"center"}}>
-                        <div style={{fontSize:7,color:"#fbbf24",marginBottom:2}}>✅ RETAIL</div>
-                        <div style={{fontSize:8,color:"#fbbf24"}}>{o.rA?.lp}% L · {o.rA?.sp}% S</div>
-                        <div style={{fontSize:8,color:o.direction==="LONG"?"#4ade80":"#f87171"}}>Contrarian {o.direction}</div>
+                        <div style={{fontSize:7,color:"#fbbf24",marginBottom:2,fontWeight:700}}>✅ 3 — RETAIL</div>
+                        <div style={{fontSize:9,color:"#f87171",fontWeight:700}}>{o.rA?.lp}% LONG</div>
+                        <div style={{fontSize:9,color:"#4ade80",fontWeight:700}}>{o.rA?.sp}% SHORT</div>
+                        <div style={{fontSize:7,color:o.direction==="LONG"?"#4ade80":"#f87171",marginTop:2}}>→ contrarian {o.direction==="LONG"?"ACHETER":"VENDRE"}</div>
                       </div>
                     </div>
-                  </div>
-                ))}
-                {partial.map(o=>(
-                  <div key={o.pair} style={{background:"#0a1628",border:`1px solid ${o.direction==="LONG"?"#4ade8044":"#f8717144"}`,borderRadius:8,padding:"8px 12px",marginBottom:6}}>
-                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                      <span style={{fontSize:11,fontWeight:700,color:"#c8d4f0"}}><FlagImg code={o.base} size={14}/> {o.base}/{o.quote} <FlagImg code={o.quote} size={14}/></span>
-                      <span style={{fontSize:9,padding:"2px 8px",borderRadius:3,background:o.direction==="LONG"?"#14532d55":"#7f1d1d55",color:o.direction==="LONG"?"#86efac":"#fca5a5"}}>{o.direction==="LONG"?"▲ LONG":"▼ SHORT"}</span>
-                    </div>
-                    <div style={{fontSize:8,color:"#64748b",marginTop:4}}>
-                      <span style={{color:o.rBase.color}}>{o.rBase.icon} {o.rBase.label}</span> vs <span style={{color:o.rQuote.color}}>{o.rQuote.icon} {o.rQuote.label}</span>
-                      {o.cotOk&&<span style={{color:"#4ade80",marginLeft:6}}>✅ COT</span>}
-                      {o.retailOk&&<span style={{color:"#fbbf24",marginLeft:6}}>✅ RETAIL</span>}
-                      {!o.retailOk&&<span style={{color:"#475569",marginLeft:6}}>⏳ retail à surveiller</span>}
+                    <div style={{background:"#050d1a",borderRadius:4,padding:"8px 10px",fontSize:8,color:"#94a3b8",lineHeight:1.7}}>
+                      <span style={{color:"#fbbf24",fontWeight:700}}>💡 POURQUOI CE TRADE ? </span>
+                      <span style={{color:o.rBase.color}}>{o.rBase.icon} {o.base} {o.rBase.label}</span>{" vs "}<span style={{color:o.rQuote.color}}>{o.rQuote.icon} {o.quote} {o.rQuote.label}</span>{" — les BCs divergent. "}
+                      {"Les Leveraged Funds "}<span style={{color:o.bCot.chgNet>0?"#4ade80":"#f87171"}}>{o.bCot.chgNet>0?"achètent":"vendent"} {o.base}</span>{" et "}<span style={{color:o.qCot.chgNet>0?"#4ade80":"#f87171"}}>{o.qCot.chgNet>0?"achètent":"vendent"} {o.quote}</span>{(o.bCot.switchType||o.qCot.switchType)?" (switch institutionnel cette semaine).":". "}
+                      {o.rA&&<span>{"Le retail est à "}<span style={{color:"#f87171",fontWeight:700}}>{Math.max(o.rA.lp,o.rA.sp)}% du mauvais côté</span>{" → signal contrarian fort. "}</span>}
+                      <span style={{color:"#4ade80",fontWeight:700}}>3 forces alignées = probabilité maximale.</span>
                     </div>
                   </div>
                 ))}
