@@ -1756,11 +1756,11 @@ function TradeCOT({ data, cotData }) {
     let cotStrength = cotAbs >= 60 ? "EXTREME" : cotAbs >= 40 ? "FORT" : cotAbs >= 20 ? "MODERE" : "NUL";
 
     // LOGIQUE NINO — les 2 devises doivent être HAUSSIER FORT ou BAISSIER FORT
-    // ET |chgNet| >= 3500 (mouvement significatif dans les 2 colonnes comme GBP/NZD)
+    // ET |chgNet| >= 3000 (mouvement significatif dans les 2 colonnes comme GBP/NZD)
     const bIsFort = bCotRaw.signal === "HAUSSIER_FORT" || bCotRaw.signal === "BAISSIER_FORT";
     const qIsFort = qCotRaw.signal === "HAUSSIER_FORT" || qCotRaw.signal === "BAISSIER_FORT";
     if (!bIsFort || !qIsFort) return;
-    if (Math.abs(bCotRaw.chgNet||0) < 3500 || Math.abs(qCotRaw.chgNet||0) < 3500) return;
+    if (Math.abs(bCotRaw.chgNet||0) < 3000 || Math.abs(qCotRaw.chgNet||0) < 3000) return;
     const bChg = bCotRaw.chgNet || 0;
     const qChg = qCotRaw.chgNet || 0;
     const forceDiff = bChg - qChg;
@@ -1913,11 +1913,11 @@ function TradeApex({ data, cotData, retailData }) {
 
     // Vérifier alignement COT avec direction
     // LOGIQUE NINO — les 2 devises doivent être HAUSSIER FORT ou BAISSIER FORT
-    // ET |chgNet| >= 3500 (mouvement significatif dans les 2 colonnes comme GBP/NZD)
+    // ET |chgNet| >= 3000 (mouvement significatif dans les 2 colonnes comme GBP/NZD)
     const bIsFort = bCotRaw.signal === "HAUSSIER_FORT" || bCotRaw.signal === "BAISSIER_FORT";
     const qIsFort = qCotRaw.signal === "HAUSSIER_FORT" || qCotRaw.signal === "BAISSIER_FORT";
     if (!bIsFort || !qIsFort) return;
-    if (Math.abs(bCotRaw.chgNet||0) < 3500 || Math.abs(qCotRaw.chgNet||0) < 3500) return;
+    if (Math.abs(bCotRaw.chgNet||0) < 3000 || Math.abs(qCotRaw.chgNet||0) < 3000) return;
     const bChg = bCotRaw.chgNet || 0;
     const qChg = qCotRaw.chgNet || 0;
     const forceDiff = bChg - qChg;
@@ -3025,7 +3025,7 @@ export default function App() {
               const qIsFort=qCot.signal==="HAUSSIER_FORT"||qCot.signal==="BAISSIER_FORT";
               const bDir=bCot.chgNet>0?"H":"B";
               const qDir=qCot.chgNet>0?"H":"B";
-              const cotOk=bIsFort&&qIsFort&&Math.abs(bCot.chgNet)>=3500&&Math.abs(qCot.chgNet)>=3500&&bDir!==qDir;
+              const cotOk=bIsFort&&qIsFort&&Math.abs(bCot.chgNet)>=3000&&Math.abs(qCot.chgNet)>=3000&&bDir!==qDir;
               const retailS=sentRetail[pair]||sentRetail[pair.slice(0,3)+"/"+pair.slice(3,6)];
               const rA=retailS?analyzeRetailS(retailS):null;
               const retailBiasOk = (direction==="SHORT"&&rA.bias==="BAISSIER")||(direction==="LONG"&&rA.bias==="HAUSSIER");

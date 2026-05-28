@@ -108,7 +108,7 @@ function buildSignal(rA, pCot) {
   if (!rA || !pCot) return { label:"— DONNÉES INCOMPLÈTES", color:"#475569", bg:"#1e3a5f22", action:"En attente des données", valid:false };
   if (rA.bias === "NEUTRE" && pCot.bias === "NEUTRE") return { label:"— NEUTRE", color:"#fbbf24", bg:"#1f2937", action:"Aucun positionnement marqué", valid:false };
   // FILTRE NINO: Les 2 devises doivent être HAUSSIER FORT ou BAISSIER FORT
-  // ET |chgNet| >= 3500 (mouvement significatif dans les 2 colonnes)
+  // ET |chgNet| >= 3000 (mouvement significatif dans les 2 colonnes)
   const bSig = pCot.base && pCot.base.signal;
   const qSig = pCot.quote && pCot.quote.signal;
   const bChgNet = Math.abs(pCot.base && pCot.base.chgNet || 0);
@@ -121,9 +121,9 @@ function buildSignal(rA, pCot) {
   if (!bIsFort || !qIsFort) {
     return { label:"— SIGNAL FAIBLE", color:"#64748b", bg:"#1e3a5f22", action:"Les 2 devises doivent être HAUSSIER FORT ou BAISSIER FORT", valid:false };
   }
-  // Le mouvement doit être significatif (|chgNet| >= 3500)
-  if (bChgNet < 3500 || qChgNet < 3500) {
-    return { label:"— MOUVEMENT INSUFFISANT", color:"#64748b", bg:"#1e3a5f22", action:"Changement de position insuffisant (<3500 contrats)", valid:false };
+  // Le mouvement doit être significatif (|chgNet| >= 3000)
+  if (bChgNet < 3000 || qChgNet < 3000) {
+    return { label:"— MOUVEMENT INSUFFISANT", color:"#64748b", bg:"#1e3a5f22", action:"Changement de position insuffisant (<3000 contrats)", valid:false };
   }
   // Directions opposées
   if (bDir === qDir || bDir === "NEUTRE" || qDir === "NEUTRE") {
