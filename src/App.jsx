@@ -2888,6 +2888,10 @@ export default function App() {
                 const quote = iF < iW ? w.code : f.code;
                 const direction = base === f.code ? "LONG" : "SHORT";
                 const scoreCombined = Math.abs(f.cot.chgNet) + Math.abs(w.cot.chgNet);
+                // NINO PUR: colonnes opposees + |chgNet| >= 3000 sur LES DEUX devises
+                const fIsFort = (f.cot.changeLong > 0 && f.cot.changeShort < 0) || (f.cot.changeLong < 0 && f.cot.changeShort > 0);
+                const wIsFort = (w.cot.changeLong > 0 && w.cot.changeShort < 0) || (w.cot.changeLong < 0 && w.cot.changeShort > 0);
+                const ninoPur = fIsFort && wIsFort && Math.abs(f.cot.chgNet) >= 3000 && Math.abs(w.cot.chgNet) >= 3000;
                 // Vérifier RETAIL: clé avec ou sans slash
                 const pairKey = base + quote;
                 const pairKeySlash = base + "/" + quote;
@@ -2904,7 +2908,7 @@ export default function App() {
                     retailBias = lp >= sp ? "LONG" : "SHORT";
                   }
                 }
-                opps.push({ base, quote, direction, forte:f, faible:w, scoreCombined, retailOk, retailPct, retailBias, retailData });
+                opps.push({ base, quote, direction, forte:f, faible:w, scoreCombined, retailOk, retailPct, retailBias, retailData, ninoPur });
               });
             });
             opps.sort((a,b) => b.scoreCombined - a.scoreCombined);
@@ -2918,7 +2922,12 @@ export default function App() {
                   {top.map((o,i) => {
                     const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
                     const isLong = o.direction === "LONG";
-                    const apexStyle = o.retailOk ? {
+                    const apexStyle = o.ninoPur ? {
+                      background: "linear-gradient(135deg, #1a1500 0%, #332b00 100%)",
+                      border: "2px solid #ffd700",
+                      borderLeft: "5px solid #ffd700",
+                      boxShadow: "0 0 16px rgba(255,215,0,0.4)"
+                    } : o.retailOk ? {
                       background: isLong ? "linear-gradient(135deg, #001a0d 0%, #003319 100%)" : "linear-gradient(135deg, #1a0000 0%, #330000 100%)",
                       border: isLong ? "2px solid #00ff88" : "2px solid #ff3b3b",
                       borderLeft: isLong ? "5px solid #00ff88" : "5px solid #ff3b3b",
@@ -2936,6 +2945,11 @@ export default function App() {
                             <FlagImg code={o.base} size={14} /> {o.base}/{o.quote} <FlagImg code={o.quote} size={14} />
                           </span>
                           <span style={{display:"flex", gap:6, alignItems:"center"}}>
+                            {o.ninoPur && (
+                              <span style={{fontSize:9, fontWeight:700, padding:"2px 6px", borderRadius:3, background:"#ffd700", color:"#1a1500", letterSpacing:0.5}}>
+                                🏆 NINO PUR
+                              </span>
+                            )}
                             {o.retailOk && (
                               <span style={{fontSize:9, fontWeight:700, padding:"2px 6px", borderRadius:3, background:o.direction==="LONG"?"#00ff88":"#ff3b3b", color:o.direction==="LONG"?"#001a0d":"#1a0000", letterSpacing:0.5}}>
                                 🎯 APEX 3/3
@@ -2986,6 +3000,9 @@ export default function App() {
                   </div>
                   <div style={{marginTop:8, padding:"6px 8px", background:"#001a0d", borderRadius:3, fontSize:8, color:"#4ade80"}}>
                     🎯 <b>APEX 3/3</b> = les paires en surbrillance passent les 3 filtres. <span style={{color:"#00ff88"}}>Vert = LONG</span> · <span style={{color:"#ff3b3b"}}>Rouge = SHORT</span>. Setups haute probabilité.
+                  </div>
+                  <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:3, fontSize:8, color:"#ffd700"}}>
+                    🏆 <b>NINO PUR</b> (or) = signature de la méthode Nino. Les Leveraged Funds <b>réduisent leurs longs ET ajoutent des shorts</b> en même temps (ou inverse). Les 2 colonnes du rapport CFTC vont en <b>directions opposées</b> = vrai signal directionnel propre, pas un repositionnement ambigu. Signal le plus puissant.
                   </div>
                 </div>
               </div>
