@@ -3025,7 +3025,8 @@ export default function App() {
               const cotOk=bIsFort&&qIsFort&&Math.abs(bCot.chgNet)>=3500&&Math.abs(qCot.chgNet)>=3500&&bDir!==qDir;
               const retailS=sentRetail[pair]||sentRetail[pair.slice(0,3)+"/"+pair.slice(3,6)];
               const rA=retailS?analyzeRetailS(retailS):null;
-              const retailOk=rA&&(rA.strength==="EXTREME"||rA.strength==="FORT")&&rA.bias===direction;
+              const retailBiasOk = (direction==="SHORT"&&rA.bias==="BAISSIER")||(direction==="LONG"&&rA.bias==="HAUSSIER");
+              const retailOk=rA&&(rA.strength==="EXTREME"||rA.strength==="FORT")&&retailBiasOk;
               const score3=(cotOk?1:0)+(retailOk?1:0)+1;
               opps.push({pair,base,quote,direction,rBase,rQuote,macroDiff,sBase,sQuote,bCot,qCot,cotOk,retailOk,rA,score3});
             });
