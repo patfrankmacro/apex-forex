@@ -2923,10 +2923,10 @@ export default function App() {
                     const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
                     const isLong = o.direction === "LONG";
                     const apexStyle = o.ninoPur ? {
-                      background: "linear-gradient(135deg, #2a2000 0%, #4d3d00 100%)",
-                      border: "3px solid #ffd700",
-                      borderLeft: "6px solid #ffeb3b",
-                      boxShadow: "0 0 25px rgba(255,215,0,0.8), 0 0 40px rgba(255,215,0,0.4), inset 0 0 15px rgba(255,215,0,0.15)"
+                      background: "linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 100%)",
+                      border: "2px solid #a855f7",
+                      borderLeft: "5px solid #c084fc",
+                      boxShadow: "0 0 18px rgba(168,85,247,0.5), 0 0 30px rgba(168,85,247,0.25)"
                     } : o.retailOk ? {
                       background: isLong ? "linear-gradient(135deg, #001a0d 0%, #003319 100%)" : "linear-gradient(135deg, #1a0000 0%, #330000 100%)",
                       border: isLong ? "2px solid #00ff88" : "2px solid #ff3b3b",
@@ -2946,8 +2946,8 @@ export default function App() {
                           </span>
                           <span style={{display:"flex", gap:6, alignItems:"center"}}>
                             {o.ninoPur && (
-                              <span style={{fontSize:9, fontWeight:700, padding:"2px 6px", borderRadius:3, background:"#ffd700", color:"#1a1500", letterSpacing:0.5}}>
-                                🏆 NINO PUR
+                              <span style={{fontSize:9, fontWeight:700, padding:"2px 6px", borderRadius:3, background:"#a855f7", color:"#fff", letterSpacing:0.5, boxShadow:"0 0 8px rgba(168,85,247,0.6)"}}>
+                                👑 NINO PUR
                               </span>
                             )}
                             {o.retailOk && (
@@ -3001,8 +3001,8 @@ export default function App() {
                   <div style={{marginTop:8, padding:"6px 8px", background:"#001a0d", borderRadius:3, fontSize:8, color:"#4ade80"}}>
                     🎯 <b>APEX 3/3</b> = les paires en surbrillance passent les 3 filtres. <span style={{color:"#00ff88"}}>Vert = LONG</span> · <span style={{color:"#ff3b3b"}}>Rouge = SHORT</span>. Setups haute probabilité.
                   </div>
-                  <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:3, fontSize:8, color:"#ffd700"}}>
-                    🏆 <b>NINO PUR</b> (or) = signature de la méthode Nino. Les Leveraged Funds <b>réduisent leurs longs ET ajoutent des shorts</b> en même temps (ou inverse). Les 2 colonnes du rapport CFTC vont en <b>directions opposées</b> = vrai signal directionnel propre, pas un repositionnement ambigu. Signal le plus puissant.
+                  <div style={{marginTop:6, padding:"6px 8px", background:"#1a0a2e", borderRadius:3, fontSize:8, color:"#c084fc", border:"1px solid #a855f744"}}>
+                    👑 <b>NINO PUR</b> (violet royal) = signature de la méthode Nino. Les Leveraged Funds <b>réduisent leurs longs ET ajoutent des shorts</b> en même temps (ou inverse). Les 2 colonnes du rapport CFTC vont en <b>directions opposées</b> = vrai signal directionnel propre, pas un repositionnement ambigu. Signal le plus puissant.
                   </div>
                 </div>
               </div>
