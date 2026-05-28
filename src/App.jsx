@@ -2889,8 +2889,8 @@ export default function App() {
                 const direction = base === f.code ? "LONG" : "SHORT";
                 const scoreCombined = Math.abs(f.cot.chgNet) + Math.abs(w.cot.chgNet);
                 // NINO PUR: colonnes opposees + |chgNet| >= 3000 sur LES DEUX devises
-                const fIsFort = (f.cot.changeLong > 0 && f.cot.changeShort < 0) || (f.cot.changeLong < 0 && f.cot.changeShort > 0);
-                const wIsFort = (w.cot.changeLong > 0 && w.cot.changeShort < 0) || (w.cot.changeLong < 0 && w.cot.changeShort > 0);
+                const fIsFort = (f.cot.chgLong > 0 && f.cot.chgShort < 0) || (f.cot.chgLong < 0 && f.cot.chgShort > 0);
+                const wIsFort = (w.cot.chgLong > 0 && w.cot.chgShort < 0) || (w.cot.chgLong < 0 && w.cot.chgShort > 0);
                 const ninoPur = fIsFort && wIsFort && Math.abs(f.cot.chgNet) >= 3000 && Math.abs(w.cot.chgNet) >= 3000;
                 // Vérifier RETAIL: clé avec ou sans slash
                 const pairKey = base + quote;
