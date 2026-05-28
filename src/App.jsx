@@ -2917,11 +2917,12 @@ export default function App() {
                 <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(300px, 1fr))", gap:8}}>
                   {top.map((o,i) => {
                     const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
+                    const isLong = o.direction === "LONG";
                     const apexStyle = o.retailOk ? {
-                      background: "linear-gradient(135deg, #001a0d 0%, #003319 100%)",
-                      border: "2px solid #00ff88",
-                      borderLeft: "5px solid #00ff88",
-                      boxShadow: "0 0 12px rgba(0,255,136,0.3)"
+                      background: isLong ? "linear-gradient(135deg, #001a0d 0%, #003319 100%)" : "linear-gradient(135deg, #1a0000 0%, #330000 100%)",
+                      border: isLong ? "2px solid #00ff88" : "2px solid #ff3b3b",
+                      borderLeft: isLong ? "5px solid #00ff88" : "5px solid #ff3b3b",
+                      boxShadow: isLong ? "0 0 12px rgba(0,255,136,0.3)" : "0 0 12px rgba(255,59,59,0.3)"
                     } : {
                       background: BG2,
                       border: `1px solid ${o.direction==="LONG"?"#4ade8033":"#f8717133"}`,
@@ -2936,7 +2937,7 @@ export default function App() {
                           </span>
                           <span style={{display:"flex", gap:6, alignItems:"center"}}>
                             {o.retailOk && (
-                              <span style={{fontSize:9, fontWeight:700, padding:"2px 6px", borderRadius:3, background:"#00ff88", color:"#001a0d", letterSpacing:0.5}}>
+                              <span style={{fontSize:9, fontWeight:700, padding:"2px 6px", borderRadius:3, background:o.direction==="LONG"?"#00ff88":"#ff3b3b", color:o.direction==="LONG"?"#001a0d":"#1a0000", letterSpacing:0.5}}>
                                 🎯 APEX 3/3
                               </span>
                             )}
