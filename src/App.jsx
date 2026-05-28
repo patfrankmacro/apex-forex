@@ -450,17 +450,16 @@ function getRegime(data, code) {
   const infHausse = coreHausse || (coreStable && cpiHausseSig);
   const infBaisse = coreBaisse || (coreStable && cpiBaisse);
 
-  // ── 2. PMI SERVICES — RÈGLE ABSOLUE (seuil 50) ───────────
+  // ── 2. PMI SERVICES — NOW vs EXP (surprise vs attente) ───
   // Services = 70-80% de l économie → PRIME sur manufacturing
+  // Ce qui compte : est-ce que ça bat les attentes ou déçoit ?
+  // NZD PMI 48.9 > exp 45 = POSITIF même si sous 50
+  // USD PMI 50.9 < exp 51.1 = NÉGATIF même si au-dessus de 50
   const svcNow   = toN(data[code]["svc"].now);
+  const svcExp   = toN(data[code]["svc"].exp);
   const svcPrior = toN(data[code]["svc"].prior);
 
-  const svcPositif  = svcNow !== null && svcNow > 50;
-  const svcNegatif  = svcNow !== null && svcNow < 50;
-  const svcRalentit = svcNow !== null && svcPrior !== null && svcNow < svcPrior;
-
-  // ── 3. CHÔMAGE vs EXPECTATION — CO-PILOTE BC ─────────────
-  // EN BAISSE = emplois + → dépenses + → inflation + → BC hawkish → devise FORTE
+  // Surprise vs expectation = signal principal
   // EN HAUSSE = emplois - → dépenses - → inflation - → BC dovish → devise FAIBLE
   const unempNow = toN(data[code]["unemp"].now);
   const unempExp = toN(data[code]["unemp"].exp);
@@ -468,25 +467,44 @@ function getRegime(data, code) {
   const unempHawkish = unempNow !== null && unempExp !== null && unempNow < unempExp - 0.05;
   const unempDovish  = unempNow !== null && unempExp !== null && unempNow > unempExp + 0.05;
 
+  const svcBeat = svcNow !== null && svcExp !== null && svcNow > svcExp + 0.1;
+  const svcMiss = svcNow !== null && svcExp !== null && svcNow < svcExp - 0.1;
+  // Seuil 50 = info contextuelle (expansion/contraction)
+  const svcAbove50 = svcNow !== null && svcNow > 50;
+  // Positif = beat les attentes (peu importe si > ou < 50)
+  // Négatif = miss les attentes
+  // Neutre = dans les attentes → trajectoire décide
+  // Beat attentes = positif SAUF si PMI sous 50 + chômage dovish (contraction réelle)
+  const svcPositif = svcBeat && (svcAbove50 || !unempDovish) || (!svcMiss && svcAbove50 && svcNow >= svcPrior);
+  const svcNegatif = svcMiss || (!svcBeat && !svcAbove50);
+  const svcRalentit = svcNow !== null && svcPrior !== null && svcNow < svcPrior;
+
+  // ── 3. CHÔMAGE vs EXPECTATION — CO-PILOTE BC ─────────────
+  // EN BAISSE = emplois + → dépenses + → inflation + → BC hawkish → devise FORTE
   // ── 4. CROISSANCE = PMI Services + Chômage co-pilote ─────
   let growthPos = false;
   let growthNeg = false;
 
   if (svcNegatif) {
-    // PMI < 50 = contraction → règle absolue NÉGATIVE
+    // PMI miss attentes = croissance décevante
+    // Chômage aggrave ou améliore
     growthNeg = true;
+    // Exception: si chômage hawkish ET PMI miss faible → neutre
+    if (unempHawkish && !svcMiss) growthNeg = false;
   } else if (svcPositif) {
-    // PMI > 50 = expansion
-    // EXCEPTION: chômage monte ET PMI ralentit = retournement précoce
+    // PMI beat attentes = croissance forte
+    // Chômage confirme ou infirme
     if (unempDovish && svcRalentit) {
+      // Chômage monte ET PMI ralentit = retournement précoce
       growthNeg = true;
     } else {
       growthPos = true;
     }
   } else {
-    // PMI exactement à 50 → chômage décide
-    growthNeg = unempDovish || svcRalentit;
-    growthPos = !growthNeg;
+    // PMI neutre → chômage décide
+    if (unempHawkish) growthPos = true;
+    else if (unempDovish) growthNeg = true;
+    else { growthNeg = svcRalentit; growthPos = !growthNeg; }
   }
 
   // ── 5. MATRICE 4 RÉGIMES — ANTICIPATION BC ───────────────
