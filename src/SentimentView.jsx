@@ -365,7 +365,7 @@ export default function SentimentView() {
                     <div style={{position:"absolute",right:0,width:"10%",height:"100%",background:"#f8717155"}}/>
                     <div style={{position:"absolute",left:(bCur?.pct||50)+"%",top:-1,width:2,height:6,background:bCur?.bias==="HAUSSIER"?"#4ade80":"#f87171",transform:"translateX(-50%)"}}/>
                   </div>
-                  {bCur&&<div style={{fontSize:7,color:"#475569",marginTop:2}}>Chg semaine: {bCur.chgNet>=0?"+":""}{bCur.chgNet?.toLocaleString()||"—"}{bCur.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:bCur.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:bCur.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontWeight:700}}>🔥 SWITCH</span>}</div>}
+                  {bCur&&<div style={{fontSize:7,color:"#475569",marginTop:2}}>Chg semaine: {bCur.chgNet>=0?"+":""}{bCur.chgNet?.toLocaleString()||"—"}{bCur.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:bCur.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:bCur.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontWeight:700}}>🔥 SWITCH</span>}{bCur.switchType && <div style={{fontSize:6,color:"#64748b",marginTop:1}}>semaine precedente: {bCur.prevChgNet>=0?"+":""}{bCur.prevChgNet?.toLocaleString()||"—"} vers {bCur.chgNet>=0?"+":""}{bCur.chgNet?.toLocaleString()}</div>}</div>}
                 </div>
                 <div>
                   <div style={{fontSize:7,color:"#475569",marginBottom:2}}><FlagImg code={quote} size={16} /> {quote} <span style={{color:qCur?.bias==="HAUSSIER"?"#4ade80":"#f87171",marginLeft:3}}>{(qCur?.signal||"—").replace("_"," ")}</span></div>
@@ -374,7 +374,7 @@ export default function SentimentView() {
                     <div style={{position:"absolute",right:0,width:"10%",height:"100%",background:"#f8717155"}}/>
                     <div style={{position:"absolute",left:(qCur?.pct||50)+"%",top:-1,width:2,height:6,background:qCur?.bias==="HAUSSIER"?"#4ade80":"#f87171",transform:"translateX(-50%)"}}/>
                   </div>
-                  {qCur&&<div style={{fontSize:7,color:"#475569",marginTop:2}}>Chg semaine: {qCur.chgNet>=0?"+":""}{qCur.chgNet?.toLocaleString()||"—"}{qCur.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:qCur.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:qCur.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontWeight:700}}>🔥 SWITCH</span>}</div>}
+                  {qCur&&<div style={{fontSize:7,color:"#475569",marginTop:2}}>Chg semaine: {qCur.chgNet>=0?"+":""}{qCur.chgNet?.toLocaleString()||"—"}{qCur.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:qCur.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:qCur.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontWeight:700}}>🔥 SWITCH</span>}{qCur.switchType && <div style={{fontSize:6,color:"#64748b",marginTop:1}}>semaine precedente: {qCur.prevChgNet>=0?"+":""}{qCur.prevChgNet?.toLocaleString()||"—"} vers {qCur.chgNet>=0?"+":""}{qCur.chgNet?.toLocaleString()}</div>}</div>}
                 </div>
               </div>
 
