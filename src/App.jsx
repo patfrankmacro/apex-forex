@@ -2785,6 +2785,14 @@ export default function App() {
           );
         })}
       </div>
+      {/* LÉGENDE bandeau */}
+      <div style={{ background:"#06060e", borderBottom:`1px solid ${BORDER}`, padding:"4px 16px", fontSize:7, color:"#475569", letterSpacing:0.5, display:"flex", gap:10, flexWrap:"wrap", justifyContent:"center" }}>
+        <span>Score macro: <span style={{color:"#4ade80"}}>+fort</span> / <span style={{color:"#f87171"}}>-faible</span></span>
+        <span style={{color:"#ffd700"}}>▲ SURCHAUFFE</span>
+        <span style={{color:"#00ff88"}}>◆ GOLDILOCKS</span>
+        <span style={{color:"#ff6600"}}>■ STAGFLATION</span>
+        <span style={{color:"#cc2200"}}>▼ RECESSION</span>
+      </div>
 
       {view==="table" && (
         <div style={{ overflowX:"auto", padding:12 }}>
@@ -2906,7 +2914,10 @@ export default function App() {
 
       {view==="rank" && (
         <div style={{ padding:16 }}>
-          <div style={{ fontSize:9, color:TEXT_DIM, letterSpacing:2, marginBottom:12 }}>CLASSEMENT MACRO — FORT → FAIBLE</div>
+          <div style={{ fontSize:9, color:TEXT_DIM, letterSpacing:2, marginBottom:6 }}>CLASSEMENT MACRO — FORT → FAIBLE</div>
+          <div style={{ fontSize:8, color:"#475569", marginBottom:12, lineHeight:1.6 }}>
+            <b>SCORE</b> = force macro globale (+1 très fort / -1 très faible) · <b>INF</b> = pression inflation vs attentes · <b>GROW</b> = croissance (PMI + emploi) vs attentes · Plus c'est élevé, plus la BC va monter les taux → devise forte
+          </div>
           {ranked.map((c,i)=>{
             const reg=getRegime(data,c.code);
             const scoreColor = c.score >= 0.3?"#00ff88":c.score >= 0.1?"#66ffaa":c.score >= 0?"#aaffcc":c.score >= -0.1?"#ffaaaa":c.score >= -0.3?"#ff6666":"#cc2200";
