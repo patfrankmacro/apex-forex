@@ -2834,6 +2834,60 @@ export default function App() {
               })}
             </tbody>
           </table>
+
+          {/* MEILLEURES OPPORTUNITÉS MACRO */}
+          {(() => {
+            const PAIRS_CHECK = ["EURUSD","GBPUSD","USDJPY","USDCHF","USDCAD","AUDUSD","NZDUSD","EURJPY","EURGBP","EURCAD","EURAUD","EURCHF","EURNZD","GBPJPY","GBPCHF","GBPCAD","GBPAUD","GBPNZD","CHFJPY","CADJPY","AUDJPY","NZDJPY","CADCHF","AUDCHF","NZDCHF","AUDCAD","NZDCAD","AUDNZD"];
+            const codes = ["EUR","GBP","JPY","CAD","AUD","CHF","USD","NZD"];
+            const scores = {};
+            codes.forEach(code => {
+              const s = ranked.find(r => r.code === code);
+              scores[code] = s ? s.score : 0;
+            });
+            const opps = [];
+            PAIRS_CHECK.forEach(pair => {
+              const base = pair.slice(0,3), quote = pair.slice(3,6);
+              if (!scores[base] && scores[base] !== 0) return;
+              if (!scores[quote] && scores[quote] !== 0) return;
+              const rBase = getRegime(data, base);
+              const rQuote = getRegime(data, quote);
+              if (!rBase || !rQuote) return;
+              const ecart = scores[base] - scores[quote];
+              if (Math.abs(ecart) < 0.5) return;
+              const direction = ecart > 0 ? "LONG" : "SHORT";
+              opps.push({ pair, base, quote, ecart, direction, rBase, rQuote, scoreBase: scores[base], scoreQuote: scores[quote] });
+            });
+            opps.sort((a,b) => Math.abs(b.ecart) - Math.abs(a.ecart));
+            const top = opps.slice(0,6);
+            if (top.length === 0) return null;
+            return (
+              <div style={{marginTop:16, padding:"12px 0"}}>
+                <div style={{fontSize:9, color:"#38bdf8", letterSpacing:2, marginBottom:10, fontWeight:700}}>🎯 MEILLEURES DIVERGENCES MACRO</div>
+                <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(280px, 1fr))", gap:8}}>
+                  {top.map((o,i) => (
+                    <div key={o.pair} style={{background:BG2, border:`1px solid ${o.direction==="LONG"?"#4ade8033":"#f8717133"}`, borderLeft:`3px solid ${o.direction==="LONG"?"#4ade80":"#f87171"}`, borderRadius:6, padding:"8px 12px"}}>
+                      <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:4}}>
+                        <span style={{fontSize:11, fontWeight:700, color:TEXT}}>
+                          <FlagImg code={o.base} size={14} /> {o.base}/{o.quote} <FlagImg code={o.quote} size={14} />
+                        </span>
+                        <span style={{fontSize:9, fontWeight:700, padding:"2px 6px", borderRadius:3, background:o.direction==="LONG"?"#14532d":"#7f1d1d", color:o.direction==="LONG"?"#4ade80":"#f87171"}}>
+                          {o.direction==="LONG"?"▲ LONG":"▼ SHORT"}
+                        </span>
+                      </div>
+                      <div style={{display:"flex", justifyContent:"space-between", fontSize:9, color:TEXT_DIM}}>
+                        <span style={{color:o.rBase.color}}>{o.rBase.icon} {o.rBase.label} ({o.scoreBase>=0?"+":""}{o.scoreBase.toFixed(2)})</span>
+                        <span style={{color:"#475569"}}>vs</span>
+                        <span style={{color:o.rQuote.color}}>{o.rQuote.icon} {o.rQuote.label} ({o.scoreQuote>=0?"+":""}{o.scoreQuote.toFixed(2)})</span>
+                      </div>
+                      <div style={{marginTop:4, fontSize:8, color:"#64748b"}}>
+                        Divergence score: <span style={{color:"#38bdf8", fontWeight:700}}>{Math.abs(o.ecart).toFixed(2)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
 
