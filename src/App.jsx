@@ -2923,10 +2923,10 @@ export default function App() {
                     const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
                     const isLong = o.direction === "LONG";
                     const apexStyle = o.ninoPur ? {
-                      background: "linear-gradient(135deg, #1a1500 0%, #332b00 100%)",
-                      border: "2px solid #ffd700",
-                      borderLeft: "5px solid #ffd700",
-                      boxShadow: "0 0 16px rgba(255,215,0,0.4)"
+                      background: "linear-gradient(135deg, #2a2000 0%, #4d3d00 100%)",
+                      border: "3px solid #ffd700",
+                      borderLeft: "6px solid #ffeb3b",
+                      boxShadow: "0 0 25px rgba(255,215,0,0.8), 0 0 40px rgba(255,215,0,0.4), inset 0 0 15px rgba(255,215,0,0.15)"
                     } : o.retailOk ? {
                       background: isLong ? "linear-gradient(135deg, #001a0d 0%, #003319 100%)" : "linear-gradient(135deg, #1a0000 0%, #330000 100%)",
                       border: isLong ? "2px solid #00ff88" : "2px solid #ff3b3b",
