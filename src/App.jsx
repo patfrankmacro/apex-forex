@@ -2658,7 +2658,13 @@ export default function App() {
 
   useEffect(() => {
     async function loadSent() {
-      const retail = await fetchRetailApp();
+      const retailRaw = await fetchRetailApp();
+      // Normaliser les clés: ajouter version sans slash
+      const retail = {...retailRaw};
+      Object.keys(retailRaw).forEach(k => {
+        const noSlash = k.replace("/","");
+        if (noSlash !== k) retail[noSlash] = retailRaw[k];
+      });
       setSentRetail(retail);
       const codes = [...new Set(Object.values(CFTC_CODES))];
       const cotRes = {};
