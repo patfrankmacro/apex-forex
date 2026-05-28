@@ -311,15 +311,14 @@ function explainRegime(data, code, regime) {
     : `→ pas de pression sur la ${bc}`;
 
   // ── TEXTES PMI ───────────────────────────────────────────
-  const svcZone = svcNow !== null ? (svcNow >= 50 ? "EXPANSION" : "CONTRACTION") : "";
-  const svcDir  = (svcNow !== null && svcPrior !== null)
-    ? (svcNow > svcPrior ? `en accélération (${svcPrior}→${svcNow})` : svcNow < svcPrior ? `en ralentissement (${svcPrior}→${svcNow})` : `stable (${svcNow})`)
-    : svcNow !== null ? `${svcNow}` : "";
-  const svcVsExp = (svcNow !== null && svcExp !== null && Math.abs(svcNow - svcExp) > 0.3)
-    ? `, vs exp ${svcExp}` : "";
-  const svcTxt = svcNow !== null
-    ? `PMI Services ${svcNow}${svcVsExp} → ${svcZone} ${svcDir}`
-    : "";
+  // Logique Nino: BAT ou MANQUE les attentes (now vs exp)
+  const svcBeatT = svcNow !== null && svcExp !== null && svcNow > svcExp + 0.1;
+  const svcMissT = svcNow !== null && svcExp !== null && svcNow < svcExp - 0.1;
+  const svcSignalT = svcBeatT ? "BAT les attentes → croissance positive" : svcMissT ? "MANQUE les attentes → croissance négative" : "dans les attentes";
+  const svcZone50 = svcNow !== null ? (svcNow >= 50 ? "expansion >50" : "contraction <50") : "";
+  const svcTxt = (svcNow !== null && svcExp !== null)
+    ? `PMI Services ${svcNow} vs exp ${svcExp} → ${svcSignalT} (${svcZone50})`
+    : svcNow !== null ? `PMI Services ${svcNow}` : "";
 
   // ── TEXTES CHÔMAGE ───────────────────────────────────────
   const unempBaisse = unempNow !== null && unempExp !== null && unempNow < unempExp - 0.05;
@@ -355,23 +354,22 @@ function getPMIWarning(data, code) {
   const svcExp   = toN(data[code]["svc"].exp);
   if (svcNow === null) return null;
   const warnings = [];
-  // Trajectoire descendante vers 50
-  if (svcNow >= 50 && svcNow < 52) {
-    if (svcPrior !== null && svcPrior > svcNow) {
-      const drop = (svcPrior - svcNow).toFixed(1);
-      warnings.push(`⚠ PMI Services en décélération (${svcPrior} → ${svcNow}, −${drop}pts) — surveiller passage sous 50`);
+  // PRIORITÉ: signal beat/miss vs exp (logique Nino)
+  if (svcExp !== null) {
+    if (svcNow > svcExp + 0.1 && svcNow < 50) {
+      warnings.push(`📈 PMI ${svcNow} BAT les attentes (exp ${svcExp}) — positif même sous 50, croissance meilleure que prévu`);
     }
-    if (svcExp !== null && svcNow < svcExp) {
-      warnings.push(`⚠ PMI Services sous les attentes (exp ${svcExp}, now ${svcNow}) — demande plus faible que prévu`);
+    if (svcNow < svcExp - 0.1 && svcNow >= 50) {
+      warnings.push(`⚠ PMI ${svcNow} MANQUE les attentes (exp ${svcExp}) — négatif même au-dessus de 50, demande plus faible que prévu`);
     }
   }
-  // PMI fort mais qui ralentit significativement
+  // Trajectoire vs prior (contexte secondaire)
+  if (svcNow >= 50 && svcNow < 52 && svcPrior !== null && svcPrior > svcNow) {
+    const drop = (svcPrior - svcNow).toFixed(1);
+    warnings.push(`⚠ PMI en décélération (${svcPrior} → ${svcNow}, −${drop}pts) — surveiller la tendance`);
+  }
   if (svcNow >= 52 && svcPrior !== null && svcPrior - svcNow >= 2) {
-    warnings.push(`⚠ PMI Services en fort ralentissement (${svcPrior} → ${svcNow}) — surveiller la tendance`);
-  }
-  // PMI qui accélère vers 50 (positif)
-  if (svcNow >= 48 && svcNow < 50 && svcPrior !== null && svcNow > svcPrior) {
-    warnings.push(`📈 PMI Services en amélioration (${svcPrior} → ${svcNow}) — approche du seuil 50, potentiel retournement`);
+    warnings.push(`⚠ PMI en fort ralentissement (${svcPrior} → ${svcNow}) — surveiller la tendance`);
   }
   return warnings.length > 0 ? warnings : null;
 }
@@ -388,12 +386,15 @@ function interpretIndicator(id, now, code, exp=null) {
     return `→ STABLE (exp ${exp}, now ${now}${arr}) — pas de signal`;
   }
   if (id === "svc" || id === "mfg") {
-    const zone = now >= 50 ? "EXPANSION ✅" : "CONTRACTION ⚠";
-    if (exp === null) return `→ ${zone} (${now})`;
+    if (exp === null) return `→ ${now >= 50 ? "expansion" : "contraction"} (${now})`;
     const diff = now - exp;
-    const arr = diff > 0.5 ? " ↑" : diff < -0.5 ? " ↓" : " →";
-    const traj = diff > 0.5 ? "accélère" : diff < -0.5 ? "ralentit" : "stable vs exp";
-    return `→ ${zone} · ${traj} (exp ${exp}, now ${now}${arr})`;
+    const arr = diff > 0.1 ? " ↑" : diff < -0.1 ? " ↓" : " →";
+    // Logique Nino: BAT ou MANQUE les attentes (now vs exp), pas seuil 50
+    const beat = diff > 0.1;
+    const miss = diff < -0.1;
+    const signal = beat ? "BAT attentes ✅" : miss ? "MANQUE attentes ⚠" : "dans attentes →";
+    const zone50 = now >= 50 ? "(>50 expansion)" : "(<50 contraction)";
+    return `→ ${signal} ${zone50} (exp ${exp}, now ${now}${arr})`;
   }
   if (id === "unemp") {
     if (exp === null) return `→ ${now}%`;
@@ -932,6 +933,36 @@ function GuideView() {
   ];
   return (
     <div style={{ padding:16, fontFamily:"'IBM Plex Mono',monospace" }}>
+
+      {/* SECTION ÉDUCATIVE — LEVERAGED FUNDS */}
+      <div style={{ background:BG2, border:"1px solid #1e3a5f", borderRadius:8, padding:14, marginBottom:10 }}>
+        <div style={{ fontSize:12, color:"#f59e0b", fontWeight:700, letterSpacing:1, marginBottom:10 }}>💼 LEVERAGED FUNDS — QUI SONT-ILS ?</div>
+        <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:12 }}>
+          Hedge funds, CTAs, fonds spéculatifs à effet de levier. Ils tradent avec un horizon <b>swing/court terme</b> — le même que nous. Contrairement aux banques centrales (hedgers) ou aux Asset Managers (long terme), leurs mouvements reflètent la <b>spéculation pure</b> sur les données macro de la semaine.
+        </div>
+        <div style={{ fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:6 }}>🎯 POURQUOI LES SUIVRE ?</div>
+        <div style={{ fontSize:10, color:TEXT_DIM, lineHeight:1.7, marginBottom:12 }}>
+          • <b>Même horizon</b> que swing trader (1-4 semaines)<br/>
+          • Ajustent positions <b>chaque semaine</b> selon CPI, PMI, taux directeurs<br/>
+          • <b>Action concrète</b> (pas paroles) — ils risquent leur argent réel<br/>
+          • Signal <b>frais hebdomadaire</b> — rapport CFTC publié chaque vendredi
+        </div>
+        <div style={{ fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:6 }}>📊 COMMENT ILS TRADENT ?</div>
+        <div style={{ fontSize:10, color:TEXT_DIM, lineHeight:1.7, marginBottom:12 }}>
+          • Analysent CPI, Core Inflation, PMI Services, Unemployment<br/>
+          • Anticipent décisions banques centrales (hausse/baisse taux)<br/>
+          • Ajustent positions Long/Short chaque mardi (snapshot CFTC)<br/>
+          • Bougent les prix par leurs flux massifs sur futures
+        </div>
+        <div style={{ fontSize:11, color:"#a78bfa", fontWeight:700, marginBottom:6 }}>⚡ NOTRE STRATÉGIE</div>
+        <div style={{ fontSize:10, color:TEXT_DIM, lineHeight:1.7 }}>
+          <b>1.</b> On lit le changement hebdomadaire (chgLong / chgShort) — pas le total<br/>
+          <b>2.</b> On compare la <b>force relative</b> entre 2 devises (Nino)<br/>
+          <b>3.</b> Si une devise a un <span style={{ background:"#14532d", color:"#4ade80", padding:"1px 6px", borderRadius:3, fontSize:9 }}>🔥 SWITCH</span> = les Leveraged Funds ont <b>renversé leur direction</b> cette semaine (ex: étaient short, deviennent long fort). C'est le signal le plus puissant selon Nino — un retournement institutionnel majeur<br/>
+          <b>4.</b> Retail contrarian 70%+ aligné = validation finale
+        </div>
+      </div>
+
       <div style={{ background:BG2, border:`1px solid ${ACCENT}33`, borderRadius:4, padding:14, marginBottom:10 }}>
         <div style={{ fontSize:9, letterSpacing:3, color:ACCENT, fontWeight:700, marginBottom:14, borderBottom:`1px solid ${ACCENT}22`, paddingBottom:8 }}>DANS LA TÊTE DE LA BANQUE CENTRALE</div>
         {indicators.map(s => (
