@@ -225,7 +225,9 @@ export default function SentimentView() {
     const res = {};
     await Promise.all(codes.map(async c => { res[c] = await fetchCOT(c); }));
     setCot(res);
-    setCotDate(new Date().toLocaleDateString("fr-CA"));
+    // Date réelle du snapshot CFTC (mardi), pas la date du jour
+    const realDate = Object.values(res).find(r => r && r.date)?.date || null;
+    setCotDate(realDate);
   }, []);
 
   useEffect(() => {
@@ -259,7 +261,7 @@ export default function SentimentView() {
         <div>
           <div style={{fontSize:11,letterSpacing:3,color:"#38bdf8",fontWeight:700}}>SENTIMENT — SIGNAUX VALIDES</div>
           <div style={{fontSize:8,color:"#475569",marginTop:2}}>
-            Retail Myfxbook {lastUp?"MàJ "+lastUp:status==="loading"?"chargement...":"—"} | COT CFTC {cotDate||"—"}
+            Retail Myfxbook {lastUp?"MàJ "+lastUp:status==="loading"?"chargement...":"—"} | <span style={{color:"#4ade80"}}>📅 Snapshot CFTC: {cotDate||"—"}</span> {cotDate && (() => { const d=new Date(cotDate); const now=new Date(); const days=Math.floor((now-d)/(1000*60*60*24)); return <span style={{color:days<=7?"#4ade80":days<=10?"#fbbf24":"#f87171",marginLeft:4}}>({days===0?"aujourd'hui":days+"j"} — {days<=7?"frais":days<=10?"a surveiller":"perime"})</span>; })()}
           </div>
         </div>
         <div style={{display:"flex",gap:6}}>
