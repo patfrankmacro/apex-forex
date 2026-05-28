@@ -2007,7 +2007,7 @@ function TradeApex({ data, cotData, retailData }) {
               <div style={{fontSize:8,color:"#94a3b8",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 2 — COT INSTITUTIONNELS</div>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <div style={{fontSize:9,color:"#94a3b8"}}>
-                  <FlagImg code={t.base} size={12} /> <span style={{color:t.bCotRaw&&t.bCotRaw.signal&&t.bCotRaw.signal.includes("HAUSSIER")?"#4ade80":"#f87171"}}>{(t.bCotRaw&&t.bCotRaw.signal||"—").replace("_"," ")}</span> <span style={{color:"#4a5070"}}>({t.bCotRaw&&t.bCotRaw.chgNet>=0?"+":""}{(t.bCotRaw&&t.bCotRaw.chgNet||0).toLocaleString()})</span> &nbsp;vs&nbsp; <FlagImg code={t.quote} size={12} /> <span style={{color:t.qCotRaw&&t.qCotRaw.signal&&t.qCotRaw.signal.includes("HAUSSIER")?"#4ade80":"#f87171"}}>{(t.qCotRaw&&t.qCotRaw.signal||"—").replace("_"," ")}</span> <span style={{color:"#4a5070"}}>({t.qCotRaw&&t.qCotRaw.chgNet>=0?"+":""}{(t.qCotRaw&&t.qCotRaw.chgNet||0).toLocaleString()})</span>
+                  <FlagImg code={t.base} size={12} /> <span style={{color:t.bCotRaw&&t.bCotRaw.signal&&t.bCotRaw.signal.includes("HAUSSIER")?"#4ade80":"#f87171"}}>{(t.bCotRaw&&t.bCotRaw.signal||"—").replace("_"," ")}</span> <span style={{color:"#4a5070"}}>({t.bCotRaw&&t.bCotRaw.chgNet>=0?"+":""}{(t.bCotRaw&&t.bCotRaw.chgNet||0).toLocaleString()})</span>{t.bCotRaw&&t.bCotRaw.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:t.bCotRaw.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:t.bCotRaw.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontSize:8,fontWeight:700}}>🔥 SWITCH</span>} &nbsp;vs&nbsp; <FlagImg code={t.quote} size={12} /> <span style={{color:t.qCotRaw&&t.qCotRaw.signal&&t.qCotRaw.signal.includes("HAUSSIER")?"#4ade80":"#f87171"}}>{(t.qCotRaw&&t.qCotRaw.signal||"—").replace("_"," ")}</span> <span style={{color:"#4a5070"}}>({t.qCotRaw&&t.qCotRaw.chgNet>=0?"+":""}{(t.qCotRaw&&t.qCotRaw.chgNet||0).toLocaleString()})</span>{t.qCotRaw&&t.qCotRaw.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:t.qCotRaw.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:t.qCotRaw.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontSize:8,fontWeight:700}}>🔥 SWITCH</span>}
                 </div>
                 <div style={{fontSize:10,fontWeight:700,color:t.cotBias==="HAUSSIER"?"#4ade80":"#f87171"}}>
                   {t.cotBias} — {t.cotStrength}
@@ -2707,8 +2707,8 @@ export default function App() {
 
   const TABS = [
     {id:"table",label:"TABLEAU"},{id:"rank",label:"RANG"},
-    {id:"regimes",label:"RÉGIMES"},{id:"tradecot",label:"TRADE COT+MACRO"},{id:"trade",label:"TRADE COT+MACRO+RETAIL"},{id:"journal",label:"JOURNAL"},
-    {id:"data",label:"DONNÉES ↗"},{id:"guide",label:"GUIDE"},{id:"heat",label:"HEATMAP"},{id:"sentiment",label:"SENTIMENT"},{id:"cal",label:"RESSOURCES"},
+    {id:"regimes",label:"RÉGIMES"},{id:"tradecot",label:"TRADE COT+MACRO"},{id:"trade",label:"TRADE COT+MACRO+RETAIL"},{id:"sentiment",label:"SENTIMENT"},{id:"journal",label:"JOURNAL"},
+    {id:"data",label:"DONNÉES ↗"},{id:"guide",label:"GUIDE"},{id:"heat",label:"HEATMAP"},{id:"cal",label:"RESSOURCES"},
   ];
 
   return (
