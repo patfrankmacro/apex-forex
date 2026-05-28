@@ -3017,7 +3017,7 @@ export default function App() {
               const bDir=bCot.chgNet>0?"H":"B";
               const qDir=qCot.chgNet>0?"H":"B";
               const cotOk=bIsFort&&qIsFort&&Math.abs(bCot.chgNet)>=3500&&Math.abs(qCot.chgNet)>=3500&&bDir!==qDir;
-              const retailS=apexRetail[pair];
+              const retailS=sentRetail[pair]||sentRetail[pair.slice(0,3)+"/"+pair.slice(3,6)];
               const rA=retailS?analyzeRetailS(retailS):null;
               const retailOk=rA&&(rA.strength==="EXTREME"||rA.strength==="FORT")&&rA.bias===direction;
               const score3=(cotOk?1:0)+(retailOk?1:0)+1;
