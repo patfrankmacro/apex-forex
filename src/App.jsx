@@ -1020,15 +1020,15 @@ function GuideView() {
         <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #66ccff" }}>
           <div style={{ fontSize:10, color:"#66ccff", fontWeight:700, marginBottom:8 }}>📈 PMI SERVICES — 2 DIMENSIONS</div>
           <div style={{ marginBottom:8, padding:8, background:"#001020", borderRadius:3, border:"1px solid #66ccff33" }}>
-            <div style={{ fontSize:9, color:"#66ccff", fontWeight:700, marginBottom:4 }}>DIMENSION 1 — SEUIL 50 (règle absolue)</div>
+            <div style={{ fontSize:9, color:"#66ccff", fontWeight:700, marginBottom:4 }}>DIMENSION 1 — NOW vs EXP (priorité)</div>
             <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
-              <span style={{color:"#00ff88"}}>{">"} 50 = EXPANSION</span> — économie en croissance → positif<br/>
-              <span style={{color:"#ff6666"}}>{"<"} 50 = CONTRACTION</span> — économie qui se contracte → négatif<br/>
-              <span style={{color:"#ffd700",fontWeight:700}}>Cette règle est absolue — peu importe le reste</span>
+              <span style={{color:"#00ff88"}}>NOW {">"} EXP = BAT</span> — croissance meilleure que prévu → positif (même sous 50)<br/>
+              <span style={{color:"#ff6666"}}>NOW {"<"} EXP = MANQUE</span> — croissance décevante → négatif (même au-dessus de 50)<br/>
+              <span style={{color:"#ffd700",fontWeight:700}}>Ex: NZD 48.9 {">"} exp 45 = positif · USD 50.9 {"<"} exp 51.1 = négatif</span>
             </div>
           </div>
           <div style={{ padding:8, background:"#001020", borderRadius:3, border:"1px solid #66ccff33" }}>
-            <div style={{ fontSize:9, color:"#66ccff", fontWeight:700, marginBottom:4 }}>DIMENSION 2 — TRAJECTOIRE (direction)</div>
+            <div style={{ fontSize:9, color:"#66ccff", fontWeight:700, marginBottom:4 }}>DIMENSION 2 — SEUIL 50 (contexte)</div>
             <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
               PMI 50 → 55 = <span style={{color:"#00ff88"}}>accélération forte → très positif</span><br/>
               PMI 55 → 51 = <span style={{color:"#ffd700"}}>ralentissement → surveiller</span><br/>
@@ -1162,54 +1162,26 @@ function GuideView() {
           ))}
         </div>
 
-        <div style={{ marginBottom:12, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #00aaff" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#00aaff", marginBottom:8 }}>📘 TAB "TRADE COT + MACRO" — 2 CONFLUENCES SUR 3</div>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:8 }}>
-            <div style={{ padding:10, background:"#00aaff11", borderRadius:3 }}>
-              <div style={{ fontSize:9, color:"#00aaff", fontWeight:700, marginBottom:6 }}>CE QUI EST VÉRIFIÉ</div>
-              <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8 }}>
-                ✅ <span style={{color:"#00ff88"}}>Macro divergence</span> entre les 2 pays<br/>
-                ✅ <span style={{color:"#00aaff"}}>COT institutionnels</span> alignés<br/>
-                ⬜ <span style={{color:TEXT_DIM}}>Retail — non filtré</span>
-              </div>
-            </div>
-            <div style={{ padding:10, background:"#00aaff11", borderRadius:3 }}>
-              <div style={{ fontSize:9, color:"#00aaff", fontWeight:700, marginBottom:6 }}>QUAND L'UTILISER</div>
-              <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8 }}>
-                → Voir les setups <span style={{color:"#00aaff"}}>avant</span> qu'ils soient parfaits<br/>
-                → Préparer l'entrée à l'avance<br/>
-                → Plus de signaux, moins filtrés
-              </div>
-            </div>
-          </div>
-          <div style={{ padding:"8px 10px", background:"#0a0a14", borderRadius:3, border:"1px dashed #00aaff33" }}>
-            <div style={{ fontSize:9, color:TEXT_DIM }}>⚠ Utilise avec discernement — le retail n'a pas encore confirmé l'extrême</div>
-          </div>
-        </div>
-
         <div style={{ padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #00ff88" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#00ff88", marginBottom:8 }}>🟢 TAB "TRADE COT + MACRO + RETAIL" — 3 CONFLUENCES SUR 3</div>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:8 }}>
-            <div style={{ padding:10, background:"#00ff8811", borderRadius:3 }}>
-              <div style={{ fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:6 }}>CE QUI EST VÉRIFIÉ</div>
-              <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8 }}>
-                ✅ <span style={{color:"#00ff88"}}>Macro divergence</span> entre les 2 pays<br/>
-                ✅ <span style={{color:"#00aaff"}}>COT institutionnels</span> alignés<br/>
-                ✅ <span style={{color:"#f97316"}}>Retail contrarian</span> à 70%+ opposé
-              </div>
-            </div>
-            <div style={{ padding:10, background:"#00ff8811", borderRadius:3 }}>
-              <div style={{ fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:6 }}>QUAND L'UTILISER</div>
-              <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8 }}>
-                → Setups <span style={{color:"#00ff88",fontWeight:700}}>APEX haute probabilité</span><br/>
-                → Entrer avec pleine confiance<br/>
-                → Moins de signaux, qualité maximale
-              </div>
-            </div>
+          <div style={{ fontSize:11, fontWeight:700, color:"#00ff88", marginBottom:10 }}>🎯 L'ONGLET ANALYSE — 3 ÉTAPES</div>
+          <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.8, marginBottom:10 }}>
+            L'onglet ANALYSE combine tout en une seule vue, en cascade :
+          </div>
+          <div style={{ marginBottom:8, padding:"8px 10px", background:BG2, borderRadius:3, borderLeft:"2px solid #a78bfa66" }}>
+            <div style={{ fontSize:10, fontWeight:700, color:"#a78bfa", marginBottom:3 }}>ÉTAPE 1 — Biais Leveraged Funds</div>
+            <div style={{ fontSize:8, color:TEXT_DIM }}>Quelles devises les institutionnels achètent / vendent cette semaine (avec 🔥 SWITCH)</div>
+          </div>
+          <div style={{ marginBottom:8, padding:"8px 10px", background:BG2, borderRadius:3, borderLeft:"2px solid #4ade8066" }}>
+            <div style={{ fontSize:10, fontWeight:700, color:"#4ade80", marginBottom:3 }}>ÉTAPE 2 — Biais Macro</div>
+            <div style={{ fontSize:8, color:TEXT_DIM }}>Quelles devises sont fortes / faibles selon leur régime économique (score)</div>
+          </div>
+          <div style={{ marginBottom:10, padding:"8px 10px", background:BG2, borderRadius:3, borderLeft:"2px solid #fbbf2466" }}>
+            <div style={{ fontSize:10, fontWeight:700, color:"#fbbf24", marginBottom:3 }}>ÉTAPE 3 — Opportunités APEX (3/3)</div>
+            <div style={{ fontSize:8, color:TEXT_DIM }}>Seulement les setups où les 3 forces s'alignent : Macro divergente + COT FORT + Retail 70%+ contrarian</div>
           </div>
           <div style={{ padding:"8px 10px", background:"#001a0d", borderRadius:3, border:"1px solid #00ff8844" }}>
-            <div style={{ fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:2 }}>C'est le tab principal pour trader.</div>
-            <div style={{ fontSize:8, color:TEXT_DIM }}>Quand un signal apparaît ici, les 3 forces du marché convergent dans la même direction.</div>
+            <div style={{ fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:2 }}>Un signal APEX = les 3 forces convergent.</div>
+            <div style={{ fontSize:8, color:TEXT_DIM }}>Si 0 signal cette semaine → ne pas forcer un trade, attendre l'alignement.</div>
           </div>
         </div>
       </div>
