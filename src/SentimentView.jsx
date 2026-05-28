@@ -413,7 +413,7 @@ export default function SentimentView() {
         <div style={{fontSize:8,color:"#64748b",lineHeight:1.9}}>
           1️⃣ Retail Myfxbook → inversion contrarian (foule = mauvaise direction)<br/>
           2️⃣ COT CFTC → changement hebdomadaire Leveraged Funds (hedge funds + CTAs)<br/>
-          3️⃣ Signal = Base vs Quote (HAUSSIER FORT / HAUSSIER / BAISSIER / BAISSIER FORT)<br/>
+          3️⃣ Force relative = différentiel chgNet entre les 2 devises (logique Nino)<br/>
           4️⃣ Signal valide = Retail (inversé) aligné avec force relative Leveraged Funds<br/>
           <span style={{color:"#f59e0b"}}>🔥🔥 Setup parfait = retail extrême + Leveraged Funds signal fort opposé</span>
         </div>

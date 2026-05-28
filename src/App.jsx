@@ -773,7 +773,7 @@ function TradeCard({ strong, weak, div, regS, regW, perfect, sentSig }) {
             <div style={{ background:"#070b14", borderRadius:6, padding:10, marginBottom:8,
               borderLeft:`2px solid ${pCot.bias==="HAUSSIER"?"#4ade80":"#f87171"}` }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-                <div style={{ fontSize:8, color:"#475569", letterSpacing:1 }}>COT INSTITS — {strong.code} vs {weak.code}</div>
+                <div style={{ fontSize:8, color:"#475569", letterSpacing:1 }}>LEVERAGED FUNDS — {strong.code} vs {weak.code}</div>
                 <div style={{ fontSize:9, fontWeight:700, color:pCot.bias==="HAUSSIER"?"#4ade80":"#f87171" }}>
                   Instits: {pCot.bias} {pCot.strength==="EXTREME"?"⚠":""}
                 </div>
@@ -1770,7 +1770,7 @@ function TradeCOT({ data, cotData }) {
       <div style={{background:"#050810",border:"1px solid #00aaff44",borderRadius:8,padding:"10px 14px",marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <div>
           <div style={{fontSize:11,letterSpacing:3,color:"#00aaff",fontWeight:700}}>📊 TRADE COT — CONFLUENCE 2/3</div>
-          <div style={{fontSize:8,color:"#4a5070",marginTop:2}}>Régimes opposés + COT institutionnels alignés — 2 confluences sur 3</div>
+          <div style={{fontSize:8,color:"#4a5070",marginTop:2}}>Régimes opposés + Leveraged Funds force relative alignée — 2 confluences sur 3</div>
         </div>
         <div style={{fontSize:20,fontWeight:700,color:"#00aaff"}}>{trades.length}</div>
       </div>
@@ -1813,18 +1813,18 @@ function TradeCOT({ data, cotData }) {
 
           {/* 2 - COT */}
           <div style={{background:"#0c0c18",borderRadius:6,padding:"8px 10px",borderLeft:"3px solid "+(t.cotBias==="HAUSSIER"?"#4ade80":"#f87171")}}>
-            <div style={{fontSize:8,color:"#94a3b8",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 2 — COT INSTITUTIONNELS</div>
+            <div style={{fontSize:8,color:"#94a3b8",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 2 — COT LEVERAGED FUNDS</div>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <div style={{fontSize:9,color:"#94a3b8"}}>
                 <FlagImg code={t.base} size={12} /> <span style={{color:t.bCotRaw?.signal?.includes("HAUSSIER")?"#4ade80":"#f87171",marginLeft:3}}>
                   {(t.bCotRaw?.signal||"—").replace("_"," ")}
                 </span>
-                <span style={{color:"#4a5070",marginLeft:4}}>({t.bCotRaw?.chgNet>=0?"+":""}{(t.bCotRaw?.chgNet||0).toLocaleString()})</span>{t.bCotRaw?.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:t.bCotRaw.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:t.bCotRaw.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontSize:8,fontWeight:700}}>🔥 SWITCH</span>}{t.bCotRaw?.switchType && <span style={{fontSize:7,color:"#64748b",marginLeft:4}}>(sem.préc: {t.bCotRaw.prevChgNet>=0?"+":""}{(t.bCotRaw.prevChgNet||0).toLocaleString()})</span>}
+                <span style={{color:"#4a5070",marginLeft:4}}>({t.bCotRaw?.chgNet>=0?"+":""}{(t.bCotRaw?.chgNet||0).toLocaleString()})</span>{t.bCotRaw?.switchType && " "}{t.bCotRaw?.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:t.bCotRaw.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:t.bCotRaw.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontSize:8,fontWeight:700}}>🔥 SWITCH</span>}{t.bCotRaw?.switchType && <span style={{fontSize:7,color:"#64748b",marginLeft:4}}>(sem.préc: {t.bCotRaw.prevChgNet>=0?"+":""}{(t.bCotRaw.prevChgNet||0).toLocaleString()})</span>}
                 &nbsp;vs&nbsp;
                 <FlagImg code={t.quote} size={12} /> <span style={{color:t.qCotRaw?.signal?.includes("HAUSSIER")?"#4ade80":"#f87171",marginLeft:3}}>
                   {(t.qCotRaw?.signal||"—").replace("_"," ")}
                 </span>
-                <span style={{color:"#4a5070",marginLeft:4}}>({t.qCotRaw?.chgNet>=0?"+":""}{(t.qCotRaw?.chgNet||0).toLocaleString()})</span>{t.qCotRaw?.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:t.qCotRaw.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:t.qCotRaw.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontSize:8,fontWeight:700}}>🔥 SWITCH</span>}{t.qCotRaw?.switchType && <span style={{fontSize:7,color:"#64748b",marginLeft:4}}>(sem.préc: {t.qCotRaw.prevChgNet>=0?"+":""}{(t.qCotRaw.prevChgNet||0).toLocaleString()})</span>}
+                <span style={{color:"#4a5070",marginLeft:4}}>({t.qCotRaw?.chgNet>=0?"+":""}{(t.qCotRaw?.chgNet||0).toLocaleString()})</span>{t.qCotRaw?.switchType && " "}{t.qCotRaw?.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:t.qCotRaw.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:t.qCotRaw.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontSize:8,fontWeight:700}}>🔥 SWITCH</span>}{t.qCotRaw?.switchType && <span style={{fontSize:7,color:"#64748b",marginLeft:4}}>(sem.préc: {t.qCotRaw.prevChgNet>=0?"+":""}{(t.qCotRaw.prevChgNet||0).toLocaleString()})</span>}
               </div>
               <div style={{fontSize:10,fontWeight:700,color:t.cotBias==="HAUSSIER"?"#4ade80":"#f87171"}}>
                 {t.cotBias} — {t.cotStrength}
@@ -1844,7 +1844,7 @@ function TradeCOT({ data, cotData }) {
                 <div style={{fontSize:7,color:"#00aaff"}}>+{t.macroPts}pts</div>
               </div>
               <div style={{padding:"4px 6px",background:"#00aaff15",borderRadius:3,textAlign:"center"}}>
-                <div style={{fontSize:7,color:"#00aaff",fontWeight:700,marginBottom:2}}>COT INSTITS</div>
+                <div style={{fontSize:7,color:"#00aaff",fontWeight:700,marginBottom:2}}>LEVERAGED FUNDS</div>
                 <div style={{fontSize:8,color:t.cotBias==="HAUSSIER"?"#4ade80":"#f87171"}}>{t.cotBias}</div>
                 <div style={{fontSize:7,color:"#94a3b8"}}>{t.cotStrength}</div>
               </div>
@@ -2004,7 +2004,7 @@ function TradeApex({ data, cotData, retailData }) {
 
             {/* 2 - COT */}
             <div style={{background:"#0c0c18",borderRadius:6,padding:"8px 10px",borderLeft:"3px solid "+(t.cotBias==="HAUSSIER"?"#4ade80":"#f87171")}}>
-              <div style={{fontSize:8,color:"#94a3b8",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 2 — COT INSTITUTIONNELS</div>
+              <div style={{fontSize:8,color:"#94a3b8",letterSpacing:2,marginBottom:4,fontWeight:700}}>✅ 2 — COT LEVERAGED FUNDS</div>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <div style={{fontSize:9,color:"#94a3b8"}}>
                   <FlagImg code={t.base} size={12} /> <span style={{color:t.bCotRaw&&t.bCotRaw.signal&&t.bCotRaw.signal.includes("HAUSSIER")?"#4ade80":"#f87171"}}>{(t.bCotRaw&&t.bCotRaw.signal||"—").replace("_"," ")}</span> <span style={{color:"#4a5070"}}>({t.bCotRaw&&t.bCotRaw.chgNet>=0?"+":""}{(t.bCotRaw&&t.bCotRaw.chgNet||0).toLocaleString()})</span>{t.bCotRaw&&t.bCotRaw.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:t.bCotRaw.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:t.bCotRaw.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontSize:8,fontWeight:700}}>🔥 SWITCH</span>}{t.bCotRaw&&t.bCotRaw.switchType && <span style={{fontSize:7,color:"#64748b",marginLeft:4}}>(sem.préc: {t.bCotRaw.prevChgNet>=0?"+":""}{(t.bCotRaw.prevChgNet||0).toLocaleString()})</span>} &nbsp;vs&nbsp; <FlagImg code={t.quote} size={12} /> <span style={{color:t.qCotRaw&&t.qCotRaw.signal&&t.qCotRaw.signal.includes("HAUSSIER")?"#4ade80":"#f87171"}}>{(t.qCotRaw&&t.qCotRaw.signal||"—").replace("_"," ")}</span> <span style={{color:"#4a5070"}}>({t.qCotRaw&&t.qCotRaw.chgNet>=0?"+":""}{(t.qCotRaw&&t.qCotRaw.chgNet||0).toLocaleString()})</span>{t.qCotRaw&&t.qCotRaw.switchType && <span style={{marginLeft:4,padding:"1px 4px",borderRadius:3,background:t.qCotRaw.switchType==="SWITCH_HAUSSIER"?"#14532d":"#7f1d1d",color:t.qCotRaw.switchType==="SWITCH_HAUSSIER"?"#4ade80":"#f87171",fontSize:8,fontWeight:700}}>🔥 SWITCH</span>}{t.qCotRaw&&t.qCotRaw.switchType && <span style={{fontSize:7,color:"#64748b",marginLeft:4}}>(sem.préc: {t.qCotRaw.prevChgNet>=0?"+":""}{(t.qCotRaw.prevChgNet||0).toLocaleString()})</span>}
@@ -2046,7 +2046,7 @@ function TradeApex({ data, cotData, retailData }) {
                 <div style={{fontSize:7,color:"#00aaff",marginTop:2}}>Divergence +{t.macroPts}pts</div>
               </div>
               <div style={{padding:"6px 8px",background:"#00aaff15",borderRadius:3,textAlign:"center",border:"1px solid #00aaff33"}}>
-                <div style={{fontSize:7,color:"#00aaff",fontWeight:700,marginBottom:3}}>✅ COT INSTITS</div>
+                <div style={{fontSize:7,color:"#00aaff",fontWeight:700,marginBottom:3}}>✅ LEVERAGED FUNDS</div>
                 <div style={{fontSize:9,color:t.cotBias==="HAUSSIER"?"#4ade80":"#f87171",fontWeight:700}}>{t.cotBias}</div>
                 <div style={{fontSize:8,color:"#94a3b8"}}>{t.cotStrength}</div>
                 <div style={{fontSize:7,color:"#4a5070",marginTop:2}}>{(t.bCotRaw?.signal||"—").replace("_"," ")} / {(t.qCotRaw?.signal||"—").replace("_"," ")}</div>
@@ -2471,7 +2471,7 @@ function JournalView() {
               </div>
               {/* COT */}
               <div style={{padding:"6px 8px",background:"#00aaff12",borderRadius:4,border:"1px solid #00aaff33",textAlign:"center"}}>
-                <div style={{fontSize:7,color:"#00aaff",fontWeight:700,letterSpacing:1,marginBottom:3}}>COT INSTITS</div>
+                <div style={{fontSize:7,color:"#00aaff",fontWeight:700,letterSpacing:1,marginBottom:3}}>LEVERAGED FUNDS</div>
                 {t.cot_dir && <div style={{fontSize:10,color:t.cot_dir==="HAUSSIER"?"#4ade80":"#f87171",fontWeight:700}}>{t.cot_dir==="HAUSSIER"?"▲":"▼"} {t.cot_dir}</div>}
                 {t.cot_strength && <div style={{fontSize:8,color:"#00aaff"}}>{t.cot_strength}</div>}
               </div>
@@ -2725,7 +2725,7 @@ export default function App() {
       <div style={{ background:BG2, borderBottom:`1px solid ${BORDER}`, padding:"10px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:8 }}>
         <div>
           <div style={{ fontSize:13, fontWeight:700, letterSpacing:3, color:ACCENT, fontFamily:"'IBM Plex Mono'" }}>PAT & FRANK MACRO FX</div>
-          <div style={{ fontSize:8, color:TEXT_DIM, letterSpacing:3 }}>ANALYSE INSTITUTIONNELLE — BIAIS BANQUE CENTRALE</div>
+          <div style={{ fontSize:8, color:TEXT_DIM, letterSpacing:3 }}>LEVERAGED FUNDS + MACRO + RETAIL — STRATÉGIE NINO</div>
           <div style={{ display:"flex", alignItems:"center", gap:5, marginTop:3 }}>
             <div style={{ width:6, height:6, borderRadius:"50%", background:connected?"#00ff88":"#ff3b3b", animation:connected?"pulse 2s infinite":"none" }} />
             <span style={{ fontSize:7, color:connected?"#00ff88":"#ff3b3b", letterSpacing:1 }}>{connected?"SYNC TEMPS RÉEL":"CONNEXION..."}</span>
