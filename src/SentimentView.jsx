@@ -4,26 +4,40 @@ const MYFXBOOK_EMAIL = "patrice-bonneau@outlook.com";
 const MYFXBOOK_PASS  = "Fucktoi69$";
 
 const PAIRS = [
+  // USD majeures
   { name:"EURUSD", base:"EUR", quote:"USD" },
   { name:"GBPUSD", base:"GBP", quote:"USD" },
   { name:"USDJPY", base:"USD", quote:"JPY" },
+  { name:"USDCHF", base:"USD", quote:"CHF" },
   { name:"USDCAD", base:"USD", quote:"CAD" },
   { name:"AUDUSD", base:"AUD", quote:"USD" },
   { name:"NZDUSD", base:"NZD", quote:"USD" },
-  { name:"USDCHF", base:"USD", quote:"CHF" },
-  { name:"XAUUSD", base:"XAU", quote:"USD" },
-  { name:"GBPJPY", base:"GBP", quote:"JPY" },
+  // EUR croisées
   { name:"EURJPY", base:"EUR", quote:"JPY" },
-  { name:"AUDJPY", base:"AUD", quote:"JPY" },
-  { name:"EURAUD", base:"EUR", quote:"AUD" },
-  { name:"GBPAUD", base:"GBP", quote:"AUD" },
   { name:"EURGBP", base:"EUR", quote:"GBP" },
-  { name:"AUDNZD", base:"AUD", quote:"NZD" },
-  { name:"CHFJPY", base:"CHF", quote:"JPY" },
-  { name:"GBPCAD", base:"GBP", quote:"CAD" },
   { name:"EURCAD", base:"EUR", quote:"CAD" },
-  { name:"AUDCAD", base:"AUD", quote:"CAD" },
+  { name:"EURAUD", base:"EUR", quote:"AUD" },
+  { name:"EURCHF", base:"EUR", quote:"CHF" },
+  { name:"EURNZD", base:"EUR", quote:"NZD" },
+  // GBP croisées
+  { name:"GBPJPY", base:"GBP", quote:"JPY" },
+  { name:"GBPCHF", base:"GBP", quote:"CHF" },
+  { name:"GBPCAD", base:"GBP", quote:"CAD" },
+  { name:"GBPAUD", base:"GBP", quote:"AUD" },
+  { name:"GBPNZD", base:"GBP", quote:"NZD" },
+  // JPY croisées
+  { name:"CHFJPY", base:"CHF", quote:"JPY" },
+  { name:"CADJPY", base:"CAD", quote:"JPY" },
+  { name:"AUDJPY", base:"AUD", quote:"JPY" },
   { name:"NZDJPY", base:"NZD", quote:"JPY" },
+  // CHF croisées
+  { name:"CADCHF", base:"CAD", quote:"CHF" },
+  { name:"AUDCHF", base:"AUD", quote:"CHF" },
+  { name:"NZDCHF", base:"NZD", quote:"CHF" },
+  // CAD/AUD/NZD croisées
+  { name:"AUDCAD", base:"AUD", quote:"CAD" },
+  { name:"NZDCAD", base:"NZD", quote:"CAD" },
+  { name:"AUDNZD", base:"AUD", quote:"NZD" },
 ];
 
 const CFTC = {
@@ -152,13 +166,17 @@ async function myfxLoadAll() {
 
 async function fetchCOT(code) {
   try {
-    const url = "https://publicreporting.cftc.gov/resource/gpe5-46if.json?cftc_contract_market_code=" + code + "&$order=report_date_as_yyyy_mm_dd DESC&$limit=1";
+    const url = "https://publicreporting.cftc.gov/resource/gpe5-46if.json?cftc_contract_market_code=" + code + "&$order=report_date_as_yyyy_mm_dd DESC&$limit=2";
     const rows = await (await fetch(url)).json();
     if (!rows?.length) return null;
     const row = rows[0];
+    const prev = rows[1] || {};
     const chgLong  = parseInt(row.change_in_lev_money_long||0);
     const chgShort = parseInt(row.change_in_lev_money_short||0);
     const chgNet   = chgLong - chgShort;
+    const prevChgLong  = parseInt(prev.change_in_lev_money_long||0);
+    const prevChgShort = parseInt(prev.change_in_lev_money_short||0);
+    const prevChgNet   = prevChgLong - prevChgShort;
     const levLong  = parseInt(row.lev_money_positions_long||0);
     const levShort = parseInt(row.lev_money_positions_short||0);
     // Signal basé sur le changement hebdomadaire
@@ -167,15 +185,18 @@ async function fetchCOT(code) {
     else if (chgLong<0 && chgShort>0) signal = "BAISSIER_FORT";
     else if (chgNet > 500) signal = "HAUSSIER";
     else if (chgNet < -500) signal = "BAISSIER";
-    // Convertir signal en net/max52/min52 pour compatibilité avec analyzeCurrency
+    // SWITCH = changement direction vs semaine précédente
+    let switchType = null;
+    const diff = chgNet - prevChgNet;
+    if (diff > 2000 && prevChgNet <= 500 && chgNet > 500) switchType = "SWITCH_HAUSSIER";
+    else if (diff < -2000 && prevChgNet >= -500 && chgNet < -500) switchType = "SWITCH_BAISSIER";
     const pct = signal==="HAUSSIER_FORT"?85:signal==="HAUSSIER"?65:signal==="BAISSIER"?35:signal==="BAISSIER_FORT"?15:50;
-    // net fictif entre -100000 et +100000 pour forcer le percentile voulu
     const fakeNet = (pct - 50) * 2000;
     return {
       net: fakeNet,
       longPos: levLong,
       shortPos: levShort,
-      chgLong, chgShort, chgNet, signal,
+      chgLong, chgShort, chgNet, prevChgNet, switchType, signal,
       max52: 100000, min52: -100000,
       date: row.report_date_as_yyyy_mm_dd?.slice(0,10) || "—",
     };
@@ -275,7 +296,7 @@ export default function SentimentView() {
         <div style={{fontSize:9,color:"#cbd5e1",lineHeight:1.7}}>
           <b>1.</b> On lit le changement hebdomadaire (chgLong / chgShort) — pas le total<br/>
           <b>2.</b> On compare la <b>force relative</b> entre 2 devises (Nino)<br/>
-          <b>3.</b> Si une devise a un <span style={{color:"#fbbf24"}}>🔥 SWITCH</span> (changement de direction vs semaine précédente) = signal premium<br/>
+          <b>3.</b> Si une devise a un <span style={{padding:"1px 5px",borderRadius:3,background:"#14532d",color:"#4ade80",fontWeight:700,fontSize:8}}>🔥 SWITCH</span> = les Leveraged Funds ont <b>renversé leur direction</b> cette semaine (ex: étaient short, deviennent long fort). C'est le signal le plus puissant selon Nino — un retournement institutionnel majeur<br/>
           <b>4.</b> Retail contrarian 70%+ aligné = validation finale
         </div>
       </div>
