@@ -2737,7 +2737,7 @@ export default function App() {
 
   const TABS = [
     {id:"table",label:"TABLEAU"},{id:"rank",label:"RANG"},
-    {id:"regimes",label:"RÉGIMES"},{id:"tradecot",label:"TRADE COT+MACRO"},{id:"trade",label:"TRADE COT+MACRO+RETAIL"},{id:"sentiment",label:"SENTIMENT"},{id:"journal",label:"JOURNAL"},
+    {id:"regimes",label:"RÉGIMES"},{id:"analyse",label:"ANALYSE"},{id:"journal",label:"JOURNAL"},
     {id:"data",label:"DONNÉES ↗"},{id:"guide",label:"GUIDE"},{id:"heat",label:"HEATMAP"},{id:"cal",label:"RESSOURCES"},
   ];
 
@@ -2935,12 +2935,142 @@ export default function App() {
         </div>
       )}
 
-      {view==="tradecot" && (
-        <TradeCOT data={data} cotData={apexCot} />
-      )}
+      {view==="analyse" && (
+        <div style={{padding:12}}>
+          {/* HEADER */}
+          <div style={{background:"#0a1628",border:"1px solid #1e3a5f",borderRadius:8,padding:"10px 14px",marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:6}}>
+            <div>
+              <div style={{fontSize:11,letterSpacing:3,color:"#38bdf8",fontWeight:700}}>⚡ ANALYSE — OPPORTUNITÉS DE TRADING</div>
+              <div style={{fontSize:8,color:"#475569",marginTop:2}}>Macro + Leveraged Funds + Retail · {Object.values(apexCot).find(d=>d?.date)?.date||"—"}</div>
+            </div>
+            {(()=>{const d=Object.values(apexCot).find(x=>x?.date)?.date;if(!d)return null;const days=Math.floor((new Date()-new Date(d))/(1000*60*60*24));const col=days<=7?"#4ade80":days<=10?"#fbbf24":"#f87171";return <div style={{fontSize:8,color:col}}>📅 CFTC: {d} ({days}j — {days<=7?"frais":days<=10?"à surveiller":"périmé"})</div>;})()}
+          </div>
 
-      {view==="trade" && (
-        <TradeApex data={data} cotData={apexCot} retailData={apexRetail} />
+          {/* ÉTAPE 1 — BIAIS LEVERAGED FUNDS */}
+          {(()=>{
+            const CFTC_MAP={EUR:"099741",GBP:"096742",JPY:"097741",CAD:"090741",AUD:"232741",CHF:"092741",USD:"098662",NZD:"112741"};
+            const biais=Object.entries(CFTC_MAP).map(([dev,code])=>{const d=apexCot[code];if(!d)return null;return{dev,chgNet:d.chgNet||0,switchType:d.switchType};}).filter(Boolean);
+            const achetent=biais.filter(b=>b.chgNet>0).sort((a,b)=>b.chgNet-a.chgNet);
+            const vendent=biais.filter(b=>b.chgNet<=0).sort((a,b)=>a.chgNet-b.chgNet);
+            return(
+              <div style={{background:"#0a1628",border:"1px solid #1e3a5f",borderRadius:8,padding:"10px 14px",marginBottom:12}}>
+                <div style={{fontSize:10,color:"#4ade80",fontWeight:700,marginBottom:8,letterSpacing:1}}>📊 ÉTAPE 1 — BIAIS LEVERAGED FUNDS</div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                  <div>
+                    <div style={{fontSize:8,color:"#4ade80",fontWeight:700,marginBottom:6}}>🟢 ACHÈTENT</div>
+                    {achetent.map(b=><div key={b.dev} style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4,padding:"4px 8px",background:"#052010",borderRadius:4,border:"1px solid #4ade8022"}}><span style={{fontSize:10,color:"#c8d4f0",fontWeight:700}}><FlagImg code={b.dev} size={14}/> {b.dev}</span><span style={{fontSize:9,color:"#4ade80"}}>+{b.chgNet.toLocaleString()}{b.switchType==="SWITCH_HAUSSIER"?" 🔥":""}</span></div>)}
+                  </div>
+                  <div>
+                    <div style={{fontSize:8,color:"#f87171",fontWeight:700,marginBottom:6}}>🔴 VENDENT</div>
+                    {vendent.map(b=><div key={b.dev} style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4,padding:"4px 8px",background:"#1a0505",borderRadius:4,border:"1px solid #f8717122"}}><span style={{fontSize:10,color:"#c8d4f0",fontWeight:700}}><FlagImg code={b.dev} size={14}/> {b.dev}</span><span style={{fontSize:9,color:"#f87171"}}>{b.chgNet.toLocaleString()}{b.switchType==="SWITCH_BAISSIER"?" 🔥":""}</span></div>)}
+                  </div>
+                </div>
+                <div style={{fontSize:7,color:"#475569",marginTop:8,paddingTop:6,borderTop:"1px solid #1e3a5f"}}>🔥 = switch cette semaine (renversement institutionnel majeur)</div>
+              </div>
+            );
+          })()}
+
+          {/* ÉTAPE 2 — BIAIS MACRO */}
+          {(()=>{
+            const fortes=ranked.filter(r=>r.score>=0.2);
+            const faibles=ranked.filter(r=>r.score<=-0.2);
+            return(
+              <div style={{background:"#0a1628",border:"1px solid #1e3a5f",borderRadius:8,padding:"10px 14px",marginBottom:12}}>
+                <div style={{fontSize:10,color:"#a78bfa",fontWeight:700,marginBottom:8,letterSpacing:1}}>🌍 ÉTAPE 2 — BIAIS MACRO</div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                  <div>
+                    <div style={{fontSize:8,color:"#4ade80",fontWeight:700,marginBottom:6}}>🟢 DEVISES FORTES</div>
+                    {fortes.map(r=>{const reg=getRegime(data,r.code);return<div key={r.code} style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4,padding:"4px 8px",background:"#052010",borderRadius:4,border:"1px solid #4ade8022"}}><span style={{fontSize:10,color:"#c8d4f0",fontWeight:700}}><FlagImg code={r.code} size={14}/> {r.code}</span><span style={{fontSize:9}}><span style={{color:reg?reg.color:"#888"}}>{reg?reg.icon+" "+reg.label:""}</span> <span style={{color:"#4ade80"}}>{r.score>=0?"+":""}{r.score.toFixed(2)}</span></span></div>;})}
+                  </div>
+                  <div>
+                    <div style={{fontSize:8,color:"#f87171",fontWeight:700,marginBottom:6}}>🔴 DEVISES FAIBLES</div>
+                    {faibles.map(r=>{const reg=getRegime(data,r.code);return<div key={r.code} style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4,padding:"4px 8px",background:"#1a0505",borderRadius:4,border:"1px solid #f8717122"}}><span style={{fontSize:10,color:"#c8d4f0",fontWeight:700}}><FlagImg code={r.code} size={14}/> {r.code}</span><span style={{fontSize:9}}><span style={{color:reg?reg.color:"#888"}}>{reg?reg.icon+" "+reg.label:""}</span> <span style={{color:"#f87171"}}>{r.score>=0?"+":""}{r.score.toFixed(2)}</span></span></div>;})}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ÉTAPE 3 — OPPORTUNITÉS */}
+          {(()=>{
+            const CFTC_MAP={EUR:"099741",GBP:"096742",JPY:"097741",CAD:"090741",AUD:"232741",CHF:"092741",USD:"098662",NZD:"112741"};
+            const PAIRS=["EURUSD","GBPUSD","USDJPY","USDCHF","USDCAD","AUDUSD","NZDUSD","EURJPY","EURGBP","EURCAD","EURAUD","EURCHF","EURNZD","GBPJPY","GBPCHF","GBPCAD","GBPAUD","GBPNZD","CHFJPY","CADJPY","AUDJPY","NZDJPY","CADCHF","AUDCHF","NZDCHF","AUDCAD","NZDCAD","AUDNZD"];
+            const opps=[];
+            PAIRS.forEach(pair=>{
+              const base=pair.slice(0,3),quote=pair.slice(3,6);
+              const rBase=getRegime(data,base),rQuote=getRegime(data,quote);
+              const bCot=apexCot[CFTC_MAP[base]],qCot=apexCot[CFTC_MAP[quote]];
+              if(!rBase||!rQuote||!bCot||!qCot)return;
+              const sBase=ranked.find(r=>r.code===base)?.score||0;
+              const sQuote=ranked.find(r=>r.code===quote)?.score||0;
+              const macroDiff=sBase-sQuote;
+              if(Math.abs(macroDiff)<0.5)return;
+              const direction=macroDiff>0?"LONG":"SHORT";
+              const cotAligned=direction==="LONG"?bCot.chgNet>qCot.chgNet:bCot.chgNet<qCot.chgNet;
+              if(!cotAligned)return;
+              const bIsFort=bCot.signal==="HAUSSIER_FORT"||bCot.signal==="BAISSIER_FORT";
+              const qIsFort=qCot.signal==="HAUSSIER_FORT"||qCot.signal==="BAISSIER_FORT";
+              const bDir=bCot.chgNet>0?"H":"B";
+              const qDir=qCot.chgNet>0?"H":"B";
+              const cotOk=bIsFort&&qIsFort&&Math.abs(bCot.chgNet)>=3500&&Math.abs(qCot.chgNet)>=3500&&bDir!==qDir;
+              const retailS=apexRetail[pair];
+              const rA=retailS?analyzeRetailS(retailS):null;
+              const retailOk=rA&&rA.strength==="EXTREME"&&rA.bias===direction;
+              const score3=(cotOk?1:0)+(retailOk?1:0)+1;
+              opps.push({pair,base,quote,direction,rBase,rQuote,macroDiff,sBase,sQuote,bCot,qCot,cotOk,retailOk,rA,score3});
+            });
+            opps.sort((a,b)=>b.score3-a.score3||Math.abs(b.macroDiff)-Math.abs(a.macroDiff));
+            const apex=opps.filter(o=>o.score3===3);
+            const partial=opps.filter(o=>o.score3===2).slice(0,5);
+            return(
+              <div>
+                <div style={{fontSize:10,color:"#fbbf24",fontWeight:700,marginBottom:8,letterSpacing:1}}>🎯 ÉTAPE 3 — OPPORTUNITÉS CONFIRMÉES</div>
+                {apex.length===0&&partial.length===0&&<div style={{padding:20,textAlign:"center",fontSize:10,color:"#475569",background:"#0a1628",borderRadius:8}}>Aucune opportunité cette semaine</div>}
+                {apex.map(o=>(
+                  <div key={o.pair} style={{background:"#0a1628",border:`2px solid ${o.direction==="LONG"?"#4ade80":"#f87171"}`,borderRadius:8,padding:"10px 14px",marginBottom:10}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                      <span style={{fontSize:13,fontWeight:700,color:"#fff"}}><FlagImg code={o.base} size={16}/> {o.base}/{o.quote} <FlagImg code={o.quote} size={16}/></span>
+                      <span style={{fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:4,background:o.direction==="LONG"?"#14532d":"#7f1d1d",color:o.direction==="LONG"?"#4ade80":"#f87171"}}>🔥🔥🔥 {o.direction==="LONG"?"▲ LONG":"▼ SHORT"} APEX</span>
+                    </div>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+                      <div style={{background:"#0c1a2e",borderRadius:4,padding:"6px 8px",textAlign:"center"}}>
+                        <div style={{fontSize:7,color:"#a78bfa",marginBottom:2}}>✅ MACRO</div>
+                        <div style={{fontSize:8,color:o.rBase.color}}>{o.rBase.icon} {o.rBase.label}</div>
+                        <div style={{fontSize:7,color:"#475569"}}>vs</div>
+                        <div style={{fontSize:8,color:o.rQuote.color}}>{o.rQuote.icon} {o.rQuote.label}</div>
+                        <div style={{fontSize:8,color:"#38bdf8",marginTop:2}}>écart {Math.abs(o.macroDiff).toFixed(2)}</div>
+                      </div>
+                      <div style={{background:"#0c1a2e",borderRadius:4,padding:"6px 8px",textAlign:"center"}}>
+                        <div style={{fontSize:7,color:"#4ade80",marginBottom:2}}>✅ COT LF</div>
+                        <div style={{fontSize:8,color:o.bCot.chgNet>0?"#4ade80":"#f87171"}}>{o.base} {o.bCot.chgNet>=0?"+":""}{o.bCot.chgNet.toLocaleString()}{o.bCot.switchType?" 🔥":""}</div>
+                        <div style={{fontSize:8,color:o.qCot.chgNet>0?"#4ade80":"#f87171"}}>{o.quote} {o.qCot.chgNet>=0?"+":""}{o.qCot.chgNet.toLocaleString()}{o.qCot.switchType?" 🔥":""}</div>
+                      </div>
+                      <div style={{background:"#0c1a2e",borderRadius:4,padding:"6px 8px",textAlign:"center"}}>
+                        <div style={{fontSize:7,color:"#fbbf24",marginBottom:2}}>✅ RETAIL</div>
+                        <div style={{fontSize:8,color:"#fbbf24"}}>{o.rA?.lp}% L · {o.rA?.sp}% S</div>
+                        <div style={{fontSize:8,color:o.direction==="LONG"?"#4ade80":"#f87171"}}>Contrarian {o.direction}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {partial.map(o=>(
+                  <div key={o.pair} style={{background:"#0a1628",border:`1px solid ${o.direction==="LONG"?"#4ade8044":"#f8717144"}`,borderRadius:8,padding:"8px 12px",marginBottom:6}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                      <span style={{fontSize:11,fontWeight:700,color:"#c8d4f0"}}><FlagImg code={o.base} size={14}/> {o.base}/{o.quote} <FlagImg code={o.quote} size={14}/></span>
+                      <span style={{fontSize:9,padding:"2px 8px",borderRadius:3,background:o.direction==="LONG"?"#14532d55":"#7f1d1d55",color:o.direction==="LONG"?"#86efac":"#fca5a5"}}>{o.direction==="LONG"?"▲ LONG":"▼ SHORT"}</span>
+                    </div>
+                    <div style={{fontSize:8,color:"#64748b",marginTop:4}}>
+                      <span style={{color:o.rBase.color}}>{o.rBase.icon} {o.rBase.label}</span> vs <span style={{color:o.rQuote.color}}>{o.rQuote.icon} {o.rQuote.label}</span>
+                      {o.cotOk&&<span style={{color:"#4ade80",marginLeft:6}}>✅ COT</span>}
+                      {o.retailOk&&<span style={{color:"#fbbf24",marginLeft:6}}>✅ RETAIL</span>}
+                      {!o.retailOk&&<span style={{color:"#475569",marginLeft:6}}>⏳ retail à surveiller</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+        </div>
       )}
 
       {view==="data"    && <DataView />}
