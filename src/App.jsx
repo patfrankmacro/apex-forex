@@ -2888,7 +2888,23 @@ export default function App() {
                 const quote = iF < iW ? w.code : f.code;
                 const direction = base === f.code ? "LONG" : "SHORT";
                 const scoreCombined = Math.abs(f.cot.chgNet) + Math.abs(w.cot.chgNet);
-                opps.push({ base, quote, direction, forte:f, faible:w, scoreCombined });
+                // Vérifier RETAIL: clé avec ou sans slash
+                const pairKey = base + quote;
+                const pairKeySlash = base + "/" + quote;
+                const retailData = apexRetail[pairKey] || apexRetail[pairKeySlash];
+                let retailOk = false, retailPct = null, retailBias = null;
+                if (retailData) {
+                  const lp = retailData.longPercentage, sp = retailData.shortPercentage;
+                  // direction=LONG → retail doit être 70%+ SHORT (contrarian) → on achète
+                  // direction=SHORT → retail doit être 70%+ LONG (contrarian) → on vend
+                  if (direction === "LONG" && sp >= 70) { retailOk = true; retailPct = sp; retailBias = "SHORT"; }
+                  if (direction === "SHORT" && lp >= 70) { retailOk = true; retailPct = lp; retailBias = "LONG"; }
+                  if (!retailOk) {
+                    retailPct = lp >= sp ? lp : sp;
+                    retailBias = lp >= sp ? "LONG" : "SHORT";
+                  }
+                }
+                opps.push({ base, quote, direction, forte:f, faible:w, scoreCombined, retailOk, retailPct, retailBias, retailData });
               });
             });
             opps.sort((a,b) => b.scoreCombined - a.scoreCombined);
@@ -2901,15 +2917,32 @@ export default function App() {
                 <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(300px, 1fr))", gap:8}}>
                   {top.map((o,i) => {
                     const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
+                    const apexStyle = o.retailOk ? {
+                      background: "linear-gradient(135deg, #001a0d 0%, #003319 100%)",
+                      border: "2px solid #00ff88",
+                      borderLeft: "5px solid #00ff88",
+                      boxShadow: "0 0 12px rgba(0,255,136,0.3)"
+                    } : {
+                      background: BG2,
+                      border: `1px solid ${o.direction==="LONG"?"#4ade8033":"#f8717133"}`,
+                      borderLeft: `3px solid ${o.direction==="LONG"?"#4ade80":"#f87171"}`
+                    };
                     return (
-                      <div key={o.base+o.quote} style={{background:BG2, border:`1px solid ${o.direction==="LONG"?"#4ade8033":"#f8717133"}`, borderLeft:`3px solid ${o.direction==="LONG"?"#4ade80":"#f87171"}`, borderRadius:6, padding:"10px 12px"}}>
+                      <div key={o.base+o.quote} style={{...apexStyle, borderRadius:6, padding:"10px 12px"}}>
                         <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6}}>
                           <span style={{fontSize:12, fontWeight:700, color:TEXT}}>
                             <span style={{marginRight:6, fontSize:11}}>{medal}</span>
                             <FlagImg code={o.base} size={14} /> {o.base}/{o.quote} <FlagImg code={o.quote} size={14} />
                           </span>
-                          <span style={{fontSize:9, fontWeight:700, padding:"2px 8px", borderRadius:3, background:o.direction==="LONG"?"#14532d":"#7f1d1d", color:o.direction==="LONG"?"#4ade80":"#f87171"}}>
-                            {o.direction==="LONG"?"▲ LONG":"▼ SHORT"}
+                          <span style={{display:"flex", gap:6, alignItems:"center"}}>
+                            {o.retailOk && (
+                              <span style={{fontSize:9, fontWeight:700, padding:"2px 6px", borderRadius:3, background:"#00ff88", color:"#001a0d", letterSpacing:0.5}}>
+                                🎯 APEX 3/3
+                              </span>
+                            )}
+                            <span style={{fontSize:9, fontWeight:700, padding:"2px 8px", borderRadius:3, background:o.direction==="LONG"?"#14532d":"#7f1d1d", color:o.direction==="LONG"?"#4ade80":"#f87171"}}>
+                              {o.direction==="LONG"?"▲ LONG":"▼ SHORT"}
+                            </span>
                           </span>
                         </div>
                         <div style={{fontSize:8, color:TEXT_DIM, marginBottom:3}}>
@@ -2924,6 +2957,15 @@ export default function App() {
                           <span style={{color:"#475569"}}> vs </span>
                           <span style={{color:"#f87171", fontWeight:700}}>🔴 {o.faible.code} {o.faible.cot.chgNet.toLocaleString()}{o.faible.cot.switchType?"🔥":""}</span>
                         </div>
+                        {o.retailData && (
+                          <div style={{fontSize:8, marginBottom:4}}>
+                            {o.retailOk ? (
+                              <span style={{color:"#00ff88"}}>✅ RETAIL: {o.retailPct}% {o.retailBias} → contrarian {o.direction} aligné</span>
+                            ) : (
+                              <span style={{color:"#fbbf24"}}>⚠ RETAIL: {o.retailPct}% {o.retailBias} → sous 70%, pas confirmé</span>
+                            )}
+                          </div>
+                        )}
                         <div style={{fontSize:8, color:"#64748b", borderTop:"1px solid #1e3a5f", paddingTop:4, marginTop:4}}>
                           Score combiné: <span style={{color:"#38bdf8", fontWeight:700}}>{o.scoreCombined.toLocaleString()}</span>
                         </div>
