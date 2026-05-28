@@ -3008,6 +3008,177 @@ export default function App() {
               </div>
             );
           })()}
+
+          {/* ========== STRATEGIE TECHNIQUE — ZONES INSTITUTIONNELLES ========== */}
+          <div style={{marginTop:24, padding:"14px 14px 16px", background:"#0a1628", border:"1px solid #1e3a5f", borderRadius:8}}>
+            <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, letterSpacing:2, marginBottom:4}}>📈 STRATÉGIE TECHNIQUE — ZONES INSTITUTIONNELLES</div>
+            <div style={{fontSize:9, color:"#475569", marginBottom:14}}>Bords d'impulsion = ordres massifs des Leveraged Funds · Timeframe H2</div>
+
+            <div style={{fontSize:9, color:TEXT, lineHeight:1.7, marginBottom:14, padding:"10px 12px", background:"#001a2e", borderRadius:4, borderLeft:"3px solid #38bdf8"}}>
+              <b style={{color:"#38bdf8"}}>🎯 LE CONCEPT</b><br/>
+              Quand les Leveraged Funds passent leurs ordres en masse, le prix bondit violemment dans leur direction. Le <b>bord de cette impulsion</b> = la zone où ils ont placé leurs gros ordres. C'est leur <b>zone institutionnelle</b>. Si le prix revient là plus tard, ils défendront leurs positions → <b>bounce probable</b>.
+            </div>
+
+            {/* === SCHEMA LONG === */}
+            <div style={{marginBottom:14, padding:"12px", background:"#001a0d", borderRadius:6, border:"1px solid #4ade8044"}}>
+              <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8}}>▲ LF ACHÈTENT → CHERCHE LE BAS DE L'IMPULSION</div>
+
+              <svg viewBox="0 0 320 200" style={{width:"100%", maxWidth:340, display:"block", margin:"0 auto 8px"}}>
+                {/* Grille de fond */}
+                <line x1="0" y1="50" x2="320" y2="50" stroke="#1e3a5f" strokeDasharray="2,2" strokeWidth="0.5"/>
+                <line x1="0" y1="100" x2="320" y2="100" stroke="#1e3a5f" strokeDasharray="2,2" strokeWidth="0.5"/>
+                <line x1="0" y1="150" x2="320" y2="150" stroke="#1e3a5f" strokeDasharray="2,2" strokeWidth="0.5"/>
+
+                {/* Bougies baissières (consolidation basse) */}
+                <line x1="30" y1="140" x2="30" y2="170" stroke="#888" strokeWidth="1"/>
+                <rect x="26" y="150" width="8" height="15" fill="#888"/>
+                <line x1="50" y1="145" x2="50" y2="175" stroke="#888" strokeWidth="1"/>
+                <rect x="46" y="155" width="8" height="18" fill="#888"/>
+                <line x1="70" y1="140" x2="70" y2="170" stroke="#888" strokeWidth="1"/>
+                <rect x="66" y="150" width="8" height="18" fill="#888"/>
+
+                {/* ZONE DE DEMANDE (violet) */}
+                <rect x="20" y="148" width="80" height="22" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
+                <text x="60" y="186" fill="#a855f7" fontSize="8" fontFamily="monospace" textAnchor="middle" fontWeight="700">DEMAND ZONE</text>
+
+                {/* IMPULSION BULLISH (grosses bougies vertes) */}
+                <line x1="110" y1="145" x2="110" y2="120" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="106" y="125" width="8" height="20" fill="#4ade80"/>
+                <line x1="130" y1="125" x2="130" y2="80" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="126" y="85" width="8" height="40" fill="#4ade80"/>
+                <line x1="150" y1="85" x2="150" y2="40" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="146" y="45" width="8" height="40" fill="#4ade80"/>
+
+                {/* Fleche IMPULSION */}
+                <line x1="105" y1="155" x2="160" y2="50" stroke="#4ade80" strokeWidth="2" strokeDasharray="3,2" markerEnd="url(#arrowGreen)"/>
+                <text x="180" y="100" fill="#4ade80" fontSize="9" fontFamily="monospace" fontWeight="700">IMPULSION</text>
+                <text x="180" y="112" fill="#4ade80" fontSize="9" fontFamily="monospace" fontWeight="700">BULLISH</text>
+
+                {/* Retest avec rebond */}
+                <line x1="190" y1="40" x2="220" y2="120" stroke="#fbbf24" strokeWidth="1.5" strokeDasharray="2,2"/>
+                <line x1="220" y1="120" x2="240" y2="135" stroke="#fbbf24" strokeWidth="1.5" strokeDasharray="2,2"/>
+
+                {/* Zone de retest etendue */}
+                <rect x="220" y="148" width="80" height="22" fill="#a855f722" stroke="#a855f7" strokeWidth="1" strokeDasharray="3,2"/>
+
+                {/* Bougie retest */}
+                <line x1="260" y1="145" x2="260" y2="170" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="256" y="150" width="8" height="20" fill="#4ade80"/>
+                <line x1="280" y1="130" x2="280" y2="160" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="276" y="135" width="8" height="25" fill="#4ade80"/>
+
+                {/* ENTRY arrow */}
+                <line x1="262" y1="195" x2="262" y2="175" stroke="#00ff88" strokeWidth="2" markerEnd="url(#arrowEntry)"/>
+                <text x="262" y="208" fill="#00ff88" fontSize="9" fontFamily="monospace" fontWeight="700" textAnchor="middle">ENTRY LONG</text>
+
+                {/* Définition des flèches */}
+                <defs>
+                  <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#4ade80"/>
+                  </marker>
+                  <marker id="arrowEntry" viewBox="0 0 10 10" refX="5" refY="2" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 0 10 L 5 0 L 10 10 z" fill="#00ff88"/>
+                  </marker>
+                </defs>
+              </svg>
+
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.7, marginTop:8}}>
+                <b style={{color:"#4ade80"}}>1.</b> TABLEAU dit "LF achètent NZD (chgNet positif)"<br/>
+                <b style={{color:"#4ade80"}}>2.</b> Sur H2, repère une <b>impulsion bullish forte</b> (grosses bougies vertes consécutives)<br/>
+                <b style={{color:"#4ade80"}}>3.</b> Marque le <b>BAS de cette impulsion</b> = rectangle violet = zone de demande institutionnelle<br/>
+                <b style={{color:"#4ade80"}}>4.</b> Attends le <b>retest</b> de cette zone<br/>
+                <b style={{color:"#4ade80"}}>5.</b> <b>Entry LONG</b> + stop sous la zone + target 2:1 minimum
+              </div>
+            </div>
+
+            {/* === SCHEMA SHORT === */}
+            <div style={{marginBottom:14, padding:"12px", background:"#1a0000", borderRadius:6, border:"1px solid #f8717144"}}>
+              <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:8}}>▼ LF VENDENT → CHERCHE LE HAUT DE L'IMPULSION</div>
+
+              <svg viewBox="0 0 320 200" style={{width:"100%", maxWidth:340, display:"block", margin:"0 auto 8px"}}>
+                {/* Grille de fond */}
+                <line x1="0" y1="50" x2="320" y2="50" stroke="#1e3a5f" strokeDasharray="2,2" strokeWidth="0.5"/>
+                <line x1="0" y1="100" x2="320" y2="100" stroke="#1e3a5f" strokeDasharray="2,2" strokeWidth="0.5"/>
+                <line x1="0" y1="150" x2="320" y2="150" stroke="#1e3a5f" strokeDasharray="2,2" strokeWidth="0.5"/>
+
+                {/* Bougies haussières (consolidation haute) */}
+                <line x1="30" y1="40" x2="30" y2="70" stroke="#888" strokeWidth="1"/>
+                <rect x="26" y="48" width="8" height="18" fill="#888"/>
+                <line x1="50" y1="35" x2="50" y2="65" stroke="#888" strokeWidth="1"/>
+                <rect x="46" y="43" width="8" height="18" fill="#888"/>
+                <line x1="70" y1="40" x2="70" y2="70" stroke="#888" strokeWidth="1"/>
+                <rect x="66" y="48" width="8" height="18" fill="#888"/>
+
+                {/* ZONE D'OFFRE (violet, en haut) */}
+                <rect x="20" y="38" width="80" height="22" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
+                <text x="60" y="28" fill="#a855f7" fontSize="8" fontFamily="monospace" textAnchor="middle" fontWeight="700">SUPPLY ZONE</text>
+
+                {/* IMPULSION BEARISH (grosses bougies rouges) */}
+                <line x1="110" y1="60" x2="110" y2="90" stroke="#f87171" strokeWidth="1"/>
+                <rect x="106" y="65" width="8" height="20" fill="#f87171"/>
+                <line x1="130" y1="90" x2="130" y2="130" stroke="#f87171" strokeWidth="1"/>
+                <rect x="126" y="95" width="8" height="35" fill="#f87171"/>
+                <line x1="150" y1="125" x2="150" y2="170" stroke="#f87171" strokeWidth="1"/>
+                <rect x="146" y="130" width="8" height="40" fill="#f87171"/>
+
+                {/* Fleche IMPULSION */}
+                <line x1="105" y1="55" x2="160" y2="160" stroke="#f87171" strokeWidth="2" strokeDasharray="3,2" markerEnd="url(#arrowRed)"/>
+                <text x="180" y="100" fill="#f87171" fontSize="9" fontFamily="monospace" fontWeight="700">IMPULSION</text>
+                <text x="180" y="112" fill="#f87171" fontSize="9" fontFamily="monospace" fontWeight="700">BEARISH</text>
+
+                {/* Retest avec descente */}
+                <line x1="190" y1="160" x2="220" y2="80" stroke="#fbbf24" strokeWidth="1.5" strokeDasharray="2,2"/>
+                <line x1="220" y1="80" x2="240" y2="65" stroke="#fbbf24" strokeWidth="1.5" strokeDasharray="2,2"/>
+
+                {/* Zone de retest étendue */}
+                <rect x="220" y="38" width="80" height="22" fill="#a855f722" stroke="#a855f7" strokeWidth="1" strokeDasharray="3,2"/>
+
+                {/* Bougie retest */}
+                <line x1="260" y1="40" x2="260" y2="65" stroke="#f87171" strokeWidth="1"/>
+                <rect x="256" y="45" width="8" height="20" fill="#f87171"/>
+                <line x1="280" y1="55" x2="280" y2="85" stroke="#f87171" strokeWidth="1"/>
+                <rect x="276" y="60" width="8" height="25" fill="#f87171"/>
+
+                {/* ENTRY arrow */}
+                <line x1="262" y1="10" x2="262" y2="35" stroke="#ff3b3b" strokeWidth="2" markerEnd="url(#arrowEntryRed)"/>
+                <text x="262" y="195" fill="#ff3b3b" fontSize="9" fontFamily="monospace" fontWeight="700" textAnchor="middle">ENTRY SHORT</text>
+
+                <defs>
+                  <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#f87171"/>
+                  </marker>
+                  <marker id="arrowEntryRed" viewBox="0 0 10 10" refX="5" refY="8" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 0 0 L 5 10 L 10 0 z" fill="#ff3b3b"/>
+                  </marker>
+                </defs>
+              </svg>
+
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.7, marginTop:8}}>
+                <b style={{color:"#f87171"}}>1.</b> TABLEAU dit "LF vendent GBP (chgNet négatif)"<br/>
+                <b style={{color:"#f87171"}}>2.</b> Sur H2, repère une <b>impulsion bearish forte</b> (grosses bougies rouges consécutives)<br/>
+                <b style={{color:"#f87171"}}>3.</b> Marque le <b>HAUT de cette impulsion</b> = rectangle violet = zone d'offre institutionnelle<br/>
+                <b style={{color:"#f87171"}}>4.</b> Attends le <b>retest</b> de cette zone<br/>
+                <b style={{color:"#f87171"}}>5.</b> <b>Entry SHORT</b> + stop au-dessus de la zone + target 2:1 minimum
+              </div>
+            </div>
+
+            {/* === POURQUOI ÇA MARCHE === */}
+            <div style={{padding:"10px 12px", background:"#1a0a2e", borderRadius:4, border:"1px solid #a855f744", fontSize:9, color:"#c084fc", lineHeight:1.7}}>
+              <b style={{color:"#a855f7"}}>💡 POURQUOI ÇA MARCHE</b><br/>
+              <span style={{color:TEXT_DIM}}>Les Leveraged Funds bougent des milliards. Ils ne peuvent pas exécuter leurs ordres en une seule bougie sans bouger le marché. Quand le prix bondit violemment, c'est qu'ils ont concentré leurs ordres à un niveau précis. Cette zone devient leur <b style={{color:"#c084fc"}}>"skin in the game"</b> — ils la défendront pour ne pas être en perte. <b style={{color:"#fbbf24"}}>Tu trades AVEC les institutionnels, pas contre eux.</b></span>
+            </div>
+
+            {/* === RÈGLES IMPORTANTES === */}
+            <div style={{marginTop:8, padding:"8px 10px", background:"#001a0d", borderRadius:4, fontSize:8, color:"#4ade80", lineHeight:1.7}}>
+              <b>⚠ RÈGLES IMPORTANTES</b><br/>
+              ✓ Timeframe <b>H2 minimum</b> (H4 acceptable, jamais sous H1)<br/>
+              ✓ <b>Zone fraîche</b> de la semaine en cours = plus fiable<br/>
+              ✓ <b>Stop SOUS la zone</b> (LONG) ou <b>AU-DESSUS</b> (SHORT) — jamais au milieu<br/>
+              ✓ <b>Patience</b> : attendre le retest, ne jamais chasser le prix<br/>
+              ✓ Confirmer avec contexte <b>APEX 3/3</b> ou <b>NINO PUR</b> du tableau ci-dessus
+            </div>
+          </div>
+
         </div>
       )}
 
