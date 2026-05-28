@@ -107,17 +107,31 @@ function analyzePairCOT(baseCur, quoteCur) {
 function buildSignal(rA, pCot) {
   if (!rA || !pCot) return { label:"— DONNÉES INCOMPLÈTES", color:"#475569", bg:"#1e3a5f22", action:"En attente des données", valid:false };
   if (rA.bias === "NEUTRE" && pCot.bias === "NEUTRE") return { label:"— NEUTRE", color:"#fbbf24", bg:"#1f2937", action:"Aucun positionnement marqué", valid:false };
-  // FILTRE STRICT: Leveraged Funds doivent être en divergence (base et quote opposées)
+  // FILTRE NINO: Les 2 devises doivent être HAUSSIER FORT ou BAISSIER FORT
+  // ET |chgNet| >= 3500 (mouvement significatif dans les 2 colonnes)
   const bSig = pCot.base && pCot.base.signal;
   const qSig = pCot.quote && pCot.quote.signal;
+  const bChgNet = Math.abs(pCot.base && pCot.base.chgNet || 0);
+  const qChgNet = Math.abs(pCot.quote && pCot.quote.chgNet || 0);
+  const bIsFort = bSig === "HAUSSIER_FORT" || bSig === "BAISSIER_FORT";
+  const qIsFort = qSig === "HAUSSIER_FORT" || qSig === "BAISSIER_FORT";
   const bDir = bSig && bSig.includes("HAUSSIER") ? "HAUSSIER" : bSig && bSig.includes("BAISSIER") ? "BAISSIER" : "NEUTRE";
   const qDir = qSig && qSig.includes("HAUSSIER") ? "HAUSSIER" : qSig && qSig.includes("BAISSIER") ? "BAISSIER" : "NEUTRE";
+  // Les 2 devises doivent être FORT (les 2 colonnes bougent)
+  if (!bIsFort || !qIsFort) {
+    return { label:"— SIGNAL FAIBLE", color:"#64748b", bg:"#1e3a5f22", action:"Les 2 devises doivent être HAUSSIER FORT ou BAISSIER FORT", valid:false };
+  }
+  // Le mouvement doit être significatif (|chgNet| >= 3500)
+  if (bChgNet < 3500 || qChgNet < 3500) {
+    return { label:"— MOUVEMENT INSUFFISANT", color:"#64748b", bg:"#1e3a5f22", action:"Changement de position insuffisant (<3500 contrats)", valid:false };
+  }
+  // Directions opposées
   if (bDir === qDir || bDir === "NEUTRE" || qDir === "NEUTRE") {
     return { label:"— PAS DE DIVERGENCE COT", color:"#64748b", bg:"#1e3a5f22", action:"Les 2 devises vont dans la même direction", valid:false };
   }
-  // FILTRE STRICT: Retail doit être 70%+ contrarian (FORT ou EXTREME)
-  if (rA.strength !== "EXTREME" && rA.strength !== "FORT") {
-    return { label:"— RETAIL FAIBLE", color:"#64748b", bg:"#1e3a5f22", action:"Retail pas assez extrême (<70%)", valid:false };
+  // FILTRE STRICT: Retail doit être 75%+ contrarian (EXTREME uniquement)
+  if (rA.strength !== "EXTREME") {
+    return { label:"— RETAIL FAIBLE", color:"#64748b", bg:"#1e3a5f22", action:"Retail pas assez extrême (<75%)", valid:false };
   }
 
   const diverge = rA.bias !== "NEUTRE" && pCot.bias !== "NEUTRE" && rA.bias === pCot.bias;

@@ -1734,20 +1734,22 @@ function TradeCOT({ data, cotData }) {
     let cotBias = cotSpread > 0 ? "HAUSSIER" : "BAISSIER";
     let cotStrength = cotAbs >= 60 ? "EXTREME" : cotAbs >= 40 ? "FORT" : cotAbs >= 20 ? "MODERE" : "NUL";
 
-    // LOGIQUE NINO — force relative entre 2 devises
+    // LOGIQUE NINO — les 2 devises doivent être HAUSSIER FORT ou BAISSIER FORT
+    // ET |chgNet| >= 3500 (mouvement significatif dans les 2 colonnes comme GBP/NZD)
+    const bIsFort = bCotRaw.signal === "HAUSSIER_FORT" || bCotRaw.signal === "BAISSIER_FORT";
+    const qIsFort = qCotRaw.signal === "HAUSSIER_FORT" || qCotRaw.signal === "BAISSIER_FORT";
+    if (!bIsFort || !qIsFort) return;
+    if (Math.abs(bCotRaw.chgNet||0) < 3500 || Math.abs(qCotRaw.chgNet||0) < 3500) return;
     const bChg = bCotRaw.chgNet || 0;
     const qChg = qCotRaw.chgNet || 0;
     const forceDiff = bChg - qChg;
-    const absForce = Math.abs(forceDiff);
-    // Minimum 1500 de différentiel pour être valide
-    if (absForce < 1500) return;
     const cotDirNino = forceDiff > 0 ? "HAUSSIER" : "BAISSIER";
     const cotAligned = (direction === "LONG" && cotDirNino === "HAUSSIER") ||
                        (direction === "SHORT" && cotDirNino === "BAISSIER");
     if (!cotAligned) return;
-    // Force selon magnitude du différentiel
     cotBias = cotDirNino;
-    cotStrength = absForce >= 6000 ? "EXTREME" : absForce >= 3000 ? "FORT" : "MODERE";
+    const absForce = Math.abs(forceDiff);
+    cotStrength = absForce >= 8000 ? "EXTREME" : absForce >= 5000 ? "FORT" : "MODERE";
 
     const sigCot = cotStrength === "EXTREME"
       ? { label:"🔥🔥 COT FORT", color:"#22c55e", bg:"#052010", priority:3 }
@@ -1889,20 +1891,22 @@ function TradeApex({ data, cotData, retailData }) {
     let cotStrength = cotAbs >= 60 ? "EXTREME" : cotAbs >= 40 ? "FORT" : cotAbs >= 20 ? "MODERE" : "NUL";
 
     // Vérifier alignement COT avec direction
-    // LOGIQUE NINO — force relative entre 2 devises
+    // LOGIQUE NINO — les 2 devises doivent être HAUSSIER FORT ou BAISSIER FORT
+    // ET |chgNet| >= 3500 (mouvement significatif dans les 2 colonnes comme GBP/NZD)
+    const bIsFort = bCotRaw.signal === "HAUSSIER_FORT" || bCotRaw.signal === "BAISSIER_FORT";
+    const qIsFort = qCotRaw.signal === "HAUSSIER_FORT" || qCotRaw.signal === "BAISSIER_FORT";
+    if (!bIsFort || !qIsFort) return;
+    if (Math.abs(bCotRaw.chgNet||0) < 3500 || Math.abs(qCotRaw.chgNet||0) < 3500) return;
     const bChg = bCotRaw.chgNet || 0;
     const qChg = qCotRaw.chgNet || 0;
     const forceDiff = bChg - qChg;
-    const absForce = Math.abs(forceDiff);
-    // Minimum 1500 de différentiel pour être valide
-    if (absForce < 1500) return;
     const cotDirNino = forceDiff > 0 ? "HAUSSIER" : "BAISSIER";
     const cotAligned = (direction === "LONG" && cotDirNino === "HAUSSIER") ||
                        (direction === "SHORT" && cotDirNino === "BAISSIER");
     if (!cotAligned) return;
-    // Force selon magnitude du différentiel
     cotBias = cotDirNino;
-    cotStrength = absForce >= 6000 ? "EXTREME" : absForce >= 3000 ? "FORT" : "MODERE";
+    const absForce = Math.abs(forceDiff);
+    cotStrength = absForce >= 8000 ? "EXTREME" : absForce >= 5000 ? "FORT" : "MODERE";
 
     // Retail
     const rData = retailData[name];
