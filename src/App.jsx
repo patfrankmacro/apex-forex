@@ -2586,8 +2586,8 @@ export default function App() {
     const loadCOT = async () => {
       const res = await Promise.all(COT_CODES.map(async code => {
         try {
-          const url = "https://publicreporting.cftc.gov/resource/gpe5-46if.json?cftc_contract_market_code="+code+"&$order=report_date_as_yyyy_mm_dd DESC&$limit=55";
-          const rows = await (await fetch(url)).json();
+          const url = "https://publicreporting.cftc.gov/resource/gpe5-46if.json?cftc_contract_market_code="+code+"&$order=report_date_as_yyyy_mm_dd DESC&$limit=55&t="+Date.now();
+          const rows = await (await fetch(url, {cache:"no-store"})).json();
           if (!rows?.length) return [code, null];
           const row=rows[0];
           const prev=rows[1]||{};
@@ -2631,7 +2631,7 @@ export default function App() {
     const loadMFX = async (attempt = 1) => {
       try {
         // Un seul appel — login + outlook côté serveur
-        const r = await fetch("/api/myfxbook?email="+encodeURIComponent("patrice-bonneau@outlook.com")+"&password="+encodeURIComponent("Fucktoi69$")+"&t="+Date.now());
+        const r = await fetch("/api/myfxbook?email="+encodeURIComponent("patrice-bonneau@outlook.com")+"&password="+encodeURIComponent("Fucktoi69$")+"&t="+Date.now(), {cache:"no-store"});
         const d = await r.json();
         // Si échec (rate limit Myfxbook) → réessayer jusqu'à 3 fois avec délai croissant
         if (d.error || !d.symbols) {
