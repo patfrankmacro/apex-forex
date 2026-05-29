@@ -3031,9 +3031,20 @@ export default function App() {
             buys.sort((a,b) => b.chgNet - a.chgNet);
             sells.sort((a,b) => a.chgNet - b.chgNet);
             if (buys.length === 0 && sells.length === 0) return null;
+            // Date du dernier rapport CFTC + fraîcheur
+            const cftcDate = Object.values(apexCot).find(x=>x?.date)?.date;
+            let freshLabel = null, freshColor = "#475569";
+            if (cftcDate) {
+              const days = Math.floor((new Date() - new Date(cftcDate)) / (1000*60*60*24));
+              freshColor = days <= 7 ? "#4ade80" : days <= 10 ? "#fbbf24" : "#f87171";
+              freshLabel = `${cftcDate} (${days}j — ${days<=7?"frais ✓":days<=10?"à surveiller":"périmé ⚠"})`;
+            }
             return (
               <div style={{ marginTop:24, padding:14, background:"#0a1628", border:"1px solid #1e3a5f", borderRadius:8 }}>
-                <div style={{ fontSize:11, color:"#4ade80", fontWeight:700, letterSpacing:2, marginBottom:10 }}>📊 BIAIS LEVERAGED FUNDS (cette semaine)</div>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:4, marginBottom:10 }}>
+                  <span style={{ fontSize:11, color:"#4ade80", fontWeight:700, letterSpacing:2 }}>📊 BIAIS LEVERAGED FUNDS</span>
+                  {freshLabel && <span style={{ fontSize:8, color:freshColor }}>📅 CFTC: {freshLabel}</span>}
+                </div>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
                   <div>
                     <div style={{ fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}>🟢 ACHÈTENT</div>
