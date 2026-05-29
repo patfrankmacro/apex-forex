@@ -3131,15 +3131,15 @@ export default function App() {
               <b>3.</b> Si une devise a un <span style={{ background:"#14532d", color:"#4ade80", padding:"1px 6px", borderRadius:3, fontSize:9 }}>🔥 SWITCH</span> = les Leveraged Funds ont <b>renversé leur direction</b> cette semaine (ex: étaient short, deviennent long fort). C'est le signal le plus puissant selon Nino — un retournement institutionnel majeur<br/>
               <b>4.</b> Retail contrarian 70%+ aligné = validation finale
             </div>
-            <div style={{fontSize:11, color:"#f97316", fontWeight:700, marginTop:14, marginBottom:6}}>👥 POURQUOI LES LF PRENNENT LE CONTRAIRE DU RETAIL ?</div>
+            <div style={{fontSize:11, color:"#f97316", fontWeight:700, marginTop:14, marginBottom:6}}>👥 POURQUOI LES LEVERAGED FUNDS PRENNENT LE CONTRAIRE DU RETAIL ?</div>
             <div style={{fontSize:10, color:TEXT_DIM, lineHeight:1.7}}>
               Ce n'est pas par principe — c'est une <b>nécessité mécanique</b> :<br/>
               • Pour <b>vendre des milliards</b>, il faut des acheteurs en face. Le retail qui achète au sommet (FOMO) fournit cette <b>liquidité</b><br/>
               • Pour <b>acheter des milliards</b>, il faut des vendeurs. Le retail qui panique au creux la fournit<br/>
-              • Les LF ne peuvent entrer gros QUE là où la foule prend l'autre côté<br/><br/>
-              <span style={{color:"#fbbf24"}}>Quand 70%+ du retail est LONG, la plupart ont déjà acheté → plus personne pour pousser le prix plus haut → les LF vendent dans cette liquidité et le prix chute.</span><br/><br/>
-              <span style={{color:"#4ade80"}}>🎯 Retail massivement LONG → LF VENDENT → on VEND avec eux</span><br/>
-              <span style={{color:"#4ade80"}}>🎯 Retail massivement SHORT → LF ACHÈTENT → on ACHÈTE avec eux</span>
+              • Les Leveraged Funds ne peuvent entrer gros QUE là où la foule prend l'autre côté<br/><br/>
+              <span style={{color:"#fbbf24"}}>Quand 70%+ du retail est LONG, la plupart ont déjà acheté → plus personne pour pousser le prix plus haut → les Leveraged Funds vendent dans cette liquidité et le prix chute.</span><br/><br/>
+              <span style={{color:"#4ade80"}}>🎯 Retail massivement LONG → Leveraged Funds VENDENT → on VEND avec eux</span><br/>
+              <span style={{color:"#4ade80"}}>🎯 Retail massivement SHORT → Leveraged Funds ACHÈTENT → on ACHÈTE avec eux</span>
             </div>
           </div>
 
