@@ -3018,6 +3018,63 @@ export default function App() {
             );
           })()}
 
+          {/* ========== LES 4 RÉGIMES (aide-mémoire) ========== */}
+          <div style={{marginTop:24, padding:"14px", background:"#0a1628", border:"1px solid #a855f744", borderRadius:8}}>
+            <div style={{fontSize:11, color:"#a855f7", fontWeight:700, letterSpacing:2, marginBottom:4}}>🎯 LES 4 RÉGIMES — AIDE-MÉMOIRE</div>
+            <div style={{fontSize:8, color:"#475569", marginBottom:12}}>Comment lire le tableau et identifier un régime soi-même</div>
+            {[
+              { label:"SURCHAUFFE", icon:"▲", color:"#ffd700", bg:"#1a1500",
+                inflation:"↑ PLUS HAUTE que prévu", inflColor:"#ffd700",
+                pmi:"↑ MEILLEUR que prévu", pmiColor:"#ffd700",
+                chomage:"↓ EN BAISSE", chColor:"#ffd700",
+                logic:"Tout accélère en même temps. L'économie chauffe, l'inflation grimpe. La banque centrale DOIT monter les taux.",
+                action:"ACHÈTE la devise — les capitaux affluent vers les hauts rendements.",
+                devise:"FORTE ↑↑↑" },
+              { label:"GOLDILOCKS", icon:"◆", color:"#00ff88", bg:"#001a0d",
+                inflation:"→ STABLE ou plus basse", inflColor:"#66ffaa",
+                pmi:"↑ MEILLEUR que prévu", pmiColor:"#00ff88",
+                chomage:"→ STABLE ou en baisse", chColor:"#66ffaa",
+                logic:"Scénario parfait : l'économie croît SANS faire grimper l'inflation. La BC est détendue, aucune pression.",
+                action:"Capitaux affluent pour la stabilité. Meilleur environnement long terme.",
+                devise:"FORTE STABLE ↑↑" },
+              { label:"STAGFLATION", icon:"■", color:"#ff3b3b", bg:"#1a0000",
+                inflation:"↑ PLUS HAUTE que prévu", inflColor:"#ff6666",
+                pmi:"↓ PIRE que prévu", pmiColor:"#ff3b3b",
+                chomage:"↑ EN HAUSSE", chColor:"#ff3b3b",
+                logic:"Piège mortel : l'inflation monte MAIS l'économie ralentit. La BC est COINCÉE — monter tue l'économie, baisser nourrit l'inflation. Aucune issue.",
+                action:"FUIS la devise — pire scénario possible.",
+                devise:"FAIBLE ↓↓" },
+              { label:"RECESSION", icon:"▼", color:"#ff7a00", bg:"#1a0800",
+                inflation:"→ STABLE ou plus basse", inflColor:"#ffaa66",
+                pmi:"↓ PIRE que prévu", pmiColor:"#ff7a00",
+                chomage:"↑ EN HAUSSE", chColor:"#ff7a00",
+                logic:"L'économie se contracte ET l'inflation cède. La BC a de la marge : elle PEUT baisser les taux pour relancer.",
+                action:"VENDS la devise — capitaux fuient les bas rendements.",
+                devise:"FAIBLE ↓↓↓" },
+            ].map(R=>(
+              <div key={R.label} style={{ marginBottom:8, padding:12, background:R.bg, borderRadius:4, border:`1px solid ${R.color}44`, borderLeft:`4px solid ${R.color}` }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8, borderBottom:`1px solid ${R.color}33`, paddingBottom:6 }}>
+                  <span style={{ fontSize:12, fontWeight:700, color:R.color }}>{R.icon} {R.label}</span>
+                  <span style={{ fontSize:10, fontWeight:700, color:R.color }}>DEVISE {R.devise}</span>
+                </div>
+                <div style={{ display:"grid", gridTemplateColumns:"auto 1fr", gap:"3px 10px", fontSize:9, marginBottom:8 }}>
+                  <span style={{ color:TEXT_DIM }}>Inflation :</span>
+                  <span style={{ color:R.inflColor, fontWeight:700 }}>{R.inflation}</span>
+                  <span style={{ color:TEXT_DIM }}>PMI :</span>
+                  <span style={{ color:R.pmiColor, fontWeight:700 }}>{R.pmi}</span>
+                  <span style={{ color:TEXT_DIM }}>Chômage :</span>
+                  <span style={{ color:R.chColor, fontWeight:700 }}>{R.chomage}</span>
+                </div>
+                <div style={{ fontSize:9, color:TEXT_DIM, lineHeight:1.6, marginBottom:6, paddingTop:6, borderTop:`1px solid ${R.color}22` }}>
+                  <span style={{ color:"#fbbf24" }}>💡 </span>{R.logic}
+                </div>
+                <div style={{ fontSize:10, color:R.color, fontWeight:700, lineHeight:1.5 }}>
+                  🎯 {R.action}
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* ========== STRATEGIE TECHNIQUE — ZONES INSTITUTIONNELLES ========== */}
           <div style={{marginTop:24, padding:"14px 14px 16px", background:"#0a1628", border:"1px solid #1e3a5f", borderRadius:8}}>
             <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, letterSpacing:2, marginBottom:4}}>📈 STRATÉGIE TECHNIQUE — ZONES INSTITUTIONNELLES</div>
