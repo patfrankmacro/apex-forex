@@ -2805,6 +2805,48 @@ export default function App() {
 
       {view==="table" && (
         <div style={{ overflowX:"auto", padding:12 }}>
+
+          {/* ========== BIAIS LEVERAGED FUNDS (panneau live) ========== */}
+          {(() => {
+            const CFTC_MAP = {EUR:"099741",GBP:"096742",JPY:"097741",CAD:"090741",AUD:"232741",CHF:"092741",USD:"098662",NZD:"112741"};
+            const buys = [], sells = [];
+            Object.entries(CFTC_MAP).forEach(([code, id]) => {
+              const cot = apexCot[id];
+              if (!cot || cot.chgNet === undefined) return;
+              if (cot.chgNet > 0) buys.push({ code, chgNet: cot.chgNet, sw: cot.switchType });
+              else if (cot.chgNet < 0) sells.push({ code, chgNet: cot.chgNet, sw: cot.switchType });
+            });
+            buys.sort((a,b) => b.chgNet - a.chgNet);
+            sells.sort((a,b) => a.chgNet - b.chgNet);
+            if (buys.length === 0 && sells.length === 0) return null;
+            return (
+              <div style={{ marginBottom:12, padding:14, background:"#0a1628", border:"1px solid #1e3a5f", borderRadius:8 }}>
+                <div style={{ fontSize:11, color:"#4ade80", fontWeight:700, letterSpacing:2, marginBottom:10 }}>📊 BIAIS LEVERAGED FUNDS (cette semaine)</div>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                  <div>
+                    <div style={{ fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}>🟢 ACHÈTENT</div>
+                    {buys.map(b => (
+                      <div key={b.code} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 10px", marginBottom:4, background:"#001a0d", border:"1px solid #4ade8033", borderRadius:4 }}>
+                        <span style={{ display:"flex", alignItems:"center", gap:6, fontSize:11, fontWeight:700, color:TEXT }}><FlagImg code={b.code} size={16} /> {b.code}</span>
+                        <span style={{ fontSize:11, fontWeight:700, color:"#4ade80" }}>+{b.chgNet.toLocaleString()} {b.sw?"🔥":""}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div>
+                    <div style={{ fontSize:10, color:"#f87171", fontWeight:700, marginBottom:8, display:"flex", alignItems:"center", gap:6 }}>🔴 VENDENT</div>
+                    {sells.map(s => (
+                      <div key={s.code} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 10px", marginBottom:4, background:"#1a0000", border:"1px solid #f8717133", borderRadius:4 }}>
+                        <span style={{ display:"flex", alignItems:"center", gap:6, fontSize:11, fontWeight:700, color:TEXT }}><FlagImg code={s.code} size={16} /> {s.code}</span>
+                        <span style={{ fontSize:11, fontWeight:700, color:"#f87171" }}>{s.chgNet.toLocaleString()} {s.sw?"🔥":""}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ fontSize:8, color:"#475569", marginTop:10, fontStyle:"italic" }}>🔥 = switch cette semaine (renversement institutionnel majeur)</div>
+              </div>
+            );
+          })()}
+
           <div style={{ fontSize:8, color:TEXT_DIM, marginBottom:8, letterSpacing:1 }}>PRIOR → EXP → NOW · Vert=EN HAUSSE · Rouge=EN BAISSE · Gris=STABLE · Tier1: Inflation/Core · Tier2: Unemployment/Services PMI</div>
           <table style={{ borderCollapse:"collapse", minWidth:980 }}>
             <thead>
