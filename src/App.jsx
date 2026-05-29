@@ -941,21 +941,21 @@ function GuideView() {
           Hedge funds, CTAs, fonds spéculatifs à effet de levier. Ils tradent avec un horizon <b>swing/court terme</b> — le même que nous. Contrairement aux banques centrales (hedgers) ou aux Asset Managers (long terme), leurs mouvements reflètent la <b>spéculation pure</b> sur les données macro de la semaine.
         </div>
         <div style={{ fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:6 }}>🎯 POURQUOI LES SUIVRE ?</div>
-        <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:12 }}>
+        <div style={{ fontSize:10, color:TEXT_DIM, lineHeight:1.7, marginBottom:12 }}>
           • <b>Même horizon</b> que swing trader (1-4 semaines)<br/>
           • Ajustent positions <b>chaque semaine</b> selon CPI, PMI, taux directeurs<br/>
           • <b>Action concrète</b> (pas paroles) — ils risquent leur argent réel<br/>
           • Signal <b>frais hebdomadaire</b> — rapport CFTC publié chaque vendredi
         </div>
         <div style={{ fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:6 }}>📊 COMMENT ILS TRADENT ?</div>
-        <div style={{ fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:12 }}>
+        <div style={{ fontSize:10, color:TEXT_DIM, lineHeight:1.7, marginBottom:12 }}>
           • Analysent CPI, Core Inflation, PMI Services, Unemployment<br/>
           • Anticipent décisions banques centrales (hausse/baisse taux)<br/>
           • Ajustent positions Long/Short chaque mardi (snapshot CFTC)<br/>
           • Bougent les prix par leurs flux massifs sur futures
         </div>
         <div style={{ fontSize:11, color:"#a78bfa", fontWeight:700, marginBottom:6 }}>⚡ NOTRE STRATÉGIE</div>
-        <div style={{ fontSize:10, color:TEXT, lineHeight:1.7 }}>
+        <div style={{ fontSize:10, color:TEXT_DIM, lineHeight:1.7 }}>
           <b>1.</b> On lit le changement hebdomadaire (chgLong / chgShort) — pas le total<br/>
           <b>2.</b> On compare la <b>force relative</b> entre 2 devises (Nino)<br/>
           <b>3.</b> Si une devise a un <span style={{ background:"#14532d", color:"#4ade80", padding:"1px 6px", borderRadius:3, fontSize:9 }}>🔥 SWITCH</span> = les Leveraged Funds ont <b>renversé leur direction</b> cette semaine (ex: étaient short, deviennent long fort). C'est le signal le plus puissant selon Nino — un retournement institutionnel majeur<br/>
@@ -3111,28 +3111,28 @@ export default function App() {
               Hedge funds, CTAs, fonds spéculatifs à effet de levier. Ils tradent avec un horizon <b>swing/court terme</b> — le même que nous. Contrairement aux banques centrales (hedgers) ou aux Asset Managers (long terme), leurs mouvements reflètent la <b>spéculation pure</b> sur les données macro de la semaine.
             </div>
             <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:6}}>🎯 POURQUOI LES SUIVRE ?</div>
-            <div style={{fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:12}}>
+            <div style={{fontSize:10, color:TEXT_DIM, lineHeight:1.7, marginBottom:12}}>
               • <b>Même horizon</b> que swing trader (1-4 semaines)<br/>
               • Ajustent positions <b>chaque semaine</b> selon CPI, PMI, taux directeurs<br/>
               • <b>Action concrète</b> (pas paroles) — ils risquent leur argent réel<br/>
               • Signal <b>frais hebdomadaire</b> — rapport CFTC publié chaque vendredi
             </div>
             <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:6}}>📊 COMMENT ILS TRADENT ?</div>
-            <div style={{fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:12}}>
+            <div style={{fontSize:10, color:TEXT_DIM, lineHeight:1.7, marginBottom:12}}>
               • Analysent CPI, Core Inflation, PMI Services, Unemployment<br/>
               • Anticipent décisions banques centrales (hausse/baisse taux)<br/>
               • Ajustent positions Long/Short chaque mardi (snapshot CFTC)<br/>
               • Bougent les prix par leurs flux massifs sur futures
             </div>
             <div style={{fontSize:11, color:"#a78bfa", fontWeight:700, marginBottom:6}}>⚡ NOTRE STRATÉGIE</div>
-            <div style={{fontSize:10, color:TEXT, lineHeight:1.7}}>
+            <div style={{fontSize:10, color:TEXT_DIM, lineHeight:1.7}}>
               <b>1.</b> On lit le changement hebdomadaire (chgLong / chgShort) — pas le total<br/>
               <b>2.</b> On compare la <b>force relative</b> entre 2 devises (Nino)<br/>
               <b>3.</b> Si une devise a un <span style={{ background:"#14532d", color:"#4ade80", padding:"1px 6px", borderRadius:3, fontSize:9 }}>🔥 SWITCH</span> = les Leveraged Funds ont <b>renversé leur direction</b> cette semaine (ex: étaient short, deviennent long fort). C'est le signal le plus puissant selon Nino — un retournement institutionnel majeur<br/>
               <b>4.</b> Retail contrarian 70%+ aligné = validation finale
             </div>
             <div style={{fontSize:11, color:"#f97316", fontWeight:700, marginTop:14, marginBottom:6}}>👥 POURQUOI LES LF PRENNENT LE CONTRAIRE DU RETAIL ?</div>
-            <div style={{fontSize:10, color:TEXT, lineHeight:1.7}}>
+            <div style={{fontSize:10, color:TEXT_DIM, lineHeight:1.7}}>
               Ce n'est pas par principe — c'est une <b>nécessité mécanique</b> :<br/>
               • Pour <b>vendre des milliards</b>, il faut des acheteurs en face. Le retail qui achète au sommet (FOMO) fournit cette <b>liquidité</b><br/>
               • Pour <b>acheter des milliards</b>, il faut des vendeurs. Le retail qui panique au creux la fournit<br/>
