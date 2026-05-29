@@ -3220,7 +3220,7 @@ export default function App() {
 
             {/* === SCHEMA LONG (zone COT mardi, comme NZDCAD) === */}
             <div style={{marginBottom:14, padding:"12px", background:"#001a0d", borderRadius:6, border:"1px solid #4ade8044"}}>
-              <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8}}>▲ LEVERAGED FUNDS ACHÈTENT → ZONE LONG DU DERNIER COT</div>
+              <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8}}>▲ LEVERAGED FUNDS ACHÈTENT — ZONE DU DERNIER COT</div>
 
               <svg viewBox="0 0 340 230" style={{width:"100%", maxWidth:360, display:"block", margin:"0 auto 8px"}}>
                 {/* Label zone au-dessus (ne chevauche pas) */}
@@ -3255,7 +3255,7 @@ export default function App() {
                 {/* 4. Bougie de RETEST dans la zone avec MÈCHE DE REJET (LF défendent) */}
                 <line x1="165" y1="148" x2="165" y2="185" stroke="#4ade80" strokeWidth="1.5"/>
                 <rect x="160" y="150" width="10" height="20" fill="#4ade80"/>
-                <text x="180" y="200" fill="#4ade80" fontSize="7" fontFamily="monospace">mèche rejet = Leveraged Funds défendent</text>
+                <text x="10" y="210" fill="#4ade80" fontSize="7" fontFamily="monospace">↑ mèche rejet = Leveraged Funds défendent</text>
 
                 {/* 5. Prix repart en HAUT */}
                 <line x1="188" y1="120" x2="188" y2="150" stroke="#4ade80" strokeWidth="1"/>
@@ -3291,7 +3291,7 @@ export default function App() {
 
             {/* === SCHEMA SHORT === */}
             <div style={{marginBottom:14, padding:"12px", background:"#1a0000", borderRadius:6, border:"1px solid #f8717144"}}>
-              <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:8}}>▼ LEVERAGED FUNDS VENDENT → ZONE SHORT DU DERNIER COT</div>
+              <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:8}}>▼ LEVERAGED FUNDS VENDENT — ZONE DU DERNIER COT</div>
 
               <svg viewBox="0 0 340 230" style={{width:"100%", maxWidth:360, display:"block", margin:"0 auto 8px"}}>
                 {/* ENTRY SHORT en haut (au contact de la zone) */}
@@ -3330,7 +3330,7 @@ export default function App() {
                 {/* 4. Bougie de RETEST dans la zone avec MÈCHE DE REJET (LF défendent) */}
                 <line x1="165" y1="52" x2="165" y2="90" stroke="#f87171" strokeWidth="1.5"/>
                 <rect x="160" y="68" width="10" height="20" fill="#f87171"/>
-                <text x="180" y="48" fill="#f87171" fontSize="7" fontFamily="monospace">mèche rejet = Leveraged Funds défendent</text>
+                <text x="10" y="38" fill="#f87171" fontSize="7" fontFamily="monospace">↓ mèche rejet = Leveraged Funds défendent</text>
 
                 {/* 5. Prix repart en BAS */}
                 <line x1="188" y1="88" x2="188" y2="116" stroke="#f87171" strokeWidth="1"/>
@@ -3374,9 +3374,9 @@ export default function App() {
               ✓ <b>NE PAS entrer au 1er contact</b> — attendre la CONFIRMATION :<br/>
               &nbsp;&nbsp;&nbsp;• mèche de rejet dans la zone<br/>
               &nbsp;&nbsp;&nbsp;• ou bougie englobante dans ton sens<br/>
-              &nbsp;&nbsp;&nbsp;• = le footprint des LF qui défendent<br/>
+              &nbsp;&nbsp;&nbsp;• = le footprint des Leveraged Funds qui défendent<br/>
               ✓ <b>Stop</b> juste de l'autre côté de la zone · <b>target 2:1</b> min (extrême précédent)<br/>
-              ✗ <span style={{color:"#f87171"}}>Si le prix <b>TRAVERSE la zone franchement</b> = les LF ont lâché → PAS de trade (signal invalidé)</span><br/>
+              ✗ <span style={{color:"#f87171"}}>Si le prix <b>TRAVERSE la zone franchement</b> = les Leveraged Funds ont lâché → PAS de trade (signal invalidé)</span><br/>
               ✓ Confirmer avec <b>APEX 3/3</b> ou <b>NINO PUR</b> du tableau ci-dessus
             </div>
           </div>
