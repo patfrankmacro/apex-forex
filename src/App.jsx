@@ -2875,6 +2875,14 @@ export default function App() {
             </tbody>
           </table>
 
+          {/* INDICATEUR DE CHARGEMENT (tant que CFTC pas chargé) */}
+          {Object.keys(apexCot).length === 0 && (
+            <div style={{marginTop:16, padding:"24px", textAlign:"center", background:"#0a1628", border:"1px solid #1e3a5f", borderRadius:8}}>
+              <div style={{fontSize:13, color:"#38bdf8", marginBottom:6}}>⏳ Chargement des données live…</div>
+              <div style={{fontSize:9, color:"#475569"}}>CFTC (Leveraged Funds) + Myfxbook (Retail) en cours</div>
+            </div>
+          )}
+
           {/* MEILLEURES OPPORTUNITÉS — MACRO + LEVERAGED FUNDS COMBINÉS */}
           {(() => {
             const CFTC_MAP = {EUR:"099741",GBP:"096742",JPY:"097741",CAD:"090741",AUD:"232741",CHF:"092741",USD:"098662",NZD:"112741"};
@@ -2981,15 +2989,31 @@ export default function App() {
                         </div>
                         <div style={{fontSize:8, color:TEXT_DIM, marginBottom:3}}>
                           <span style={{color:"#a78bfa"}}>MACRO:</span>{" "}
-                          <span style={{color:o.forte.reg.color}}>{o.forte.reg.icon} {o.forte.reg.label} ({o.forte.score>=0?"+":""}{o.forte.score.toFixed(2)})</span>
-                          <span style={{color:"#475569"}}> vs </span>
-                          <span style={{color:o.faible.reg.color}}>{o.faible.reg.icon} {o.faible.reg.label} ({o.faible.score>=0?"+":""}{o.faible.score.toFixed(2)})</span>
+                          {(() => {
+                            // Afficher dans l'ordre de la paire : base d'abord, quote ensuite
+                            const baseSide = o.forte.code === o.base ? o.forte : o.faible;
+                            const quoteSide = o.forte.code === o.quote ? o.forte : o.faible;
+                            return (<>
+                              <span style={{color:baseSide.reg.color}}>{baseSide.reg.icon} {baseSide.reg.label} ({baseSide.score>=0?"+":""}{baseSide.score.toFixed(2)})</span>
+                              <span style={{color:"#475569"}}> vs </span>
+                              <span style={{color:quoteSide.reg.color}}>{quoteSide.reg.icon} {quoteSide.reg.label} ({quoteSide.score>=0?"+":""}{quoteSide.score.toFixed(2)})</span>
+                            </>);
+                          })()}
                         </div>
                         <div style={{fontSize:8, color:TEXT_DIM, marginBottom:4}}>
                           <span style={{color:"#4ade80"}}>COT:</span>{" "}
-                          <span style={{color:"#4ade80", fontWeight:700}}>🟢 {o.forte.code} +{o.forte.cot.chgNet.toLocaleString()}{o.forte.cot.switchType?"🔥":""}</span>
-                          <span style={{color:"#475569"}}> vs </span>
-                          <span style={{color:"#f87171", fontWeight:700}}>🔴 {o.faible.code} {o.faible.cot.chgNet.toLocaleString()}{o.faible.cot.switchType?"🔥":""}</span>
+                          {(() => {
+                            const baseSide = o.forte.code === o.base ? o.forte : o.faible;
+                            const quoteSide = o.forte.code === o.quote ? o.forte : o.faible;
+                            const dot = s => s.cot.chgNet > 0 ? "🟢" : "🔴";
+                            const col = s => s.cot.chgNet > 0 ? "#4ade80" : "#f87171";
+                            const sign = s => s.cot.chgNet >= 0 ? "+" : "";
+                            return (<>
+                              <span style={{color:col(baseSide), fontWeight:700}}>{dot(baseSide)} {baseSide.code} {sign(baseSide)}{baseSide.cot.chgNet.toLocaleString()}{baseSide.cot.switchType?"🔥":""}</span>
+                              <span style={{color:"#475569"}}> vs </span>
+                              <span style={{color:col(quoteSide), fontWeight:700}}>{dot(quoteSide)} {quoteSide.code} {sign(quoteSide)}{quoteSide.cot.chgNet.toLocaleString()}{quoteSide.cot.switchType?"🔥":""}</span>
+                            </>);
+                          })()}
                         </div>
                         {o.retailData && (
                           <div style={{fontSize:8, marginBottom:4}}>
