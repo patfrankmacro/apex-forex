@@ -2628,12 +2628,19 @@ export default function App() {
       // Aussi refresh le samedi matin pour être sûr
       if (day === 6 && hour >= 0 && hour <= 2) loadCOT();
     }, 60 * 60 * 1000); // vérif toutes les heures
-    const loadMFX = async () => {
+    const loadMFX = async (attempt = 1) => {
       try {
         // Un seul appel — login + outlook côté serveur
         const r = await fetch("/api/myfxbook?email="+encodeURIComponent("patrice-bonneau@outlook.com")+"&password="+encodeURIComponent("Fucktoi69$")+"&t="+Date.now());
         const d = await r.json();
-        if (d.error || !d.symbols) return;
+        // Si échec (rate limit Myfxbook) → réessayer jusqu'à 3 fois avec délai croissant
+        if (d.error || !d.symbols) {
+          if (attempt < 3) {
+            setTimeout(() => loadMFX(attempt + 1), attempt * 5000); // 5s, puis 10s
+          }
+          // Ne PAS vider apexRetail — on garde les dernières données valides
+          return;
+        }
         const map = {};
         d.symbols.forEach(s => {
           map[s.name] = s;
@@ -2641,7 +2648,10 @@ export default function App() {
           map[s.name.replace("/","")] = s;
         });
         if (Object.keys(map).length > 0) setApexRetail(map);
-      } catch(e) {}
+      } catch(e) {
+        // Erreur réseau → réessayer aussi
+        if (attempt < 3) setTimeout(() => loadMFX(attempt + 1), attempt * 5000);
+      }
     };
     loadMFX();
     const mfxInterval = setInterval(loadMFX, 30 * 60 * 1000);
