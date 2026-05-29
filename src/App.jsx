@@ -3220,49 +3220,57 @@ export default function App() {
             <div style={{marginBottom:14, padding:"12px", background:"#001a0d", borderRadius:6, border:"1px solid #4ade8044"}}>
               <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8}}>▲ LF ACHÈTENT → ZONE LONG DU DERNIER COT</div>
 
-              <svg viewBox="0 0 320 210" style={{width:"100%", maxWidth:340, display:"block", margin:"0 auto 8px"}}>
-                {/* ZONE COT (violet, horizontale = niveau du mardi) */}
-                <rect x="10" y="120" width="300" height="26" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
-                <text x="155" y="137" fill="#c084fc" fontSize="8" fontFamily="monospace" textAnchor="middle" fontWeight="700">POSITION LF — DERNIER COT (MARDI)</text>
+              <svg viewBox="0 0 340 230" style={{width:"100%", maxWidth:360, display:"block", margin:"0 auto 8px"}}>
+                {/* Label zone au-dessus (ne chevauche pas) */}
+                <text x="10" y="148" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">ZONE LF (prix du mardi COT) = DEMANDE</text>
+                {/* ZONE COT/demande (violet, horizontale) */}
+                <rect x="10" y="150" width="320" height="24" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
 
-                {/* Prix part vers le bas après le mardi, puis remonte */}
-                <line x1="30" y1="125" x2="30" y2="150" stroke="#888" strokeWidth="1"/>
-                <rect x="26" y="130" width="8" height="15" fill="#888"/>
-                <line x1="48" y1="135" x2="48" y2="165" stroke="#888" strokeWidth="1"/>
-                <rect x="44" y="140" width="8" height="20" fill="#888"/>
-                <line x1="66" y1="145" x2="66" y2="178" stroke="#888" strokeWidth="1"/>
-                <rect x="62" y="150" width="8" height="22" fill="#888"/>
-                <line x1="84" y1="138" x2="84" y2="168" stroke="#888" strokeWidth="1"/>
-                <rect x="80" y="143" width="8" height="20" fill="#888"/>
+                {/* 1. Bougies du mardi DANS la zone (où LF ont acheté) */}
+                <line x1="35" y1="150" x2="35" y2="176" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="31" y="156" width="8" height="16" fill="#4ade80"/>
+                <line x1="52" y1="148" x2="52" y2="172" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="48" y="152" width="8" height="16" fill="#4ade80"/>
 
-                {/* Prix revient tester la zone "cette semaine" */}
-                <line x1="120" y1="130" x2="120" y2="160" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="116" y="135" width="8" height="22" fill="#4ade80"/>
-                <line x1="138" y1="122" x2="138" y2="150" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="134" y="128" width="8" height="20" fill="#4ade80"/>
+                {/* 2. Prix MONTE et s'éloigne au-dessus */}
+                <line x1="72" y1="135" x2="72" y2="158" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="68" y="138" width="8" height="18" fill="#4ade80"/>
+                <line x1="90" y1="110" x2="90" y2="138" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="86" y="114" width="8" height="24" fill="#4ade80"/>
+                <line x1="108" y1="92" x2="108" y2="116" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="104" y="95" width="8" height="20" fill="#4ade80"/>
 
-                {/* Annotation "cette semaine" */}
-                <text x="150" y="100" fill="#4ade80" fontSize="9" fontFamily="monospace" fontWeight="700">CETTE SEMAINE</text>
-                <line x1="150" y1="105" x2="140" y2="125" stroke="#4ade80" strokeWidth="1"/>
+                {/* 3. Prix REDESCEND tester la zone (cette semaine) */}
+                <line x1="128" y1="95" x2="128" y2="120" stroke="#888" strokeWidth="1"/>
+                <rect x="124" y="98" width="8" height="20" fill="#888"/>
+                <line x1="146" y1="115" x2="146" y2="145" stroke="#888" strokeWidth="1"/>
+                <rect x="142" y="118" width="8" height="24" fill="#888"/>
 
-                {/* LF défendent → impulsion vers le haut */}
-                <line x1="160" y1="118" x2="160" y2="95" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="156" y="100" width="8" height="20" fill="#4ade80"/>
-                <line x1="180" y1="100" x2="180" y2="65" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="176" y="70" width="8" height="32" fill="#4ade80"/>
-                <line x1="200" y1="70" x2="200" y2="35" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="196" y="40" width="8" height="32" fill="#4ade80"/>
-                <line x1="220" y1="45" x2="220" y2="20" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="216" y="22" width="8" height="25" fill="#4ade80"/>
+                {/* "CETTE SEMAINE" en haut, flèche vers la bougie de retest */}
+                <text x="158" y="80" fill="#fbbf24" fontSize="9" fontFamily="monospace" fontWeight="700">CETTE SEMAINE</text>
+                <line x1="170" y1="85" x2="165" y2="148" stroke="#fbbf24" strokeWidth="1" strokeDasharray="2,2"/>
 
-                {/* Flèche LF défendent */}
-                <line x1="145" y1="120" x2="225" y2="30" stroke="#4ade80" strokeWidth="2" strokeDasharray="3,2" markerEnd="url(#arGL)"/>
-                <text x="235" y="70" fill="#4ade80" fontSize="8" fontFamily="monospace" fontWeight="700">LF</text>
-                <text x="235" y="82" fill="#4ade80" fontSize="8" fontFamily="monospace" fontWeight="700">DÉFENDENT</text>
+                {/* 4. Bougie de RETEST dans la zone avec MÈCHE DE REJET (LF défendent) */}
+                <line x1="165" y1="148" x2="165" y2="185" stroke="#4ade80" strokeWidth="1.5"/>
+                <rect x="160" y="150" width="10" height="20" fill="#4ade80"/>
+                <text x="180" y="200" fill="#4ade80" fontSize="7" fontFamily="monospace">mèche rejet = LF défendent</text>
 
-                {/* ENTRY LONG dans la zone */}
-                <line x1="130" y1="185" x2="130" y2="160" stroke="#00ff88" strokeWidth="2" markerEnd="url(#arEntL)"/>
-                <text x="130" y="200" fill="#00ff88" fontSize="9" fontFamily="monospace" fontWeight="700" textAnchor="middle">ENTRY LONG</text>
+                {/* 5. Prix repart en HAUT */}
+                <line x1="188" y1="120" x2="188" y2="150" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="184" y="124" width="8" height="26" fill="#4ade80"/>
+                <line x1="206" y1="95" x2="206" y2="124" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="202" y="98" width="8" height="26" fill="#4ade80"/>
+                <line x1="224" y1="68" x2="224" y2="98" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="220" y="72" width="8" height="26" fill="#4ade80"/>
+                <line x1="242" y1="45" x2="242" y2="72" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="238" y="48" width="8" height="24" fill="#4ade80"/>
+
+                {/* Flèche montée */}
+                <line x1="175" y1="160" x2="248" y2="55" stroke="#4ade80" strokeWidth="2" strokeDasharray="3,2" markerEnd="url(#arGL)"/>
+
+                {/* ENTRY LONG pile au contact de la zone */}
+                <line x1="165" y1="212" x2="165" y2="186" stroke="#00ff88" strokeWidth="2.5" markerEnd="url(#arEntL)"/>
+                <text x="165" y="226" fill="#00ff88" fontSize="10" fontFamily="monospace" fontWeight="700" textAnchor="middle">ENTRY LONG (au retest)</text>
 
                 <defs>
                   <marker id="arGL" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4ade80"/></marker>
@@ -3283,49 +3291,57 @@ export default function App() {
             <div style={{marginBottom:14, padding:"12px", background:"#1a0000", borderRadius:6, border:"1px solid #f8717144"}}>
               <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:8}}>▼ LF VENDENT → ZONE SHORT DU DERNIER COT</div>
 
-              <svg viewBox="0 0 320 210" style={{width:"100%", maxWidth:340, display:"block", margin:"0 auto 8px"}}>
-                {/* ZONE COT (violet, horizontale = niveau du mardi) */}
-                <rect x="10" y="65" width="300" height="26" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
-                <text x="155" y="82" fill="#c084fc" fontSize="8" fontFamily="monospace" textAnchor="middle" fontWeight="700">POSITION LF — DERNIER COT (MARDI)</text>
+              <svg viewBox="0 0 340 230" style={{width:"100%", maxWidth:360, display:"block", margin:"0 auto 8px"}}>
+                {/* ENTRY SHORT en haut (au contact de la zone) */}
+                <text x="165" y="16" fill="#ff3b3b" fontSize="10" fontFamily="monospace" fontWeight="700" textAnchor="middle">ENTRY SHORT (au retest)</text>
+                <line x1="165" y1="22" x2="165" y2="48" stroke="#ff3b3b" strokeWidth="2.5" markerEnd="url(#arEntS)"/>
 
-                {/* Prix part vers le haut après le mardi, puis redescend */}
-                <line x1="30" y1="70" x2="30" y2="95" stroke="#888" strokeWidth="1"/>
-                <rect x="26" y="75" width="8" height="15" fill="#888"/>
-                <line x1="48" y1="55" x2="48" y2="85" stroke="#888" strokeWidth="1"/>
-                <rect x="44" y="60" width="8" height="20" fill="#888"/>
-                <line x1="66" y1="45" x2="66" y2="78" stroke="#888" strokeWidth="1"/>
-                <rect x="62" y="50" width="8" height="22" fill="#888"/>
-                <line x1="84" y1="55" x2="84" y2="85" stroke="#888" strokeWidth="1"/>
-                <rect x="80" y="60" width="8" height="20" fill="#888"/>
+                {/* Label zone */}
+                <text x="10" y="60" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">ZONE LF (prix du mardi COT) = OFFRE</text>
+                {/* ZONE COT/offre (violet, horizontale) */}
+                <rect x="10" y="62" width="320" height="24" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
 
-                {/* Prix revient tester la zone "cette semaine" par le haut */}
-                <line x1="120" y1="55" x2="120" y2="85" stroke="#f87171" strokeWidth="1"/>
-                <rect x="116" y="60" width="8" height="22" fill="#f87171"/>
-                <line x1="138" y1="62" x2="138" y2="90" stroke="#f87171" strokeWidth="1"/>
-                <rect x="134" y="66" width="8" height="20" fill="#f87171"/>
+                {/* 1. Bougies du mardi DANS la zone (où LF ont vendu) */}
+                <line x1="35" y1="60" x2="35" y2="86" stroke="#f87171" strokeWidth="1"/>
+                <rect x="31" y="64" width="8" height="16" fill="#f87171"/>
+                <line x1="52" y1="64" x2="52" y2="88" stroke="#f87171" strokeWidth="1"/>
+                <rect x="48" y="68" width="8" height="16" fill="#f87171"/>
 
-                {/* Annotation "cette semaine" */}
-                <text x="150" y="40" fill="#f87171" fontSize="9" fontFamily="monospace" fontWeight="700">CETTE SEMAINE</text>
-                <line x1="150" y1="45" x2="140" y2="62" stroke="#f87171" strokeWidth="1"/>
+                {/* 2. Prix DESCEND et s'éloigne en dessous */}
+                <line x1="72" y1="78" x2="72" y2="102" stroke="#f87171" strokeWidth="1"/>
+                <rect x="68" y="80" width="8" height="18" fill="#f87171"/>
+                <line x1="90" y1="98" x2="90" y2="126" stroke="#f87171" strokeWidth="1"/>
+                <rect x="86" y="100" width="8" height="24" fill="#f87171"/>
+                <line x1="108" y1="120" x2="108" y2="144" stroke="#f87171" strokeWidth="1"/>
+                <rect x="104" y="122" width="8" height="20" fill="#f87171"/>
 
-                {/* LF défendent → impulsion vers le bas */}
-                <line x1="160" y1="88" x2="160" y2="112" stroke="#f87171" strokeWidth="1"/>
-                <rect x="156" y="90" width="8" height="20" fill="#f87171"/>
-                <line x1="180" y1="108" x2="180" y2="145" stroke="#f87171" strokeWidth="1"/>
-                <rect x="176" y="110" width="8" height="33" fill="#f87171"/>
-                <line x1="200" y1="140" x2="200" y2="178" stroke="#f87171" strokeWidth="1"/>
-                <rect x="196" y="142" width="8" height="33" fill="#f87171"/>
-                <line x1="220" y1="170" x2="220" y2="198" stroke="#f87171" strokeWidth="1"/>
-                <rect x="216" y="172" width="8" height="25" fill="#f87171"/>
+                {/* 3. Prix REMONTE tester la zone (cette semaine) */}
+                <line x1="128" y1="118" x2="128" y2="142" stroke="#888" strokeWidth="1"/>
+                <rect x="124" y="120" width="8" height="20" fill="#888"/>
+                <line x1="146" y1="92" x2="146" y2="122" stroke="#888" strokeWidth="1"/>
+                <rect x="142" y="96" width="8" height="24" fill="#888"/>
 
-                {/* Flèche LF défendent */}
-                <line x1="145" y1="90" x2="225" y2="185" stroke="#f87171" strokeWidth="2" strokeDasharray="3,2" markerEnd="url(#arGS)"/>
-                <text x="235" y="140" fill="#f87171" fontSize="8" fontFamily="monospace" fontWeight="700">LF</text>
-                <text x="235" y="152" fill="#f87171" fontSize="8" fontFamily="monospace" fontWeight="700">DÉFENDENT</text>
+                {/* "CETTE SEMAINE" en bas, flèche vers la bougie de retest */}
+                <text x="158" y="160" fill="#fbbf24" fontSize="9" fontFamily="monospace" fontWeight="700">CETTE SEMAINE</text>
+                <line x1="170" y1="155" x2="165" y2="90" stroke="#fbbf24" strokeWidth="1" strokeDasharray="2,2"/>
 
-                {/* ENTRY SHORT dans la zone */}
-                <line x1="130" y1="25" x2="130" y2="55" stroke="#ff3b3b" strokeWidth="2" markerEnd="url(#arEntS)"/>
-                <text x="130" y="18" fill="#ff3b3b" fontSize="9" fontFamily="monospace" fontWeight="700" textAnchor="middle">ENTRY SHORT</text>
+                {/* 4. Bougie de RETEST dans la zone avec MÈCHE DE REJET (LF défendent) */}
+                <line x1="165" y1="52" x2="165" y2="90" stroke="#f87171" strokeWidth="1.5"/>
+                <rect x="160" y="68" width="10" height="20" fill="#f87171"/>
+                <text x="180" y="48" fill="#f87171" fontSize="7" fontFamily="monospace">mèche rejet = LF défendent</text>
+
+                {/* 5. Prix repart en BAS */}
+                <line x1="188" y1="88" x2="188" y2="116" stroke="#f87171" strokeWidth="1"/>
+                <rect x="184" y="90" width="8" height="26" fill="#f87171"/>
+                <line x1="206" y1="114" x2="206" y2="142" stroke="#f87171" strokeWidth="1"/>
+                <rect x="202" y="116" width="8" height="26" fill="#f87171"/>
+                <line x1="224" y1="140" x2="224" y2="170" stroke="#f87171" strokeWidth="1"/>
+                <rect x="220" y="142" width="8" height="26" fill="#f87171"/>
+                <line x1="242" y1="166" x2="242" y2="194" stroke="#f87171" strokeWidth="1"/>
+                <rect x="238" y="168" width="8" height="24" fill="#f87171"/>
+
+                {/* Flèche descente */}
+                <line x1="175" y1="80" x2="248" y2="180" stroke="#f87171" strokeWidth="2" strokeDasharray="3,2" markerEnd="url(#arGS)"/>
 
                 <defs>
                   <marker id="arGS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#f87171"/></marker>
