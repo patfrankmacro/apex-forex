@@ -3018,6 +3018,35 @@ export default function App() {
             );
           })()}
 
+          {/* ========== LEVERAGED FUNDS — QUI SONT-ILS ? ========== */}
+          <div style={{marginTop:24, padding:"14px", background:"#0a1628", border:"1px solid #1e3a5f", borderRadius:8}}>
+            <div style={{fontSize:12, color:"#f59e0b", fontWeight:700, letterSpacing:1, marginBottom:10}}>💼 LEVERAGED FUNDS — QUI SONT-ILS ?</div>
+            <div style={{fontSize:10, color:TEXT, lineHeight:1.7, marginBottom:12}}>
+              Hedge funds, CTAs, fonds spéculatifs à effet de levier. Ils tradent avec un horizon <b>swing/court terme</b> — le même que nous. Contrairement aux banques centrales (hedgers) ou aux Asset Managers (long terme), leurs mouvements reflètent la <b>spéculation pure</b> sur les données macro de la semaine.
+            </div>
+            <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:6}}>🎯 POURQUOI LES SUIVRE ?</div>
+            <div style={{fontSize:10, color:TEXT_DIM, lineHeight:1.7, marginBottom:12}}>
+              • <b>Même horizon</b> que swing trader (1-4 semaines)<br/>
+              • Ajustent positions <b>chaque semaine</b> selon CPI, PMI, taux directeurs<br/>
+              • <b>Action concrète</b> (pas paroles) — ils risquent leur argent réel<br/>
+              • Signal <b>frais hebdomadaire</b> — rapport CFTC publié chaque vendredi
+            </div>
+            <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:6}}>📊 COMMENT ILS TRADENT ?</div>
+            <div style={{fontSize:10, color:TEXT_DIM, lineHeight:1.7, marginBottom:12}}>
+              • Analysent CPI, Core Inflation, PMI Services, Unemployment<br/>
+              • Anticipent décisions banques centrales (hausse/baisse taux)<br/>
+              • Ajustent positions Long/Short chaque mardi (snapshot CFTC)<br/>
+              • Bougent les prix par leurs flux massifs sur futures
+            </div>
+            <div style={{fontSize:11, color:"#a78bfa", fontWeight:700, marginBottom:6}}>⚡ NOTRE STRATÉGIE</div>
+            <div style={{fontSize:10, color:TEXT_DIM, lineHeight:1.7}}>
+              <b>1.</b> On lit le changement hebdomadaire (chgLong / chgShort) — pas le total<br/>
+              <b>2.</b> On compare la <b>force relative</b> entre 2 devises (Nino)<br/>
+              <b>3.</b> Si une devise a un <span style={{ background:"#14532d", color:"#4ade80", padding:"1px 6px", borderRadius:3, fontSize:9 }}>🔥 SWITCH</span> = les Leveraged Funds ont <b>renversé leur direction</b> cette semaine (ex: étaient short, deviennent long fort). C'est le signal le plus puissant selon Nino — un retournement institutionnel majeur<br/>
+              <b>4.</b> Retail contrarian 70%+ aligné = validation finale
+            </div>
+          </div>
+
           {/* ========== LES 4 RÉGIMES (aide-mémoire) ========== */}
           <div style={{marginTop:24, padding:"14px", background:"#0a1628", border:"1px solid #a855f744", borderRadius:8}}>
             <div style={{fontSize:11, color:"#a855f7", fontWeight:700, letterSpacing:2, marginBottom:4}}>🎯 LES 4 RÉGIMES — AIDE-MÉMOIRE</div>
