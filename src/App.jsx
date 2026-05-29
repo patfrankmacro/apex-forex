@@ -2586,7 +2586,7 @@ export default function App() {
     const loadCOT = async () => {
       const res = await Promise.all(COT_CODES.map(async code => {
         try {
-          const url = "https://publicreporting.cftc.gov/resource/gpe5-46if.json?cftc_contract_market_code="+code+"&$order=report_date_as_yyyy_mm_dd DESC&$limit=55&t="+Date.now();
+          const url = "https://publicreporting.cftc.gov/resource/gpe5-46if.json?cftc_contract_market_code="+code+"&$order=report_date_as_yyyy_mm_dd DESC&$limit=55";
           const rows = await (await fetch(url, {cache:"no-store"})).json();
           if (!rows?.length) return [code, null];
           const row=rows[0];
