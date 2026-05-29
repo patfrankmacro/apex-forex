@@ -3168,13 +3168,18 @@ export default function App() {
 
           {/* ========== STRATEGIE TECHNIQUE — ZONES INSTITUTIONNELLES ========== */}
           <div style={{marginTop:24, padding:"14px 14px 16px", background:"#0a1628", border:"1px solid #1e3a5f", borderRadius:8}}>
-            <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, letterSpacing:2, marginBottom:4}}>📈 STRATÉGIE TECHNIQUE — ZONE DU DERNIER COT</div>
-            <div style={{fontSize:9, color:"#475569", marginBottom:14}}>Niveau de prix du MARDI snapshot COT · Timeframe H4 (timeframe des Leveraged Funds)</div>
+            <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, letterSpacing:2, marginBottom:4}}>📈 STRATÉGIE TECHNIQUE — SUIVRE LES LEVERAGED FUNDS</div>
+            <div style={{fontSize:9, color:"#475569", marginBottom:14}}>Entrer au même prix que les LF, au retest de leur zone · Timeframe H4</div>
 
             <div style={{fontSize:9, color:TEXT, lineHeight:1.7, marginBottom:14, padding:"10px 12px", background:"#001a2e", borderRadius:4, borderLeft:"3px solid #38bdf8"}}>
-              <b style={{color:"#38bdf8"}}>🎯 LE CONCEPT</b><br/>
-              Le rapport COT sort le <b>vendredi</b> mais montre les positions du <b>MARDI précédent</b> (décalage de 3 jours). Le <b>niveau de prix de ce mardi</b> = là où les Leveraged Funds se sont positionnés. C'est leur <b>zone d'entrée</b>.<br/><br/>
-              Quand le prix <b>revient tester cette zone cette semaine</b>, les LF <b>défendent et rajoutent</b> à leur position → le prix repart dans leur sens. On entre <b>AVEC eux</b> au retest.
+              <b style={{color:"#38bdf8"}}>🎯 LA LOGIQUE</b><br/>
+              Le COT du <b>vendredi</b> révèle où les LF se sont positionnés le <b>MARDI</b>. Le prix de ce mardi = leur <b>prix d'entrée moyen</b>.<br/><br/>
+              <b>Pourquoi ça compte :</b> un fonds ne place pas des milliards en une seule fois. Il construit sa position sur plusieurs jours autour d'un même niveau. Ce niveau devient <b>SA zone</b> — il a trop d'argent engagé pour la laisser tomber.<br/><br/>
+              <b>Quand le prix y revient cette semaine :</b><br/>
+              → les LF qui veulent <b>ajouter</b> le font ici (même bon prix)<br/>
+              → ceux déjà engagés <b>défendent</b> (refusent d'être en perte)<br/>
+              → afflux d'ordres dans leur sens = <b>le prix rejette</b><br/><br/>
+              <span style={{color:"#fbbf24"}}>On entre AU MÊME PRIX qu'eux, AVEC eux — pas après.</span>
             </div>
 
             {/* === SCHEMA LONG (zone COT mardi, comme NZDCAD) === */}
@@ -3232,11 +3237,11 @@ export default function App() {
               </svg>
 
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.7, marginTop:8}}>
-                <b style={{color:"#4ade80"}}>1.</b> TABLEAU dit "LF achètent (chgNet positif)" → biais LONG<br/>
-                <b style={{color:"#4ade80"}}>2.</b> En <b>H4</b>, marque le niveau de prix du <b>MARDI</b> (jour du snapshot COT) = zone violette<br/>
-                <b style={{color:"#4ade80"}}>3.</b> Le COT sort vendredi → tu connais la zone en début de semaine<br/>
-                <b style={{color:"#4ade80"}}>4.</b> Attends que le prix <b>revienne tester la zone cette semaine</b><br/>
-                <b style={{color:"#4ade80"}}>5.</b> Les LF <b>défendent leurs longs</b> (bougies de rejet) → <b>Entry LONG</b> + stop sous la zone + target 2:1
+                <b style={{color:"#4ade80"}}>①</b> TABLEAU dit "LF achètent" (chgNet positif) → biais LONG<br/>
+                <b style={{color:"#4ade80"}}>②</b> En <b>H4</b>, zone violette = prix du <b>MARDI</b> (COT) = "ici les LF ont acheté"<br/>
+                <b style={{color:"#4ade80"}}>③</b> Le prix s'éloigne, puis <b>REVIENT dans la zone</b> cette semaine = même prix qu'eux<br/>
+                <b style={{color:"#4ade80"}}>④</b> <b>Mèches de rejet</b> dans la zone = footprint des LF qui défendent/ajoutent<br/>
+                <b style={{color:"#4ade80"}}>⑤</b> <b>Entry LONG</b> sur la bougie de confirmation · stop sous la zone · target = haut précédent (2:1)
               </div>
             </div>
 
@@ -3295,11 +3300,11 @@ export default function App() {
               </svg>
 
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.7, marginTop:8}}>
-                <b style={{color:"#f87171"}}>1.</b> TABLEAU dit "LF vendent (chgNet négatif)" → biais SHORT<br/>
-                <b style={{color:"#f87171"}}>2.</b> En <b>H4</b>, marque le niveau de prix du <b>MARDI</b> (jour du snapshot COT) = zone violette<br/>
-                <b style={{color:"#f87171"}}>3.</b> Le COT sort vendredi → tu connais la zone en début de semaine<br/>
-                <b style={{color:"#f87171"}}>4.</b> Attends que le prix <b>remonte tester la zone cette semaine</b><br/>
-                <b style={{color:"#f87171"}}>5.</b> Les LF <b>reprennent leurs shorts</b> (bougies de rejet) → <b>Entry SHORT</b> + stop au-dessus + target 2:1
+                <b style={{color:"#f87171"}}>①</b> TABLEAU dit "LF vendent" (chgNet négatif) → biais SHORT<br/>
+                <b style={{color:"#f87171"}}>②</b> En <b>H4</b>, zone violette = prix du <b>MARDI</b> (COT) = "ici les LF ont vendu"<br/>
+                <b style={{color:"#f87171"}}>③</b> Le prix s'éloigne, puis <b>REMONTE dans la zone</b> cette semaine = même prix qu'eux<br/>
+                <b style={{color:"#f87171"}}>④</b> <b>Mèches de rejet</b> dans la zone = footprint des LF qui défendent/ajoutent<br/>
+                <b style={{color:"#f87171"}}>⑤</b> <b>Entry SHORT</b> sur la bougie de confirmation · stop au-dessus · target = bas précédent (2:1)
               </div>
             </div>
 
@@ -3311,13 +3316,16 @@ export default function App() {
 
             {/* === RÈGLES IMPORTANTES === */}
             <div style={{marginTop:8, padding:"8px 10px", background:"#001a0d", borderRadius:4, fontSize:8, color:"#4ade80", lineHeight:1.7}}>
-              <b>⚠ RÈGLES IMPORTANTES</b><br/>
-              ✓ Timeframe <b>H4</b> — le vrai timeframe des Leveraged Funds (jamais sous H1)<br/>
-              ✓ Zone = niveau de prix du <b>MARDI</b> du dernier COT (le COT sort vendredi, données du mardi)<br/>
-              ✓ <b>Stop SOUS la zone</b> (LONG) ou <b>AU-DESSUS</b> (SHORT) — jamais au milieu<br/>
-              ✓ <b>Patience</b> : attendre le retest cette semaine, ne jamais chasser le prix<br/>
-              ✓ Chercher le <b>footprint des LF</b> : bougies de rejet/mèches dans la zone = ils défendent<br/>
-              ✓ Confirmer avec contexte <b>APEX 3/3</b> ou <b>NINO PUR</b> du tableau ci-dessus
+              <b>⚠ RÈGLES & CONFIRMATION</b><br/>
+              ✓ <b>H4</b> = timeframe des Leveraged Funds (jamais sous H1)<br/>
+              ✓ Zone = prix du <b>MARDI</b> (le COT sort vendredi, données du mardi)<br/>
+              ✓ <b>NE PAS entrer au 1er contact</b> — attendre la CONFIRMATION :<br/>
+              &nbsp;&nbsp;&nbsp;• mèche de rejet dans la zone<br/>
+              &nbsp;&nbsp;&nbsp;• ou bougie englobante dans ton sens<br/>
+              &nbsp;&nbsp;&nbsp;• = le footprint des LF qui défendent<br/>
+              ✓ <b>Stop</b> juste de l'autre côté de la zone · <b>target 2:1</b> min (extrême précédent)<br/>
+              ✗ <span style={{color:"#f87171"}}>Si le prix <b>TRAVERSE la zone franchement</b> = les LF ont lâché → PAS de trade (signal invalidé)</span><br/>
+              ✓ Confirmer avec <b>APEX 3/3</b> ou <b>NINO PUR</b> du tableau ci-dessus
             </div>
           </div>
 
