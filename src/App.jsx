@@ -3203,26 +3203,28 @@ export default function App() {
           {/* ========== STRATEGIE TECHNIQUE — ZONES INSTITUTIONNELLES ========== */}
           <div style={{marginTop:24, padding:"14px 14px 16px", background:"#0a1628", border:"1px solid #1e3a5f", borderRadius:8}}>
             <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, letterSpacing:2, marginBottom:4}}>📈 STRATÉGIE TECHNIQUE — SUIVRE LES LEVERAGED FUNDS</div>
-            <div style={{fontSize:9, color:"#475569", marginBottom:14}}>Entrer au même prix que les LF, au retest de leur zone · Timeframe H4</div>
+            <div style={{fontSize:9, color:"#475569", marginBottom:14}}>Entrer au même prix que les Leveraged Funds, au retest de leur zone · Timeframe H4</div>
 
-            <div style={{fontSize:9, color:TEXT, lineHeight:1.7, marginBottom:14, padding:"10px 12px", background:"#001a2e", borderRadius:4, borderLeft:"3px solid #38bdf8"}}>
-              <b style={{color:"#38bdf8"}}>🎯 LA LOGIQUE</b><br/>
-              Le COT du <b>vendredi</b> révèle où les LF se sont positionnés le <b>MARDI</b>. Le prix de ce mardi = leur <b>prix d'entrée moyen</b>.<br/><br/>
-              <b>Pourquoi ça compte :</b> un fonds ne place pas des milliards en une seule fois. Il construit sa position sur plusieurs jours autour d'un même niveau. Ce niveau devient <b>SA zone</b> — il a trop d'argent engagé pour la laisser tomber.<br/><br/>
-              <b>Quand le prix y revient cette semaine :</b><br/>
-              → les LF qui veulent <b>ajouter</b> le font ici (même bon prix)<br/>
-              → ceux déjà engagés <b>défendent</b> (refusent d'être en perte)<br/>
-              → afflux d'ordres dans leur sens = <b>le prix rejette</b><br/><br/>
-              <span style={{color:"#fbbf24"}}>On entre AU MÊME PRIX qu'eux, AVEC eux — pas après.</span>
+            <div style={{fontSize:9, color:TEXT, lineHeight:1.8, marginBottom:14, padding:"12px 14px", background:"#001a2e", borderRadius:4, borderLeft:"3px solid #38bdf8"}}>
+              <b style={{color:"#38bdf8"}}>🎯 LA LOGIQUE — PENSE COMME UN LEVERAGED FUND</b><br/><br/>
+              Imagine que tu gères <b>2 milliards de dollars</b>. Tu ne peux pas acheter d'un coup — le marché bougerait contre toi. Alors tu <b>construis ta position sur plusieurs jours</b>, autour d'un niveau précis. Ce niveau, c'est <b>ton prix moyen d'entrée</b>.<br/><br/>
+              Le rapport CFTC sort chaque <b>vendredi</b> et capture exactement ça : où les Leveraged Funds se sont positionnés le <b>mardi</b>. Ce prix du mardi = <b>leur zone</b>.<br/><br/>
+              <b>Maintenant imagine que le prix revient sur ta zone cette semaine :</b><br/>
+              → Tu as 2 milliards engagés à ce niveau. <b>Tu ne peux pas te permettre d'être en perte.</b><br/>
+              → Alors tu <b>rachètes / rajoutes</b> pour défendre ton prix moyen<br/>
+              → Tes collègues fonds voient la même zone sur leurs charts — <b>ils font pareil</b><br/>
+              → Cette concentration d'ordres institutionnels <b>repousse le prix</b><br/><br/>
+              <b style={{color:"#a78bfa"}}>Le niveau du mardi COT = zone où des milliards sont engagés = zone de demande/offre institutionnelle.</b><br/><br/>
+              <span style={{color:"#fbbf24"}}>Tu n'entres pas "après" les Leveraged Funds. Tu entres AU MÊME PRIX qu'eux, AVEC eux, au retest de leur zone.</span>
             </div>
 
             {/* === SCHEMA LONG (zone COT mardi, comme NZDCAD) === */}
             <div style={{marginBottom:14, padding:"12px", background:"#001a0d", borderRadius:6, border:"1px solid #4ade8044"}}>
-              <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8}}>▲ LF ACHÈTENT → ZONE LONG DU DERNIER COT</div>
+              <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8}}>▲ LEVERAGED FUNDS ACHÈTENT → ZONE LONG DU DERNIER COT</div>
 
               <svg viewBox="0 0 340 230" style={{width:"100%", maxWidth:360, display:"block", margin:"0 auto 8px"}}>
                 {/* Label zone au-dessus (ne chevauche pas) */}
-                <text x="10" y="148" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">ZONE LF (prix du mardi COT) = DEMANDE</text>
+                <text x="10" y="148" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">ZONE (prix du mardi COT) = DEMANDE INSTITUTIONNELLE</text>
                 {/* ZONE COT/demande (violet, horizontale) */}
                 <rect x="10" y="150" width="320" height="24" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
 
@@ -3253,7 +3255,7 @@ export default function App() {
                 {/* 4. Bougie de RETEST dans la zone avec MÈCHE DE REJET (LF défendent) */}
                 <line x1="165" y1="148" x2="165" y2="185" stroke="#4ade80" strokeWidth="1.5"/>
                 <rect x="160" y="150" width="10" height="20" fill="#4ade80"/>
-                <text x="180" y="200" fill="#4ade80" fontSize="7" fontFamily="monospace">mèche rejet = LF défendent</text>
+                <text x="180" y="200" fill="#4ade80" fontSize="7" fontFamily="monospace">mèche rejet = Leveraged Funds défendent</text>
 
                 {/* 5. Prix repart en HAUT */}
                 <line x1="188" y1="120" x2="188" y2="150" stroke="#4ade80" strokeWidth="1"/>
@@ -3279,17 +3281,17 @@ export default function App() {
               </svg>
 
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.7, marginTop:8}}>
-                <b style={{color:"#4ade80"}}>①</b> TABLEAU dit "LF achètent" (chgNet positif) → biais LONG<br/>
-                <b style={{color:"#4ade80"}}>②</b> En <b>H4</b>, zone violette = prix du <b>MARDI</b> (COT) = "ici les LF ont acheté"<br/>
+                <b style={{color:"#4ade80"}}>①</b> TABLEAU dit "Leveraged Funds achètent" (chgNet positif) → biais LONG<br/>
+                <b style={{color:"#4ade80"}}>②</b> En <b>H4</b>, zone violette = prix du <b>MARDI</b> (COT) = "ici les Leveraged Funds ont acheté"<br/>
                 <b style={{color:"#4ade80"}}>③</b> Le prix s'éloigne, puis <b>REVIENT dans la zone</b> cette semaine = même prix qu'eux<br/>
-                <b style={{color:"#4ade80"}}>④</b> <b>Mèches de rejet</b> dans la zone = footprint des LF qui défendent/ajoutent<br/>
+                <b style={{color:"#4ade80"}}>④</b> <b>Mèches de rejet</b> dans la zone = footprint des Leveraged Funds qui défendent/ajoutent<br/>
                 <b style={{color:"#4ade80"}}>⑤</b> <b>Entry LONG</b> sur la bougie de confirmation · stop sous la zone · target = haut précédent (2:1)
               </div>
             </div>
 
             {/* === SCHEMA SHORT === */}
             <div style={{marginBottom:14, padding:"12px", background:"#1a0000", borderRadius:6, border:"1px solid #f8717144"}}>
-              <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:8}}>▼ LF VENDENT → ZONE SHORT DU DERNIER COT</div>
+              <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:8}}>▼ LEVERAGED FUNDS VENDENT → ZONE SHORT DU DERNIER COT</div>
 
               <svg viewBox="0 0 340 230" style={{width:"100%", maxWidth:360, display:"block", margin:"0 auto 8px"}}>
                 {/* ENTRY SHORT en haut (au contact de la zone) */}
@@ -3297,7 +3299,7 @@ export default function App() {
                 <line x1="165" y1="22" x2="165" y2="48" stroke="#ff3b3b" strokeWidth="2.5" markerEnd="url(#arEntS)"/>
 
                 {/* Label zone */}
-                <text x="10" y="60" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">ZONE LF (prix du mardi COT) = OFFRE</text>
+                <text x="10" y="60" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">ZONE (prix du mardi COT) = OFFRE INSTITUTIONNELLE</text>
                 {/* ZONE COT/offre (violet, horizontale) */}
                 <rect x="10" y="62" width="320" height="24" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
 
@@ -3328,7 +3330,7 @@ export default function App() {
                 {/* 4. Bougie de RETEST dans la zone avec MÈCHE DE REJET (LF défendent) */}
                 <line x1="165" y1="52" x2="165" y2="90" stroke="#f87171" strokeWidth="1.5"/>
                 <rect x="160" y="68" width="10" height="20" fill="#f87171"/>
-                <text x="180" y="48" fill="#f87171" fontSize="7" fontFamily="monospace">mèche rejet = LF défendent</text>
+                <text x="180" y="48" fill="#f87171" fontSize="7" fontFamily="monospace">mèche rejet = Leveraged Funds défendent</text>
 
                 {/* 5. Prix repart en BAS */}
                 <line x1="188" y1="88" x2="188" y2="116" stroke="#f87171" strokeWidth="1"/>
@@ -3350,10 +3352,10 @@ export default function App() {
               </svg>
 
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.7, marginTop:8}}>
-                <b style={{color:"#f87171"}}>①</b> TABLEAU dit "LF vendent" (chgNet négatif) → biais SHORT<br/>
-                <b style={{color:"#f87171"}}>②</b> En <b>H4</b>, zone violette = prix du <b>MARDI</b> (COT) = "ici les LF ont vendu"<br/>
+                <b style={{color:"#f87171"}}>①</b> TABLEAU dit "Leveraged Funds vendent" (chgNet négatif) → biais SHORT<br/>
+                <b style={{color:"#f87171"}}>②</b> En <b>H4</b>, zone violette = prix du <b>MARDI</b> (COT) = "ici les Leveraged Funds ont vendu"<br/>
                 <b style={{color:"#f87171"}}>③</b> Le prix s'éloigne, puis <b>REMONTE dans la zone</b> cette semaine = même prix qu'eux<br/>
-                <b style={{color:"#f87171"}}>④</b> <b>Mèches de rejet</b> dans la zone = footprint des LF qui défendent/ajoutent<br/>
+                <b style={{color:"#f87171"}}>④</b> <b>Mèches de rejet</b> dans la zone = footprint des Leveraged Funds qui défendent/ajoutent<br/>
                 <b style={{color:"#f87171"}}>⑤</b> <b>Entry SHORT</b> sur la bougie de confirmation · stop au-dessus · target = bas précédent (2:1)
               </div>
             </div>
