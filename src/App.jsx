@@ -2572,11 +2572,11 @@ function JournalView() {
 
 
 function PositionCalc() {
-  const [capital, setCapital] = React.useState("");
-  const [risque, setRisque] = React.useState("1");
-  const [paire, setPaire] = React.useState("GBPNZD");
-  const [entree, setEntree] = React.useState("");
-  const [stop, setStop] = React.useState("");
+  const [capital, setCapital] = useState("");
+  const [risque, setRisque] = useState("1");
+  const [paire, setPaire] = useState("GBPNZD");
+  const [entree, setEntree] = useState("");
+  const [stop, setStop] = useState("");
 
   const PAIRES = ["EURNZD","EURCHF","NZDJPY","CHFJPY","GBPNZD","AUDNZD","EURUSD","GBPUSD","USDCAD","USDJPY","AUDUSD","NZDUSD","EURJPY","GBPJPY","AUDJPY","CADJPY","EURCAD","GBPCAD","EURGBP","EURAUD","GBPAUD","NZDCAD","AUDCAD","AUDNZD","USDCHF","NZDCHF","CADCHF","AUDCHF","GBPCHF"];
 
