@@ -3001,7 +3001,7 @@ export default function App() {
                           })()}
                         </div>
                         <div style={{fontSize:8, color:TEXT_DIM, marginBottom:4}}>
-                          <span style={{color:"#4ade80"}}>COT:</span>{" "}
+                          <span style={{color:"#4ade80"}}>Leveraged Funds:</span>{" "}
                           {(() => {
                             const baseSide = o.forte.code === o.base ? o.forte : o.faible;
                             const quoteSide = o.forte.code === o.quote ? o.forte : o.faible;
