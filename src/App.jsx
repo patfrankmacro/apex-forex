@@ -2571,6 +2571,114 @@ function JournalView() {
 
 
 
+function PositionCalc() {
+  const [capital, setCapital] = React.useState("");
+  const [risque, setRisque] = React.useState("1");
+  const [paire, setPaire] = React.useState("GBPNZD");
+  const [entree, setEntree] = React.useState("");
+  const [stop, setStop] = React.useState("");
+
+  const PAIRES = ["EURNZD","EURCHF","NZDJPY","CHFJPY","GBPNZD","AUDNZD","EURUSD","GBPUSD","USDCAD","USDJPY","AUDUSD","NZDUSD","EURJPY","GBPJPY","AUDJPY","CADJPY","EURCAD","GBPCAD","EURGBP","EURAUD","GBPAUD","NZDCAD","AUDCAD","AUDNZD","USDCHF","NZDCHF","CADCHF","AUDCHF","GBPCHF"];
+
+  const cap = parseFloat(capital)||0;
+  const rsk = parseFloat(risque)||0;
+  const ent = parseFloat(entree)||0;
+  const stp = parseFloat(stop)||0;
+
+  // Calcul
+  const isJPY = paire.endsWith("JPY");
+  const pipSize = isJPY ? 0.01 : 0.0001;
+  const stopPips = ent && stp ? Math.abs(ent - stp) / pipSize : 0;
+  const riskAmount = cap * rsk / 100;
+
+  // Valeur du pip pour 1 lot standard (100k) en devise QUOTE
+  // Puis conversion en USD selon la paire
+  const quote = paire.slice(3,6);
+  // Valeur pip par lot standard en devise quote = pipSize * 100000
+  const pipValueQuote = pipSize * 100000; // ex: 0.0001*100000 = 10 (quote units)
+
+  // Conversion quote -> USD (approximation avec prix d'entrée quand quote n'est pas USD)
+  // Pour paires XXXUSD: pip vaut deja ~10 USD
+  // Pour USDXXX: diviser par prix
+  // Pour cross: approximation
+  let pipValueUSD = 10; // defaut
+  if (quote === "USD") {
+    pipValueUSD = pipValueQuote; // ~10 USD
+  } else if (paire.startsWith("USD")) {
+    pipValueUSD = ent ? pipValueQuote / ent : 10;
+  } else {
+    // cross: pip en quote, convertir quote->USD
+    // approximation: si quote=JPY ~0.0067, CAD ~0.73, CHF ~1.1, NZD ~0.6, AUD ~0.65, GBP ~1.27, EUR ~1.08
+    const quoteToUSD = {JPY:0.0067, CAD:0.73, CHF:1.12, NZD:0.60, AUD:0.65, GBP:1.27, EUR:1.08, USD:1};
+    pipValueUSD = pipValueQuote * (quoteToUSD[quote]||1);
+  }
+
+  const lots = stopPips > 0 && pipValueUSD > 0 ? riskAmount / (stopPips * pipValueUSD) : 0;
+  const direction = ent && stp ? (stp < ent ? "LONG" : "SHORT") : "";
+
+  const inputStyle = {width:"100%", padding:"10px 12px", fontSize:14, background:"#0a1628", border:"1px solid #1e3a5f", borderRadius:6, color:"#c8d4f0", marginTop:4, boxSizing:"border-box", fontFamily:"monospace"};
+  const labelStyle = {fontSize:11, color:"#94a3b8", fontWeight:600, letterSpacing:0.5};
+
+  return (
+    <div style={{maxWidth:520, margin:"0 auto", padding:"4px 0"}}>
+      <div style={{fontSize:13, color:"#38bdf8", fontWeight:700, letterSpacing:2, marginBottom:4}}>🧮 CALCULATRICE DE POSITION</div>
+      <div style={{fontSize:10, color:"#475569", marginBottom:16}}>Compte USD · Calcule le nombre de lots pour risquer un % fixe de ton capital</div>
+
+      <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:12}}>
+        <div>
+          <div style={labelStyle}>CAPITAL ($ USD)</div>
+          <input style={inputStyle} type="number" inputMode="decimal" placeholder="10000" value={capital} onChange={e=>setCapital(e.target.value)}/>
+        </div>
+        <div>
+          <div style={labelStyle}>RISQUE (%)</div>
+          <input style={inputStyle} type="number" inputMode="decimal" placeholder="1" value={risque} onChange={e=>setRisque(e.target.value)}/>
+        </div>
+      </div>
+
+      <div style={{marginBottom:12}}>
+        <div style={labelStyle}>PAIRE</div>
+        <select style={inputStyle} value={paire} onChange={e=>setPaire(e.target.value)}>
+          {PAIRES.filter((p,i,a)=>a.indexOf(p)===i).map(p=><option key={p} value={p}>{p.slice(0,3)}/{p.slice(3,6)}</option>)}
+        </select>
+      </div>
+
+      <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:16}}>
+        <div>
+          <div style={labelStyle}>PRIX D'ENTRÉE</div>
+          <input style={inputStyle} type="number" inputMode="decimal" placeholder="2.2800" value={entree} onChange={e=>setEntree(e.target.value)}/>
+        </div>
+        <div>
+          <div style={labelStyle}>PRIX DU STOP</div>
+          <input style={inputStyle} type="number" inputMode="decimal" placeholder="2.2900" value={stop} onChange={e=>setStop(e.target.value)}/>
+        </div>
+      </div>
+
+      {lots > 0 ? (
+        <div style={{padding:"16px", background:"#001a0d", border:"1px solid #14532d", borderRadius:8}}>
+          <div style={{display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:10}}>
+            <span style={{fontSize:11, color:"#94a3b8"}}>POSITION À PRENDRE {direction && <span style={{color:direction==="LONG"?"#4ade80":"#f87171", fontWeight:700}}>· {direction}</span>}</span>
+          </div>
+          <div style={{fontSize:32, color:"#4ade80", fontWeight:700, fontFamily:"monospace", lineHeight:1}}>{lots.toFixed(2)} <span style={{fontSize:14, color:"#94a3b8"}}>lots</span></div>
+          <div style={{marginTop:14, paddingTop:14, borderTop:"1px solid #14532d", display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, fontSize:11, color:"#c8d4f0", fontFamily:"monospace"}}>
+            <div>Risque $ : <b style={{color:"#fbbf24"}}>{riskAmount.toFixed(2)} $</b></div>
+            <div>Stop : <b>{stopPips.toFixed(1)} pips</b></div>
+            <div>Valeur pip : <b>{pipValueUSD.toFixed(2)} $/lot</b></div>
+            <div>Unités : <b>{(lots*100000).toLocaleString()}</b></div>
+          </div>
+        </div>
+      ) : (
+        <div style={{padding:"16px", background:"#0a1628", border:"1px solid #1e3a5f", borderRadius:8, textAlign:"center", fontSize:11, color:"#475569"}}>
+          Remplis capital, risque, entrée et stop pour voir le nombre de lots
+        </div>
+      )}
+
+      <div style={{marginTop:14, fontSize:8, color:"#475569", lineHeight:1.6}}>
+        ⚠ Les valeurs de pip pour les cross et paires JPY sont approximatives (basées sur des taux de conversion moyens). Vérifie toujours avec ton broker avant d'exécuter. La calculatrice suppose 1 lot standard = 100 000 unités.
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [data, setData] = useState(mkData());
   const [view, setView] = useState("table");
@@ -2770,6 +2878,7 @@ export default function App() {
   const TABS = [
     {id:"table",label:"TABLEAU"},{id:"rank",label:"RANG"},
     {id:"regimes",label:"RÉGIMES"},{id:"analyse",label:"ANALYSE"},{id:"journal",label:"JOURNAL"},
+    {id:"calc",label:"CALCUL"},
     {id:"data",label:"DONNÉES ↗"},{id:"guide",label:"GUIDE"},{id:"heat",label:"HEATMAP"},{id:"cal",label:"RESSOURCES"},
   ];
 
@@ -3576,6 +3685,7 @@ export default function App() {
       {view==="sentiment" && <SentimentView />}
       {view==="cal"     && <CalView />}
       {view==="journal" && <JournalView />}
+      {view==="calc"    && <PositionCalc />}
     </div>
   );
 }
