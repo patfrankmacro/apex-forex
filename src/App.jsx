@@ -883,7 +883,7 @@ function DataView() {
       </div>
       <div style={{ background:BG2, border:`1px solid #ffd70044`, borderRadius:4, padding:14 }}>
         <div style={{ fontSize:9, letterSpacing:3, color:"#ffd700", fontWeight:700, marginBottom:10, borderBottom:"1px solid #ffd70022", paddingBottom:8, fontFamily:"'IBM Plex Mono'" }}>COMMENT SAISIR</div>
-        {[["Previous","#ffd700","Le chiffre du mois dernier → colonne PRIOR"],["Consensus",ACCENT,"Ce que les économistes prévoient → colonne EXP"],["Actual","#00ff88","Le chiffre publié → colonne NOW"]].map(([k,col,v])=>(
+        {[["Previous","#ffd700","Le chiffre du mois dernier → colonne PREVIOUS"],["Consensus",ACCENT,"Ce que les économistes prévoient → colonne CONSENSUS"],["Actual","#00ff88","Le chiffre publié → colonne ACTUAL"]].map(([k,col,v])=>(
           <div key={k} style={{ display:"flex", gap:12, marginBottom:8, padding:"7px 10px", background:BG, borderRadius:3, borderLeft:`3px solid ${col}55` }}>
             <div style={{ fontSize:10, fontWeight:700, color:col, minWidth:80, fontFamily:"'IBM Plex Mono'" }}>{k}</div>
             <div style={{ fontSize:10, color:TEXT_DIM }}>{v}</div>
@@ -2924,7 +2924,7 @@ export default function App() {
 
       {view==="table" && (
         <div style={{ overflowX:"auto", padding:12 }}>
-          <div style={{ fontSize:8, color:TEXT_DIM, marginBottom:8, letterSpacing:1 }}>PRIOR → EXP → NOW · Vert=EN HAUSSE · Rouge=EN BAISSE · Gris=STABLE · Tier1: Inflation/Core · Tier2: Unemployment/Services PMI</div>
+          <div style={{ fontSize:8, color:TEXT_DIM, marginBottom:8, letterSpacing:1 }}>PREVIOUS → CONSENSUS → ACTUAL · Vert=EN HAUSSE · Rouge=EN BAISSE · Gris=STABLE · Tier1: Inflation/Core · Tier2: Unemployment/Services PMI</div>
           <table style={{ borderCollapse:"collapse", minWidth:980 }}>
             <thead>
               <tr>
@@ -2939,7 +2939,7 @@ export default function App() {
               </tr>
               <tr>
                 <th style={{ background:BG3, border:`1px solid ${BORDER}` }} />
-                {INDS.map(ind=>["Prior","Exp","Now"].map(f=>(
+                {INDS.map(ind=>["Previous","Consensus","Actual"].map(f=>(
                   <th key={ind.id+f} style={{ background:BG3, padding:"2px 4px", fontSize:7, color:TEXT_DIM, border:`1px solid ${BORDER}`, textAlign:"center" }}>{f}</th>
                 )))}
                 <th style={{ background:BG3, border:`1px solid ${BORDER}` }} />
