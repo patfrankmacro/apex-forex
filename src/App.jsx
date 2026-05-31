@@ -998,7 +998,7 @@ function GuideView() {
           <div style={{ fontSize:10, color:"#ff6666", fontWeight:700, marginBottom:8 }}>📊 INFLATION vs EXPECTATION</div>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
             <div style={{ padding:8, background:"#001a0d", borderRadius:3, border:"1px solid #00ff8833" }}>
-              <div style={{ fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:4 }}>EN HAUSSE (now {">"} exp)</div>
+              <div style={{ fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:4 }}>EN HAUSSE (Actual {">"} Consensus)</div>
               <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
                 → BC va MONTER les taux<br/>
                 → Capitaux entrent<br/>
@@ -1006,7 +1006,7 @@ function GuideView() {
               </div>
             </div>
             <div style={{ padding:8, background:"#1a0000", borderRadius:3, border:"1px solid #ff666633" }}>
-              <div style={{ fontSize:9, color:"#ff6666", fontWeight:700, marginBottom:4 }}>EN BAISSE (now {"<"} exp)</div>
+              <div style={{ fontSize:9, color:"#ff6666", fontWeight:700, marginBottom:4 }}>EN BAISSE (Actual {"<"} Consensus)</div>
               <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
                 → BC va BAISSER les taux<br/>
                 → Capitaux sortent<br/>
@@ -1043,7 +1043,7 @@ function GuideView() {
           <div style={{ fontSize:10, color:"#66aaff", fontWeight:700, marginBottom:8 }}>👥 CHÔMAGE — LOGIQUE ÉCONOMIQUE COMPLÈTE</div>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:8 }}>
             <div style={{ padding:8, background:"#001a0d", borderRadius:3, border:"1px solid #00ff8833" }}>
-              <div style={{ fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:4 }}>EN BAISSE (now {"<"} exp) ✓</div>
+              <div style={{ fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:4 }}>EN BAISSE (Actual {"<"} Consensus) ✓</div>
               <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
                 Plus d'emplois<br/>
                 → Plus de revenus<br/>
@@ -1055,7 +1055,7 @@ function GuideView() {
               </div>
             </div>
             <div style={{ padding:8, background:"#1a0000", borderRadius:3, border:"1px solid #ff666633" }}>
-              <div style={{ fontSize:9, color:"#ff6666", fontWeight:700, marginBottom:4 }}>EN HAUSSE (now {">"} exp) ⚠</div>
+              <div style={{ fontSize:9, color:"#ff6666", fontWeight:700, marginBottom:4 }}>EN HAUSSE (Actual {">"} Consensus) ⚠</div>
               <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
                 Perte d'emplois<br/>
                 → Moins de revenus<br/>
