@@ -1022,9 +1022,9 @@ function GuideView() {
           <div style={{ marginBottom:8, padding:8, background:"#001020", borderRadius:3, border:"1px solid #66ccff33" }}>
             <div style={{ fontSize:9, color:"#66ccff", fontWeight:700, marginBottom:4 }}>DIMENSION 1 — ACTUAL vs CONSENSUS (priorité)</div>
             <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
-              <span style={{color:"#00ff88"}}>NOW {">"} EXP = BAT</span> — croissance meilleure que prévu → positif (même sous 50)<br/>
-              <span style={{color:"#ff6666"}}>NOW {"<"} EXP = MANQUE</span> — croissance décevante → négatif (même au-dessus de 50)<br/>
-              <span style={{color:"#ffd700",fontWeight:700}}>Ex: NZD 48.9 {">"} exp 45 = positif · USD 50.9 {"<"} exp 51.1 = négatif</span>
+              <span style={{color:"#00ff88"}}>ACTUAL {">"} CONSENSUS = BAT</span> — croissance meilleure que prévu → positif (même sous 50)<br/>
+              <span style={{color:"#ff6666"}}>ACTUAL {"<"} CONSENSUS = MANQUE</span> — croissance décevante → négatif (même au-dessus de 50)<br/>
+              <span style={{color:"#ffd700",fontWeight:700}}>Ex: NZD 48.9 {">"} Consensus 45 = positif · USD 50.9 {"<"} Consensus 51.1 = négatif</span>
             </div>
           </div>
           <div style={{ padding:8, background:"#001020", borderRadius:3, border:"1px solid #66ccff33" }}>
