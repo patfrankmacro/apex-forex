@@ -3048,7 +3048,7 @@ export default function App() {
               });
             });
             opps.sort((a,b) => b.scoreCombined - a.scoreCombined);
-            const top = opps.slice(0,6);
+            const top = opps.slice(0,10);
             if (top.length === 0) return null;
             return (
               <div style={{marginTop:16, padding:"12px 0"}}>
