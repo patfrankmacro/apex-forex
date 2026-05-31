@@ -902,22 +902,22 @@ function GuideView() {
   const indicators = [
     { title:"CORE INFLATION", sub:"Core Inflation Rate — Trading Economics",
       desc:"Le plus important — indicateur pur de l'inflation structurelle. La BC regarde ça en premier pour décider des taux.",
-      good:"EN HAUSSE vs exp → BC va monter les taux → capitaux entrent → devise monte",
-      bad:"EN BAISSE vs exp → BC va baisser les taux → capitaux sortent → devise baisse",
+      good:"EN HAUSSE vs Consensus → BC va monter les taux → capitaux entrent → devise monte",
+      bad:"EN BAISSE vs Consensus → BC va baisser les taux → capitaux sortent → devise baisse",
       pct:"Tier 1 · 27.5%", color:"#ff6666" },
     { title:"INFLATION (CPI)", sub:"Inflation Rate — Trading Economics",
-      desc:"Confirme le Core. Si les 2 sont en hausse vs exp = signal hawkish très puissant. Si les 2 baissent = signal dovish fort.",
-      good:"EN HAUSSE vs exp + Core EN HAUSSE → double confirmation hawkish",
-      bad:"EN BAISSE vs exp + Core EN BAISSE → double confirmation dovish",
+      desc:"Confirme le Core. Si les 2 sont en hausse vs Consensus = signal hawkish très puissant. Si les 2 baissent = signal dovish fort.",
+      good:"EN HAUSSE vs Consensus + Core EN HAUSSE → double confirmation hawkish",
+      bad:"EN BAISSE vs Consensus + Core EN BAISSE → double confirmation dovish",
       pct:"Tier 1 · 22.5%", color:"#ff9966" },
     { title:"UNEMPLOYMENT RATE", sub:"Unemployment Rate — Trading Economics",
       desc:"LOGIQUE INVERSE — chômage EN BAISSE = bon pour l'économie. Plus d'emplois → plus de revenus → plus de dépenses → inflation monte → BC hawkish. Chômage EN HAUSSE = perte d'emplois → moins de dépenses → inflation baisse → BC dovish.",
-      good:"EN BAISSE vs exp → plus d'emplois → plus de dépenses → inflation monte → hawkish",
-      bad:"EN HAUSSE vs exp → perte d'emplois → moins de dépenses → inflation baisse → dovish",
+      good:"EN BAISSE vs Consensus → plus d'emplois → plus de dépenses → inflation monte → hawkish",
+      bad:"EN HAUSSE vs Consensus → perte d'emplois → moins de dépenses → inflation baisse → dovish",
       pct:"Tier 2 · 20%", color:"#66aaff" },
     { title:"SERVICES PMI", sub:"Services PMI — Trading Economics",
-      desc:"70% de l'économie. CE QUI COMPTE : NOW vs EXP (la surprise vs attente). NZD PMI 48.9 > exp 45 = POSITIF même sous 50. USD PMI 50.9 < exp 51.1 = NÉGATIF même au-dessus de 50. Seuil 50 = contexte additionnel, pas règle absolue.",
-      good:"NOW > EXP → croissance meilleure que prévu → signal positif (même si PMI < 50)",
+      desc:"70% de l'économie. CE QUI COMPTE : ACTUAL vs CONSENSUS (la surprise vs attente). NZD PMI 48.9 > exp 45 = POSITIF même sous 50. USD PMI 50.9 < exp 51.1 = NÉGATIF même au-dessus de 50. Seuil 50 = contexte additionnel, pas règle absolue.",
+      good:"ACTUAL > CONSENSUS → croissance meilleure que prévu → signal positif (même si PMI < 50)",
       bad:"SOUS 50 OU EN BAISSE vers 50 → contraction ou ralentissement → croissance faible",
       pct:"Tier 2 · 17.5%", color:"#66ccff" },
     { title:"MANUFACTURING PMI", sub:"Manufacturing PMI — Trading Economics",
@@ -926,9 +926,9 @@ function GuideView() {
       bad:"SOUS 50 OU EN BAISSE → ralentissement industriel → signal négatif",
       pct:"Tier 3 · 7.5%", color:"#aaaacc" },
     { title:"FUNDS RATE", sub:"Interest Rate — Trading Economics",
-      desc:"Le taux directeur de la BC. Compare NOW vs PRIOR. Le différentiel de taux entre 2 pays détermine où les capitaux vont.",
-      good:"EN HAUSSE vs prior → différentiel augmente → capitaux entrent → devise monte",
-      bad:"EN BAISSE vs prior → différentiel diminue → capitaux sortent → devise baisse",
+      desc:"Le taux directeur de la BC. Compare ACTUAL vs PREVIOUS. Le différentiel de taux entre 2 pays détermine où les capitaux vont.",
+      good:"EN HAUSSE vs Previous → différentiel augmente → capitaux entrent → devise monte",
+      bad:"EN BAISSE vs Previous → différentiel diminue → capitaux sortent → devise baisse",
       pct:"Tier 3 · 5%", color:"#888899" },
   ];
   return (
@@ -989,7 +989,7 @@ function GuideView() {
             On ne trade pas ce qui s'est passé.<br/>
             <span style={{color:"#a855f7",fontWeight:700}}>On anticipe ce que la banque centrale va faire ENSUITE.</span><br/><br/>
             Chaque donnée économique est comparée à son <span style={{color:"#ffd700"}}>expectation (EXP)</span>.<br/>
-            La surprise vs expectation = signal d'anticipation pour les institutionnels.
+            La surprise vs Consensusectation = signal d'anticipation pour les institutionnels.
           </div>
         </div>
 
@@ -1020,7 +1020,7 @@ function GuideView() {
         <div style={{ marginBottom:10, padding:12, background:BG, borderRadius:3, borderLeft:"3px solid #66ccff" }}>
           <div style={{ fontSize:10, color:"#66ccff", fontWeight:700, marginBottom:8 }}>📈 PMI SERVICES — 2 DIMENSIONS</div>
           <div style={{ marginBottom:8, padding:8, background:"#001020", borderRadius:3, border:"1px solid #66ccff33" }}>
-            <div style={{ fontSize:9, color:"#66ccff", fontWeight:700, marginBottom:4 }}>DIMENSION 1 — NOW vs EXP (priorité)</div>
+            <div style={{ fontSize:9, color:"#66ccff", fontWeight:700, marginBottom:4 }}>DIMENSION 1 — ACTUAL vs CONSENSUS (priorité)</div>
             <div style={{ fontSize:8, color:TEXT_DIM, lineHeight:1.7 }}>
               <span style={{color:"#00ff88"}}>NOW {">"} EXP = BAT</span> — croissance meilleure que prévu → positif (même sous 50)<br/>
               <span style={{color:"#ff6666"}}>NOW {"<"} EXP = MANQUE</span> — croissance décevante → négatif (même au-dessus de 50)<br/>
