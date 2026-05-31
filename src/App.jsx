@@ -3161,6 +3161,27 @@ export default function App() {
             );
           })()}
 
+          {/* ========== BIAIS MACRO (devises fortes/faibles) — copié de ANALYSE ========== */}
+          {(()=>{
+            const fortes=ranked.filter(r=>r.score>=0.2);
+            const faibles=ranked.filter(r=>r.score<=-0.2);
+            return(
+              <div style={{background:"#0a1628",border:"1px solid #1e3a5f",borderRadius:8,padding:"10px 14px",marginTop:16,marginBottom:12}}>
+                <div style={{fontSize:11,color:"#a78bfa",fontWeight:700,marginBottom:8,letterSpacing:1}}>🌍 BIAIS MACRO</div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                  <div>
+                    <div style={{fontSize:8,color:"#4ade80",fontWeight:700,marginBottom:6}}>🟢 DEVISES FORTES</div>
+                    {fortes.map(r=>{const reg=getRegime(data,r.code);return<div key={r.code} style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4,padding:"4px 8px",background:"#052010",borderRadius:4,border:"1px solid #4ade8022"}}><span style={{fontSize:10,color:"#c8d4f0",fontWeight:700}}><FlagImg code={r.code} size={14}/> {r.code}</span><span style={{fontSize:9}}><span style={{color:reg?reg.color:"#888"}}>{reg?reg.icon+" "+reg.label:""}</span> <span style={{color:"#4ade80"}}>{r.score>=0?"+":""}{r.score.toFixed(2)}</span></span></div>;})}
+                  </div>
+                  <div>
+                    <div style={{fontSize:8,color:"#f87171",fontWeight:700,marginBottom:6}}>🔴 DEVISES FAIBLES</div>
+                    {faibles.map(r=>{const reg=getRegime(data,r.code);return<div key={r.code} style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4,padding:"4px 8px",background:"#1a0505",borderRadius:4,border:"1px solid #f8717122"}}><span style={{fontSize:10,color:"#c8d4f0",fontWeight:700}}><FlagImg code={r.code} size={14}/> {r.code}</span><span style={{fontSize:9}}><span style={{color:reg?reg.color:"#888"}}>{reg?reg.icon+" "+reg.label:""}</span> <span style={{color:"#f87171"}}>{r.score>=0?"+":""}{r.score.toFixed(2)}</span></span></div>;})}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* ========== BIAIS LEVERAGED FUNDS (panneau live) ========== */}
           {(() => {
             const CFTC_MAP = {EUR:"099741",GBP:"096742",JPY:"097741",CAD:"090741",AUD:"232741",CHF:"092741",USD:"098662",NZD:"112741"};
