@@ -916,7 +916,7 @@ function GuideView() {
       bad:"EN HAUSSE vs Consensus → perte d'emplois → moins de dépenses → inflation baisse → dovish",
       pct:"Tier 2 · 20%", color:"#66aaff" },
     { title:"SERVICES PMI", sub:"Services PMI — Trading Economics",
-      desc:"70% de l'économie. CE QUI COMPTE : ACTUAL vs CONSENSUS (la surprise vs attente). NZD PMI 48.9 > exp 45 = POSITIF même sous 50. USD PMI 50.9 < exp 51.1 = NÉGATIF même au-dessus de 50. Seuil 50 = contexte additionnel, pas règle absolue.",
+      desc:"70% de l'économie. CE QUI COMPTE : ACTUAL vs CONSENSUS (la surprise vs attente). NZD PMI 48.9 > Consensus 45 = POSITIF même sous 50. USD PMI 50.9 < Consensus 51.1 = NÉGATIF même au-dessus de 50. Seuil 50 = contexte additionnel, pas règle absolue.",
       good:"ACTUAL > CONSENSUS → croissance meilleure que prévu → signal positif (même si PMI < 50)",
       bad:"SOUS 50 OU EN BAISSE vers 50 → contraction ou ralentissement → croissance faible",
       pct:"Tier 2 · 17.5%", color:"#66ccff" },
@@ -989,7 +989,7 @@ function GuideView() {
             On ne trade pas ce qui s'est passé.<br/>
             <span style={{color:"#a855f7",fontWeight:700}}>On anticipe ce que la banque centrale va faire ENSUITE.</span><br/><br/>
             Chaque donnée économique est comparée à son <span style={{color:"#ffd700"}}>expectation (EXP)</span>.<br/>
-            La surprise vs Consensusectation = signal d'anticipation pour les institutionnels.
+            La surprise vs Consensus = signal d'anticipation pour les institutionnels.
           </div>
         </div>
 
