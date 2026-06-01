@@ -3350,59 +3350,69 @@ export default function App() {
 
             {/* === SCHEMA LONG (zone COT mardi, comme NZDCAD) === */}
             <div style={{marginBottom:14, padding:"12px", background:"#001a0d", borderRadius:6, border:"1px solid #4ade8044"}}>
-              <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8}}>▲ LEVERAGED FUNDS ACHÈTENT — ZONE DU DERNIER COT</div>
+              <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8}}>▲ LEVERAGED FUNDS ACHÈTENT — ACCUMULATION AU GOLDEN POCKET</div>
 
-              <svg viewBox="0 0 340 230" style={{width:"100%", maxWidth:360, display:"block", margin:"0 auto 8px"}}>
-                {/* Label zone au-dessus (ne chevauche pas) */}
-                <text x="10" y="148" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">ZONE (prix du mardi COT) = DEMANDE INSTITUTIONNELLE</text>
-                {/* ZONE COT/demande (violet, horizontale) */}
-                <rect x="10" y="150" width="320" height="24" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
+              <svg viewBox="0 0 340 240" style={{width:"100%", maxWidth:360, display:"block", margin:"0 auto 8px"}}>
+                {/* Niveaux Fibonacci */}
+                <line x1="10" y1="40" x2="330" y2="40" stroke="#555" strokeWidth="0.8" strokeDasharray="2,2"/>
+                <text x="312" y="37" fill="#888" fontSize="7" fontFamily="monospace">100%</text>
+                <line x1="10" y1="95" x2="330" y2="95" stroke="#888" strokeWidth="0.8" strokeDasharray="2,2"/>
+                <text x="315" y="92" fill="#aaa" fontSize="7" fontFamily="monospace">50%</text>
+                {/* GOLDEN POCKET 61.8-65% (zone violette) */}
+                <rect x="10" y="120" width="320" height="22" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
+                <text x="14" y="116" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">GOLDEN POCKET 61.8%-65% = ZONE D'ACCUMULATION</text>
+                <line x1="10" y1="170" x2="330" y2="170" stroke="#ff6666" strokeWidth="0.8" strokeDasharray="2,2"/>
+                <text x="305" y="182" fill="#ff6666" fontSize="7" fontFamily="monospace">78.6% (stop)</text>
 
-                {/* 1. Bougies du mardi DANS la zone (où LF ont acheté) */}
-                <line x1="35" y1="150" x2="35" y2="176" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="31" y="156" width="8" height="16" fill="#4ade80"/>
-                <line x1="52" y1="148" x2="52" y2="172" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="48" y="152" width="8" height="16" fill="#4ade80"/>
+                {/* 1. IMPULSION haussière (vert) du bas vers le haut */}
+                <line x1="30" y1="175" x2="30" y2="195" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="26" y="178" width="8" height="17" fill="#4ade80"/>
+                <line x1="46" y1="140" x2="46" y2="180" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="42" y="144" width="8" height="32" fill="#4ade80"/>
+                <line x1="62" y1="95" x2="62" y2="142" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="58" y="98" width="8" height="42" fill="#4ade80"/>
+                <line x1="78" y1="55" x2="78" y2="98" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="74" y="58" width="8" height="40" fill="#4ade80"/>
+                <text x="40" y="218" fill="#4ade80" fontSize="7" fontFamily="monospace">① impulsion</text>
 
-                {/* 2. Prix MONTE et s'éloigne au-dessus */}
-                <line x1="72" y1="135" x2="72" y2="158" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="68" y="138" width="8" height="18" fill="#4ade80"/>
-                <line x1="90" y1="110" x2="90" y2="138" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="86" y="114" width="8" height="24" fill="#4ade80"/>
-                <line x1="108" y1="92" x2="108" y2="116" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="104" y="95" width="8" height="20" fill="#4ade80"/>
+                {/* 2. Pullback vers le golden pocket */}
+                <line x1="98" y1="55" x2="98" y2="80" stroke="#888" strokeWidth="1"/>
+                <rect x="94" y="58" width="8" height="22" fill="#888"/>
+                <line x1="114" y1="75" x2="114" y2="115" stroke="#888" strokeWidth="1"/>
+                <rect x="110" y="78" width="8" height="37" fill="#888"/>
 
-                {/* 3. Prix REDESCEND tester la zone (cette semaine) */}
-                <line x1="128" y1="95" x2="128" y2="120" stroke="#888" strokeWidth="1"/>
-                <rect x="124" y="98" width="8" height="20" fill="#888"/>
-                <line x1="146" y1="115" x2="146" y2="145" stroke="#888" strokeWidth="1"/>
-                <rect x="142" y="118" width="8" height="24" fill="#888"/>
+                {/* 3. TOUCHE 1 du golden pocket avec mèche basse de rejet */}
+                <line x1="132" y1="100" x2="132" y2="150" stroke="#4ade80" strokeWidth="1.5"/>
+                <rect x="128" y="104" width="8" height="20" fill="#4ade80"/>
+                <text x="138" y="158" fill="#4ade80" fontSize="7" fontFamily="monospace">rejet 1</text>
 
-                {/* "CETTE SEMAINE" en haut, flèche vers la bougie de retest */}
-                <text x="158" y="80" fill="#fbbf24" fontSize="9" fontFamily="monospace" fontWeight="700">CETTE SEMAINE</text>
-                <line x1="170" y1="85" x2="165" y2="148" stroke="#fbbf24" strokeWidth="1" strokeDasharray="2,2"/>
+                {/* 4. Petit rebond + TOUCHE 2 (rejet) */}
+                <line x1="150" y1="90" x2="150" y2="110" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="146" y="93" width="8" height="17" fill="#4ade80"/>
+                <line x1="168" y1="102" x2="168" y2="148" stroke="#4ade80" strokeWidth="1.5"/>
+                <rect x="164" y="106" width="8" height="18" fill="#4ade80"/>
+                <text x="174" y="158" fill="#4ade80" fontSize="7" fontFamily="monospace">rejet 2</text>
 
-                {/* 4. Bougie de RETEST dans la zone avec MÈCHE DE REJET (LF défendent) */}
-                <line x1="165" y1="148" x2="165" y2="185" stroke="#4ade80" strokeWidth="1.5"/>
-                <rect x="160" y="150" width="10" height="20" fill="#4ade80"/>
-                <text x="10" y="210" fill="#4ade80" fontSize="7" fontFamily="monospace">↑ mèche rejet = Leveraged Funds défendent</text>
+                {/* 5. TOUCHE 3 (rejet) puis départ */}
+                <line x1="186" y1="100" x2="186" y2="142" stroke="#4ade80" strokeWidth="1.5"/>
+                <rect x="182" y="104" width="8" height="16" fill="#4ade80"/>
 
-                {/* 5. Prix repart en HAUT */}
-                <line x1="188" y1="120" x2="188" y2="150" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="184" y="124" width="8" height="26" fill="#4ade80"/>
-                <line x1="206" y1="95" x2="206" y2="124" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="202" y="98" width="8" height="26" fill="#4ade80"/>
-                <line x1="224" y1="68" x2="224" y2="98" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="220" y="72" width="8" height="26" fill="#4ade80"/>
-                <line x1="242" y1="45" x2="242" y2="72" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="238" y="48" width="8" height="24" fill="#4ade80"/>
+                {/* Volume croissant (barres en bas) */}
+                <rect x="128" y="228" width="8" height="6" fill="#4ade8088"/>
+                <rect x="164" y="225" width="8" height="9" fill="#4ade80aa"/>
+                <rect x="182" y="221" width="8" height="13" fill="#4ade80"/>
+                <text x="200" y="233" fill="#4ade80" fontSize="6.5" fontFamily="monospace">volume ↑ à chaque touche</text>
 
-                {/* Flèche montée */}
-                <line x1="175" y1="160" x2="248" y2="55" stroke="#4ade80" strokeWidth="2" strokeDasharray="3,2" markerEnd="url(#arGL)"/>
+                {/* 6. Cassure et départ haussier */}
+                <line x1="204" y1="70" x2="204" y2="105" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="200" y="74" width="8" height="31" fill="#4ade80"/>
+                <line x1="222" y1="45" x2="222" y2="74" stroke="#4ade80" strokeWidth="1"/>
+                <rect x="218" y="48" width="8" height="26" fill="#4ade80"/>
+                <line x1="240" y1="48" x2="305" y2="20" stroke="#4ade80" strokeWidth="2" strokeDasharray="3,2" markerEnd="url(#arGL)"/>
 
-                {/* ENTRY LONG pile au contact de la zone */}
-                <line x1="165" y1="212" x2="165" y2="186" stroke="#00ff88" strokeWidth="2.5" markerEnd="url(#arEntL)"/>
-                <text x="165" y="226" fill="#00ff88" fontSize="10" fontFamily="monospace" fontWeight="700" textAnchor="middle">ENTRY LONG (au retest)</text>
+                {/* ENTRY LONG au golden pocket */}
+                <line x1="186" y1="200" x2="186" y2="150" stroke="#00ff88" strokeWidth="2.5" markerEnd="url(#arEntL)"/>
+                <text x="186" y="214" fill="#00ff88" fontSize="9" fontFamily="monospace" fontWeight="700" textAnchor="middle">ENTRY (3 rejets confirmés)</text>
 
                 <defs>
                   <marker id="arGL" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4ade80"/></marker>
@@ -3412,68 +3422,78 @@ export default function App() {
 
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.7, marginTop:8}}>
                 <b style={{color:"#4ade80"}}>①</b> TABLEAU dit "Leveraged Funds achètent" (chgNet positif) → biais LONG<br/>
-                <b style={{color:"#4ade80"}}>②</b> En <b>H4</b>, zone violette = prix du <b>MARDI</b> (COT) = "ici les Leveraged Funds ont acheté"<br/>
-                <b style={{color:"#4ade80"}}>③</b> Le prix s'éloigne, puis <b>REVIENT dans la zone</b> cette semaine = même prix qu'eux<br/>
-                <b style={{color:"#4ade80"}}>④</b> <b>Mèches de rejet</b> dans la zone = footprint des Leveraged Funds qui défendent/ajoutent<br/>
-                <b style={{color:"#4ade80"}}>⑤</b> <b>Entry LONG</b> sur la bougie de confirmation · stop sous la zone · target = haut précédent (2:1)
+                <b style={{color:"#4ade80"}}>②</b> En <b>H4</b>, trace le <b>Fibonacci</b> sur la dernière impulsion haussière (du bas au haut)<br/>
+                <b style={{color:"#4ade80"}}>③</b> Le prix recule dans le <b>GOLDEN POCKET (61.8%-65%)</b> = zone d'escompte où les fonds accumulent<br/>
+                <b style={{color:"#4ade80"}}>④</b> <b>Touches répétées</b> du golden pocket avec mèches de rejet + <b>volume qui monte</b> = ils rajoutent<br/>
+                <b style={{color:"#4ade80"}}>⑤</b> <b>Entry LONG</b> à la confirmation (2-3 rejets qui tiennent) · stop sous le 78.6% · target = extension 1.618
               </div>
             </div>
 
             {/* === SCHEMA SHORT === */}
             <div style={{marginBottom:14, padding:"12px", background:"#1a0000", borderRadius:6, border:"1px solid #f8717144"}}>
-              <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:8}}>▼ LEVERAGED FUNDS VENDENT — ZONE DU DERNIER COT</div>
+              <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:8}}>▼ LEVERAGED FUNDS VENDENT — DISTRIBUTION AU GOLDEN POCKET</div>
 
-              <svg viewBox="0 0 340 230" style={{width:"100%", maxWidth:360, display:"block", margin:"0 auto 8px"}}>
-                {/* ENTRY SHORT en haut (au contact de la zone) */}
-                <text x="165" y="16" fill="#ff3b3b" fontSize="10" fontFamily="monospace" fontWeight="700" textAnchor="middle">ENTRY SHORT (au retest)</text>
-                <line x1="165" y1="22" x2="165" y2="48" stroke="#ff3b3b" strokeWidth="2.5" markerEnd="url(#arEntS)"/>
+              <svg viewBox="0 0 340 240" style={{width:"100%", maxWidth:360, display:"block", margin:"0 auto 8px"}}>
+                {/* Niveaux Fibonacci (inversés: golden pocket en haut) */}
+                <line x1="10" y1="40" x2="330" y2="40" stroke="#ff6666" strokeWidth="0.8" strokeDasharray="2,2"/>
+                <text x="295" y="37" fill="#ff6666" fontSize="7" fontFamily="monospace">78.6% (stop)</text>
+                {/* GOLDEN POCKET 61.8-65% (zone violette, en haut) */}
+                <rect x="10" y="58" width="320" height="22" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
+                <text x="14" y="54" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">GOLDEN POCKET 61.8%-65% = ZONE DE VENTE</text>
+                <line x1="10" y1="110" x2="330" y2="110" stroke="#888" strokeWidth="0.8" strokeDasharray="2,2"/>
+                <text x="315" y="107" fill="#aaa" fontSize="7" fontFamily="monospace">50%</text>
+                <line x1="10" y1="165" x2="330" y2="165" stroke="#555" strokeWidth="0.8" strokeDasharray="2,2"/>
+                <text x="312" y="175" fill="#888" fontSize="7" fontFamily="monospace">100%</text>
 
-                {/* Label zone */}
-                <text x="10" y="60" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">ZONE (prix du mardi COT) = OFFRE INSTITUTIONNELLE</text>
-                {/* ZONE COT/offre (violet, horizontale) */}
-                <rect x="10" y="62" width="320" height="24" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
+                {/* ENTRY SHORT au golden pocket (en haut) */}
+                <text x="186" y="232" fill="#ff3b3b" fontSize="9" fontFamily="monospace" fontWeight="700" textAnchor="middle">ENTRY (3 rejets confirmés)</text>
+                <line x1="186" y1="218" x2="186" y2="84" stroke="#ff3b3b" strokeWidth="2.5" markerEnd="url(#arEntS)"/>
 
-                {/* 1. Bougies du mardi DANS la zone (où LF ont vendu) */}
-                <line x1="35" y1="60" x2="35" y2="86" stroke="#f87171" strokeWidth="1"/>
-                <rect x="31" y="64" width="8" height="16" fill="#f87171"/>
-                <line x1="52" y1="64" x2="52" y2="88" stroke="#f87171" strokeWidth="1"/>
-                <rect x="48" y="68" width="8" height="16" fill="#f87171"/>
+                {/* 1. IMPULSION baissière (rouge) du haut vers le bas */}
+                <line x1="30" y1="45" x2="30" y2="65" stroke="#f87171" strokeWidth="1"/>
+                <rect x="26" y="48" width="8" height="17" fill="#f87171"/>
+                <line x1="46" y1="60" x2="46" y2="100" stroke="#f87171" strokeWidth="1"/>
+                <rect x="42" y="63" width="8" height="32" fill="#f87171"/>
+                <line x1="62" y1="98" x2="62" y2="145" stroke="#f87171" strokeWidth="1"/>
+                <rect x="58" y="100" width="8" height="42" fill="#f87171"/>
+                <line x1="78" y1="140" x2="78" y2="185" stroke="#f87171" strokeWidth="1"/>
+                <rect x="74" y="143" width="8" height="40" fill="#f87171"/>
+                <text x="40" y="205" fill="#f87171" fontSize="7" fontFamily="monospace">① impulsion</text>
 
-                {/* 2. Prix DESCEND et s'éloigne en dessous */}
-                <line x1="72" y1="78" x2="72" y2="102" stroke="#f87171" strokeWidth="1"/>
-                <rect x="68" y="80" width="8" height="18" fill="#f87171"/>
-                <line x1="90" y1="98" x2="90" y2="126" stroke="#f87171" strokeWidth="1"/>
-                <rect x="86" y="100" width="8" height="24" fill="#f87171"/>
-                <line x1="108" y1="120" x2="108" y2="144" stroke="#f87171" strokeWidth="1"/>
-                <rect x="104" y="122" width="8" height="20" fill="#f87171"/>
+                {/* 2. Pullback (remontée) vers le golden pocket */}
+                <line x1="98" y1="135" x2="98" y2="160" stroke="#888" strokeWidth="1"/>
+                <rect x="94" y="138" width="8" height="22" fill="#888"/>
+                <line x1="114" y1="100" x2="114" y2="140" stroke="#888" strokeWidth="1"/>
+                <rect x="110" y="103" width="8" height="37" fill="#888"/>
 
-                {/* 3. Prix REMONTE tester la zone (cette semaine) */}
-                <line x1="128" y1="118" x2="128" y2="142" stroke="#888" strokeWidth="1"/>
-                <rect x="124" y="120" width="8" height="20" fill="#888"/>
-                <line x1="146" y1="92" x2="146" y2="122" stroke="#888" strokeWidth="1"/>
-                <rect x="142" y="96" width="8" height="24" fill="#888"/>
+                {/* 3. TOUCHE 1 du golden pocket avec mèche haute de rejet */}
+                <line x1="132" y1="50" x2="132" y2="100" stroke="#f87171" strokeWidth="1.5"/>
+                <rect x="128" y="76" width="8" height="20" fill="#f87171"/>
+                <text x="138" y="46" fill="#f87171" fontSize="7" fontFamily="monospace">rejet 1</text>
 
-                {/* "CETTE SEMAINE" en bas, flèche vers la bougie de retest */}
-                <text x="158" y="160" fill="#fbbf24" fontSize="9" fontFamily="monospace" fontWeight="700">CETTE SEMAINE</text>
-                <line x1="170" y1="155" x2="165" y2="90" stroke="#fbbf24" strokeWidth="1" strokeDasharray="2,2"/>
+                {/* 4. TOUCHE 2 (rejet) */}
+                <line x1="150" y1="90" x2="150" y2="110" stroke="#f87171" strokeWidth="1"/>
+                <rect x="146" y="93" width="8" height="17" fill="#f87171"/>
+                <line x1="168" y1="52" x2="168" y2="98" stroke="#f87171" strokeWidth="1.5"/>
+                <rect x="164" y="76" width="8" height="18" fill="#f87171"/>
+                <text x="174" y="46" fill="#f87171" fontSize="7" fontFamily="monospace">rejet 2</text>
 
-                {/* 4. Bougie de RETEST dans la zone avec MÈCHE DE REJET (LF défendent) */}
-                <line x1="165" y1="52" x2="165" y2="90" stroke="#f87171" strokeWidth="1.5"/>
-                <rect x="160" y="68" width="10" height="20" fill="#f87171"/>
-                <text x="10" y="38" fill="#f87171" fontSize="7" fontFamily="monospace">↓ mèche rejet = Leveraged Funds défendent</text>
+                {/* 5. TOUCHE 3 (rejet) puis départ */}
+                <line x1="186" y1="58" x2="186" y2="100" stroke="#f87171" strokeWidth="1.5"/>
+                <rect x="182" y="80" width="8" height="16" fill="#f87171"/>
 
-                {/* 5. Prix repart en BAS */}
-                <line x1="188" y1="88" x2="188" y2="116" stroke="#f87171" strokeWidth="1"/>
-                <rect x="184" y="90" width="8" height="26" fill="#f87171"/>
-                <line x1="206" y1="114" x2="206" y2="142" stroke="#f87171" strokeWidth="1"/>
-                <rect x="202" y="116" width="8" height="26" fill="#f87171"/>
-                <line x1="224" y1="140" x2="224" y2="170" stroke="#f87171" strokeWidth="1"/>
-                <rect x="220" y="142" width="8" height="26" fill="#f87171"/>
-                <line x1="242" y1="166" x2="242" y2="194" stroke="#f87171" strokeWidth="1"/>
-                <rect x="238" y="168" width="8" height="24" fill="#f87171"/>
+                {/* Volume croissant */}
+                <rect x="128" y="210" width="8" height="6" fill="#f8717188"/>
+                <rect x="164" y="207" width="8" height="9" fill="#f87171aa"/>
+                <rect x="182" y="203" width="8" height="13" fill="#f87171"/>
+                <text x="200" y="215" fill="#f87171" fontSize="6.5" fontFamily="monospace">volume ↑ à chaque touche</text>
 
-                {/* Flèche descente */}
-                <line x1="175" y1="80" x2="248" y2="180" stroke="#f87171" strokeWidth="2" strokeDasharray="3,2" markerEnd="url(#arGS)"/>
+                {/* 6. Cassure et départ baissier */}
+                <line x1="204" y1="95" x2="204" y2="130" stroke="#f87171" strokeWidth="1"/>
+                <rect x="200" y="98" width="8" height="31" fill="#f87171"/>
+                <line x1="222" y1="128" x2="222" y2="157" stroke="#f87171" strokeWidth="1"/>
+                <rect x="218" y="131" width="8" height="26" fill="#f87171"/>
+                <line x1="240" y1="155" x2="305" y2="183" stroke="#f87171" strokeWidth="2" strokeDasharray="3,2" markerEnd="url(#arGS)"/>
 
                 <defs>
                   <marker id="arGS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#f87171"/></marker>
@@ -3483,10 +3503,10 @@ export default function App() {
 
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.7, marginTop:8}}>
                 <b style={{color:"#f87171"}}>①</b> TABLEAU dit "Leveraged Funds vendent" (chgNet négatif) → biais SHORT<br/>
-                <b style={{color:"#f87171"}}>②</b> En <b>H4</b>, zone violette = prix du <b>MARDI</b> (COT) = "ici les Leveraged Funds ont vendu"<br/>
-                <b style={{color:"#f87171"}}>③</b> Le prix s'éloigne, puis <b>REMONTE dans la zone</b> cette semaine = même prix qu'eux<br/>
-                <b style={{color:"#f87171"}}>④</b> <b>Mèches de rejet</b> dans la zone = footprint des Leveraged Funds qui défendent/ajoutent<br/>
-                <b style={{color:"#f87171"}}>⑤</b> <b>Entry SHORT</b> sur la bougie de confirmation · stop au-dessus · target = bas précédent (2:1)
+                <b style={{color:"#f87171"}}>②</b> En <b>H4</b>, trace le <b>Fibonacci</b> sur la dernière impulsion baissière (du haut au bas)<br/>
+                <b style={{color:"#f87171"}}>③</b> Le prix remonte dans le <b>GOLDEN POCKET (61.8%-65%)</b> = zone chère où les fonds vendent<br/>
+                <b style={{color:"#f87171"}}>④</b> <b>Touches répétées</b> du golden pocket avec mèches de rejet + <b>volume qui monte</b> = ils rajoutent leur short<br/>
+                <b style={{color:"#f87171"}}>⑤</b> <b>Entry SHORT</b> à la confirmation (2-3 rejets qui tiennent) · stop au-dessus du 78.6% · target = extension 1.618
               </div>
             </div>
 
