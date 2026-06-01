@@ -166,7 +166,7 @@ const TE_LINKS = {
   JPY: { mfg:"japan/manufacturing-pmi", svc:"japan/services-pmi", unemp:"japan/unemployment-rate", rate:"japan/interest-rate", cpi:"japan/inflation-rate", core:"japan/core-inflation-rate" },
   GBP: { mfg:"united-kingdom/manufacturing-pmi", svc:"united-kingdom/services-pmi", unemp:"united-kingdom/unemployment-rate", rate:"united-kingdom/interest-rate", cpi:"united-kingdom/inflation-rate", core:"united-kingdom/core-inflation-rate" },
   NZD: { mfg:"new-zealand/manufacturing-pmi", svc:"new-zealand/services-pmi", unemp:"new-zealand/unemployment-rate", rate:"new-zealand/interest-rate", cpi:"new-zealand/inflation-rate", core:"new-zealand/core-inflation-rate" },
-  CNY: { mfg:"china/manufacturing-pmi", svc:"china/services-pmi", unemp:"china/unemployment-rate", rate:"china/interest-rate", cpi:"china/inflation-rate", core:"china/core-inflation-rate" },
+  CNY: { mfg:"china/business-confidence", svc:"china/non-manufacturing-pmi", unemp:"china/unemployment-rate", rate:"china/interest-rate", cpi:"china/inflation-rate", core:"china/core-inflation-rate" },
 };
 
 const REGIMES = {
