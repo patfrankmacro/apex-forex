@@ -2741,14 +2741,19 @@ export default function App() {
         // Un seul appel — login + outlook côté serveur
         const r = await fetch("/api/myfxbook?email="+encodeURIComponent("patrice-bonneau@outlook.com")+"&password="+encodeURIComponent("Fucktoi69$")+"&t="+Date.now(), {cache:"no-store"});
         const d = await r.json();
-        // Si échec (rate limit Myfxbook) → réessayer jusqu'à 3 fois avec délai croissant
+        // Si échec (rate limit Myfxbook ou deconnexion) → reessayer
         if (d.error || !d.symbols) {
+          window.__mfxConnected = false;
           if (attempt < 3) {
             setTimeout(() => loadMFX(attempt + 1), attempt * 5000); // 5s, puis 10s
+          } else {
+            // Apres 3 echecs rapproches: reessayer toutes les 5 min jusqu'a reconnexion
+            setTimeout(() => loadMFX(1), 5 * 60 * 1000);
           }
           // Ne PAS vider apexRetail — on garde les dernières données valides
           return;
         }
+        window.__mfxConnected = true;
         const map = {};
         d.symbols.forEach(s => {
           map[s.name] = s;
