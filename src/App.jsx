@@ -158,7 +158,7 @@ async function fetchRetailApp(){
 
 const TE = "https://tradingeconomics.com";
 const TE_LINKS = {
-  USD: { mfg:"united-states/business-confidence", svc:"united-states/non-manufacturing-pmi", unemp:"united-states/unemployment-rate", rate:"united-states/interest-rate", cpi:"united-states/inflation-cpi", core:"united-states/core-inflation-rate" },
+  USD: { mfg:"united-states/business-confidence", svc:"united-states/non-manufacturing-pmi", unemp:"united-states/unemployment-rate", rate:"united-states/interest-rate", cpi:"united-states/inflation-rate", core:"united-states/core-inflation-rate" },
   EUR: { mfg:"euro-area/manufacturing-pmi", svc:"euro-area/services-pmi", unemp:"euro-area/unemployment-rate", rate:"euro-area/interest-rate", cpi:"euro-area/inflation-rate", core:"euro-area/core-inflation-rate" },
   CAD: { mfg:"canada/manufacturing-pmi", svc:"canada/services-pmi", unemp:"canada/unemployment-rate", rate:"canada/interest-rate", cpi:"canada/inflation-rate", core:"canada/core-inflation-rate" },
   CHF: { mfg:"switzerland/manufacturing-pmi", svc:"switzerland/services-pmi", unemp:"switzerland/unemployment-rate", rate:"switzerland/interest-rate", cpi:"switzerland/inflation-rate", core:"switzerland/core-inflation-rate" },
