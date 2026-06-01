@@ -2755,7 +2755,24 @@ export default function App() {
           // Normaliser sans slash: "GBP/NZD" → "GBPNZD"
           map[s.name.replace("/","")] = s;
         });
-        if (Object.keys(map).length > 0) setApexRetail(map);
+        if (Object.keys(map).length > 0) {
+          setApexRetail(map);
+          // Snapshot historique du sentiment retail (1 max par 4h) pour voir la tendance
+          try {
+            const now = Date.now();
+            const lastSnap = window.__lastRetailSnap || 0;
+            if (now - lastSnap > 4 * 60 * 60 * 1000) {
+              window.__lastRetailSnap = now;
+              const snap = {};
+              d.symbols.forEach(s => {
+                const key = s.name.replace("/","");
+                snap[key] = { l: Math.round(s.longPercentage), s: Math.round(s.shortPercentage) };
+              });
+              const bucket = Math.floor(now / (4 * 60 * 60 * 1000)); // tranche de 4h
+              set(ref(db, `retailHistory/${bucket}`), { t: now, data: snap });
+            }
+          } catch(err) {}
+        }
       } catch(e) {
         // Erreur réseau → réessayer aussi
         if (attempt < 3) setTimeout(() => loadMFX(attempt + 1), attempt * 5000);
