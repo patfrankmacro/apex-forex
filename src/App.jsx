@@ -3341,9 +3341,38 @@ export default function App() {
               Comme un grossiste, tu attends que le prix <b>redescende en solde</b> avant de charger. Ce niveau d'escompte, sur un graphique, c'est le <b style={{color:"#c084fc"}}>Golden Pocket : la zone 61.8%–65%</b> du dernier mouvement (retracement de Fibonacci).<br/><br/>
               Quand le prix recule jusque-là, les fonds <b>accumulent</b> : ils achètent par paquets à chaque retour dans la zone. Tu vois leur empreinte par <b>les rejets répétés + le volume qui monte</b>. Tu entres AU MÊME PRIX qu'eux, dans la zone d'escompte, AVEC eux.
             </div>
+            <div style={{marginBottom:14, padding:"12px 14px", background:"#0a2540", borderRadius:6, border:"1px solid #38bdf855"}}>
+              <div style={{fontSize:10, color:"#38bdf8", fontWeight:700, marginBottom:8}}>🔗 LE LIEN COT ↔ GOLDEN POCKET</div>
+              <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>
+                Le tableau (COT) te dit que les Leveraged Funds <b>achètent ou vendent</b> une devise cette semaine — mais <b>pas à quel prix.</b><br/><br/>
+                Le Golden Pocket te donne ce prix manquant. Quand un fonds accumule des milliards, il le fait sur un <b>repli</b> (l'escompte), jamais au sommet. Statistiquement, ce repli s'arrête dans la zone <b style={{color:"#c084fc"}}>61.8%–65%</b> — c'est là que l'accumulation institutionnelle se concentre.<br/><br/>
+                👉 <b style={{color:"#38bdf8"}}>Le COT prouve QU'ILS achètent · le Golden Pocket te montre OÙ ils achètent.</b> Les deux ensemble = tu sais quelle paire trader ET à quel prix entrer avec eux.
+              </div>
+            </div>
 
             <div style={{marginBottom:14, padding:"12px", background:"#001a0d", borderRadius:6, border:"1px solid #4ade8044"}}>
               <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:10}}>▲ ACHAT — ACCUMULATION AU GOLDEN POCKET</div>
+              <svg viewBox="0 0 320 180" style={{width:"100%", maxWidth:340, display:"block", margin:"0 auto 12px"}}>
+                {/* Niveaux Fibonacci */}
+                <line x1="40" y1="25" x2="300" y2="25" stroke="#555" strokeWidth="0.8" strokeDasharray="3,3"/>
+                <text x="2" y="28" fill="#888" fontSize="8" fontFamily="monospace">100%</text>
+                <line x1="40" y1="70" x2="300" y2="70" stroke="#888" strokeWidth="0.8" strokeDasharray="3,3"/>
+                <text x="6" y="73" fill="#aaa" fontSize="8" fontFamily="monospace">50%</text>
+                {/* GOLDEN POCKET */}
+                <rect x="40" y="95" width="260" height="20" fill="#a855f733" stroke="#a855f7" strokeWidth="1.2"/>
+                <text x="44" y="91" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">GOLDEN POCKET 61.8-65%</text>
+                <line x1="40" y1="140" x2="300" y2="140" stroke="#ff6666" strokeWidth="0.8" strokeDasharray="3,3"/>
+                <text x="2" y="143" fill="#ff6666" fontSize="8" fontFamily="monospace">78.6%</text>
+                {/* Courbe de prix: impulsion montante puis repli vers le pocket avec rejets */}
+                <polyline points="45,140 70,95 90,55 110,30 130,55 145,100 155,108 165,98 178,107 188,100 205,60 230,35 260,20" fill="none" stroke="#4ade80" strokeWidth="2"/>
+                {/* Fleches de rejet dans le pocket */}
+                <text x="138" y="128" fill="#4ade80" fontSize="9">↑</text>
+                <text x="171" y="128" fill="#4ade80" fontSize="9">↑</text>
+                <text x="120" y="170" fill="#4ade80" fontSize="7" fontFamily="monospace">2-3 rejets = accumulation</text>
+                {/* Point entree */}
+                <circle cx="188" cy="100" r="4" fill="#00ff88"/>
+                <text x="196" y="103" fill="#00ff88" fontSize="8" fontFamily="monospace" fontWeight="700">ENTRÉE</text>
+              </svg>
               <div style={{display:"flex", flexDirection:"column", gap:7}}>
                 <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#4ade80", fontWeight:700, fontSize:11, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Le tableau dit <b style={{color:"#4ade80"}}>Leveraged Funds ACHÈTENT</b> (chgNet positif) → biais <b>LONG</b></span></div>
                 <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#4ade80", fontWeight:700, fontSize:11, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Sur H4, trouve la dernière <b>impulsion haussière</b> (gros mouvement vert) et trace le <b>Fibonacci du bas vers le haut</b></span></div>
@@ -3355,6 +3384,27 @@ export default function App() {
 
             <div style={{marginBottom:14, padding:"12px", background:"#1a0000", borderRadius:6, border:"1px solid #f8717144"}}>
               <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:10}}>▼ VENTE — DISTRIBUTION AU GOLDEN POCKET</div>
+              <svg viewBox="0 0 320 180" style={{width:"100%", maxWidth:340, display:"block", margin:"0 auto 12px"}}>
+                {/* Niveaux Fibonacci (inverses) */}
+                <line x1="40" y1="40" x2="300" y2="40" stroke="#ff6666" strokeWidth="0.8" strokeDasharray="3,3"/>
+                <text x="2" y="43" fill="#ff6666" fontSize="8" fontFamily="monospace">78.6%</text>
+                {/* GOLDEN POCKET en haut */}
+                <rect x="40" y="60" width="260" height="20" fill="#a855f733" stroke="#a855f7" strokeWidth="1.2"/>
+                <text x="44" y="56" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">GOLDEN POCKET 61.8-65%</text>
+                <line x1="40" y1="105" x2="300" y2="105" stroke="#888" strokeWidth="0.8" strokeDasharray="3,3"/>
+                <text x="6" y="108" fill="#aaa" fontSize="8" fontFamily="monospace">50%</text>
+                <line x1="40" y1="150" x2="300" y2="150" stroke="#555" strokeWidth="0.8" strokeDasharray="3,3"/>
+                <text x="2" y="153" fill="#888" fontSize="8" fontFamily="monospace">100%</text>
+                {/* Courbe: impulsion descendante puis remontee vers le pocket avec rejets */}
+                <polyline points="45,35 70,80 90,120 110,145 130,120 145,72 155,64 165,74 178,65 188,72 205,115 230,140 260,160" fill="none" stroke="#f87171" strokeWidth="2"/>
+                {/* Fleches de rejet dans le pocket */}
+                <text x="138" y="52" fill="#f87171" fontSize="9">↓</text>
+                <text x="171" y="52" fill="#f87171" fontSize="9">↓</text>
+                <text x="120" y="20" fill="#f87171" fontSize="7" fontFamily="monospace">2-3 rejets = accumulation short</text>
+                {/* Point entree */}
+                <circle cx="188" cy="72" r="4" fill="#ff3b3b"/>
+                <text x="196" y="75" fill="#ff3b3b" fontSize="8" fontFamily="monospace" fontWeight="700">ENTRÉE</text>
+              </svg>
               <div style={{display:"flex", flexDirection:"column", gap:7}}>
                 <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#f87171", fontWeight:700, fontSize:11, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Le tableau dit <b style={{color:"#f87171"}}>Leveraged Funds VENDENT</b> (chgNet négatif) → biais <b>SHORT</b></span></div>
                 <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#f87171", fontWeight:700, fontSize:11, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Sur H4, trouve la dernière <b>impulsion baissière</b> (gros mouvement rouge) et trace le <b>Fibonacci du haut vers le bas</b></span></div>

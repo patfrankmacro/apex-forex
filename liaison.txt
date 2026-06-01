@@ -1,0 +1,9 @@
+
+            <div style={{marginBottom:14, padding:"12px 14px", background:"#0a2540", borderRadius:6, border:"1px solid #38bdf855"}}>
+              <div style={{fontSize:10, color:"#38bdf8", fontWeight:700, marginBottom:8}}>🔗 LE LIEN COT ↔ GOLDEN POCKET</div>
+              <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>
+                Le tableau (COT) te dit que les Leveraged Funds <b>achètent ou vendent</b> une devise cette semaine — mais <b>pas à quel prix.</b><br/><br/>
+                Le Golden Pocket te donne ce prix manquant. Quand un fonds accumule des milliards, il le fait sur un <b>repli</b> (l'escompte), jamais au sommet. Statistiquement, ce repli s'arrête dans la zone <b style={{color:"#c084fc"}}>61.8%–65%</b> — c'est là que l'accumulation institutionnelle se concentre.<br/><br/>
+                👉 <b style={{color:"#38bdf8"}}>Le COT prouve QU'ILS achètent · le Golden Pocket te montre OÙ ils achètent.</b> Les deux ensemble = tu sais quelle paire trader ET à quel prix entrer avec eux.
+              </div>
+            </div>
