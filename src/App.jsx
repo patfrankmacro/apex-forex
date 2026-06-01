@@ -3454,6 +3454,27 @@ const retailLoaded = opps.some(o => o.retailData);
               <b style={{color:"#a855f7"}}>💡 POURQUOI ÇA MARCHE</b><br/>
               <span style={{color:TEXT_DIM}}>Les Leveraged Funds ne chassent jamais le prix — ils attendent un <b style={{color:"#c084fc"}}>escompte</b>. Le Golden Pocket (61.8%–65%) est ce niveau d'escompte où ils accumulent par paquets. Le retail panique et vend ses positions exactement là, fournissant la liquidité. Tu te places <b style={{color:"#fbbf24"}}>dans la zone d'escompte, avec les fonds, contre la foule.</b></span>
             </div>
+            <div style={{marginBottom:14, padding:"12px 14px", background:"#1a0a2e", borderRadius:6, border:"1px solid #a855f755"}}>
+              <div style={{fontSize:10, color:"#c084fc", fontWeight:700, marginBottom:8}}>🧠 LA PSYCHOLOGIE — POURQUOI LE PRIX REVIENT & CHASSE LES STOPS</div>
+              <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>
+                <b style={{color:"#c084fc"}}>Le problème des fonds :</b> pour acheter des milliards, il leur faut des vendeurs en face. S'ils achètent d'un coup, le prix monte contre eux. Ils ont besoin d'une <b>réserve de liquidité</b> — et cette réserve, ce sont les ordres du retail.<br/><br/>
+                <b style={{color:"#c084fc"}}>Où est la liquidité ?</b> Le retail place ses stops à des endroits ultra-prévisibles : sous les derniers creux, au-dessus des derniers sommets, aux niveaux ronds. Les fonds savent exactement où ces stops sont entassés.<br/><br/>
+                <b style={{color:"#c084fc"}}>Pourquoi le prix revient dans la zone :</b> le prix ne bouge pas au hasard — il <b>se dirige vers la liquidité</b>. Il retourne vers le Golden Pocket / les creux parce que c'est là que dorment les ordres dont les fonds ont besoin pour remplir leur position.<br/><br/>
+                <b style={{color:"#c084fc"}}>La chasse aux stops (liquidity grab) :</b> souvent le prix <b>perce légèrement</b> sous un creux (ou au-dessus d'un sommet) pour déclencher les stops du retail. Ces stops déclenchés = des ordres forcés = exactement la liquidité que les fonds prennent. Puis le prix <b>repart violemment</b> dans l'autre sens.<br/><br/>
+                <b style={{color:"#fbbf24"}}>Ce que ça change pour toi :</b> ce que le retail appelle "fausse cassure" ou "malchance" est en fait le moment où les fonds chargent. Au lieu de te faire piéger, tu <b>attends ce balayage</b> : le pic + mèche de rejet + retour dans la zone = leur empreinte. Tu entres APRÈS le grab, avec eux, pas avant.
+              </div>
+            </div>
+
+            <div style={{marginBottom:14, padding:"12px 14px", background:"#001a2e", borderRadius:6, border:"1px solid #38bdf855"}}>
+              <div style={{fontSize:10, color:"#38bdf8", fontWeight:700, marginBottom:8}}>🎭 PENSER COMME EUX — LES 3 PHASES</div>
+              <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>
+                Le marché passe le plus clair de son temps en range, pas en tendance. Ces ranges suivent 3 phases :<br/><br/>
+                <b style={{color:"#4ade80"}}>① ACCUMULATION</b> — le prix stagne. Le retail trouve le marché "faible" et vend. Les fonds utilisent cette vente pour bâtir leurs positions, tranquillement.<br/><br/>
+                <b style={{color:"#fbbf24"}}>② MANIPULATION</b> — le prix casse le range et déclenche les stops (panique retail). Les fonds achètent dans cette liquidité. C'est le "stop hunt".<br/><br/>
+                <b style={{color:"#38bdf8"}}>③ EXPANSION</b> — le prix repart franchement dans la vraie direction. Le retail piégé du mauvais côté alimente encore le mouvement.<br/><br/>
+                <b style={{color:"#fbbf24"}}>La discipline clé :</b> ne jamais entrer en même temps que la foule (sur la cassure). Attendre le balayage, la confirmation, puis entrer dans le sens des fonds. Patience = tu n'es plus la liquidité, tu es avec ceux qui la prennent.
+              </div>
+            </div>
 
             <div style={{marginTop:8, padding:"8px 10px", background:"#001a0d", borderRadius:4, fontSize:8, color:"#4ade80", lineHeight:1.7}}>
               <b>⚠ RÈGLES & CONFIRMATION</b><br/>
