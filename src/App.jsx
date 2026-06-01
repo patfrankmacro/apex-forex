@@ -3071,7 +3071,9 @@ export default function App() {
             });
             opps.sort((a,b) => b.scoreCombined - a.scoreCombined);
             // APEX 3/3 strict: ne garder que les setups ou le retail est contrarian confirme (70%+ du cote oppose)
-            const top = opps.filter(o => o.retailOk).slice(0,10);
+const retailLoaded = opps.some(o => o.retailData);
+            const top = retailLoaded ? opps.filter(o => o.retailOk).slice(0,10) : opps.slice(0,10);
+            const retailMissing = !retailLoaded;
             if (top.length === 0) return null;
             return (
               <div style={{marginTop:16, padding:"12px 0"}}>
