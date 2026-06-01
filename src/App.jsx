@@ -3397,6 +3397,9 @@ const retailLoaded = opps.some(o => o.retailData);
                 {/* Point entree */}
                 <circle cx="188" cy="100" r="4" fill="#00ff88"/>
                 <text x="196" y="103" fill="#00ff88" fontSize="8" fontFamily="monospace" fontWeight="700">ENTRÉE</text>
+                {/* Meche de balayage des stops (liquidity grab) sous le golden pocket */}
+                <line x1="155" y1="115" x2="155" y2="150" stroke="#ff6666" strokeWidth="1.5"/>
+                <text x="60" y="165" fill="#ff6666" fontSize="6.5" fontFamily="monospace">↓ balayage stops retail (grab) puis rebond</text>
               </svg>
               <div style={{display:"flex", flexDirection:"column", gap:7}}>
                 <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#4ade80", fontWeight:700, fontSize:11, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Le tableau dit <b style={{color:"#4ade80"}}>Leveraged Funds ACHÈTENT</b> (chgNet positif) → biais <b>LONG</b></span></div>
@@ -3429,6 +3432,9 @@ const retailLoaded = opps.some(o => o.retailData);
                 {/* Point entree */}
                 <circle cx="188" cy="72" r="4" fill="#ff3b3b"/>
                 <text x="196" y="75" fill="#ff3b3b" fontSize="8" fontFamily="monospace" fontWeight="700">ENTRÉE</text>
+                {/* Meche de balayage des stops (liquidity grab) au-dessus du golden pocket */}
+                <line x1="155" y1="64" x2="155" y2="30" stroke="#4ade80" strokeWidth="1.5"/>
+                <text x="60" y="22" fill="#4ade80" fontSize="6.5" fontFamily="monospace">↑ balayage stops retail (grab) puis chute</text>
               </svg>
               <div style={{display:"flex", flexDirection:"column", gap:7}}>
                 <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#f87171", fontWeight:700, fontSize:11, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Le tableau dit <b style={{color:"#f87171"}}>Leveraged Funds VENDENT</b> (chgNet négatif) → biais <b>SHORT</b></span></div>
