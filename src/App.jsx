@@ -158,15 +158,15 @@ async function fetchRetailApp(){
 
 const TE = "https://tradingeconomics.com";
 const TE_LINKS = {
-  USD: { mfg:"united-states/business-confidence", svc:"united-states/non-manufacturing-pmi", unemp:"united-states/unemployment-rate", rate:"united-states/interest-rate", cpi:"united-states/inflation-rate", core:"united-states/core-inflation-rate" },
-  EUR: { mfg:"euro-area/manufacturing-pmi", svc:"euro-area/services-pmi", unemp:"euro-area/unemployment-rate", rate:"euro-area/interest-rate", cpi:"euro-area/inflation-rate", core:"euro-area/core-inflation-rate" },
-  CAD: { mfg:"canada/manufacturing-pmi", svc:"canada/services-pmi", unemp:"canada/unemployment-rate", rate:"canada/interest-rate", cpi:"canada/inflation-rate", core:"canada/core-inflation-rate" },
-  CHF: { mfg:"switzerland/manufacturing-pmi", svc:"switzerland/services-pmi", unemp:"switzerland/unemployment-rate", rate:"switzerland/interest-rate", cpi:"switzerland/inflation-rate", core:"switzerland/core-inflation-rate" },
-  AUD: { mfg:"australia/manufacturing-pmi", svc:"australia/services-pmi", unemp:"australia/unemployment-rate", rate:"australia/interest-rate", cpi:"australia/inflation-rate", core:"australia/core-inflation-rate" },
-  JPY: { mfg:"japan/manufacturing-pmi", svc:"japan/services-pmi", unemp:"japan/unemployment-rate", rate:"japan/interest-rate", cpi:"japan/inflation-rate", core:"japan/core-inflation-rate" },
-  GBP: { mfg:"united-kingdom/manufacturing-pmi", svc:"united-kingdom/services-pmi", unemp:"united-kingdom/unemployment-rate", rate:"united-kingdom/interest-rate", cpi:"united-kingdom/inflation-rate", core:"united-kingdom/core-inflation-rate" },
-  NZD: { mfg:"new-zealand/manufacturing-pmi", svc:"new-zealand/services-pmi", unemp:"new-zealand/unemployment-rate", rate:"new-zealand/interest-rate", cpi:"new-zealand/inflation-rate", core:"new-zealand/core-inflation-rate" },
-  CNY: { mfg:"china/business-confidence", svc:"china/non-manufacturing-pmi", unemp:"china/unemployment-rate", rate:"china/interest-rate", cpi:"china/inflation-rate", core:"china/core-inflation-rate" },
+  USD: { mfg:"united-states/business-confidence", svc:"united-states/non-manufacturing-pmi", unemp:"united-states/unemployment-rate", rate:"united-states/interest-rate", cpi:"united-states/inflation-cpi", core:"united-states/core-inflation-rate" },
+  EUR: { mfg:"euro-area/manufacturing-pmi", svc:"euro-area/services-pmi", unemp:"euro-area/unemployment-rate", rate:"euro-area/interest-rate", cpi:"euro-area/inflation-cpi", core:"euro-area/core-inflation-rate" },
+  CAD: { mfg:"canada/manufacturing-pmi", svc:"canada/services-pmi", unemp:"canada/unemployment-rate", rate:"canada/interest-rate", cpi:"canada/inflation-cpi", core:"canada/core-inflation-rate" },
+  CHF: { mfg:"switzerland/manufacturing-pmi", svc:"switzerland/services-pmi", unemp:"switzerland/unemployment-rate", rate:"switzerland/interest-rate", cpi:"switzerland/inflation-cpi", core:"switzerland/core-inflation-rate" },
+  AUD: { mfg:"australia/manufacturing-pmi", svc:"australia/services-pmi", unemp:"australia/unemployment-rate", rate:"australia/interest-rate", cpi:"australia/inflation-cpi", core:"australia/core-inflation-rate" },
+  JPY: { mfg:"japan/manufacturing-pmi", svc:"japan/services-pmi", unemp:"japan/unemployment-rate", rate:"japan/interest-rate", cpi:"japan/inflation-cpi", core:"japan/core-inflation-rate" },
+  GBP: { mfg:"united-kingdom/manufacturing-pmi", svc:"united-kingdom/services-pmi", unemp:"united-kingdom/unemployment-rate", rate:"united-kingdom/interest-rate", cpi:"united-kingdom/inflation-cpi", core:"united-kingdom/core-inflation-rate" },
+  NZD: { mfg:"new-zealand/manufacturing-pmi", svc:"new-zealand/services-pmi", unemp:"new-zealand/unemployment-rate", rate:"new-zealand/interest-rate", cpi:"new-zealand/inflation-cpi", core:"new-zealand/core-inflation-rate" },
+  CNY: { mfg:"china/business-confidence", svc:"china/non-manufacturing-pmi", unemp:"china/unemployment-rate", rate:"china/interest-rate", cpi:"china/inflation-cpi", core:"china/core-inflation-rate" },
 };
 
 const REGIMES = {
