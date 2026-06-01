@@ -3330,203 +3330,63 @@ export default function App() {
             ))}
           </div>
 
-          {/* ========== STRATEGIE TECHNIQUE — ZONES INSTITUTIONNELLES ========== */}
+          {/* ========== STRATEGIE TECHNIQUE — GOLDEN POCKET ========== */}
           <div style={{marginTop:24, padding:"14px 14px 16px", background:"#0a1628", border:"1px solid #1e3a5f", borderRadius:8}}>
-            <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, letterSpacing:2, marginBottom:4}}>📈 STRATÉGIE TECHNIQUE — SUIVRE LES LEVERAGED FUNDS</div>
-            <div style={{fontSize:9, color:"#475569", marginBottom:14}}>Entrer au même prix que les Leveraged Funds, au retest de leur zone · Timeframe H4</div>
+            <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, letterSpacing:2, marginBottom:4}}>📈 STRATÉGIE TECHNIQUE — ENTRER AVEC LES LEVERAGED FUNDS</div>
+            <div style={{fontSize:9, color:"#475569", marginBottom:14}}>Le tableau donne la DIRECTION · le Golden Pocket Fibonacci donne le PRIX D'ENTRÉE · Timeframe H4</div>
 
             <div style={{fontSize:9, color:TEXT, lineHeight:1.8, marginBottom:14, padding:"12px 14px", background:"#001a2e", borderRadius:4, borderLeft:"3px solid #38bdf8"}}>
-              <b style={{color:"#38bdf8"}}>🎯 LA LOGIQUE — PENSE COMME UN LEVERAGED FUND</b><br/><br/>
-              Imagine que tu gères <b>2 milliards de dollars</b>. Tu ne peux pas acheter d'un coup — le marché bougerait contre toi. Alors tu <b>construis ta position sur plusieurs jours</b>, autour d'un niveau précis. Ce niveau, c'est <b>ton prix moyen d'entrée</b>.<br/><br/>
-              Le rapport CFTC sort chaque <b>vendredi</b> et capture exactement ça : où les Leveraged Funds se sont positionnés le <b>mardi</b>. Ce prix du mardi = <b>leur zone</b>.<br/><br/>
-              <b>Maintenant imagine que le prix revient sur ta zone cette semaine :</b><br/>
-              → Tu as 2 milliards engagés à ce niveau. <b>Tu ne peux pas te permettre d'être en perte.</b><br/>
-              → Alors tu <b>rachètes / rajoutes</b> pour défendre ton prix moyen<br/>
-              → Tes collègues fonds voient la même zone sur leurs charts — <b>ils font pareil</b><br/>
-              → Cette concentration d'ordres institutionnels <b>repousse le prix</b><br/><br/>
-              <b style={{color:"#a78bfa"}}>Le niveau du mardi COT = zone où des milliards sont engagés = zone de demande/offre institutionnelle.</b><br/><br/>
-              <span style={{color:"#fbbf24"}}>Tu n'entres pas "après" les Leveraged Funds. Tu entres AU MÊME PRIX qu'eux, AVEC eux, au retest de leur zone.</span>
+              <b style={{color:"#38bdf8"}}>🎯 PENSE COMME UN LEVERAGED FUND</b><br/><br/>
+              Imagine que tu gères <b>2 milliards de dollars</b> et que tu veux acheter une devise. Tu ne peux pas tout acheter d'un coup — le marché monterait contre toi. Et surtout : <b>tu ne veux pas payer le prix fort.</b><br/><br/>
+              Comme un grossiste, tu attends que le prix <b>redescende en solde</b> avant de charger. Ce niveau d'escompte, sur un graphique, c'est le <b style={{color:"#c084fc"}}>Golden Pocket : la zone 61.8%–65%</b> du dernier mouvement (retracement de Fibonacci).<br/><br/>
+              Quand le prix recule jusque-là, les fonds <b>accumulent</b> : ils achètent par paquets à chaque retour dans la zone. Tu vois leur empreinte par <b>les rejets répétés + le volume qui monte</b>. Tu entres AU MÊME PRIX qu'eux, dans la zone d'escompte, AVEC eux.
             </div>
 
-            {/* === SCHEMA LONG (zone COT mardi, comme NZDCAD) === */}
             <div style={{marginBottom:14, padding:"12px", background:"#001a0d", borderRadius:6, border:"1px solid #4ade8044"}}>
-              <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8}}>▲ LEVERAGED FUNDS ACHÈTENT — ACCUMULATION AU GOLDEN POCKET</div>
-
-              <svg viewBox="0 0 340 240" style={{width:"100%", maxWidth:360, display:"block", margin:"0 auto 8px"}}>
-                {/* Niveaux Fibonacci */}
-                <line x1="10" y1="40" x2="330" y2="40" stroke="#555" strokeWidth="0.8" strokeDasharray="2,2"/>
-                <text x="312" y="37" fill="#888" fontSize="7" fontFamily="monospace">100%</text>
-                <line x1="10" y1="95" x2="330" y2="95" stroke="#888" strokeWidth="0.8" strokeDasharray="2,2"/>
-                <text x="315" y="92" fill="#aaa" fontSize="7" fontFamily="monospace">50%</text>
-                {/* GOLDEN POCKET 61.8-65% (zone violette) */}
-                <rect x="10" y="120" width="320" height="22" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
-                <text x="14" y="116" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">GOLDEN POCKET 61.8%-65% = ZONE D'ACCUMULATION</text>
-                <line x1="10" y1="170" x2="330" y2="170" stroke="#ff6666" strokeWidth="0.8" strokeDasharray="2,2"/>
-                <text x="305" y="182" fill="#ff6666" fontSize="7" fontFamily="monospace">78.6% (stop)</text>
-
-                {/* 1. IMPULSION haussière (vert) du bas vers le haut */}
-                <line x1="30" y1="175" x2="30" y2="195" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="26" y="178" width="8" height="17" fill="#4ade80"/>
-                <line x1="46" y1="140" x2="46" y2="180" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="42" y="144" width="8" height="32" fill="#4ade80"/>
-                <line x1="62" y1="95" x2="62" y2="142" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="58" y="98" width="8" height="42" fill="#4ade80"/>
-                <line x1="78" y1="55" x2="78" y2="98" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="74" y="58" width="8" height="40" fill="#4ade80"/>
-                <text x="40" y="218" fill="#4ade80" fontSize="7" fontFamily="monospace">① impulsion</text>
-
-                {/* 2. Pullback vers le golden pocket */}
-                <line x1="98" y1="55" x2="98" y2="80" stroke="#888" strokeWidth="1"/>
-                <rect x="94" y="58" width="8" height="22" fill="#888"/>
-                <line x1="114" y1="75" x2="114" y2="115" stroke="#888" strokeWidth="1"/>
-                <rect x="110" y="78" width="8" height="37" fill="#888"/>
-
-                {/* 3. TOUCHE 1 du golden pocket avec mèche basse de rejet */}
-                <line x1="132" y1="100" x2="132" y2="150" stroke="#4ade80" strokeWidth="1.5"/>
-                <rect x="128" y="104" width="8" height="20" fill="#4ade80"/>
-                <text x="138" y="158" fill="#4ade80" fontSize="7" fontFamily="monospace">rejet 1</text>
-
-                {/* 4. Petit rebond + TOUCHE 2 (rejet) */}
-                <line x1="150" y1="90" x2="150" y2="110" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="146" y="93" width="8" height="17" fill="#4ade80"/>
-                <line x1="168" y1="102" x2="168" y2="148" stroke="#4ade80" strokeWidth="1.5"/>
-                <rect x="164" y="106" width="8" height="18" fill="#4ade80"/>
-                <text x="174" y="158" fill="#4ade80" fontSize="7" fontFamily="monospace">rejet 2</text>
-
-                {/* 5. TOUCHE 3 (rejet) puis départ */}
-                <line x1="186" y1="100" x2="186" y2="142" stroke="#4ade80" strokeWidth="1.5"/>
-                <rect x="182" y="104" width="8" height="16" fill="#4ade80"/>
-
-                {/* Volume croissant (barres en bas) */}
-                <rect x="128" y="228" width="8" height="6" fill="#4ade8088"/>
-                <rect x="164" y="225" width="8" height="9" fill="#4ade80aa"/>
-                <rect x="182" y="221" width="8" height="13" fill="#4ade80"/>
-                <text x="200" y="233" fill="#4ade80" fontSize="6.5" fontFamily="monospace">volume ↑ à chaque touche</text>
-
-                {/* 6. Cassure et départ haussier */}
-                <line x1="204" y1="70" x2="204" y2="105" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="200" y="74" width="8" height="31" fill="#4ade80"/>
-                <line x1="222" y1="45" x2="222" y2="74" stroke="#4ade80" strokeWidth="1"/>
-                <rect x="218" y="48" width="8" height="26" fill="#4ade80"/>
-                <line x1="240" y1="48" x2="305" y2="20" stroke="#4ade80" strokeWidth="2" strokeDasharray="3,2" markerEnd="url(#arGL)"/>
-
-                {/* ENTRY LONG au golden pocket */}
-                <line x1="186" y1="200" x2="186" y2="150" stroke="#00ff88" strokeWidth="2.5" markerEnd="url(#arEntL)"/>
-                <text x="186" y="214" fill="#00ff88" fontSize="9" fontFamily="monospace" fontWeight="700" textAnchor="middle">ENTRY (3 rejets confirmés)</text>
-
-                <defs>
-                  <marker id="arGL" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4ade80"/></marker>
-                  <marker id="arEntL" viewBox="0 0 10 10" refX="5" refY="2" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 10 L 5 0 L 10 10 z" fill="#00ff88"/></marker>
-                </defs>
-              </svg>
-
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.7, marginTop:8}}>
-                <b style={{color:"#4ade80"}}>①</b> TABLEAU dit "Leveraged Funds achètent" (chgNet positif) → biais LONG<br/>
-                <b style={{color:"#4ade80"}}>②</b> En <b>H4</b>, trace le <b>Fibonacci</b> sur la dernière impulsion haussière (du bas au haut)<br/>
-                <b style={{color:"#4ade80"}}>③</b> Le prix recule dans le <b>GOLDEN POCKET (61.8%-65%)</b> = zone d'escompte où les fonds accumulent<br/>
-                <b style={{color:"#4ade80"}}>④</b> <b>Touches répétées</b> du golden pocket avec mèches de rejet + <b>volume qui monte</b> = ils rajoutent<br/>
-                <b style={{color:"#4ade80"}}>⑤</b> <b>Entry LONG</b> à la confirmation (2-3 rejets qui tiennent) · stop sous le 78.6% · target = extension 1.618
+              <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:10}}>▲ ACHAT — ACCUMULATION AU GOLDEN POCKET</div>
+              <div style={{display:"flex", flexDirection:"column", gap:7}}>
+                <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#4ade80", fontWeight:700, fontSize:11, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Le tableau dit <b style={{color:"#4ade80"}}>Leveraged Funds ACHÈTENT</b> (chgNet positif) → biais <b>LONG</b></span></div>
+                <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#4ade80", fontWeight:700, fontSize:11, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Sur H4, trouve la dernière <b>impulsion haussière</b> (gros mouvement vert) et trace le <b>Fibonacci du bas vers le haut</b></span></div>
+                <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#4ade80", fontWeight:700, fontSize:11, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Attends que le prix <b>recule dans le</b> <b style={{color:"#c084fc"}}>GOLDEN POCKET (61.8%–65%)</b> = la zone d'escompte où les fonds rachètent</span></div>
+                <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#4ade80", fontWeight:700, fontSize:11, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Guette <b>2-3 touches</b> de la zone avec <b>mèches basses de rejet</b> + <b style={{color:"#fbbf24"}}>volume qui monte</b> à chaque touche = ils accumulent</span></div>
+                <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#4ade80", fontWeight:700, fontSize:11, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#00ff88"}}>ENTRÉE LONG</b> quand les rejets tiennent · <b>stop sous le 78.6%</b> · target = extension <b>1.618</b></span></div>
               </div>
             </div>
 
-            {/* === SCHEMA SHORT === */}
             <div style={{marginBottom:14, padding:"12px", background:"#1a0000", borderRadius:6, border:"1px solid #f8717144"}}>
-              <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:8}}>▼ LEVERAGED FUNDS VENDENT — DISTRIBUTION AU GOLDEN POCKET</div>
-
-              <svg viewBox="0 0 340 240" style={{width:"100%", maxWidth:360, display:"block", margin:"0 auto 8px"}}>
-                {/* Niveaux Fibonacci (inversés: golden pocket en haut) */}
-                <line x1="10" y1="40" x2="330" y2="40" stroke="#ff6666" strokeWidth="0.8" strokeDasharray="2,2"/>
-                <text x="295" y="37" fill="#ff6666" fontSize="7" fontFamily="monospace">78.6% (stop)</text>
-                {/* GOLDEN POCKET 61.8-65% (zone violette, en haut) */}
-                <rect x="10" y="58" width="320" height="22" fill="#a855f733" stroke="#a855f7" strokeWidth="1.5"/>
-                <text x="14" y="54" fill="#c084fc" fontSize="8" fontFamily="monospace" fontWeight="700">GOLDEN POCKET 61.8%-65% = ZONE DE VENTE</text>
-                <line x1="10" y1="110" x2="330" y2="110" stroke="#888" strokeWidth="0.8" strokeDasharray="2,2"/>
-                <text x="315" y="107" fill="#aaa" fontSize="7" fontFamily="monospace">50%</text>
-                <line x1="10" y1="165" x2="330" y2="165" stroke="#555" strokeWidth="0.8" strokeDasharray="2,2"/>
-                <text x="312" y="175" fill="#888" fontSize="7" fontFamily="monospace">100%</text>
-
-                {/* ENTRY SHORT au golden pocket (en haut) */}
-                <text x="186" y="232" fill="#ff3b3b" fontSize="9" fontFamily="monospace" fontWeight="700" textAnchor="middle">ENTRY (3 rejets confirmés)</text>
-                <line x1="186" y1="218" x2="186" y2="84" stroke="#ff3b3b" strokeWidth="2.5" markerEnd="url(#arEntS)"/>
-
-                {/* 1. IMPULSION baissière (rouge) du haut vers le bas */}
-                <line x1="30" y1="45" x2="30" y2="65" stroke="#f87171" strokeWidth="1"/>
-                <rect x="26" y="48" width="8" height="17" fill="#f87171"/>
-                <line x1="46" y1="60" x2="46" y2="100" stroke="#f87171" strokeWidth="1"/>
-                <rect x="42" y="63" width="8" height="32" fill="#f87171"/>
-                <line x1="62" y1="98" x2="62" y2="145" stroke="#f87171" strokeWidth="1"/>
-                <rect x="58" y="100" width="8" height="42" fill="#f87171"/>
-                <line x1="78" y1="140" x2="78" y2="185" stroke="#f87171" strokeWidth="1"/>
-                <rect x="74" y="143" width="8" height="40" fill="#f87171"/>
-                <text x="40" y="205" fill="#f87171" fontSize="7" fontFamily="monospace">① impulsion</text>
-
-                {/* 2. Pullback (remontée) vers le golden pocket */}
-                <line x1="98" y1="135" x2="98" y2="160" stroke="#888" strokeWidth="1"/>
-                <rect x="94" y="138" width="8" height="22" fill="#888"/>
-                <line x1="114" y1="100" x2="114" y2="140" stroke="#888" strokeWidth="1"/>
-                <rect x="110" y="103" width="8" height="37" fill="#888"/>
-
-                {/* 3. TOUCHE 1 du golden pocket avec mèche haute de rejet */}
-                <line x1="132" y1="50" x2="132" y2="100" stroke="#f87171" strokeWidth="1.5"/>
-                <rect x="128" y="76" width="8" height="20" fill="#f87171"/>
-                <text x="138" y="46" fill="#f87171" fontSize="7" fontFamily="monospace">rejet 1</text>
-
-                {/* 4. TOUCHE 2 (rejet) */}
-                <line x1="150" y1="90" x2="150" y2="110" stroke="#f87171" strokeWidth="1"/>
-                <rect x="146" y="93" width="8" height="17" fill="#f87171"/>
-                <line x1="168" y1="52" x2="168" y2="98" stroke="#f87171" strokeWidth="1.5"/>
-                <rect x="164" y="76" width="8" height="18" fill="#f87171"/>
-                <text x="174" y="46" fill="#f87171" fontSize="7" fontFamily="monospace">rejet 2</text>
-
-                {/* 5. TOUCHE 3 (rejet) puis départ */}
-                <line x1="186" y1="58" x2="186" y2="100" stroke="#f87171" strokeWidth="1.5"/>
-                <rect x="182" y="80" width="8" height="16" fill="#f87171"/>
-
-                {/* Volume croissant */}
-                <rect x="128" y="210" width="8" height="6" fill="#f8717188"/>
-                <rect x="164" y="207" width="8" height="9" fill="#f87171aa"/>
-                <rect x="182" y="203" width="8" height="13" fill="#f87171"/>
-                <text x="200" y="215" fill="#f87171" fontSize="6.5" fontFamily="monospace">volume ↑ à chaque touche</text>
-
-                {/* 6. Cassure et départ baissier */}
-                <line x1="204" y1="95" x2="204" y2="130" stroke="#f87171" strokeWidth="1"/>
-                <rect x="200" y="98" width="8" height="31" fill="#f87171"/>
-                <line x1="222" y1="128" x2="222" y2="157" stroke="#f87171" strokeWidth="1"/>
-                <rect x="218" y="131" width="8" height="26" fill="#f87171"/>
-                <line x1="240" y1="155" x2="305" y2="183" stroke="#f87171" strokeWidth="2" strokeDasharray="3,2" markerEnd="url(#arGS)"/>
-
-                <defs>
-                  <marker id="arGS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#f87171"/></marker>
-                  <marker id="arEntS" viewBox="0 0 10 10" refX="5" refY="8" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 5 10 L 10 0 z" fill="#ff3b3b"/></marker>
-                </defs>
-              </svg>
-
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.7, marginTop:8}}>
-                <b style={{color:"#f87171"}}>①</b> TABLEAU dit "Leveraged Funds vendent" (chgNet négatif) → biais SHORT<br/>
-                <b style={{color:"#f87171"}}>②</b> En <b>H4</b>, trace le <b>Fibonacci</b> sur la dernière impulsion baissière (du haut au bas)<br/>
-                <b style={{color:"#f87171"}}>③</b> Le prix remonte dans le <b>GOLDEN POCKET (61.8%-65%)</b> = zone chère où les fonds vendent<br/>
-                <b style={{color:"#f87171"}}>④</b> <b>Touches répétées</b> du golden pocket avec mèches de rejet + <b>volume qui monte</b> = ils rajoutent leur short<br/>
-                <b style={{color:"#f87171"}}>⑤</b> <b>Entry SHORT</b> à la confirmation (2-3 rejets qui tiennent) · stop au-dessus du 78.6% · target = extension 1.618
+              <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:10}}>▼ VENTE — DISTRIBUTION AU GOLDEN POCKET</div>
+              <div style={{display:"flex", flexDirection:"column", gap:7}}>
+                <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#f87171", fontWeight:700, fontSize:11, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Le tableau dit <b style={{color:"#f87171"}}>Leveraged Funds VENDENT</b> (chgNet négatif) → biais <b>SHORT</b></span></div>
+                <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#f87171", fontWeight:700, fontSize:11, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Sur H4, trouve la dernière <b>impulsion baissière</b> (gros mouvement rouge) et trace le <b>Fibonacci du haut vers le bas</b></span></div>
+                <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#f87171", fontWeight:700, fontSize:11, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Attends que le prix <b>remonte dans le</b> <b style={{color:"#c084fc"}}>GOLDEN POCKET (61.8%–65%)</b> = la zone chère où les fonds revendent</span></div>
+                <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#f87171", fontWeight:700, fontSize:11, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Guette <b>2-3 touches</b> de la zone avec <b>mèches hautes de rejet</b> + <b style={{color:"#fbbf24"}}>volume qui monte</b> à chaque touche = ils accumulent leur short</span></div>
+                <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#f87171", fontWeight:700, fontSize:11, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#ff3b3b"}}>ENTRÉE SHORT</b> quand les rejets tiennent · <b>stop au-dessus du 78.6%</b> · target = extension <b>1.618</b></span></div>
               </div>
             </div>
 
-            {/* === POURQUOI ÇA MARCHE === */}
+            <div style={{marginBottom:14, padding:"12px 14px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2444"}}>
+              <div style={{fontSize:10, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🔍 COMMENT VOIR L'ACCUMULATION (leur empreinte)</div>
+              <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>
+                Un seul passage dans le Golden Pocket = peut-être du hasard. Ce qui prouve que les fonds sont là :<br/>
+                • <b style={{color:"#fbbf24"}}>Touches répétées</b> : le prix revient 2-3 fois sur la zone sans la casser<br/>
+                • <b style={{color:"#fbbf24"}}>Mèches de rejet</b> à chaque touche (le prix entre puis repart vite)<br/>
+                • <b style={{color:"#fbbf24"}}>Volume croissant</b> à chaque retour (Volume Profile) = les institutions qui chargent, pas du bruit retail<br/>
+                <span style={{color:TEXT_DIM}}>Plus il y a de rejets qui tiennent avec du volume, plus l'accumulation est réelle.</span>
+              </div>
+            </div>
+
             <div style={{padding:"10px 12px", background:"#1a0a2e", borderRadius:4, border:"1px solid #a855f744", fontSize:9, color:"#c084fc", lineHeight:1.7}}>
               <b style={{color:"#a855f7"}}>💡 POURQUOI ÇA MARCHE</b><br/>
-              <span style={{color:TEXT_DIM}}>Les Leveraged Funds bougent des milliards et entrent à un niveau de prix précis (capturé par le COT du mardi). Cette zone devient leur <b style={{color:"#c084fc"}}>"skin in the game"</b> — quand le prix y revient, ils <b>défendent et rajoutent</b> pour ne pas être en perte, ce qui repousse le prix dans leur sens. <b style={{color:"#fbbf24"}}>Tu entres AVEC eux au retest, pas contre eux.</b></span>
+              <span style={{color:TEXT_DIM}}>Les Leveraged Funds ne chassent jamais le prix — ils attendent un <b style={{color:"#c084fc"}}>escompte</b>. Le Golden Pocket (61.8%–65%) est ce niveau d'escompte où ils accumulent par paquets. Le retail panique et vend ses positions exactement là, fournissant la liquidité. Tu te places <b style={{color:"#fbbf24"}}>dans la zone d'escompte, avec les fonds, contre la foule.</b></span>
             </div>
 
-            {/* === RÈGLES IMPORTANTES === */}
             <div style={{marginTop:8, padding:"8px 10px", background:"#001a0d", borderRadius:4, fontSize:8, color:"#4ade80", lineHeight:1.7}}>
               <b>⚠ RÈGLES & CONFIRMATION</b><br/>
               ✓ <b>H4</b> = timeframe des Leveraged Funds (jamais sous H1)<br/>
-              ✓ Zone = prix du <b>MARDI</b> (le COT sort vendredi, données du mardi)<br/>
-              ✓ <b>NE PAS entrer au 1er contact</b> — attendre la CONFIRMATION :<br/>
-              &nbsp;&nbsp;&nbsp;• mèche de rejet dans la zone<br/>
-              &nbsp;&nbsp;&nbsp;• ou bougie englobante dans ton sens<br/>
-              &nbsp;&nbsp;&nbsp;• = le footprint des Leveraged Funds qui défendent<br/>
-              ✓ <b>Stop</b> juste de l'autre côté de la zone · <b>target 2:1</b> min (extrême précédent)<br/>
-              ✗ <span style={{color:"#f87171"}}>Si le prix <b>TRAVERSE la zone franchement</b> = les Leveraged Funds ont lâché → PAS de trade (signal invalidé)</span><br/>
+              ✓ Le prix doit d'abord dépasser le <b>50%</b> (filtre) avant d'entrer dans le Golden Pocket<br/>
+              ✓ <b>NE PAS entrer au 1er contact</b> — attendre 2-3 rejets qui tiennent + volume croissant<br/>
+              ✓ <b>Stop</b> juste au-delà du <b>78.6%</b> · target = extension <b>1.618</b> (R:R 2:1 min)<br/>
+              ✗ <span style={{color:"#f87171"}}>Si le prix <b>CLÔTURE au-delà du 78.6%</b> = les fonds ont lâché → PAS de trade (invalidé)</span><br/>
               ✓ Confirmer avec <b>APEX 3/3</b> ou <b>NINO PUR</b> du tableau ci-dessus
             </div>
           </div>
