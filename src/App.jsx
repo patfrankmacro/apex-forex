@@ -3181,6 +3181,22 @@ const retailLoaded = opps.some(o => o.retailData);
                   <div style={{marginTop:6, padding:"6px 8px", background:"#1a0a2e", borderRadius:3, fontSize:8, color:"#c084fc", border:"1px solid #a855f744"}}>
                     👑 <b>NINO PUR</b> (violet royal) = signature de la méthode Nino. Les Leveraged Funds <b>réduisent leurs longs ET ajoutent des shorts</b> en même temps (ou inverse). Les 2 colonnes du rapport CFTC vont en <b>directions opposées</b> = vrai signal directionnel propre, pas un repositionnement ambigu. Signal le plus puissant.
                   </div>
+                  <div style={{marginTop:8, padding:"8px 10px", background:"#001a2e", borderRadius:4, fontSize:8, color:TEXT, border:"1px solid #38bdf844", lineHeight:1.7}}>
+                    <b style={{color:"#38bdf8"}}>🔄 EXEMPLE — POURQUOI LE RETAIL OPPOSÉ EST UN BON SIGNAL</b><br/>
+                    <span style={{color:TEXT_DIM}}>Cas d'un SHORT où le retail est 75% LONG (opposé à toi) :</span><br/><br/>
+                    Les fonds veulent <b style={{color:"#f87171"}}>vendre</b> la paire (des milliards)<br/>
+                    <span style={{color:"#475569"}}>↓</span><br/>
+                    Il leur faut des <b>acheteurs en face</b> pour absorber leurs ventes<br/>
+                    <span style={{color:"#475569"}}>↓</span><br/>
+                    Le <b style={{color:"#fbbf24"}}>retail 75% long</b> = ces acheteurs (ils achètent la paire)<br/>
+                    <span style={{color:"#475569"}}>↓</span><br/>
+                    Les fonds <b>vendent DANS cette demande retail</b><br/>
+                    <span style={{color:"#475569"}}>↓</span><br/>
+                    Une fois tous les retail acheteurs entrés → <b>plus personne pour pousser le prix en haut</b><br/>
+                    <span style={{color:"#475569"}}>↓</span><br/>
+                    La paire <b style={{color:"#f87171"}}>chute</b> → les retail longs se font piéger → leur panique (ils coupent leurs longs = vendent) <b>alimente encore la baisse</b><br/><br/>
+                    <b style={{color:"#fbbf24"}}>👉 Le retail opposé n'est pas un contre-argument — c'est le CARBURANT du trade.</b> Tu veux toujours la foule du côté opposé au tien.
+                  </div>
                 </div>
               </div>
             );
