@@ -2773,25 +2773,22 @@ function DayTradeView() {
       {/* TABLEAU RECAP - PLAN DE TRADE */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:10}}>📋 TON PLAN DE TRADE — RÉSUMÉ</div>
-        <div style={{display:"flex", flexDirection:"column", gap:1, fontSize:8.5, borderRadius:6, overflow:"hidden"}}>
-          <div style={{display:"grid", gridTemplateColumns:"70px 1fr 1fr", gap:1, background:"#1e3a5f", padding:"6px 8px", fontWeight:700, color:"#fbbf24"}}>
-            <span>QUAND</span><span>QUOI FAIRE</span><span>POURQUOI</span>
-          </div>
-          <div style={{display:"grid", gridTemplateColumns:"70px 1fr 1fr", gap:1, background:"#001018", padding:"6px 8px", color:TEXT}}>
-            <span style={{color:"#4ade80", fontWeight:700}}>6h30 ET</span><span>Colle MarketMilk + lance l'analyse</span><span style={{color:TEXT_DIM}}>Londres bouge, tendance déjà lancée</span>
-          </div>
-          <div style={{display:"grid", gridTemplateColumns:"70px 1fr 1fr", gap:1, background:"#0a1f0a", padding:"6px 8px", color:TEXT}}>
-            <span style={{color:"#4ade80", fontWeight:700}}>Si alerte</span><span>Entre au repli (pullback) H1/M15</span><span style={{color:TEXT_DIM}}>Meilleur prix, pas l'extension</span>
-          </div>
-          <div style={{display:"grid", gridTemplateColumns:"70px 1fr 1fr", gap:1, background:"#001018", padding:"6px 8px", color:TEXT}}>
-            <span style={{color:"#38bdf8", fontWeight:700}}>8h ET</span><span>Tiens ta position</span><span style={{color:TEXT_DIM}}>NY ouvre et amplifie le mouvement</span>
-          </div>
-          <div style={{display:"grid", gridTemplateColumns:"70px 1fr 1fr", gap:1, background:"#0a1f0a", padding:"6px 8px", color:TEXT}}>
-            <span style={{color:"#fbbf24", fontWeight:700}}>~11h ET</span><span>Sécurise / sors</span><span style={{color:TEXT_DIM}}>Momentum s'essouffle après-midi</span>
-          </div>
-          <div style={{display:"grid", gridTemplateColumns:"70px 1fr 1fr", gap:1, background:"#1a0000", padding:"6px 8px", color:TEXT}}>
-            <span style={{color:"#f87171", fontWeight:700}}>Après 17h</span><span>Ne trade pas</span><span style={{color:TEXT_DIM}}>Zone morte, spreads larges</span>
-          </div>
+        <div style={{display:"flex", flexDirection:"column", gap:8}}>
+          {[
+            {t:"6h30 ET", a:"Colle MarketMilk + lance l'analyse", p:"Londres bouge, la tendance est déjà lancée", col:"#4ade80"},
+            {t:"Si alerte", a:"Entre au repli (pullback) sur H1/M15", p:"Meilleur prix — jamais sur l'extension", col:"#4ade80"},
+            {t:"8h ET", a:"Tiens ta position", p:"New York ouvre et amplifie le mouvement", col:"#38bdf8"},
+            {t:"~11h ET", a:"Sécurise tes gains ou sors", p:"Le momentum s'essouffle l'après-midi", col:"#fbbf24"},
+            {t:"Après 17h", a:"Ne trade pas", p:"Zone morte, spreads larges, faux signaux", col:"#f87171"}
+          ].map((r,i)=>(
+            <div key={i} style={{display:"flex", gap:10, alignItems:"flex-start", padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:`3px solid ${r.col}`}}>
+              <span style={{fontSize:9, fontWeight:700, color:r.col, minWidth:54, paddingTop:1}}>{r.t}</span>
+              <span style={{flex:1}}>
+                <span style={{fontSize:10, color:TEXT, fontWeight:600, display:"block", lineHeight:1.4}}>{r.a}</span>
+                <span style={{fontSize:8.5, color:TEXT_DIM, display:"block", marginTop:2, lineHeight:1.4}}>{r.p}</span>
+              </span>
+            </div>
+          ))}
         </div>
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:8, lineHeight:1.5}}>Si aucune alerte ne sort à 6h30 = pas de trade ce jour. La discipline d'attendre le bon setup fait partie de la stratégie.</div>
       </div>
