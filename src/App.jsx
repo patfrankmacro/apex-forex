@@ -2640,8 +2640,9 @@ function DayTradeAnalyzer() {
         // devise motrice (la faible ou forte est-elle #1-2 au volatility meter)
         const weakCur = direction==="SHORT"?p.base:p.quote;
         const driverVol = vRank[weakCur]!==undefined && vRank[weakCur]<=1;
-        candidates.push({...p, direction, forceGap, isMaxDiv, volRank:v.rank, volChg:v.chg, score, driverVol, weakCur,
-          strongCur: direction==="LONG"?p.base:p.quote});
+        const strongCur = direction==="LONG"?p.base:p.quote;
+        candidates.push({...p, direction, forceGap, isMaxDiv, volRank:v.rank, volChg:v.chg, score, driverVol, weakCur, strongCur,
+          strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: strength.length});
       };
       gainers.forEach(p=>consider(p,"LONG"));
       losers.forEach(p=>consider(p,"SHORT"));
@@ -2673,7 +2674,7 @@ function DayTradeAnalyzer() {
                 {o.isMaxDiv && <span style={{fontSize:7, color:"#fbbf24", background:"#1a1500", padding:"2px 6px", borderRadius:3}}>DIVERGENCE MAX</span>}
               </div>
               <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>
-                <b style={{color:o.direction==="LONG"?"#4ade80":"#f87171"}}>POURQUOI {o.direction==="LONG"?"ACHETER":"VENDRE"} :</b> {o.strongCur} est {sRank[o.strongCur]===0?"la devise la plus FORTE":"forte ("+(sRank[o.strongCur]+1)+"e)"} et {o.weakCur} {sRank[o.weakCur]===strength.length-1?"la plus FAIBLE":"faible ("+(sRank[o.weakCur]+1)+"e)"}. La {o.direction==="LONG"?"forte monte contre la faible → on achète":"faible chute contre la forte → on vend"}.<br/>
+                <b style={{color:o.direction==="LONG"?"#4ade80":"#f87171"}}>POURQUOI {o.direction==="LONG"?"ACHETER":"VENDRE"} :</b> {o.strongCur} est {o.strongRank===0?"la devise la plus FORTE":"forte ("+(o.strongRank+1)+"e)"} et {o.weakCur} {o.weakRank===o.strengthLen-1?"la plus FAIBLE":"faible ("+(o.weakRank+1)+"e)"}. La {o.direction==="LONG"?"forte monte contre la faible → on achète":"faible chute contre la forte → on vend"}.<br/>
                 <b style={{color:"#38bdf8"}}>POURQUOI CETTE PAIRE :</b> {o.isMaxDiv?"divergence MAXIMALE du jour (les 2 extrêmes absolus du classement de force).":"écart de force net + "}confirmée par toutes les sources.{o.driverVol?` Le ${o.weakCur} est aussi parmi les devises qui bougent le plus = c'est lui qui drive le marché.`:""}<br/>
                 <b style={{color:"#fbbf24"}}>FORCE DU SIGNAL :</b> momentum #{o.rank} ({o.chg>0?"+":""}{o.chg}% aujourd'hui, mouvement lancé) · volatilité #{o.volRank} ({o.volChg}%, assez de pips)<br/>
                 <b style={{color:"#c084fc"}}>EXÉCUTION :</b> attends un repli {o.direction==="LONG"?"baissier puis achète quand ça repart vers le haut":"haussier puis vends quand ça repart vers le bas"} (H1/M15). Stop serré {o.direction==="LONG"?"sous le dernier creux":"au-dessus du dernier sommet"} · target 1.5-2× le risque.
