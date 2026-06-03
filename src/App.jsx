@@ -2572,6 +2572,7 @@ function JournalView() {
 
 
 
+
 function DayTradeAnalyzer() {
   const [raw, setRaw] = useState("");
   const [result, setResult] = useState(null);
@@ -2586,16 +2587,18 @@ function DayTradeAnalyzer() {
         const order=[]; let on=false;
         for (const l of lines){
           if (l.includes(startName)){ on=true; continue; }
-          if (on){ if (l.startsWith("As of")) break; const c=CURS.find(x=>l===x); if (c&&!order.includes(c)) order.push(c); }
+          if (on){ if (l.startsWith("As of")) break; const x=CURS.find(c=>l===c); if (x&&!order.includes(x)) order.push(x); }
         }
         return order;
       };
-      const strengthOrder = grabCurrencies("Currency Strength Meter");
-      const strongest = strengthOrder[0], weakest = strengthOrder[strengthOrder.length-1];
-      const strengthRank = {}; strengthOrder.forEach((c,i)=>strengthRank[c]=i);
+      const strength = grabCurrencies("Currency Strength Meter");   // 0 = plus fort
+      const volMeter = grabCurrencies("Currency Volatility Meter"); // 0 = plus volatile
+      const strongest = strength[0], weakest = strength[strength.length-1];
+      const sRank = {}; strength.forEach((c,i)=>sRank[c]=i);
+      const vRank = {}; volMeter.forEach((c,i)=>vRank[c]=i);
 
       const grabPairs = (startName, stops) => {
-        const out=[]; let on=false;
+        const out=[]; let on=false, rank=0;
         for (let i=0;i<lines.length;i++){
           const l=lines[i];
           if (l.includes(startName)){ on=true; continue; }
@@ -2605,74 +2608,80 @@ function DayTradeAnalyzer() {
             if (m){
               let chg=null;
               for (let j=i+1;j<Math.min(i+4,lines.length);j++){ const pm=lines[j].match(/([+-]?\d+\.\d+)%/); if (pm){chg=parseFloat(pm[1]);break;} }
-              out.push({pair:m[1]+m[2], base:m[1], quote:m[2], chg});
+              rank++;
+              out.push({pair:m[1]+m[2], base:m[1], quote:m[2], chg, rank});
             }
           }
         }
         return out;
       };
-      const gainers   = grabPairs("Top Gainers", ["Top Losers","Volatility","Most Volatile"]);
-      const losers    = grabPairs("Top Losers", ["Volatility","Most Volatile","Currency Volatility"]);
-      const mostVol   = grabPairs("Most Volatile", ["Least Volatile","As of"]).map(p=>p.pair);
-      const leastVol  = grabPairs("Least Volatile", ["MarketMilk","Copyright","As of"]).map(p=>p.pair);
+      const gainers  = grabPairs("Top Gainers", ["Top Losers","Volatility","Most Volatile"]);
+      const losers   = grabPairs("Top Losers", ["Volatility","Most Volatile","Currency Volatility"]);
+      const mostVol  = grabPairs("Most Volatile", ["Least Volatile","MarketMilk","Copyright"]);
+      const volRankPair = {}; mostVol.forEach((p)=>volRankPair[p.pair]={rank:p.rank, chg:p.chg});
 
-      const opps=[];
-      const evalPair = (p, direction) => {
-        if (leastVol.includes(p.pair)) return; // JAMAIS les least volatile
-        const isVol = mostVol.includes(p.pair);
-        // Divergence de force: base et quote aux extremes du strength
-        const rb = strengthRank[p.base], rq = strengthRank[p.quote];
-        let strengthMatch=false, strengthNote="";
-        if (rb!==undefined && rq!==undefined){
-          // LONG: base plus forte que quote ; SHORT: base plus faible
-          if (direction==="LONG" && rb<rq){ strengthMatch=true; }
-          if (direction==="SHORT" && rb>rq){ strengthMatch=true; }
-          // divergence max si l'une est strongest et l'autre weakest
-          if ((p.base===strongest&&p.quote===weakest)||(p.base===weakest&&p.quote===strongest)) strengthNote="divergence MAX";
-        }
-        // Etoiles: momentum(gainer/loser) +volatile +strength
-        let stars=1; // dans gainers/losers = momentum de base
-        if (isVol) stars++;
-        if (strengthMatch) stars++;
-        opps.push({...p, direction, isVol, strengthMatch, strengthNote, stars});
+      if (!strongest || !weakest){ setResult({error:"Format non reconnu — colle le bloc MarketMilk complet (Currency Strength inclus)."}); return; }
+
+      // Construire les candidats APEX: doivent cocher les 3 sources
+      const candidates = [];
+      const consider = (p, direction) => {
+        // 1. Doit etre dans Most Volatile
+        const v = volRankPair[p.pair];
+        if (!v) return;
+        // 2. Divergence de force: base/quote du bon cote
+        const rb=sRank[p.base], rq=sRank[p.quote];
+        if (rb===undefined||rq===undefined) return;
+        const forceOk = (direction==="LONG" && rb<rq) || (direction==="SHORT" && rb>rq);
+        if (!forceOk) return;
+        // Score precision: ecart de force (grand=mieux) + position gainer/loser (haut=mieux) + position volatile (haut=mieux)
+        const forceGap = Math.abs(rb-rq);
+        const isMaxDiv = (p.base===strongest&&p.quote===weakest)||(p.base===weakest&&p.quote===strongest);
+        const score = forceGap*2 + (8-p.rank) + (8-v.rank) + (isMaxDiv?5:0);
+        // devise motrice (la faible ou forte est-elle #1-2 au volatility meter)
+        const weakCur = direction==="SHORT"?p.base:p.quote;
+        const driverVol = vRank[weakCur]!==undefined && vRank[weakCur]<=1;
+        candidates.push({...p, direction, forceGap, isMaxDiv, volRank:v.rank, volChg:v.chg, score, driverVol, weakCur,
+          strongCur: direction==="LONG"?p.base:p.quote});
       };
-      gainers.forEach(p=>evalPair(p,"LONG"));
-      losers.forEach(p=>evalPair(p,"SHORT"));
+      gainers.forEach(p=>consider(p,"LONG"));
+      losers.forEach(p=>consider(p,"SHORT"));
 
-      // Tri: etoiles puis |chg|
-      opps.sort((a,b)=> b.stars-a.stars || Math.abs(b.chg||0)-Math.abs(a.chg||0));
+      candidates.sort((a,b)=>b.score-a.score);
+      const top = candidates.slice(0,5);
 
-      if (opps.length===0){ setResult({error:"Format non reconnu — colle le bloc MarketMilk complet."}); return; }
-      setResult({ strongest, weakest, strengthOrder, opps });
+      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX aujourd'hui — aucune paire ne réunit force + momentum + volatilité. Pas de trade = bonne décision.", strongest, weakest}); return; }
+      setResult({ strongest, weakest, top });
     } catch(e){ setResult({error:"Erreur: "+e.message}); }
   };
-
-  const stars = n => "★".repeat(n)+"☆".repeat(3-n);
 
   return (
     <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2455", marginBottom:14}}>
       <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🤖 ANALYSE AUTO — COLLE TES DONNÉES MARKETMILK</div>
-      <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici tout le contenu copié depuis marketmilk.babypips.com (Currency Strength, Gainers, Losers, Most/Least Volatile)..." style={{width:"100%", minHeight:90, background:"#001018", color:TEXT, border:"1px solid #1e3a5f", borderRadius:6, padding:8, fontSize:9, fontFamily:"monospace", resize:"vertical"}}/>
+      <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici tout le contenu copié depuis marketmilk.babypips.com (Currency Strength, Volatility Meter, Gainers, Losers, Most Volatile)..." style={{width:"100%", minHeight:90, background:"#001018", color:TEXT, border:"1px solid #1e3a5f", borderRadius:6, padding:8, fontSize:9, fontFamily:"monospace", resize:"vertical"}}/>
       <button onClick={analyze} style={{marginTop:8, width:"100%", padding:"10px", background:"#fbbf24", color:"#1a1500", border:"none", borderRadius:6, fontSize:11, fontWeight:700, letterSpacing:1, cursor:"pointer"}}>⚡ ANALYSER</button>
 
-      {result && result.error && (<div style={{marginTop:10, padding:"8px 10px", background:"#1a0000", borderRadius:6, fontSize:9, color:"#f87171"}}>{result.error}</div>)}
+      {result && result.error && (<div style={{marginTop:10, padding:"10px", background:"#1a0a00", borderRadius:6, fontSize:9, color:"#fbbf24", lineHeight:1.6}}>{result.error}{result.strongest?<div style={{color:TEXT_DIM, marginTop:6, fontSize:8}}>Force du jour : {result.strongest} fort → {result.weakest} faible</div>:""}</div>)}
+
       {result && !result.error && (
         <div style={{marginTop:10}}>
-          <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>FORCE DU JOUR : <b style={{color:"#4ade80"}}>{result.strongest} (forte)</b> → <b style={{color:"#f87171"}}>{result.weakest} (faible)</b></div>
-          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:6}}>🎯 OPPORTUNITÉS DU JOUR (classées)</div>
-          {result.opps.map((o,i)=>(
-            <div key={i} style={{padding:"8px 10px", background:"#001018", borderRadius:6, border:`1px solid ${o.direction==="LONG"?"#4ade8044":"#f8717144"}`, marginBottom:6}}>
-              <div style={{display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-                <span style={{fontSize:12, fontWeight:700, color:o.direction==="LONG"?"#00ff88":"#ff3b3b"}}>{o.direction==="LONG"?"▲":"▼"} {o.base}/{o.quote} {o.direction}</span>
-                <span style={{fontSize:10, color:"#fbbf24"}}>{stars(o.stars)}</span>
+          <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>FORCE DU JOUR : <b style={{color:"#4ade80"}}>{result.strongest} (la plus forte)</b> → <b style={{color:"#f87171"}}>{result.weakest} (la plus faible)</b></div>
+          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 TOP {result.top.length} OPPORTUNITÉS APEX (force + momentum + volatilité)</div>
+          {result.top.map((o,i)=>(
+            <div key={i} style={{padding:"10px 12px", background:"#001018", borderRadius:6, border:`1px solid ${o.direction==="LONG"?"#4ade8055":"#f8717155"}`, marginBottom:8}}>
+              <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6}}>
+                <span style={{fontSize:13, fontWeight:700, color:o.direction==="LONG"?"#00ff88":"#ff3b3b"}}>#{i+1} {o.direction==="LONG"?"▲ ACHETER":"▼ VENDRE"} {o.base}/{o.quote}</span>
+                {o.isMaxDiv && <span style={{fontSize:7, color:"#fbbf24", background:"#1a1500", padding:"2px 6px", borderRadius:3}}>DIVERGENCE MAX</span>}
               </div>
-              <div style={{fontSize:8, color:TEXT_DIM, marginTop:3}}>
-                {o.chg!==null?`${o.chg>0?"+":""}${o.chg}% · `:""}{o.isVol?"🔥 volatile":"volatilité faible"}{o.strengthMatch?` · force alignée${o.strengthNote?" ("+o.strengthNote+")":""}`:""}
+              <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>
+                <b style={{color:o.direction==="LONG"?"#4ade80":"#f87171"}}>POURQUOI {o.direction==="LONG"?"ACHETER":"VENDRE"} :</b> {o.strongCur} est {sRank[o.strongCur]===0?"la devise la plus FORTE":"forte ("+(sRank[o.strongCur]+1)+"e)"} et {o.weakCur} {sRank[o.weakCur]===strength.length-1?"la plus FAIBLE":"faible ("+(sRank[o.weakCur]+1)+"e)"}. La {o.direction==="LONG"?"forte monte contre la faible → on achète":"faible chute contre la forte → on vend"}.<br/>
+                <b style={{color:"#38bdf8"}}>POURQUOI CETTE PAIRE :</b> {o.isMaxDiv?"divergence MAXIMALE du jour (les 2 extrêmes absolus du classement de force).":"écart de force net + "}confirmée par toutes les sources.{o.driverVol?` Le ${o.weakCur} est aussi parmi les devises qui bougent le plus = c'est lui qui drive le marché.`:""}<br/>
+                <b style={{color:"#fbbf24"}}>FORCE DU SIGNAL :</b> momentum #{o.rank} ({o.chg>0?"+":""}{o.chg}% aujourd'hui, mouvement lancé) · volatilité #{o.volRank} ({o.volChg}%, assez de pips)<br/>
+                <b style={{color:"#c084fc"}}>EXÉCUTION :</b> attends un repli {o.direction==="LONG"?"baissier puis achète quand ça repart vers le haut":"haussier puis vends quand ça repart vers le bas"} (H1/M15). Stop serré {o.direction==="LONG"?"sous le dernier creux":"au-dessus du dernier sommet"} · target 1.5-2× le risque.
               </div>
             </div>
           ))}
-          <div style={{marginTop:8, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
-            ★★★ = momentum + volatilité + divergence de force alignés (meilleur). Entrée H1/M15 au repli · stop serré · target 1.5-2×. Ne chasse pas un mouvement déjà trop avancé.
+          <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
+            ⚠ Toutes ces paires réunissent les 3 critères (force + momentum + volatilité). Ne chasse pas un mouvement déjà trop avancé — attends toujours le repli. Trade pendant les heures fortes (voir ci-dessous).
           </div>
         </div>
       )}
