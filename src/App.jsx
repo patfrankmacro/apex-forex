@@ -2623,21 +2623,26 @@ function DayTradeAnalyzer() {
       if (!strongest || !weakest){ setResult({error:"Format non reconnu — colle le bloc MarketMilk complet (Currency Strength inclus)."}); return; }
 
       const leastVol = grabPairs("Least Volatile", ["MarketMilk","Copyright","Manage"]).map(p=>p.pair);
-      const MOMENTUM_MIN = 0.40;
+      const TOP_RANK = 2; // on ne garde que le top 2 des gainers et losers
       const candidates = [];
       const consider = (p, direction) => {
-        if (p.chg===null || Math.abs(p.chg) < MOMENTUM_MIN) return;
+        if (p.rank > TOP_RANK) return;          // top 2 par rang (pas de seuil %)
+        if (p.chg===null) return;
         if (leastVol.includes(p.pair)) return;
         const rb=sRank[p.base], rq=sRank[p.quote];
         if (rb===undefined||rq===undefined) return;
         const forceOk = (direction==="LONG" && rb<rq) || (direction==="SHORT" && rb>rq);
         if (!forceOk) return;
+        // FILTRE SESSION London-NY (6h-11h ET): la paire doit contenir une devise active
+        const SESSION_CURS = ["EUR","GBP","USD","CHF","CAD"];
+        const sessionOk = SESSION_CURS.includes(p.base) || SESSION_CURS.includes(p.quote);
+        if (!sessionOk) return; // ecarte les paires purement asiatiques (NZD/JPY etc.)
         const v = volRankPair[p.pair];
         const isVolatile = !!v;
         const volRank = v?v.rank:null, volChg = v?v.chg:null;
         const forceGap = Math.abs(rb-rq);
         const isMaxDiv = (p.base===strongest&&p.quote===weakest)||(p.base===weakest&&p.quote===strongest);
-        const score = Math.abs(p.chg)*30 + forceGap*2 + (isVolatile?(8-volRank):0) + (isMaxDiv?5:0);
+        const score = (10-p.rank*3) + forceGap*2 + (isVolatile?(8-volRank):0) + (isMaxDiv?5:0) + Math.abs(p.chg);
         const weakCur = direction==="SHORT"?p.base:p.quote;
         const driverVol = vRank[weakCur]!==undefined && vRank[weakCur]<=1;
         const strongCur = direction==="LONG"?p.base:p.quote;
@@ -2648,9 +2653,10 @@ function DayTradeAnalyzer() {
       losers.forEach(p=>consider(p,"SHORT"));
 
       candidates.sort((a,b)=>b.score-a.score);
-      const top = candidates.slice(0,5);
+      const top = candidates.slice(0,3);
+      if (top.length>0) top[0].surbrillance = true; // la meilleure = surbrillance
 
-      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX aujourd'hui — aucune paire ne réunit force + momentum + volatilité. Pas de trade = bonne décision.", strongest, weakest}); return; }
+      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session (London-NY 6h-11h ET) — aucune paire active ne converge. Pas de trade = bonne décision.", strongest, weakest}); return; }
       setResult({ strongest, weakest, top });
     } catch(e){ setResult({error:"Erreur: "+e.message}); }
   };
@@ -2668,10 +2674,11 @@ function DayTradeAnalyzer() {
           <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>FORCE DU JOUR : <b style={{color:"#4ade80"}}>{result.strongest} (la plus forte)</b> → <b style={{color:"#f87171"}}>{result.weakest} (la plus faible)</b></div>
           <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 TOP {result.top.length} OPPORTUNITÉS APEX (force + momentum + volatilité)</div>
           {result.top.map((o,i)=>(
-            <div key={i} style={{padding:"10px 12px", background:"#001018", borderRadius:6, border:`1px solid ${o.direction==="LONG"?"#4ade8055":"#f8717155"}`, marginBottom:8}}>
+            <div key={i} style={{padding:o.surbrillance?"12px 14px":"10px 12px", background:o.surbrillance?"#1a1500":"#001018", borderRadius:6, border:o.surbrillance?"2px solid #fbbf24":`1px solid ${o.direction==="LONG"?"#4ade8055":"#f8717155"}`, marginBottom:8, boxShadow:o.surbrillance?"0 0 12px #fbbf2433":"none"}}>
+              {o.surbrillance && <div style={{fontSize:8, color:"#fbbf24", fontWeight:700, letterSpacing:1, marginBottom:6}}>⭐ MEILLEURE OPPORTUNITÉ — convergence maximale</div>}
               <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6}}>
                 <span style={{fontSize:13, fontWeight:700, color:o.direction==="LONG"?"#00ff88":"#ff3b3b"}}>#{i+1} {o.direction==="LONG"?"▲ ACHETER":"▼ VENDRE"} {o.base}/{o.quote}</span>
-                {o.isMaxDiv && <span style={{fontSize:7, color:"#fbbf24", background:"#1a1500", padding:"2px 6px", borderRadius:3}}>DIVERGENCE MAX</span>}
+                {o.isMaxDiv && <span style={{fontSize:7, color:"#fbbf24", background:"#0a0a00", padding:"2px 6px", borderRadius:3}}>DIVERGENCE MAX</span>}
               </div>
               <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>
                 <b style={{color:o.direction==="LONG"?"#4ade80":"#f87171"}}>POURQUOI {o.direction==="LONG"?"ACHETER":"VENDRE"} :</b> {o.strongCur} est {o.strongRank===0?"la devise la plus FORTE":"forte ("+(o.strongRank+1)+"e)"} et {o.weakCur} {o.weakRank===o.strengthLen-1?"la plus FAIBLE":"faible ("+(o.weakRank+1)+"e)"}. La {o.direction==="LONG"?"forte monte contre la faible → on achète":"faible chute contre la forte → on vend"}.<br/>
@@ -2704,8 +2711,9 @@ function DayTradeView() {
       <div style={{padding:"12px 14px", background:"#1a1500", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 LA LOGIQUE</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
-          Sur le court terme, le prix suit le <b style={{color:"#fbbf24"}}>momentum</b> : une devise forte aujourd'hui tend à rester forte quelques heures à quelques jours, une faible reste faible. L'idée est simple : <b>acheter la devise la plus forte du jour CONTRE la plus faible</b>, quand la volatilité est suffisante pour générer du mouvement.<br/><br/>
-          On ne cherche pas le "pourquoi" fondamental ici (c'est le rôle du COT). On surfe le flux du moment : <b style={{color:"#38bdf8"}}>force relative + volatilité + direction déjà engagée</b>. On reste du côté qui bouge, pas contre.
+          Les <b style={{color:"#fbbf24"}}>gros joueurs</b> (banques, fonds) déplacent des milliards chaque jour. Leurs flux créent des tendances intraday : une devise qu'ils achètent devient FORTE, une qu'ils vendent devient FAIBLE — et ça dure quelques heures à quelques jours. On ne devine pas, <b>on SUIT ce flux</b>.<br/><br/>
+          Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> du jour contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence), quand le mouvement est déjà lancé (momentum) et que la paire bouge assez (volatilité).<br/><br/>
+          <b style={{color:"#38bdf8"}}>⏰ Le timing de session est CRUCIAL :</b> chaque devise bouge surtout quand SON marché est ouvert. Tu trades 6h-11h ET = session <b>Londres + New York</b>. Les devises actives à ces heures : <b>EUR, GBP, USD, CHF, CAD</b>. Une paire comme NZD/JPY peut sembler parfaite, mais NZD et JPY sont asiatiques — à 8h ET leur marché dort, la paire est plate. L'app filtre automatiquement pour ne proposer que des paires <b>actives pendant ta session</b>.
         </div>
       </div>
 
@@ -2717,7 +2725,7 @@ function DayTradeView() {
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Forme la paire : <b>FORTE / FAIBLE</b> → tu prends la forte en LONG contre la faible (ex: si NZD faible et CHF fort → CHF/NZD long, ou vendre NZD)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Regarde la <b>volatilité</b> : si la paire est dans <b>Most Volatile</b> = bonus (bouge bien). Mais un fort <b>momentum directionnel</b> suffit. Évite seulement les <b>Least Volatile</b> (ça stagne)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Confirme avec <b>Top Gainers / Losers</b> : la paire est-elle déjà dans la liste ? = le mouvement est lancé, le momentum est réel</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE confirmée (filtre clé) :</b> la devise forte et la faible sont bien aux extrêmes du Currency Strength, BONUS = volatilité. Le momentum fort + la divergence de force sont obligatoires, la volatilité ajoute de la qualité</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>CONVERGENCE + SESSION (clé) :</b> la meilleure paire réunit tout — top 2 force (forte vs faible) + top 2 gainers/losers + top 3 volatilité + au moins une devise ACTIVE dans ta session London-NY (EUR/GBP/USD/CHF/CAD). Plus les sources convergent, plus le signal est pur (⭐ = la meilleure)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Entrée sur <b>H1 / M15</b> : attends un petit repli (pullback) dans le sens du momentum, puis entre. Stop serré, target = 1.5 à 2× le risque</span></div>
         </div>
       </div>
