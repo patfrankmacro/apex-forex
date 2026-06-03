@@ -2625,29 +2625,42 @@ function DayTradeAnalyzer() {
       const leastVol = grabPairs("Least Volatile", ["MarketMilk","Copyright","Manage"]).map(p=>p.pair);
       const TOP_RANK = 2; // on ne garde que le top 2 des gainers et losers
       const candidates = [];
+      const SESSION_CURS = ["EUR","GBP","USD","CHF","CAD"]; // actives 6h-11h ET
+      const nStr = strength.length;
       const consider = (p, direction) => {
-        if (p.rank > TOP_RANK) return;          // top 2 par rang (pas de seuil %)
+        // ETAPE 1 - FILTRE SESSION (d'abord): paire tradable a London-NY ?
+        const sessionOk = SESSION_CURS.includes(p.base) || SESSION_CURS.includes(p.quote);
+        if (!sessionOk) return; // NZD/JPY etc. elimines d'entree
+        // ETAPE 2 - top 2 gainers/losers (OBLIGATOIRE)
+        if (p.rank > TOP_RANK) return;
         if (p.chg===null) return;
         if (leastVol.includes(p.pair)) return;
+        // ETAPE 3 - CONVERGENCE FORCE (OBLIGATOIRE): base et quote aux extremes (top2 fort / top2 faible)
         const rb=sRank[p.base], rq=sRank[p.quote];
         if (rb===undefined||rq===undefined) return;
-        const forceOk = (direction==="LONG" && rb<rq) || (direction==="SHORT" && rb>rq);
-        if (!forceOk) return;
-        // FILTRE SESSION London-NY (6h-11h ET): la paire doit contenir une devise active
-        const SESSION_CURS = ["EUR","GBP","USD","CHF","CAD"];
-        const sessionOk = SESSION_CURS.includes(p.base) || SESSION_CURS.includes(p.quote);
-        if (!sessionOk) return; // ecarte les paires purement asiatiques (NZD/JPY etc.)
+        const strongCur = direction==="LONG"?p.base:p.quote;
+        const weakCur   = direction==="LONG"?p.quote:p.base;
+        const strongInTop2 = sRank[strongCur] <= 1;            // top 2 forts
+        const weakInBot2   = sRank[weakCur]   >= nStr-2;       // top 2 faibles
+        if (!(strongInTop2 && weakInBot2)) return;             // divergence stricte exigee
+        // BONUS DE CONVERGENCE (pour le classement / surbrillance)
         const v = volRankPair[p.pair];
         const isVolatile = !!v;
         const volRank = v?v.rank:null, volChg = v?v.chg:null;
+        const inMostVol2 = isVolatile && volRank <= 1;         // top 2 Most Volatile
+        const baseVM = vRank[p.base], quoteVM = vRank[p.quote];
+        const inVolMeter3 = (baseVM!==undefined && baseVM<=2) || (quoteVM!==undefined && quoteVM<=2); // top 3 Volatility Meter
         const forceGap = Math.abs(rb-rq);
         const isMaxDiv = (p.base===strongest&&p.quote===weakest)||(p.base===weakest&&p.quote===strongest);
-        const score = (10-p.rank*3) + forceGap*2 + (isVolatile?(8-volRank):0) + (isMaxDiv?5:0) + Math.abs(p.chg);
-        const weakCur = direction==="SHORT"?p.base:p.quote;
-        const driverVol = vRank[weakCur]!==undefined && vRank[weakCur]<=1;
-        const strongCur = direction==="LONG"?p.base:p.quote;
-        candidates.push({...p, direction, forceGap, isMaxDiv, isVolatile, volRank, volChg, score, driverVol, weakCur, strongCur,
-          strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: strength.length});
+        // Score de convergence: chaque source qui pointe ajoute des points
+        let conv = 2; // force + session deja valides
+        if (inMostVol2) conv++;
+        if (inVolMeter3) conv++;
+        if (isMaxDiv) conv++;
+        const score = conv*10 + (10-p.rank*3) + forceGap + Math.abs(p.chg);
+        const driverVol = baseVM!==undefined && baseVM<=1 || quoteVM!==undefined && quoteVM<=1;
+        candidates.push({...p, direction, forceGap, isMaxDiv, isVolatile, volRank, volChg, score, conv, inMostVol2, inVolMeter3, driverVol, weakCur, strongCur,
+          strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: nStr});
       };
       gainers.forEach(p=>consider(p,"LONG"));
       losers.forEach(p=>consider(p,"SHORT"));
