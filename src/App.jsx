@@ -2571,12 +2571,124 @@ function JournalView() {
 
 
 
+
+function DayTradeAnalyzer() {
+  const [raw, setRaw] = useState("");
+  const [result, setResult] = useState(null);
+  const TEXT="#c8d4f0", TEXT_DIM="#4a5070";
+
+  const analyze = () => {
+    try {
+      const lines = raw.split("\n").map(l=>l.trim()).filter(Boolean);
+      const CURS = ["USD","EUR","GBP","JPY","CHF","CAD","AUD","NZD"];
+
+      const grabCurrencies = (startName) => {
+        const order=[]; let on=false;
+        for (const l of lines){
+          if (l.includes(startName)){ on=true; continue; }
+          if (on){ if (l.startsWith("As of")) break; const c=CURS.find(x=>l===x); if (c&&!order.includes(c)) order.push(c); }
+        }
+        return order;
+      };
+      const strengthOrder = grabCurrencies("Currency Strength Meter");
+      const strongest = strengthOrder[0], weakest = strengthOrder[strengthOrder.length-1];
+      const strengthRank = {}; strengthOrder.forEach((c,i)=>strengthRank[c]=i);
+
+      const grabPairs = (startName, stops) => {
+        const out=[]; let on=false;
+        for (let i=0;i<lines.length;i++){
+          const l=lines[i];
+          if (l.includes(startName)){ on=true; continue; }
+          if (on){
+            if (l.startsWith("As of")||stops.some(s=>l.includes(s))) break;
+            const m=l.match(/^([A-Z]{3})\/([A-Z]{3})$/);
+            if (m){
+              let chg=null;
+              for (let j=i+1;j<Math.min(i+4,lines.length);j++){ const pm=lines[j].match(/([+-]?\d+\.\d+)%/); if (pm){chg=parseFloat(pm[1]);break;} }
+              out.push({pair:m[1]+m[2], base:m[1], quote:m[2], chg});
+            }
+          }
+        }
+        return out;
+      };
+      const gainers   = grabPairs("Top Gainers", ["Top Losers","Volatility","Most Volatile"]);
+      const losers    = grabPairs("Top Losers", ["Volatility","Most Volatile","Currency Volatility"]);
+      const mostVol   = grabPairs("Most Volatile", ["Least Volatile","As of"]).map(p=>p.pair);
+      const leastVol  = grabPairs("Least Volatile", ["MarketMilk","Copyright","As of"]).map(p=>p.pair);
+
+      const opps=[];
+      const evalPair = (p, direction) => {
+        if (leastVol.includes(p.pair)) return; // JAMAIS les least volatile
+        const isVol = mostVol.includes(p.pair);
+        // Divergence de force: base et quote aux extremes du strength
+        const rb = strengthRank[p.base], rq = strengthRank[p.quote];
+        let strengthMatch=false, strengthNote="";
+        if (rb!==undefined && rq!==undefined){
+          // LONG: base plus forte que quote ; SHORT: base plus faible
+          if (direction==="LONG" && rb<rq){ strengthMatch=true; }
+          if (direction==="SHORT" && rb>rq){ strengthMatch=true; }
+          // divergence max si l'une est strongest et l'autre weakest
+          if ((p.base===strongest&&p.quote===weakest)||(p.base===weakest&&p.quote===strongest)) strengthNote="divergence MAX";
+        }
+        // Etoiles: momentum(gainer/loser) +volatile +strength
+        let stars=1; // dans gainers/losers = momentum de base
+        if (isVol) stars++;
+        if (strengthMatch) stars++;
+        opps.push({...p, direction, isVol, strengthMatch, strengthNote, stars});
+      };
+      gainers.forEach(p=>evalPair(p,"LONG"));
+      losers.forEach(p=>evalPair(p,"SHORT"));
+
+      // Tri: etoiles puis |chg|
+      opps.sort((a,b)=> b.stars-a.stars || Math.abs(b.chg||0)-Math.abs(a.chg||0));
+
+      if (opps.length===0){ setResult({error:"Format non reconnu — colle le bloc MarketMilk complet."}); return; }
+      setResult({ strongest, weakest, strengthOrder, opps });
+    } catch(e){ setResult({error:"Erreur: "+e.message}); }
+  };
+
+  const stars = n => "★".repeat(n)+"☆".repeat(3-n);
+
+  return (
+    <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2455", marginBottom:14}}>
+      <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🤖 ANALYSE AUTO — COLLE TES DONNÉES MARKETMILK</div>
+      <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici tout le contenu copié depuis marketmilk.babypips.com (Currency Strength, Gainers, Losers, Most/Least Volatile)..." style={{width:"100%", minHeight:90, background:"#001018", color:TEXT, border:"1px solid #1e3a5f", borderRadius:6, padding:8, fontSize:9, fontFamily:"monospace", resize:"vertical"}}/>
+      <button onClick={analyze} style={{marginTop:8, width:"100%", padding:"10px", background:"#fbbf24", color:"#1a1500", border:"none", borderRadius:6, fontSize:11, fontWeight:700, letterSpacing:1, cursor:"pointer"}}>⚡ ANALYSER</button>
+
+      {result && result.error && (<div style={{marginTop:10, padding:"8px 10px", background:"#1a0000", borderRadius:6, fontSize:9, color:"#f87171"}}>{result.error}</div>)}
+      {result && !result.error && (
+        <div style={{marginTop:10}}>
+          <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>FORCE DU JOUR : <b style={{color:"#4ade80"}}>{result.strongest} (forte)</b> → <b style={{color:"#f87171"}}>{result.weakest} (faible)</b></div>
+          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:6}}>🎯 OPPORTUNITÉS DU JOUR (classées)</div>
+          {result.opps.map((o,i)=>(
+            <div key={i} style={{padding:"8px 10px", background:"#001018", borderRadius:6, border:`1px solid ${o.direction==="LONG"?"#4ade8044":"#f8717144"}`, marginBottom:6}}>
+              <div style={{display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+                <span style={{fontSize:12, fontWeight:700, color:o.direction==="LONG"?"#00ff88":"#ff3b3b"}}>{o.direction==="LONG"?"▲":"▼"} {o.base}/{o.quote} {o.direction}</span>
+                <span style={{fontSize:10, color:"#fbbf24"}}>{stars(o.stars)}</span>
+              </div>
+              <div style={{fontSize:8, color:TEXT_DIM, marginTop:3}}>
+                {o.chg!==null?`${o.chg>0?"+":""}${o.chg}% · `:""}{o.isVol?"🔥 volatile":"volatilité faible"}{o.strengthMatch?` · force alignée${o.strengthNote?" ("+o.strengthNote+")":""}`:""}
+              </div>
+            </div>
+          ))}
+          <div style={{marginTop:8, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
+            ★★★ = momentum + volatilité + divergence de force alignés (meilleur). Entrée H1/M15 au repli · stop serré · target 1.5-2×. Ne chasse pas un mouvement déjà trop avancé.
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function DayTradeView() {
   const ACCENT="#38bdf8", TEXT="#c8d4f0", TEXT_DIM="#4a5070", BORDER="#1a1a2e";
   return (
     <div style={{padding:16, maxWidth:760, margin:"0 auto"}}>
       <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE — CURRENCY STRENGTH MOMENTUM</div>
       <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (intraday / 1-3 jours) basé sur la force et la volatilité du jour · Séparé de la méthode COT swing</div>
+
+      <DayTradeAnalyzer />
+
 
       {/* LOGIQUE */}
       <div style={{padding:"12px 14px", background:"#1a1500", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
@@ -2595,7 +2707,7 @@ function DayTradeView() {
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Forme la paire : <b>FORTE / FAIBLE</b> → tu prends la forte en LONG contre la faible (ex: si NZD faible et CHF fort → CHF/NZD long, ou vendre NZD)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Vérifie le <b>Volatility Meter</b> : la paire doit être dans les <b>Most Volatile</b> (assez de mouvement pour faire des pips, sinon ça stagne)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Confirme avec <b>Top Gainers / Losers</b> : la paire est-elle déjà dans la liste ? = le mouvement est lancé, le momentum est réel</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#a855f7"}}>CONFLUENCE COT (filtre clé) :</b> le momentum va-t-il dans le même sens que les Leveraged Funds (onglet TABLEAU) ? Si oui = signal renforcé. Si contre = on passe</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE confirmée (filtre clé) :</b> la devise forte et la faible sont bien aux extrêmes du Currency Strength, ET la paire est dans les gainers/losers ET volatile = les 3 convergent = meilleur signal</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Entrée sur <b>H1 / M15</b> : attends un petit repli (pullback) dans le sens du momentum, puis entre. Stop serré, target = 1.5 à 2× le risque</span></div>
         </div>
       </div>
@@ -2619,7 +2731,35 @@ function DayTradeView() {
           • <b>Volatility Meter</b> = quelles devises bougent assez pour valoir le coup<br/>
           • <b>Top Gainers / Losers</b> = quelles paires ont déjà le momentum lancé<br/>
           • <b>Most / Least Volatile</b> = évite les "Least Volatile" (ça stagne, pas de pips)<br/><br/>
-          <b style={{color:"#fbbf24"}}>L'ordre de lecture :</b> force → trouve la paire forte/faible → vérifie qu'elle est volatile → confirme qu'elle est dans les gainers/losers → check confluence COT → entrée.
+          <b style={{color:"#fbbf24"}}>L'ordre de lecture :</b> force → trouve la paire forte/faible → vérifie qu'elle est volatile → confirme qu'elle est dans les gainers/losers → entrée.
+        </div>
+      </div>
+
+
+      {/* MEILLEURES HEURES (heure de New York / ET) */}
+      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #4ade8044", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:8}}>🕐 MEILLEURES HEURES POUR SUIVRE LES GROS JOUEURS (heure de New York)</div>
+        <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
+          <div style={{padding:"6px 8px", background:"#052010", borderRadius:4, marginBottom:6, border:"1px solid #4ade8033"}}>
+            <b style={{color:"#4ade80"}}>⭐ 8h00 – 12h00 ET — LE CRÉNEAU ROI</b><br/>
+            Chevauchement Londres + New York = ~50% du volume quotidien. Liquidité et mouvements institutionnels maximum, spreads les plus serrés. <b>Si tu ne trades qu'un moment, c'est celui-là.</b>
+          </div>
+          <div style={{padding:"6px 8px", background:"#001018", borderRadius:4, marginBottom:6}}>
+            <b style={{color:"#38bdf8"}}>2h00 – 3h00 ET — Ouverture de Londres</b><br/>
+            Les ordres institutionnels affluent, la volatilité explose. Donne souvent la direction du jour.
+          </div>
+          <div style={{padding:"6px 8px", background:"#001018", borderRadius:4, marginBottom:6}}>
+            <b style={{color:"#fbbf24"}}>8h30 – 10h00 ET — News US (NFP, CPI, FOMC)</b><br/>
+            Les grosses nouvelles US tombent ici → mouvements violents. Accélère ou renverse la tendance de Londres.
+          </div>
+          <div style={{padding:"6px 8px", background:"#001018", borderRadius:4, marginBottom:6}}>
+            <b style={{color:"#c084fc"}}>19h00 – 20h00 ET — Ouverture de Tokyo (paires JPY)</b><br/>
+            Flux institutionnel japonais → bon pour NZD/JPY, CHF/JPY, AUD/JPY.
+          </div>
+          <div style={{padding:"6px 8px", background:"#1a0000", borderRadius:4, border:"1px solid #f8717133"}}>
+            <b style={{color:"#f87171"}}>⛔ APRÈS 17h00 ET — À ÉVITER</b><br/>
+            Les fournisseurs de liquidité réinitialisent, les spreads s'élargissent de 10-20 pips. Peut déclencher tes stops sans vrai mouvement. Zone morte.
+          </div>
         </div>
       </div>
 
