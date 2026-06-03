@@ -2648,6 +2648,17 @@ function DayTradeAnalyzer() {
         if (!hasLondon) return;
         // CRITERE 4 - pas Least Volatile
         if (leastVol.includes(p.pair)) return;
+        // CRITERE 5 - RETAIL CONTRARIEN >= 70% (obligatoire si dispo)
+        const rt = (window.__apexRetail||{})[p.pair] || (window.__apexRetail||{})[p.base+p.quote];
+        let retailOk=false, retailPct=null, retailSide=null, retailMissing=false;
+        if (rt && rt.longPercentage!=null && rt.shortPercentage!=null){
+          const lp=Math.round(rt.longPercentage), sp=Math.round(rt.shortPercentage);
+          if (direction==="LONG"){ retailPct=sp; retailSide="SHORT"; retailOk = sp>=70; }
+          else { retailPct=lp; retailSide="LONG"; retailOk = lp>=70; }
+          if (!retailOk) return; // retail pas assez a contre-sens -> alerte non validee
+        } else {
+          retailMissing=true; // Myfxbook deconnecte -> on affiche avec mention
+        }
         // BONUS (classement + surbrillance)
         const v = volRankPair[p.pair];
         const isVolatile = !!v;
@@ -2657,7 +2668,7 @@ function DayTradeAnalyzer() {
         const isMaxDiv = (p.base===strongest&&p.quote===weakest)||(p.base===weakest&&p.quote===strongest);
         const score = forceGap*10 + (10-p.rank*3) + (inMostVol2?8:0) + (hasNY?4:0) + (isMaxDiv?5:0) + Math.abs(p.chg);
         const driverVol = false;
-        candidates.push({...p, direction, forceGap, isMaxDiv, isVolatile, volRank, volChg, score, inMostVol2, hasNY, driverVol, weakCur, strongCur,
+        candidates.push({...p, direction, forceGap, isMaxDiv, isVolatile, volRank, volChg, score, inMostVol2, hasNY, driverVol, retailOk, retailPct, retailSide, retailMissing, weakCur, strongCur,
           strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: nStr});
       };
       gainers.forEach(p=>consider(p,"LONG"));
@@ -2695,6 +2706,7 @@ function DayTradeAnalyzer() {
                 <b style={{color:o.direction==="LONG"?"#4ade80":"#f87171"}}>POURQUOI {o.direction==="LONG"?"ACHETER":"VENDRE"} :</b> {o.strongCur} est {o.strongRank===0?"la devise la plus FORTE":"forte ("+(o.strongRank+1)+"e)"} et {o.weakCur} {o.weakRank===o.strengthLen-1?"la plus FAIBLE":"faible ("+(o.weakRank+1)+"e)"}. La {o.direction==="LONG"?"forte monte contre la faible → on achète":"faible chute contre la forte → on vend"}.<br/>
                 <b style={{color:"#38bdf8"}}>POURQUOI CETTE PAIRE :</b> {o.isMaxDiv?"divergence MAXIMALE (les 2 extrêmes absolus du classement). ":`divergence de ${o.forceGap} rangs au Currency Strength. `}Contient une devise de Londres = active à ton entrée 6h30.{o.hasNY?" Et une devise NY = le mouvement s'amplifiera quand New York ouvre à 8h (tu gardes jusqu'à 11h).":""}<br/>
                 <b style={{color:"#fbbf24"}}>LE SIGNAL :</b> {o.direction==="LONG"?"top gainer":"top loser"} #{o.rank} ({o.chg>0?"+":""}{o.chg}%, mouvement de Londres lancé) · divergence {o.forceGap} rangs{o.isVolatile?` · Most Volatile #${o.volRank+1} (${o.volChg}%)`:""}<br/>
+                <b style={{color:"#34d399"}}>RETAIL CONTRARIEN :</b> {o.retailMissing?"⚠ Myfxbook non connecté — retail non vérifié":`${o.retailPct}% du retail est ${o.retailSide} = à contre-sens de toi. Ils se font piéger, leurs stops alimentent ton mouvement ✓`}<br/>
                 <b style={{color:"#c084fc"}}>EXÉCUTION :</b> attends un repli {o.direction==="LONG"?"baissier puis achète quand ça repart vers le haut":"haussier puis vends quand ça repart vers le bas"} (H1/M15). Stop serré {o.direction==="LONG"?"sous le dernier creux":"au-dessus du dernier sommet"} · target 1.5-2× le risque.
               </div>
             </div>
@@ -2992,6 +3004,7 @@ export default function App() {
         });
         if (Object.keys(map).length > 0) {
           setApexRetail(map);
+          window.__apexRetail = map; // expose pour le DayTradeAnalyzer
           // Snapshot historique du sentiment retail (1 max par 4h) pour voir la tendance
           try {
             const now = Date.now();
