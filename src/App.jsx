@@ -2695,12 +2695,27 @@ function DayTradeAnalyzer() {
         <div style={{marginTop:10}}>
           <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>FORCE DU JOUR : <b style={{color:"#4ade80"}}>{result.strongest} (la plus forte)</b> → <b style={{color:"#f87171"}}>{result.weakest} (la plus faible)</b></div>
           <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} APEX (les 5 filtres réunis)</div>
-          {result.top.map((o,i)=>(
-            <div key={i} style={{padding:o.surbrillance?"12px 14px":"10px 12px", background:o.surbrillance?"#1a1500":"#001018", borderRadius:6, border:o.surbrillance?"2px solid #fbbf24":`1px solid ${o.direction==="LONG"?"#4ade8055":"#f8717155"}`, marginBottom:8, boxShadow:o.surbrillance?"0 0 12px #fbbf2433":"none"}}>
-              {o.surbrillance && <div style={{fontSize:8, color:"#fbbf24", fontWeight:700, letterSpacing:1, marginBottom:6}}>⭐ MEILLEURE OPPORTUNITÉ — convergence maximale</div>}
+          {result.top.map((o,i)=>{
+            const isLong = o.direction==="LONG";
+            const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
+            const cardStyle = o.surbrillance ? {
+              background: isLong ? "linear-gradient(135deg, #001a0d 0%, #003319 100%)" : "linear-gradient(135deg, #1a0000 0%, #330000 100%)",
+              border: isLong ? "2px solid #00ff88" : "2px solid #ff3b3b",
+              borderLeft: isLong ? "5px solid #00ff88" : "5px solid #ff3b3b",
+              boxShadow: isLong ? "0 0 16px rgba(0,255,136,0.4)" : "0 0 16px rgba(255,59,59,0.4)"
+            } : {
+              background: "#0a1628",
+              border: `1px solid ${isLong?"#4ade8033":"#f8717133"}`,
+              borderLeft: `4px solid ${isLong?"#4ade80":"#f87171"}`
+            };
+            return (
+            <div key={i} style={{...cardStyle, borderRadius:6, padding:"10px 12px", marginBottom:8}}>
               <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6}}>
-                <span style={{fontSize:13, fontWeight:700, color:o.direction==="LONG"?"#00ff88":"#ff3b3b"}}>#{i+1} {o.direction==="LONG"?"▲ ACHETER":"▼ VENDRE"} {o.base}/{o.quote}</span>
-                {o.isMaxDiv && <span style={{fontSize:7, color:"#fbbf24", background:"#0a0a00", padding:"2px 6px", borderRadius:3}}>DIVERGENCE MAX</span>}
+                <span style={{fontSize:13, fontWeight:700, color:isLong?"#00ff88":"#ff3b3b"}}>{medal} {isLong?"▲ ACHETER":"▼ VENDRE"} {o.base}/{o.quote}</span>
+                <span style={{display:"flex", gap:4, alignItems:"center"}}>
+                  {o.surbrillance && <span style={{fontSize:8, fontWeight:700, padding:"2px 6px", borderRadius:3, background:"#fbbf24", color:"#1a1500"}}>⭐ MEILLEURE</span>}
+                  {o.isMaxDiv && <span style={{fontSize:7, color:"#fbbf24", background:"#0a0a00", padding:"2px 6px", borderRadius:3}}>DIVERGENCE MAX</span>}
+                </span>
               </div>
               <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>
                 <b style={{color:o.direction==="LONG"?"#4ade80":"#f87171"}}>POURQUOI {o.direction==="LONG"?"ACHETER":"VENDRE"} :</b> {o.strongCur} est {o.strongRank===0?"la devise la plus FORTE":"forte ("+(o.strongRank+1)+"e)"} et {o.weakCur} {o.weakRank===o.strengthLen-1?"la plus FAIBLE":"faible ("+(o.weakRank+1)+"e)"}. La {o.direction==="LONG"?"forte monte contre la faible → on achète":"faible chute contre la forte → on vend"}.<br/>
@@ -2710,7 +2725,7 @@ function DayTradeAnalyzer() {
                 <b style={{color:"#c084fc"}}>EXÉCUTION :</b> attends un repli {o.direction==="LONG"?"baissier puis achète quand ça repart vers le haut":"haussier puis vends quand ça repart vers le bas"} (H1/M15). Stop serré {o.direction==="LONG"?"sous le dernier creux":"au-dessus du dernier sommet"} · target 1.5-2× le risque.
               </div>
             </div>
-          ))}
+          );})}
           <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
             ⚠ Chaque paire coche les 4 critères Session Londres (divergence ≥4 rangs + top 2 gainers/losers + devise de Londres + pas least volatile). Classées par divergence et continuation NY. Entre au repli, garde jusqu'à ~11h pendant que NY amplifie.
           </div>
