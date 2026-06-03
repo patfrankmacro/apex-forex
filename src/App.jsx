@@ -2622,26 +2622,26 @@ function DayTradeAnalyzer() {
 
       if (!strongest || !weakest){ setResult({error:"Format non reconnu — colle le bloc MarketMilk complet (Currency Strength inclus)."}); return; }
 
-      // Construire les candidats APEX: doivent cocher les 3 sources
+      const leastVol = grabPairs("Least Volatile", ["MarketMilk","Copyright","Manage"]).map(p=>p.pair);
+      const MOMENTUM_MIN = 0.40;
       const candidates = [];
       const consider = (p, direction) => {
-        // 1. Doit etre dans Most Volatile
-        const v = volRankPair[p.pair];
-        if (!v) return;
-        // 2. Divergence de force: base/quote du bon cote
+        if (p.chg===null || Math.abs(p.chg) < MOMENTUM_MIN) return;
+        if (leastVol.includes(p.pair)) return;
         const rb=sRank[p.base], rq=sRank[p.quote];
         if (rb===undefined||rq===undefined) return;
         const forceOk = (direction==="LONG" && rb<rq) || (direction==="SHORT" && rb>rq);
         if (!forceOk) return;
-        // Score precision: ecart de force (grand=mieux) + position gainer/loser (haut=mieux) + position volatile (haut=mieux)
+        const v = volRankPair[p.pair];
+        const isVolatile = !!v;
+        const volRank = v?v.rank:null, volChg = v?v.chg:null;
         const forceGap = Math.abs(rb-rq);
         const isMaxDiv = (p.base===strongest&&p.quote===weakest)||(p.base===weakest&&p.quote===strongest);
-        const score = forceGap*2 + (8-p.rank) + (8-v.rank) + (isMaxDiv?5:0);
-        // devise motrice (la faible ou forte est-elle #1-2 au volatility meter)
+        const score = Math.abs(p.chg)*30 + forceGap*2 + (isVolatile?(8-volRank):0) + (isMaxDiv?5:0);
         const weakCur = direction==="SHORT"?p.base:p.quote;
         const driverVol = vRank[weakCur]!==undefined && vRank[weakCur]<=1;
         const strongCur = direction==="LONG"?p.base:p.quote;
-        candidates.push({...p, direction, forceGap, isMaxDiv, volRank:v.rank, volChg:v.chg, score, driverVol, weakCur, strongCur,
+        candidates.push({...p, direction, forceGap, isMaxDiv, isVolatile, volRank, volChg, score, driverVol, weakCur, strongCur,
           strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: strength.length});
       };
       gainers.forEach(p=>consider(p,"LONG"));
@@ -2676,7 +2676,7 @@ function DayTradeAnalyzer() {
               <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>
                 <b style={{color:o.direction==="LONG"?"#4ade80":"#f87171"}}>POURQUOI {o.direction==="LONG"?"ACHETER":"VENDRE"} :</b> {o.strongCur} est {o.strongRank===0?"la devise la plus FORTE":"forte ("+(o.strongRank+1)+"e)"} et {o.weakCur} {o.weakRank===o.strengthLen-1?"la plus FAIBLE":"faible ("+(o.weakRank+1)+"e)"}. La {o.direction==="LONG"?"forte monte contre la faible → on achète":"faible chute contre la forte → on vend"}.<br/>
                 <b style={{color:"#38bdf8"}}>POURQUOI CETTE PAIRE :</b> {o.isMaxDiv?"divergence MAXIMALE du jour (les 2 extrêmes absolus du classement de force).":"écart de force net + "}confirmée par toutes les sources.{o.driverVol?` Le ${o.weakCur} est aussi parmi les devises qui bougent le plus = c'est lui qui drive le marché.`:""}<br/>
-                <b style={{color:"#fbbf24"}}>FORCE DU SIGNAL :</b> momentum #{o.rank} ({o.chg>0?"+":""}{o.chg}% aujourd'hui, mouvement lancé) · volatilité #{o.volRank} ({o.volChg}%, assez de pips)<br/>
+                <b style={{color:"#fbbf24"}}>FORCE DU SIGNAL :</b> momentum #{o.rank} ({o.chg>0?"+":""}{o.chg}% aujourd'hui, mouvement directionnel net){o.isVolatile?` · volatilité #${o.volRank+1} (${o.volChg}%, bouge bien)`:" · volatilité modérée (mouvement net mais oscille moins)"}<br/>
                 <b style={{color:"#c084fc"}}>EXÉCUTION :</b> attends un repli {o.direction==="LONG"?"baissier puis achète quand ça repart vers le haut":"haussier puis vends quand ça repart vers le bas"} (H1/M15). Stop serré {o.direction==="LONG"?"sous le dernier creux":"au-dessus du dernier sommet"} · target 1.5-2× le risque.
               </div>
             </div>
