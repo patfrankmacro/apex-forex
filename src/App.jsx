@@ -2571,6 +2571,67 @@ function JournalView() {
 
 
 
+function DayTradeView() {
+  const ACCENT="#38bdf8", TEXT="#c8d4f0", TEXT_DIM="#4a5070", BORDER="#1a1a2e";
+  return (
+    <div style={{padding:16, maxWidth:760, margin:"0 auto"}}>
+      <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE — CURRENCY STRENGTH MOMENTUM</div>
+      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (intraday / 1-3 jours) basé sur la force et la volatilité du jour · Séparé de la méthode COT swing</div>
+
+      {/* LOGIQUE */}
+      <div style={{padding:"12px 14px", background:"#1a1500", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 LA LOGIQUE</div>
+        <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
+          Sur le court terme, le prix suit le <b style={{color:"#fbbf24"}}>momentum</b> : une devise forte aujourd'hui tend à rester forte quelques heures à quelques jours, une faible reste faible. L'idée est simple : <b>acheter la devise la plus forte du jour CONTRE la plus faible</b>, quand la volatilité est suffisante pour générer du mouvement.<br/><br/>
+          On ne cherche pas le "pourquoi" fondamental ici (c'est le rôle du COT). On surfe le flux du moment : <b style={{color:"#38bdf8"}}>force relative + volatilité + direction déjà engagée</b>. On reste du côté qui bouge, pas contre.
+        </div>
+      </div>
+
+      {/* SEQUENCE */}
+      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LA SÉQUENCE — ÉTAPE PAR ÉTAPE</div>
+        <div style={{display:"flex", flexDirection:"column", gap:8}}>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Ouvre <b>MarketMilk</b> et regarde le <b>Currency Strength Meter</b> : repère la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> et la plus <b style={{color:"#f87171"}}>FAIBLE</b> du jour</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Forme la paire : <b>FORTE / FAIBLE</b> → tu prends la forte en LONG contre la faible (ex: si NZD faible et CHF fort → CHF/NZD long, ou vendre NZD)</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Vérifie le <b>Volatility Meter</b> : la paire doit être dans les <b>Most Volatile</b> (assez de mouvement pour faire des pips, sinon ça stagne)</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Confirme avec <b>Top Gainers / Losers</b> : la paire est-elle déjà dans la liste ? = le mouvement est lancé, le momentum est réel</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#a855f7"}}>CONFLUENCE COT (filtre clé) :</b> le momentum va-t-il dans le même sens que les Leveraged Funds (onglet TABLEAU) ? Si oui = signal renforcé. Si contre = on passe</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Entrée sur <b>H1 / M15</b> : attends un petit repli (pullback) dans le sens du momentum, puis entre. Stop serré, target = 1.5 à 2× le risque</span></div>
+        </div>
+      </div>
+
+      {/* PSYCHOLOGIE */}
+      <div style={{padding:"12px 14px", background:"#1a0a2e", borderRadius:8, border:"1px solid #a855f744", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#c084fc", fontWeight:700, marginBottom:8}}>🧠 LA PSYCHOLOGIE</div>
+        <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
+          <b style={{color:"#c084fc"}}>Reste du côté du flux.</b> En day trade, tu ne prédis pas — tu suis ce qui bouge déjà. La devise forte attire les acheteurs, la faible attire les vendeurs : tu te places dans ce courant.<br/><br/>
+          <b style={{color:"#c084fc"}}>Ne chasse pas un mouvement trop avancé.</b> Si une paire a déjà fait +1.5% aujourd'hui, le gros du mouvement est peut-être passé. Entre sur un <b>repli</b>, pas sur l'extension. Le bon moment = quand le momentum reprend après une petite pause.<br/><br/>
+          <b style={{color:"#c084fc"}}>La volatilité est ton amie ET ton ennemie.</b> Elle crée les pips, mais aussi les faux mouvements. Stop serré et discipline absolue.<br/><br/>
+          <b style={{color:"#fbbf24"}}>Une décision, une exécution.</b> Pas de sur-analyse, pas de revenge trade. Le day trade punit l'émotion plus vite que le swing.
+        </div>
+      </div>
+
+      {/* COMMENT REGARDER */}
+      <div style={{padding:"12px 14px", background:"#001a2e", borderRadius:8, border:"1px solid #38bdf844", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:8}}>👁 COMMENT BIEN REGARDER MARKETMILK</div>
+        <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
+          • <b>Currency Strength Meter</b> = qui est fort / faible AUJOURD'HUI (le cœur du système)<br/>
+          • <b>Volatility Meter</b> = quelles devises bougent assez pour valoir le coup<br/>
+          • <b>Top Gainers / Losers</b> = quelles paires ont déjà le momentum lancé<br/>
+          • <b>Most / Least Volatile</b> = évite les "Least Volatile" (ça stagne, pas de pips)<br/><br/>
+          <b style={{color:"#fbbf24"}}>L'ordre de lecture :</b> force → trouve la paire forte/faible → vérifie qu'elle est volatile → confirme qu'elle est dans les gainers/losers → check confluence COT → entrée.
+        </div>
+      </div>
+
+      {/* LIEN */}
+      <a href="https://marketmilk.babypips.com/" target="_blank" rel="noopener noreferrer" style={{display:"block", textAlign:"center", padding:"12px", background:"#38bdf8", color:"#001a2e", borderRadius:8, fontSize:11, fontWeight:700, textDecoration:"none", letterSpacing:1}}>
+        🥛 OUVRIR MARKETMILK ↗
+      </a>
+      <div style={{fontSize:8, color:TEXT_DIM, textAlign:"center", marginTop:6}}>marketmilk.babypips.com — force, volatilité et momentum des devises en temps réel</div>
+    </div>
+  );
+}
+
 function PositionCalc() {
   const [capital, setCapital] = useState("");
   const [risque, setRisque] = useState("1");
@@ -2900,7 +2961,7 @@ export default function App() {
   const TABS = [
     {id:"table",label:"TABLEAU"},{id:"rank",label:"RANG"},
     {id:"regimes",label:"RÉGIMES"},{id:"analyse",label:"ANALYSE"},{id:"journal",label:"JOURNAL"},
-    {id:"calc",label:"CALCUL"},
+    {id:"calc",label:"CALCUL"},{id:"daytrade",label:"DAY TRADE"},
     {id:"data",label:"DONNÉES ↗"},{id:"guide",label:"GUIDE"},{id:"heat",label:"HEATMAP"},{id:"cal",label:"RESSOURCES"},
   ];
 
@@ -3699,6 +3760,7 @@ const retailLoaded = opps.some(o => o.retailData);
       {view==="cal"     && <CalView />}
       {view==="journal" && <JournalView />}
       {view==="calc"    && <PositionCalc />}
+      {view==="daytrade" && <DayTradeView />}
     </div>
   );
 }
