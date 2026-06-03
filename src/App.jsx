@@ -2682,7 +2682,7 @@ function DayTradeAnalyzer() {
             </div>
           ))}
           <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
-            ⚠ Toutes ces paires réunissent les 3 critères (force + momentum + volatilité). Ne chasse pas un mouvement déjà trop avancé — attends toujours le repli. Trade pendant les heures fortes (voir ci-dessous).
+            ⚠ Toutes ces paires ont un momentum fort + une divergence de force (volatilité en bonus). Triées par force du mouvement. Ne chasse pas un mouvement déjà trop avancé — attends toujours le repli. Trade pendant les heures fortes (voir ci-dessous).
           </div>
         </div>
       )}
@@ -2715,9 +2715,9 @@ function DayTradeView() {
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Ouvre <b>MarketMilk</b> et regarde le <b>Currency Strength Meter</b> : repère la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> et la plus <b style={{color:"#f87171"}}>FAIBLE</b> du jour</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Forme la paire : <b>FORTE / FAIBLE</b> → tu prends la forte en LONG contre la faible (ex: si NZD faible et CHF fort → CHF/NZD long, ou vendre NZD)</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Vérifie le <b>Volatility Meter</b> : la paire doit être dans les <b>Most Volatile</b> (assez de mouvement pour faire des pips, sinon ça stagne)</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Regarde la <b>volatilité</b> : si la paire est dans <b>Most Volatile</b> = bonus (bouge bien). Mais un fort <b>momentum directionnel</b> suffit. Évite seulement les <b>Least Volatile</b> (ça stagne)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Confirme avec <b>Top Gainers / Losers</b> : la paire est-elle déjà dans la liste ? = le mouvement est lancé, le momentum est réel</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE confirmée (filtre clé) :</b> la devise forte et la faible sont bien aux extrêmes du Currency Strength, ET la paire est dans les gainers/losers ET volatile = les 3 convergent = meilleur signal</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE confirmée (filtre clé) :</b> la devise forte et la faible sont bien aux extrêmes du Currency Strength, BONUS = volatilité. Le momentum fort + la divergence de force sont obligatoires, la volatilité ajoute de la qualité</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Entrée sur <b>H1 / M15</b> : attends un petit repli (pullback) dans le sens du momentum, puis entre. Stop serré, target = 1.5 à 2× le risque</span></div>
         </div>
       </div>
@@ -2738,10 +2738,10 @@ function DayTradeView() {
         <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:8}}>👁 COMMENT BIEN REGARDER MARKETMILK</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
           • <b>Currency Strength Meter</b> = qui est fort / faible AUJOURD'HUI (le cœur du système)<br/>
-          • <b>Volatility Meter</b> = quelles devises bougent assez pour valoir le coup<br/>
+          • <b>Volatility Meter</b> = bonus de qualité (paire qui bouge bien), pas obligatoire<br/>
           • <b>Top Gainers / Losers</b> = quelles paires ont déjà le momentum lancé<br/>
           • <b>Most / Least Volatile</b> = évite les "Least Volatile" (ça stagne, pas de pips)<br/><br/>
-          <b style={{color:"#fbbf24"}}>L'ordre de lecture :</b> force → trouve la paire forte/faible → vérifie qu'elle est volatile → confirme qu'elle est dans les gainers/losers → entrée.
+          <b style={{color:"#fbbf24"}}>L'ordre de lecture :</b> force → trouve la paire forte/faible → momentum ≥0.40% (gainers/losers) → divergence de force → volatilité en bonus → entrée.
         </div>
       </div>
 
