@@ -2770,6 +2770,20 @@ function DayTradeView() {
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ BONUS (surbrillance) : la paire est aussi dans Most Volatile + contient USD/CAD (continuation quand NY ouvre à 8h) + divergence maximale.</div>
       </div>
 
+      {/* EXEMPLE REEL - GBP/NZD */}
+      <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:4}}>📐 EXEMPLE RÉEL — GBP/NZD ce matin 6h30</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength du matin : NZD #8 (le plus faible), GBP #4. Voici pourquoi GBP/NZD ACHAT cochait les 5 filtres.</div>
+        <div style={{display:"flex", flexDirection:"column", gap:6}}>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Divergence ✓</b> — GBP #4 vs NZD #8 = écart de 4 rangs. Vraie divergence (forte en haut, faible au fond), pas 2 voisines.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Momentum ✓</b> — top gainer #1 (+0.47%). Le mouvement de Londres était déjà lancé.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Devise de Londres ✓</b> — GBP est de Londres, donc la paire bouge à ton entrée 6h30.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Pas Least Volatile ✓</b> — la paire bougeait bien, pas dans les stagnantes.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Retail contrarien ✓</b> — le retail était SHORT à 70%+ pendant que toi tu achetais. Ils se faisaient piéger.</span></div>
+        </div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 5 filtres réunis = ALERTE à 6h30. Résultat : GBP/NZD a grimpé jusqu'à +0.88% dans la journée pendant que NY amplifiait. C'est exactement le type de trade que le système cherche.</div>
+      </div>
+
       {/* TABLEAU RECAP - PLAN DE TRADE */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:10}}>📋 TON PLAN DE TRADE — RÉSUMÉ</div>
