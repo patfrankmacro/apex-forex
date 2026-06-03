@@ -2770,6 +2770,32 @@ function DayTradeView() {
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ BONUS (surbrillance) : la paire est aussi dans Most Volatile + contient USD/CAD (continuation quand NY ouvre à 8h) + divergence maximale.</div>
       </div>
 
+      {/* TABLEAU RECAP - PLAN DE TRADE */}
+      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:10}}>📋 TON PLAN DE TRADE — RÉSUMÉ</div>
+        <div style={{display:"flex", flexDirection:"column", gap:1, fontSize:8.5, borderRadius:6, overflow:"hidden"}}>
+          <div style={{display:"grid", gridTemplateColumns:"70px 1fr 1fr", gap:1, background:"#1e3a5f", padding:"6px 8px", fontWeight:700, color:"#fbbf24"}}>
+            <span>QUAND</span><span>QUOI FAIRE</span><span>POURQUOI</span>
+          </div>
+          <div style={{display:"grid", gridTemplateColumns:"70px 1fr 1fr", gap:1, background:"#001018", padding:"6px 8px", color:TEXT}}>
+            <span style={{color:"#4ade80", fontWeight:700}}>6h30 ET</span><span>Colle MarketMilk + lance l'analyse</span><span style={{color:TEXT_DIM}}>Londres bouge, tendance déjà lancée</span>
+          </div>
+          <div style={{display:"grid", gridTemplateColumns:"70px 1fr 1fr", gap:1, background:"#0a1f0a", padding:"6px 8px", color:TEXT}}>
+            <span style={{color:"#4ade80", fontWeight:700}}>Si alerte</span><span>Entre au repli (pullback) H1/M15</span><span style={{color:TEXT_DIM}}>Meilleur prix, pas l'extension</span>
+          </div>
+          <div style={{display:"grid", gridTemplateColumns:"70px 1fr 1fr", gap:1, background:"#001018", padding:"6px 8px", color:TEXT}}>
+            <span style={{color:"#38bdf8", fontWeight:700}}>8h ET</span><span>Tiens ta position</span><span style={{color:TEXT_DIM}}>NY ouvre et amplifie le mouvement</span>
+          </div>
+          <div style={{display:"grid", gridTemplateColumns:"70px 1fr 1fr", gap:1, background:"#0a1f0a", padding:"6px 8px", color:TEXT}}>
+            <span style={{color:"#fbbf24", fontWeight:700}}>~11h ET</span><span>Sécurise / sors</span><span style={{color:TEXT_DIM}}>Momentum s'essouffle après-midi</span>
+          </div>
+          <div style={{display:"grid", gridTemplateColumns:"70px 1fr 1fr", gap:1, background:"#1a0000", padding:"6px 8px", color:TEXT}}>
+            <span style={{color:"#f87171", fontWeight:700}}>Après 17h</span><span>Ne trade pas</span><span style={{color:TEXT_DIM}}>Zone morte, spreads larges</span>
+          </div>
+        </div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8, lineHeight:1.5}}>Si aucune alerte ne sort à 6h30 = pas de trade ce jour. La discipline d'attendre le bon setup fait partie de la stratégie.</div>
+      </div>
+
       {/* PSYCHOLOGIE */}
       <div style={{padding:"12px 14px", background:"#1a0a2e", borderRadius:8, border:"1px solid #a855f744", marginBottom:14}}>
         <div style={{fontSize:11, color:"#c084fc", fontWeight:700, marginBottom:8}}>🧠 LA PSYCHOLOGIE</div>
@@ -2784,26 +2810,27 @@ function DayTradeView() {
       {/* MEILLEURES HEURES (heure de New York / ET) */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #4ade8044", marginBottom:14}}>
         <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:8}}>🕐 MEILLEURES HEURES POUR SUIVRE LES GROS JOUEURS (heure de New York)</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:8}}>Dans l'ordre de la journée. Ton créneau de trade est mis en évidence.</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
-          <div style={{padding:"6px 8px", background:"#052010", borderRadius:4, marginBottom:6, border:"1px solid #4ade8033"}}>
-            <b style={{color:"#4ade80"}}>⭐ 8h00 – 12h00 ET — LE CRÉNEAU ROI</b><br/>
-            Chevauchement Londres + New York = ~50% du volume quotidien. Liquidité et mouvements institutionnels maximum, spreads les plus serrés. <b>Si tu ne trades qu'un moment, c'est celui-là.</b>
+          <div style={{padding:"6px 8px", background:"#001018", borderRadius:4, marginBottom:6}}>
+            <b style={{color:"#38bdf8"}}>3h00 ET — Ouverture de Londres</b><br/>
+            EUR, GBP, CHF se réveillent. Les ordres institutionnels affluent, la tendance du jour se forme.
+          </div>
+          <div style={{padding:"8px 10px", background:"#052010", borderRadius:4, marginBottom:6, border:"2px solid #4ade80"}}>
+            <b style={{color:"#4ade80"}}>⭐ 6h30 – 11h00 ET — TON CRÉNEAU</b><br/>
+            Tu entres à 6h30 (Londres bien lancé) et tu tiens jusqu'à ~11h. Tu profites de la tendance de Londres PUIS de l'amplification de New York. C'est ta fenêtre.
           </div>
           <div style={{padding:"6px 8px", background:"#001018", borderRadius:4, marginBottom:6}}>
-            <b style={{color:"#38bdf8"}}>2h00 – 3h00 ET — Ouverture de Londres</b><br/>
-            Les ordres institutionnels affluent, la volatilité explose. Donne souvent la direction du jour.
+            <b style={{color:"#38bdf8"}}>8h00 ET — Ouverture de New York</b><br/>
+            USD et CAD se réveillent. Chevauchement Londres+NY = ~50% du volume quotidien, le pic de liquidité. Ta position de Londres s'amplifie.
           </div>
           <div style={{padding:"6px 8px", background:"#001018", borderRadius:4, marginBottom:6}}>
             <b style={{color:"#fbbf24"}}>8h30 – 10h00 ET — News US (NFP, CPI, FOMC)</b><br/>
-            Les grosses nouvelles US tombent ici → mouvements violents. Accélère ou renverse la tendance de Londres.
-          </div>
-          <div style={{padding:"6px 8px", background:"#001018", borderRadius:4, marginBottom:6}}>
-            <b style={{color:"#c084fc"}}>19h00 – 20h00 ET — Ouverture de Tokyo (paires JPY)</b><br/>
-            Flux institutionnel japonais → bon pour NZD/JPY, CHF/JPY, AUD/JPY.
+            Les grosses nouvelles US → mouvements violents. Peut accélérer ou renverser la tendance. Prudence si tu es déjà en position.
           </div>
           <div style={{padding:"6px 8px", background:"#1a0000", borderRadius:4, border:"1px solid #f8717133"}}>
-            <b style={{color:"#f87171"}}>⛔ APRÈS 17h00 ET — À ÉVITER</b><br/>
-            Les fournisseurs de liquidité réinitialisent, les spreads s'élargissent de 10-20 pips. Peut déclencher tes stops sans vrai mouvement. Zone morte.
+            <b style={{color:"#f87171"}}>⛔ APRÈS 17h00 ET — ZONE MORTE</b><br/>
+            Les fournisseurs de liquidité réinitialisent, spreads larges (10-20 pips), faux mouvements. Ne trade pas — l'app te dira d'ailleurs qu'il n'y a aucune opportunité.
           </div>
         </div>
       </div>
