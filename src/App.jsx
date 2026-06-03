@@ -2642,22 +2642,22 @@ function DayTradeAnalyzer() {
         const weakCur   = direction==="LONG"?p.quote:p.base;
         const strongInTop2 = sRank[strongCur] <= 1;            // top 2 forts
         const weakInBot2   = sRank[weakCur]   >= nStr-2;       // top 2 faibles
-        if (!(strongInTop2 && weakInBot2)) return;             // divergence stricte exigee
-        // BONUS DE CONVERGENCE (pour le classement / surbrillance)
+        if (!(strongInTop2 && weakInBot2)) return;             // ETAPE 3: divergence stricte exigee
+        // ETAPE 4 - VOLATILITY METER (OBLIGATOIRE): les DEUX devises dans le top 3
+        const baseVM = vRank[p.base], quoteVM = vRank[p.quote];
+        const inVolMeter3 = (baseVM!==undefined && baseVM<=2) && (quoteVM!==undefined && quoteVM<=2);
+        if (!inVolMeter3) return;
+        // ETAPE 5 - MOST VOLATILE (OBLIGATOIRE): la paire dans le top 2
         const v = volRankPair[p.pair];
         const isVolatile = !!v;
         const volRank = v?v.rank:null, volChg = v?v.chg:null;
-        const inMostVol2 = isVolatile && volRank <= 1;         // top 2 Most Volatile
-        const baseVM = vRank[p.base], quoteVM = vRank[p.quote];
-        const inVolMeter3 = (baseVM!==undefined && baseVM<=2) || (quoteVM!==undefined && quoteVM<=2); // top 3 Volatility Meter
+        const inMostVol2 = isVolatile && volRank <= 1;
+        if (!inMostVol2) return;
+        // Tous les filtres passes = signal pur. La divergence MAX absolue = etoile
         const forceGap = Math.abs(rb-rq);
         const isMaxDiv = (p.base===strongest&&p.quote===weakest)||(p.base===weakest&&p.quote===strongest);
-        // Score de convergence: chaque source qui pointe ajoute des points
-        let conv = 2; // force + session deja valides
-        if (inMostVol2) conv++;
-        if (inVolMeter3) conv++;
-        if (isMaxDiv) conv++;
-        const score = conv*10 + (10-p.rank*3) + forceGap + Math.abs(p.chg);
+        const conv = 5; // les 5 criteres sont tous valides
+        const score = (isMaxDiv?100:0) + (10-p.rank*3) + (10-volRank*2) + forceGap + Math.abs(p.chg);
         const driverVol = baseVM!==undefined && baseVM<=1 || quoteVM!==undefined && quoteVM<=1;
         candidates.push({...p, direction, forceGap, isMaxDiv, isVolatile, volRank, volChg, score, conv, inMostVol2, inVolMeter3, driverVol, weakCur, strongCur,
           strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: nStr});
