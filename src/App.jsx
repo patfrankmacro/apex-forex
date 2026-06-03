@@ -2685,7 +2685,7 @@ function DayTradeAnalyzer() {
       {result && !result.error && (
         <div style={{marginTop:10}}>
           <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>FORCE DU JOUR : <b style={{color:"#4ade80"}}>{result.strongest} (la plus forte)</b> → <b style={{color:"#f87171"}}>{result.weakest} (la plus faible)</b></div>
-          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 TOP {result.top.length} OPPORTUNITÉS APEX (force + momentum + volatilité)</div>
+          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} APEX (les 5 filtres réunis)</div>
           {result.top.map((o,i)=>(
             <div key={i} style={{padding:o.surbrillance?"12px 14px":"10px 12px", background:o.surbrillance?"#1a1500":"#001018", borderRadius:6, border:o.surbrillance?"2px solid #fbbf24":`1px solid ${o.direction==="LONG"?"#4ade8055":"#f8717155"}`, marginBottom:8, boxShadow:o.surbrillance?"0 0 12px #fbbf2433":"none"}}>
               {o.surbrillance && <div style={{fontSize:8, color:"#fbbf24", fontWeight:700, letterSpacing:1, marginBottom:6}}>⭐ MEILLEURE OPPORTUNITÉ — convergence maximale</div>}
@@ -2695,7 +2695,7 @@ function DayTradeAnalyzer() {
               </div>
               <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>
                 <b style={{color:o.direction==="LONG"?"#4ade80":"#f87171"}}>POURQUOI {o.direction==="LONG"?"ACHETER":"VENDRE"} :</b> {o.strongCur} est {o.strongRank===0?"la devise la plus FORTE":"forte ("+(o.strongRank+1)+"e)"} et {o.weakCur} {o.weakRank===o.strengthLen-1?"la plus FAIBLE":"faible ("+(o.weakRank+1)+"e)"}. La {o.direction==="LONG"?"forte monte contre la faible → on achète":"faible chute contre la forte → on vend"}.<br/>
-                <b style={{color:"#38bdf8"}}>POURQUOI CETTE PAIRE :</b> {o.isMaxDiv?"divergence MAXIMALE du jour (les 2 extrêmes absolus du classement de force).":"écart de force net + "}confirmée par toutes les sources.{o.driverVol?` Le ${o.weakCur} est aussi parmi les devises qui bougent le plus = c'est lui qui drive le marché.`:""}<br/>
+                <b style={{color:"#38bdf8"}}>POURQUOI CETTE PAIRE :</b> {o.isMaxDiv?"divergence MAXIMALE du jour (les 2 extrêmes absolus du classement de force). ":"écart de force net + "}confirmée par toutes les sources.{o.driverVol?` Le ${o.weakCur} est aussi parmi les devises qui bougent le plus = c'est lui qui drive le marché.`:""}<br/>
                 <b style={{color:"#fbbf24"}}>FORCE DU SIGNAL :</b> momentum #{o.rank} ({o.chg>0?"+":""}{o.chg}% aujourd'hui, mouvement directionnel net){o.isVolatile?` · volatilité #${o.volRank+1} (${o.volChg}%, bouge bien)`:" · volatilité modérée (mouvement net mais oscille moins)"}<br/>
                 <b style={{color:"#c084fc"}}>EXÉCUTION :</b> attends un repli {o.direction==="LONG"?"baissier puis achète quand ça repart vers le haut":"haussier puis vends quand ça repart vers le bas"} (H1/M15). Stop serré {o.direction==="LONG"?"sous le dernier creux":"au-dessus du dernier sommet"} · target 1.5-2× le risque.
               </div>
