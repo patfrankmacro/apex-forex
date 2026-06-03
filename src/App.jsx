@@ -2758,14 +2758,16 @@ function DayTradeView() {
       {/* SEQUENCE */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LA SÉQUENCE — ÉTAPE PAR ÉTAPE</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie ces 5 filtres pour toi quand tu colles tes données. Une alerte n'apparaît que si les 5 sont cochés.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Ouvre <b>MarketMilk</b> et regarde le <b>Currency Strength Meter</b> : repère la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> et la plus <b style={{color:"#f87171"}}>FAIBLE</b> du jour</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Forme la paire : <b>FORTE / FAIBLE</b> → tu prends la forte en LONG contre la faible (ex: si NZD faible et CHF fort → CHF/NZD long, ou vendre NZD)</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Regarde la <b>volatilité</b> : si la paire est dans <b>Most Volatile</b> = bonus (bouge bien). Mais un fort <b>momentum directionnel</b> suffit. Évite seulement les <b>Least Volatile</b> (ça stagne)</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Confirme avec <b>Top Gainers / Losers</b> : la paire est-elle déjà dans la liste ? = le mouvement est lancé, le momentum est réel</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>LES 4 CRITÈRES (entrée 6h30 Londres) :</b> ① DIVERGENCE : forte et faible séparées d'au moins 4 rangs au Currency Strength (vraie divergence, pas 2 voisines) · ② top 2 gainers (LONG) ou top 2 losers (SHORT) · ③ la paire contient une devise de Londres (EUR/GBP/CHF, active à 6h30) · ④ pas dans Least Volatile · ⑤ RETAIL CONTRARIEN ≥70% (si tu achètes, le retail doit être short 70%+ ; si tu vends, long 70%+ — ils se font piéger, leurs stops alimentent ton mouvement). BONUS (⭐) : aussi Most Volatile + contient USD/CAD (amplifie quand NY ouvre à 8h)</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Entrée sur <b>H1 / M15</b> : attends un petit repli (pullback) dans le sens du momentum, puis entre. Stop serré, target = 1.5 à 2× le risque</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE ≥ 4 rangs</b> au Currency Strength : la devise forte et la faible séparées d'au moins 4 places (vraie divergence, pas 2 voisines)</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>TOP 2 momentum</b> : la paire est #1 ou #2 des Top Gainers (→ achat) ou Top Losers (→ vente). Le mouvement est déjà lancé</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DEVISE DE LONDRES</b> : la paire contient EUR, GBP ou CHF (actives à ton entrée 6h30). Les paires asiatiques sont écartées</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>PAS Least Volatile</b> : on écarte ce qui stagne (pas de pips à faire)</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>RETAIL CONTRARIEN ≥ 70%</b> : si tu achètes, le retail doit être short 70%+ ; si tu vends, long 70%+. Ils se font piéger, leurs stops alimentent ton mouvement</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#c084fc", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>ENTRÉE</b> : sur H1/M15, attends un repli (pullback) puis entre. Stop serré, target 1.5-2× le risque. Garde jusqu'à ~11h (NY amplifie)</span></div>
         </div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ BONUS (surbrillance) : la paire est aussi dans Most Volatile + contient USD/CAD (continuation quand NY ouvre à 8h) + divergence maximale.</div>
       </div>
 
       {/* PSYCHOLOGIE */}
@@ -2778,19 +2780,6 @@ function DayTradeView() {
           <b style={{color:"#fbbf24"}}>Une décision, une exécution.</b> Pas de sur-analyse, pas de revenge trade. Le day trade punit l'émotion plus vite que le swing.
         </div>
       </div>
-
-      {/* COMMENT REGARDER */}
-      <div style={{padding:"12px 14px", background:"#001a2e", borderRadius:8, border:"1px solid #38bdf844", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:8}}>👁 COMMENT BIEN REGARDER MARKETMILK</div>
-        <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
-          • <b>Currency Strength Meter</b> = qui est fort / faible AUJOURD'HUI (le cœur du système)<br/>
-          • <b>Top Gainers / Losers</b> = ta boussole : le mouvement de Londres déjà lancé (on prend le top 2)<br/>
-          • <b>Most Volatile</b> = bonus d'amplitude · <b>Least Volatile</b> = à éviter (ça stagne)<br/>
-          • <b>Most / Least Volatile</b> = évite les "Least Volatile" (ça stagne, pas de pips)<br/><br/>
-          <b style={{color:"#fbbf24"}}>L'ordre de lecture :</b> repère la devise faible (moteur) → top 2 gainers/losers → divergence ≥4 rangs → devise de Londres (EUR/GBP/CHF) dans la paire → retail contrarien ≥70% → bonus USD/CAD pour la continuation NY → entrée au repli.
-        </div>
-      </div>
-
 
       {/* MEILLEURES HEURES (heure de New York / ET) */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #4ade8044", marginBottom:14}}>
