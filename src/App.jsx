@@ -2657,7 +2657,7 @@ function DayTradeAnalyzer() {
         const isMaxDiv = (p.base===strongest&&p.quote===weakest)||(p.base===weakest&&p.quote===strongest);
         const score = forceGap*10 + (10-p.rank*3) + (inMostVol2?8:0) + (hasNY?4:0) + (isMaxDiv?5:0) + Math.abs(p.chg);
         const driverVol = false;
-        candidates.push({...p, direction, forceGap, isMaxDiv, isVolatile, volRank, volChg, score, conv, inMostVol2, inVolMeter3, driverVol, weakCur, strongCur,
+        candidates.push({...p, direction, forceGap, isMaxDiv, isVolatile, volRank, volChg, score, inMostVol2, hasNY, driverVol, weakCur, strongCur,
           strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: nStr});
       };
       gainers.forEach(p=>consider(p,"LONG"));
@@ -2758,7 +2758,7 @@ function DayTradeView() {
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
           • <b>Currency Strength Meter</b> = qui est fort / faible AUJOURD'HUI (le cœur du système)<br/>
           • <b>Top Gainers / Losers</b> = ta boussole : le mouvement de Londres déjà lancé (on prend le top 2)<br/>
-          • <b>Top Gainers / Losers</b> = quelles paires ont déjà le momentum lancé<br/>
+          • <b>Most Volatile</b> = bonus d'amplitude · <b>Least Volatile</b> = à éviter (ça stagne)<br/>
           • <b>Most / Least Volatile</b> = évite les "Least Volatile" (ça stagne, pas de pips)<br/><br/>
           <b style={{color:"#fbbf24"}}>L'ordre de lecture :</b> repère la devise faible (moteur) → top 2 gainers/losers → divergence ≥4 rangs → devise de Londres (EUR/GBP/CHF) dans la paire → bonus USD/CAD pour la continuation NY → entrée au repli.
         </div>
