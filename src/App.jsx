@@ -2627,38 +2627,36 @@ function DayTradeAnalyzer() {
       const candidates = [];
       const SESSION_CURS = ["EUR","GBP","USD","CHF","CAD"]; // actives 6h-11h ET
       const nStr = strength.length;
+      const LONDON_CURS = ["EUR","GBP","CHF"];   // actives a ton entree 6h30
+      const NY_CURS = ["USD","CAD"];             // amplifient quand NY ouvre a 8h
+      const GAP_MIN = 4;                          // divergence min (sur 8 devises)
       const consider = (p, direction) => {
-        // ETAPE 1 - FILTRE SESSION (d'abord): paire tradable a London-NY ?
-        const sessionOk = SESSION_CURS.includes(p.base) || SESSION_CURS.includes(p.quote);
-        if (!sessionOk) return; // NZD/JPY etc. elimines d'entree
-        // ETAPE 2 - top 2 gainers/losers (OBLIGATOIRE)
-        if (p.rank > TOP_RANK) return;
-        if (p.chg===null) return;
-        if (leastVol.includes(p.pair)) return;
-        // ETAPE 3 - CONVERGENCE FORCE (OBLIGATOIRE): base et quote aux extremes (top2 fort / top2 faible)
+        // CRITERE 1 - DIVERGENCE SUFFISANTE (ecart >= 4 rangs)
         const rb=sRank[p.base], rq=sRank[p.quote];
         if (rb===undefined||rq===undefined) return;
         const strongCur = direction==="LONG"?p.base:p.quote;
         const weakCur   = direction==="LONG"?p.quote:p.base;
-        const strongInTop2 = sRank[strongCur] <= 1;            // top 2 forts
-        const weakInBot2   = sRank[weakCur]   >= nStr-2;       // top 2 faibles
-        if (!(strongInTop2 && weakInBot2)) return;             // ETAPE 3: divergence stricte exigee
-        // ETAPE 4 - VOLATILITY METER (OBLIGATOIRE): les DEUX devises dans le top 3
-        const baseVM = vRank[p.base], quoteVM = vRank[p.quote];
-        const inVolMeter3 = (baseVM!==undefined && baseVM<=2) && (quoteVM!==undefined && quoteVM<=2);
-        if (!inVolMeter3) return;
-        // ETAPE 5 - MOST VOLATILE (OBLIGATOIRE): la paire dans le top 2
+        const forceGap = Math.abs(rb-rq);
+        if (forceGap < GAP_MIN) return;            // pas assez de divergence -> rejete
+        // la forte doit etre en moitie haute, la faible en moitie basse
+        if (!(sRank[strongCur] < sRank[weakCur])) return;
+        // CRITERE 2 - MOMENTUM: top 2 gainers/losers
+        if (p.rank > TOP_RANK) return;
+        if (p.chg===null) return;
+        // CRITERE 3 - SESSION LONDRES: au moins une devise EUR/GBP/CHF
+        const hasLondon = LONDON_CURS.includes(p.base) || LONDON_CURS.includes(p.quote);
+        if (!hasLondon) return;
+        // CRITERE 4 - pas Least Volatile
+        if (leastVol.includes(p.pair)) return;
+        // BONUS (classement + surbrillance)
         const v = volRankPair[p.pair];
         const isVolatile = !!v;
         const volRank = v?v.rank:null, volChg = v?v.chg:null;
         const inMostVol2 = isVolatile && volRank <= 1;
-        if (!inMostVol2) return;
-        // Tous les filtres passes = signal pur. La divergence MAX absolue = etoile
-        const forceGap = Math.abs(rb-rq);
+        const hasNY = NY_CURS.includes(p.base) || NY_CURS.includes(p.quote); // continuation NY
         const isMaxDiv = (p.base===strongest&&p.quote===weakest)||(p.base===weakest&&p.quote===strongest);
-        const conv = 5; // les 5 criteres sont tous valides
-        const score = (isMaxDiv?100:0) + (10-p.rank*3) + (10-volRank*2) + forceGap + Math.abs(p.chg);
-        const driverVol = baseVM!==undefined && baseVM<=1 || quoteVM!==undefined && quoteVM<=1;
+        const score = forceGap*10 + (10-p.rank*3) + (inMostVol2?8:0) + (hasNY?4:0) + (isMaxDiv?5:0) + Math.abs(p.chg);
+        const driverVol = false;
         candidates.push({...p, direction, forceGap, isMaxDiv, isVolatile, volRank, volChg, score, conv, inMostVol2, inVolMeter3, driverVol, weakCur, strongCur,
           strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: nStr});
       };
@@ -2695,14 +2693,14 @@ function DayTradeAnalyzer() {
               </div>
               <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>
                 <b style={{color:o.direction==="LONG"?"#4ade80":"#f87171"}}>POURQUOI {o.direction==="LONG"?"ACHETER":"VENDRE"} :</b> {o.strongCur} est {o.strongRank===0?"la devise la plus FORTE":"forte ("+(o.strongRank+1)+"e)"} et {o.weakCur} {o.weakRank===o.strengthLen-1?"la plus FAIBLE":"faible ("+(o.weakRank+1)+"e)"}. La {o.direction==="LONG"?"forte monte contre la faible → on achète":"faible chute contre la forte → on vend"}.<br/>
-                <b style={{color:"#38bdf8"}}>POURQUOI CETTE PAIRE :</b> {o.isMaxDiv?"divergence MAXIMALE du jour (les 2 extrêmes absolus du classement de force). ":"écart de force net + "}confirmée par toutes les sources.{o.driverVol?` Le ${o.weakCur} est aussi parmi les devises qui bougent le plus = c'est lui qui drive le marché.`:""}<br/>
-                <b style={{color:"#fbbf24"}}>FORCE DU SIGNAL :</b> momentum #{o.rank} ({o.chg>0?"+":""}{o.chg}% aujourd'hui, mouvement directionnel net){o.isVolatile?` · volatilité #${o.volRank+1} (${o.volChg}%, bouge bien)`:" · volatilité modérée (mouvement net mais oscille moins)"}<br/>
+                <b style={{color:"#38bdf8"}}>POURQUOI CETTE PAIRE :</b> {o.isMaxDiv?"divergence MAXIMALE (les 2 extrêmes absolus du classement). ":`divergence de ${o.forceGap} rangs au Currency Strength. `}Contient une devise de Londres = active à ton entrée 6h30.{o.hasNY?" Et une devise NY = le mouvement s'amplifiera quand New York ouvre à 8h (tu gardes jusqu'à 11h).":""}<br/>
+                <b style={{color:"#fbbf24"}}>LE SIGNAL :</b> {o.direction==="LONG"?"top gainer":"top loser"} #{o.rank} ({o.chg>0?"+":""}{o.chg}%, mouvement de Londres lancé) · divergence {o.forceGap} rangs{o.isVolatile?` · Most Volatile #${o.volRank+1} (${o.volChg}%)`:""}<br/>
                 <b style={{color:"#c084fc"}}>EXÉCUTION :</b> attends un repli {o.direction==="LONG"?"baissier puis achète quand ça repart vers le haut":"haussier puis vends quand ça repart vers le bas"} (H1/M15). Stop serré {o.direction==="LONG"?"sous le dernier creux":"au-dessus du dernier sommet"} · target 1.5-2× le risque.
               </div>
             </div>
           ))}
           <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
-            ⚠ Chaque paire ici coche les 5 filtres APEX (session + momentum + force + volatility meter + most volatile). Souvent 1 seule paire = c'est voulu, seuls les signaux purs passent. Attends toujours le repli avant d'entrer. Trade pendant les heures fortes (voir ci-dessous).
+            ⚠ Chaque paire coche les 4 critères Session Londres (divergence ≥4 rangs + top 2 gainers/losers + devise de Londres + pas least volatile). Classées par divergence et continuation NY. Entre au repli, garde jusqu'à ~11h pendant que NY amplifie.
           </div>
         </div>
       )}
@@ -2726,7 +2724,7 @@ function DayTradeView() {
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
           Les <b style={{color:"#fbbf24"}}>gros joueurs</b> (banques, fonds) déplacent des milliards chaque jour. Leurs flux créent des tendances intraday : une devise qu'ils achètent devient FORTE, une qu'ils vendent devient FAIBLE — et ça dure quelques heures à quelques jours. On ne devine pas, <b>on SUIT ce flux</b>.<br/><br/>
           Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> du jour contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence), quand le mouvement est déjà lancé (momentum) et que la paire bouge assez (volatilité).<br/><br/>
-          <b style={{color:"#38bdf8"}}>⏰ Le timing de session est CRUCIAL :</b> chaque devise bouge surtout quand SON marché est ouvert. Tu trades 6h-11h ET = session <b>Londres + New York</b>. Les devises actives à ces heures : <b>EUR, GBP, USD, CHF, CAD</b>. Une paire comme NZD/JPY peut sembler parfaite, mais NZD et JPY sont asiatiques — à 8h ET leur marché dort, la paire est plate. L'app filtre automatiquement pour ne proposer que des paires <b>actives pendant ta session</b>.
+          <b style={{color:"#38bdf8"}}>⏰ Ton timing — entrée 6h30, tenue jusqu'à 11h :</b> tu entres en pleine session de <b>Londres</b> (ouverte depuis 3h ET), donc tu cherches les paires qui bougent DÉJÀ avec une devise de Londres (<b>EUR, GBP, CHF</b>) contre une devise faible (vraie divergence). Tu te positionnes AVANT que New York (8h ET) amplifie — une paire avec <b>USD/CAD</b> en plus = bonus de continuation pour l'après-midi. Les paires asiatiques (NZD/JPY...) sont écartées : mortes à ton heure.
         </div>
       </div>
 
@@ -2738,7 +2736,7 @@ function DayTradeView() {
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Forme la paire : <b>FORTE / FAIBLE</b> → tu prends la forte en LONG contre la faible (ex: si NZD faible et CHF fort → CHF/NZD long, ou vendre NZD)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Regarde la <b>volatilité</b> : si la paire est dans <b>Most Volatile</b> = bonus (bouge bien). Mais un fort <b>momentum directionnel</b> suffit. Évite seulement les <b>Least Volatile</b> (ça stagne)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Confirme avec <b>Top Gainers / Losers</b> : la paire est-elle déjà dans la liste ? = le mouvement est lancé, le momentum est réel</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>LES 5 FILTRES (tous OBLIGATOIRES) :</b> ① devise active session London-NY · ② top 2 gainers/losers · ③ force : forte dans top 2 fort ET faible dans top 2 faible · ④ les 2 devises dans le top 3 du Volatility Meter · ⑤ paire dans le top 2 Most Volatile. Une paire ne passe que si elle coche TOUT (⭐ = divergence max absolue)</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>LES 4 CRITÈRES (entrée 6h30 Londres) :</b> ① DIVERGENCE : forte et faible séparées d'au moins 4 rangs au Currency Strength (vraie divergence, pas 2 voisines) · ② top 2 gainers (LONG) ou top 2 losers (SHORT) · ③ la paire contient une devise de Londres (EUR/GBP/CHF, active à 6h30) · ④ pas dans Least Volatile. BONUS (⭐) : aussi Most Volatile + contient USD/CAD (amplifie quand NY ouvre à 8h)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}>Entrée sur <b>H1 / M15</b> : attends un petit repli (pullback) dans le sens du momentum, puis entre. Stop serré, target = 1.5 à 2× le risque</span></div>
         </div>
       </div>
@@ -2759,10 +2757,10 @@ function DayTradeView() {
         <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:8}}>👁 COMMENT BIEN REGARDER MARKETMILK</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
           • <b>Currency Strength Meter</b> = qui est fort / faible AUJOURD'HUI (le cœur du système)<br/>
-          • <b>Volatility Meter</b> = les 2 devises de la paire doivent être dans le top 3 (obligatoire)<br/>
+          • <b>Top Gainers / Losers</b> = ta boussole : le mouvement de Londres déjà lancé (on prend le top 2)<br/>
           • <b>Top Gainers / Losers</b> = quelles paires ont déjà le momentum lancé<br/>
           • <b>Most / Least Volatile</b> = évite les "Least Volatile" (ça stagne, pas de pips)<br/><br/>
-          <b style={{color:"#fbbf24"}}>L'ordre de lecture :</b> devise active session → top 2 gainers/losers → force top 2 vs top 2 → top 3 Volatility Meter (les 2 devises) → top 2 Most Volatile → entrée. Tout doit converger.
+          <b style={{color:"#fbbf24"}}>L'ordre de lecture :</b> repère la devise faible (moteur) → top 2 gainers/losers → divergence ≥4 rangs → devise de Londres (EUR/GBP/CHF) dans la paire → bonus USD/CAD pour la continuation NY → entrée au repli.
         </div>
       </div>
 
