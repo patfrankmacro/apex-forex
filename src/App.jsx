@@ -2756,6 +2756,21 @@ function DayTradeView() {
         </div>
       </div>
 
+      {/* POURQUOI CES 7 PAIRES */}
+      <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:8}}>🎯 POURQUOI CES 7 PAIRES À 6h30</div>
+        <div style={{fontSize:9, color:TEXT, lineHeight:1.6, marginBottom:10}}>
+          On trade UNIQUEMENT : <b style={{color:"#4ade80"}}>EUR/AUD · GBP/AUD · EUR/NZD · GBP/NZD · GBP/JPY · EUR/JPY · CHF/JPY</b>. Chacune oppose une devise de Londres (EUR, GBP, CHF) à une devise du Pacifique/Asie (AUD, NZD, JPY).
+        </div>
+        <div style={{display:"flex", flexDirection:"column", gap:7}}>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>1.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Les news sont déjà sorties.</b> À 6h30 ET il est 11h30 à Londres : les chiffres éco européens du matin (inflation, emploi, PIB UK/EU) sont tombés entre 2h et 5h. Les institutions les ont digérés et ont déjà pris position. Tu entres dans une tendance confirmée, pas dans l'incertitude.</span></div>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>2.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>La conviction des big boys est à son max.</b> Londres est ouvert depuis 3h, le volume institutionnel est massif. Les gros joueurs ont bâti leurs positions sur EUR/GBP/CHF selon les news. À 6h30 la direction est nette, pas hésitante.</span></div>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>3.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>New York arrive à 8h pour amplifier.</b> Tu te positionnes 1h30 AVANT NY. Quand le 2e plus gros pool de capitaux rejoint le mouvement, ta position de Londres s'amplifie. Tu es déjà dedans quand la vague monte.</span></div>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>4.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Le sentiment retail est déjà formé.</b> Le retail a réagi aux news du matin, souvent à contre-sens. À 6h30 leur positionnement est mûr et lisible — ton filtre retail contrarien ≥70% capte ce déséquilibre exact.</span></div>
+        </div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>💡 6h30 ET = le point de convergence : news digérées + tendance de Londres confirmée + retail piégé + NY qui arrive. Tu ne devines rien, tu te places dans un flux déjà validé, juste avant qu'il accélère.</div>
+      </div>
+
       {/* SEQUENCE */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LA SÉQUENCE — ÉTAPE PAR ÉTAPE</div>
@@ -2763,7 +2778,7 @@ function DayTradeView() {
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE ≥ 4 rangs</b> au Currency Strength : la devise forte et la faible séparées d'au moins 4 places (vraie divergence, pas 2 voisines)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>TOP 2 momentum</b> : la paire est #1 ou #2 des Top Gainers (→ achat) ou Top Losers (→ vente). Le mouvement est déjà lancé</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DEVISE DE LONDRES</b> : la paire contient EUR, GBP ou CHF (actives à ton entrée 6h30). Les paires asiatiques sont écartées</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>UNE DE TES 7 PAIRES</b> : EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD, GBP/JPY, EUR/JPY ou CHF/JPY (Londres contre Pacifique). Toute autre paire est écartée</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>PAS Least Volatile</b> : on écarte ce qui stagne (pas de pips à faire)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>RETAIL CONTRARIEN ≥ 70%</b> : si tu achètes, le retail doit être short 70%+ ; si tu vends, long 70%+. Ils se font piéger, leurs stops alimentent ton mouvement</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#c084fc", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>ENTRÉE</b> : sur H1/M15, attends un repli (pullback) puis entre. Stop serré, target 1.5-2× le risque. Garde jusqu'à ~11h (NY amplifie)</span></div>
