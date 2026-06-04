@@ -60,7 +60,7 @@ export default function DayTradeOrView() {
 
       if (strength.length===0 || usdRank<0){ setResult({error:"Format non reconnu — colle la page Commodities ET la page Forex (Currency Strength avec USD)."}); return; }
 
-      const TRADE = ["XAU","XAG"]; // on trade or + argent
+      const TRADE = ["XAU"]; // on trade uniquement l or
       const candidates = [];
 
       const consider = (com, direction) => {
@@ -83,7 +83,7 @@ export default function DayTradeOrView() {
         candidates.push({com, direction, cRank, usdRank, volRank:volSet[com], chg});
       };
 
-      ["XAU","XAG"].forEach(c=>{ consider(c,"LONG"); consider(c,"SHORT"); });
+      ["XAU"].forEach(c=>{ consider(c,"LONG"); consider(c,"SHORT"); });
 
       candidates.sort((a,b)=>Math.abs(b.chg||0)-Math.abs(a.chg||0));
       if (candidates[0]) candidates[0].best=true;
@@ -99,8 +99,8 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
   const box = {width:"100%", minHeight:70, background:"#0a1628", border:"1px solid #1e3a5f", borderRadius:8, color:TEXT, fontSize:10, padding:"8px 10px", fontFamily:"monospace", resize:"vertical", boxSizing:"border-box"};
   return (
     <div style={{maxWidth:760, margin:"0 auto", padding:"4px 2px"}}>
-      <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE OR — XAU/XAG MOMENTUM</div>
-      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:14}}>Système intraday pour l'or et l'argent · basé sur la force de la commodité + la faiblesse/force de l'USD · Séparé du Day Trade FX</div>
+      <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE OR — XAU/USD MOMENTUM</div>
+      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:14}}>Système intraday pour l'or (XAU/USD) · basé sur la force de l'or + la faiblesse/force de l'USD · Séparé du Day Trade FX</div>
 
       <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:6}}>🥇 1. COLLE LA PAGE COMMODITIES</div>
       <textarea value={rawCom} onChange={e=>setRawCom(e.target.value)} placeholder="Colle ici la page Commodities de MarketMilk (Commodity Strength, Gainers, Losers, Most/Least Volatile)..." style={box} />
