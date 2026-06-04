@@ -2863,20 +2863,20 @@ function DayTradeView() {
       </div>
 
       {/* RITUEL DU MATIN - 4 LIENS */}
-      <div style={{padding:"14px", background:"#0a1628", borderRadius:8, border:"1px solid #38bdf844"}}>
-        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:4}}>☀️ TON RITUEL DU MATIN — 6h ET</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:12, lineHeight:1.4}}>Ouvre MarketMilk pour l'analyse, puis vérifie les news avant de prendre position.</div>
+      <div style={{padding:"14px", background:"linear-gradient(135deg, #001a0d 0%, #003319 100%)", borderRadius:8, border:"2px solid #00ff88", borderLeft:"5px solid #00ff88", boxShadow:"0 0 16px rgba(0,255,136,0.4)"}}>
+        <div style={{fontSize:11, color:"#00ff88", fontWeight:700, marginBottom:4}}>☀️ TON RITUEL DU MATIN — 6h ET</div>
+        <div style={{fontSize:8.5, color:"#a7f3d0", marginBottom:12, lineHeight:1.4}}>Ouvre MarketMilk pour l'analyse, puis vérifie les news avant de prendre position.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
-          <a href="https://marketmilk.babypips.com/" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"12px 13px", background:"#38bdf8", color:"#001a2e", borderRadius:7, fontSize:12, fontWeight:700, textDecoration:"none"}}>
-            🥛 1. MarketMilk <span style={{fontWeight:500, fontSize:9}}>— force, volatilité, momentum (colle ici pour l'analyse)</span>
+          <a href="https://marketmilk.babypips.com/" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001a10", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #00ff88"}}>
+            🥛 1. MarketMilk <span style={{color:TEXT_DIM, fontWeight:400, fontSize:9}}>— force, volatilité, momentum (colle ici pour l'analyse)</span>
           </a>
-          <a href="https://www.babypips.com/economic-calendar?week=2026-W23" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001018", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #f87171"}}>
+          <a href="https://www.babypips.com/economic-calendar?week=2026-W23" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001a10", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #f87171"}}>
             📅 2. Calendrier économique <span style={{color:TEXT_DIM, fontWeight:400, fontSize:9}}>— les news du jour (NFP, CPI, taux)</span>
           </a>
-          <a href="https://investinglive.com/" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001018", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #38bdf8"}}>
+          <a href="https://investinglive.com/" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001a10", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #38bdf8"}}>
             📰 3. InvestingLive <span style={{color:TEXT_DIM, fontWeight:400, fontSize:9}}>— l'actualité en direct</span>
           </a>
-          <a href="https://www.financialjuice.com/home" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001018", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #c084fc"}}>
+          <a href="https://www.financialjuice.com/home" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001a10", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #c084fc"}}>
             🧃 4. FinancialJuice <span style={{color:TEXT_DIM, fontWeight:400, fontSize:9}}>— flux de news temps réel</span>
           </a>
         </div>
