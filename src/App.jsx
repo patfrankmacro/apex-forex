@@ -2628,7 +2628,7 @@ function DayTradeAnalyzer() {
       const SESSION_CURS = ["EUR","GBP","USD","CHF","CAD"]; // actives 6h-11h ET
       const nStr = strength.length;
       const LONDON_CURS = ["EUR","GBP","CHF"];   // actives a ton entree 6h30
-      const WHITELIST = ["EURAUD","GBPAUD","EURNZD","GBPNZD","GBPJPY","EURJPY","CHFJPY"]; // les 7 paires autorisees (format sans slash)
+      const WHITELIST = ["EURAUD","GBPAUD","EURNZD","GBPNZD","GBPJPY","EURJPY","CHFJPY","EURCAD","GBPCAD"]; // les 9 paires autorisees (format sans slash)
       const NY_CURS = ["USD","CAD"];             // amplifient quand NY ouvre a 8h
       const GAP_MIN = 4;                          // divergence min (sur 8 devises)
       const consider = (p, direction) => {
