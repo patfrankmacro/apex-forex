@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function DayTradeOrView() {
   const [rawCom, setRawCom] = useState("");
@@ -7,6 +7,12 @@ export default function DayTradeOrView() {
   const [thesis, setThesis] = useState({});
   const [thesisLoading, setThesisLoading] = useState(false);
   const TEXT="#c8d4f0", TEXT_DIM="#4a5070";
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+  React.useEffect(() => {
+    const h = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, []);
 
   const analyze = () => {
     try {
@@ -125,7 +131,7 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
     <div style={{maxWidth:1200, margin:"0 auto", padding:"4px 2px"}}>
       <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE OR — XAU/USD MOMENTUM</div>
       <div style={{fontSize:9, color:TEXT_DIM, marginBottom:14}}>Système intraday pour l'or (XAU/USD) · basé sur la force de l'or + la faiblesse/force de l'USD · Séparé du Day Trade FX</div>
-      <div style={{display:"grid", gridTemplateColumns:"minmax(0,1fr) minmax(0,1fr)", gap:20, alignItems:"start"}}>
+      <div style={{display:"grid", gridTemplateColumns:isDesktop?"minmax(0,1fr) minmax(0,1fr)":"1fr", gap:20, alignItems:"start"}}>
       <div>
 
       <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:6}}>🥇 1. COLLE LA PAGE COMMODITIES</div>
