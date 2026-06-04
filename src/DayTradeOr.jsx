@@ -77,7 +77,7 @@ export default function DayTradeOrView() {
         if (!divOk) return;
         // FILTRE 2 - MOUVEMENT NET >= 0.5% dans le bon sens (seuil absolu, pas vs autres commodites)
         if (chg==null || Math.abs(chg) < MOVE_MIN) return;
-        candidates.push({com, direction, cRank, usdRank, chg, inMostVol:!!volSet[com]});
+        candidates.push({com, direction, cRank, usdRank, usdTotal, chg, inMostVol:!!volSet[com]});
       };
 
       ["XAU"].forEach(c=>{ consider(c,"LONG"); consider(c,"SHORT"); });
@@ -119,7 +119,7 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
                 <div style={{fontSize:12, fontWeight:800, color:isLong?"#00ff88":"#ff4d5e", marginBottom:6}}>{i===0?"🥇":i===1?"🥈":"🥉"} {isLong?"▲ ACHETER":"▼ VENDRE"} {name} {o.best?"⭐ MEILLEURE":""}</div>
                 <div style={{fontSize:9, color:TEXT, lineHeight:1.6}}>
                   <div><b style={{color:"#fbbf24"}}>POURQUOI :</b> {isLong?`l'or est FORT (commodité) et l'USD FAIBLE (rang ${o.usdRank+1}/${o.usdTotal}). Quand le dollar baisse, l'or monte → on achète.`:`l'or est FAIBLE (commodité) et l'USD FORT (rang ${o.usdRank+1}/${o.usdTotal}). Quand le dollar monte, l'or baisse → on vend.`}</div>
-                  <div><b style={{color:"#fbbf24"}}>LE SIGNAL :</b> {isLong?"top gainer":"top loser"} {o.chg!=null?`(${o.chg>0?"+":""}${o.chg}%)`:""} · dans Most Volatile · divergence or/USD</div>
+                  <div><b style={{color:"#fbbf24"}}>LE SIGNAL :</b> {isLong?"top gainer":"top loser"} {o.chg!=null?`(${o.chg>0?"+":""}${o.chg}%)`:""} · divergence or/USD confirmée</div>
                   <div><b style={{color:"#fbbf24"}}>EXÉCUTION :</b> attends un repli sur H1/M15 puis entre dans le sens du momentum. Stop serré, target 1.5-2× le risque. Surveille les news US (8h30).</div>
                 </div>
               </div>
