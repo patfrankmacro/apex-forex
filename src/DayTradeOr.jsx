@@ -63,24 +63,23 @@ export default function DayTradeOrView() {
       const TRADE = ["XAU"]; // on trade uniquement l or
       const candidates = [];
 
+      const MOVE_MIN = 0.5; // seuil de mouvement absolu de l or (%)
       const consider = (com, direction) => {
         if (!TRADE.includes(com)) return;
         const cRank = sRank[com]; if (cRank==null) return;
-        // momentum top 2
         const list = direction==="LONG" ? gainers : losers;
-        const inTop2 = list.slice(0,2).some(p=>p.com===com);
-        if (!inTop2) return;
-        // divergence : LONG -> com fort (top3) + USD faible (3 plus faibles) ; SHORT -> inverse
+        const found = list.find(p=>p.com===com);
+        const chg = found ? found.chg : null;
+        // FILTRE 1 - DIVERGENCE OR/USD : LONG -> or fort (top4) + USD faible (4 plus faibles) ; SHORT -> inverse
         let divOk=false;
-        if (direction==="LONG") divOk = (cRank<=2) && (usdRank>=usdTotal-3);
-        else divOk = (cRank>=strength.length-3) && (usdRank<=2);
+        if (direction==="LONG") divOk = (cRank<=3) && (usdRank>=usdTotal-4);
+        else divOk = (cRank>=strength.length-4) && (usdRank<=3);
         if (!divOk) return;
-        // pas least volatile
+        // FILTRE 2 - MOUVEMENT NET >= 0.5% dans le bon sens (seuil absolu, pas vs autres commodites)
+        if (chg==null || Math.abs(chg) < MOVE_MIN) return;
+        // FILTRE 3 - PAS dans LEAST VOLATILE (or pas totalement stagnant)
         if (leastVol.includes(com)) return;
-        // dans most volatile
-        if (!volSet[com]) return;
-        const chg = (list.find(p=>p.com===com)||{}).chg;
-        candidates.push({com, direction, cRank, usdRank, volRank:volSet[com], chg});
+        candidates.push({com, direction, cRank, usdRank, chg, inMostVol:!!volSet[com]});
       };
 
       ["XAU"].forEach(c=>{ consider(c,"LONG"); consider(c,"SHORT"); });
@@ -113,7 +112,7 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
       {result && !result.error && (
         <div style={{marginTop:10}}>
           <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>USD : rang {result.usdRank+1}/{result.usdTotal} au Currency Strength {result.usdRank>=result.usdTotal-3?"(faible → favorise l'OR haussier)":result.usdRank<=2?"(fort → favorise l'OR baissier)":"(neutre)"}</div>
-          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} OR (les 4 filtres réunis)</div>
+          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} OR (les 3 filtres réunis)</div>
           {result.top.length===0 && <div style={{padding:"12px", background:"#0a1628", borderRadius:8, fontSize:9, color:TEXT_DIM, lineHeight:1.6}}>AUCUNE opportunité OR maintenant. Soit l'or n'a pas la divergence avec l'USD, soit pas le momentum top 2, soit pas assez de volatilité. Pas de trade = discipline.</div>}
           {result.top.map((o,i)=>{
             const isLong=o.direction==="LONG"; const name=o.com==="XAU"?"OR (XAU/USD)":"ARGENT (XAG/USD)";
@@ -138,12 +137,11 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
       </div>
 
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LES 4 FILTRES</div>
+        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LES 3 FILTRES</div>
         <div style={{display:"flex", flexDirection:"column", gap:9}}>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE OR/USD</b> : achat = or FORT (top 3 commodités) + USD FAIBLE (3 plus faibles au forex) ; vente = or FAIBLE + USD FORT (top 3)</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>TOP 2 MOMENTUM</b> : l'or est #1 ou #2 des Top Gainers (achat) ou Top Losers (vente) des commodités. Le mouvement est lancé</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE OR/USD</b> : achat = or FORT (top 4 commodités) + USD FAIBLE (4 plus faibles au forex) ; vente = or FAIBLE + USD FORT. C est LE moteur de l or</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>MOUVEMENT NET ≥ 0,5%</b> : l'or bouge d'au moins 0,5% dans le sens de la divergence. Seuil absolu — on ne compare PAS l'or au pétrole/gaz (il perdrait toujours)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>PAS LEAST VOLATILE</b> : on écarte l'or s'il stagne (pas de pips à faire)</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DANS MOST VOLATILE</b> : l'or doit figurer dans la liste Most Volatile des commodités (il bouge vraiment)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#4ade80", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#4ade80"}}>ENTRÉE</b> : repli sur H1/M15 dans le sens du momentum. Stop serré, target 1.5-2×. Surveille les news US à 8h30</span></div>
         </div>
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>Pas de filtre retail sur l'or : le retail est presque toujours long sur le métal, donc moins fiable que sur le forex.</div>
