@@ -105,9 +105,11 @@ export default function DayTradeOrView() {
 function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEXT, TEXT_DIM }) {
   const box = {width:"100%", minHeight:70, background:"#0a1628", border:"1px solid #1e3a5f", borderRadius:8, color:TEXT, fontSize:10, padding:"8px 10px", fontFamily:"monospace", resize:"vertical", boxSizing:"border-box"};
   return (
-    <div style={{maxWidth:760, margin:"0 auto", padding:"4px 2px"}}>
+    <div style={{maxWidth:1200, margin:"0 auto", padding:"4px 2px"}}>
       <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE OR — XAU/USD MOMENTUM</div>
       <div style={{fontSize:9, color:TEXT_DIM, marginBottom:14}}>Système intraday pour l'or (XAU/USD) · basé sur la force de l'or + la faiblesse/force de l'USD · Séparé du Day Trade FX</div>
+      <div style={{display:"grid", gridTemplateColumns:"minmax(0,1fr) minmax(0,1fr)", gap:20, alignItems:"start"}}>
+      <div>
 
       <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:6}}>🥇 1. COLLE LA PAGE COMMODITIES</div>
       <textarea value={rawCom} onChange={e=>setRawCom(e.target.value)} placeholder="Colle ici la page Commodities de MarketMilk (Commodity Strength, Gainers, Losers, Most/Least Volatile)..." style={box} />
@@ -139,6 +141,7 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
         </div>
       )}
 
+      </div><div>
       <div style={{marginTop:18, padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 LA LOGIQUE DE L'OR</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.6}}>L'or (XAU) et le dollar (USD) sont des frères ennemis : quand l'USD baisse, l'or monte, et inversement. C'est la relation la plus fiable du métal jaune. On ne devine pas : on attend que l'or bouge DÉJÀ (momentum) dans le sens de la faiblesse/force du dollar.<br/><br/>Contrairement au forex de Londres, l'or se joue surtout en <b style={{color:"#fbbf24"}}>session New York (8h-12h ET)</b> : c'est là que le dollar et les taux US bougent le plus. L'or réagit violemment aux news US (inflation, emploi, Fed) — d'où l'importance de vérifier le calendrier avant d'entrer.</div>
@@ -321,6 +324,7 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
         <div style={{fontSize:9, color:TEXT, lineHeight:1.6}}>L'or est PLUS volatil que le forex : il bouge vite et fort. Stop serré obligatoire. Ne chasse jamais un mouvement déjà très avancé. Et rappelle-toi : l'or peut renverser brutalement sur une news US — si tu es en position pendant une annonce, sois prêt.</div>
       </div>
 
+      </div></div>
       <div style={{padding:"14px", background:"linear-gradient(135deg, #001a0d 0%, #003319 100%)", borderRadius:8, border:"2px solid #00ff88", borderLeft:"5px solid #00ff88", boxShadow:"0 0 16px rgba(0,255,136,0.4)"}}>
         <div style={{fontSize:11, color:"#00ff88", fontWeight:700, marginBottom:4}}>☀️ TON RITUEL OR — avant la session NY (8h ET)</div>
         <div style={{fontSize:8.5, color:"#a7f3d0", marginBottom:12, lineHeight:1.4}}>Ouvre les 2 pages MarketMilk (Commodities + Forex), puis vérifie les news US avant de prendre position.</div>
