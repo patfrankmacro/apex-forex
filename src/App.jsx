@@ -3215,7 +3215,7 @@ export default function App() {
   const TABS = [
     {id:"table",label:"TABLEAU"},{id:"rank",label:"RANG"},
     {id:"regimes",label:"RÉGIMES"},{id:"analyse",label:"ANALYSE"},{id:"journal",label:"JOURNAL"},
-    {id:"calc",label:"CALCUL"},{id:"daytrade",label:"DAY TRADE"},
+    {id:"calc",label:"CALCUL"},
     {id:"data",label:"DONNÉES ↗"},{id:"guide",label:"GUIDE"},{id:"heat",label:"HEATMAP"},{id:"cal",label:"RESSOURCES"},
   ];
 
@@ -3231,7 +3231,9 @@ export default function App() {
             <span style={{ fontSize:7, color:connected?"#00ff88":"#ff3b3b", letterSpacing:1 }}>{connected?"SYNC TEMPS RÉEL":"CONNEXION..."}</span>
           </div>
         </div>
-        <div style={{ display:"flex", gap:4, flexWrap:"wrap", alignItems:"center" }}>
+        <div style={{ display:"flex", gap:6, flexWrap:"wrap", alignItems:"center" }}>
+          <button onClick={()=>setView("daytrade")} style={{ padding:"6px 12px", borderRadius:6, fontSize:10, fontWeight:800, letterSpacing:1, cursor:"pointer", border: view==="daytrade"?"2px solid #fbbf24":"2px solid #fbbf2466", background: view==="daytrade"?"#fbbf24":"#1a1500", color: view==="daytrade"?"#1a1500":"#fbbf24", fontFamily:"'IBM Plex Mono'", boxShadow:"0 0 8px rgba(251,191,36,0.3)" }}>⚡ DAY TRADE</button>
+          <div style={{ width:1, height:20, background:BORDER, margin:"0 2px" }} />
           {TABS.map(t=><button key={t.id} style={tabStyle(view===t.id)} onClick={()=>setView(t.id)}>{t.label}</button>)}
         </div>
       </div>
