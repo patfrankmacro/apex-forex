@@ -282,6 +282,40 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
         </div>
       </div>
 
+      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🏦 COMMENT SUIVRE LES INSTITUTIONNELS SUR L'OR</div>
+        <div style={{display:"flex", flexDirection:"column", gap:10}}>
+          <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #38bdf8"}}>
+            <div style={{fontSize:9, color:"#38bdf8", fontWeight:700, marginBottom:3}}>2h-5h ET — Les banques bullion de Londres entrent</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Goldman Sachs London, HSBC, UBS placent leurs premières positions sur l'or. Si l'USD est faible, ils achètent massivement. À 5h30 ET, le London AM Gold Fix fixe le premier prix officiel de l'or du jour.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
+            <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>6h30 ET — Tu lis leur trace et tu les suis</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Or fort + USD faible = les banques bullion ont acheté depuis 2h. Tes 3 filtres confirment. Tu entres derrière eux au repli sur H1/M15.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
+            <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>8h ET — New York amplifie le mouvement</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Les contrats or COMEX s'activent. Goldman NY, JPMorgan, les fonds souverains voient le même chart : or fort, USD faible. Ils entrent automatiquement dans le même sens. 70% des highs/lows journaliers de l'or se forment ici.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #c084fc"}}>
+            <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:3}}>10h ET — London PM Gold Fix</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Deuxième prix de référence officiel fixé par les banques bullion. Deuxième pic de volume — souvent une accélération finale du mouvement avant la fermeture de Londres.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #4ade80"}}>
+            <div style={{fontSize:9, color:"#4ade80", fontWeight:700, marginBottom:3}}>11h-12h ET — Tu sors AVANT la fermeture</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Les desks or de Londres ferment leurs positions. Volume de vente qui ralentit ou renverse. Sors avant 12h — ton profit est fait.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #c084fc"}}>
+            <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:3}}>🔗 Comment les banques se passent le relais</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Goldman London achète l'or à 3h. Goldman NY voit le même chart à 8h : or fort, USD faible, tendance confirmée. Il entre dans le même sens — sans appeler Londres. Les raisons fondamentales (USD faible, inflation) n'ont pas changé. NY amplifie ce que Londres a commencé. Automatique, prévisible, répétable.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2444"}}>
+            <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>💡 La règle d'or de l'or</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Quand l'USD s'effondre, les banques centrales (Chine, Russie, Inde) et les fonds institutionnels achètent l'or massivement comme valeur refuge. Tes 3 filtres captent exactement ce moment. Tu ne devines pas — tu suis un flux déjà lancé et confirmé.</div>
+          </div>
+        </div>
+      </div>
+
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:8}}>🧠 PSYCHOLOGIE OR</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.6}}>L'or est PLUS volatil que le forex : il bouge vite et fort. Stop serré obligatoire. Ne chasse jamais un mouvement déjà très avancé. Et rappelle-toi : l'or peut renverser brutalement sur une news US — si tu es en position pendant une annonce, sois prêt.</div>

@@ -2942,6 +2942,40 @@ function DayTradeView() {
         </div>
       </div>
 
+      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🏦 COMMENT SUIVRE LES GROS JOUEURS — PRENDS-MOI PAR LA MAIN</div>
+        <div style={{display:"flex", flexDirection:"column", gap:10}}>
+          <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #38bdf8"}}>
+            <div style={{fontSize:9, color:"#38bdf8", fontWeight:700, marginBottom:3}}>3h ET — Londres entre en premier</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Deutsche Bank, HSBC, BNP, Barclays ouvrent leurs desks. Ils achètent EUR, GBP ou CHF selon les données économiques européennes du matin. Ce sont eux qui créent la divergence que tu vas lire à 6h30 sur MarketMilk. Tu ne les vois pas entrer — mais tu vois leur résultat : EUR #1, JPY #8 = ils ont acheté EUR depuis 3h.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
+            <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>6h30 ET — Tu lis leur trace et tu les suis</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 6 filtres confirment que le mouvement est réel. Tu entres derrière eux sur ta meilleure paire (EUR/JPY, EUR/CAD, GBP/JPY...). Tu ne devines pas — tu confirmes et tu suis. Comme un sniper qui attend le bon moment.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
+            <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>8h ET — New York amplifie TES paires</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Goldman Sachs, JPMorgan, Citibank entrent. Ils tradent EUR/USD massivement → l'EUR monte → tes EUR/JPY, EUR/CAD, EUR/AUD profitent. Ils tradent aussi directement EUR/JPY, GBP/JPY, EUR/CAD — exactement tes paires. Tu ne prends pas de nouvelles positions à 8h. Tu tiens celles de 6h30 et tu laisses NY travailler pour toi.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #4ade80"}}>
+            <div style={{fontSize:9, color:"#4ade80", fontWeight:700, marginBottom:3}}>11h ET — Tu sors AVANT eux</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Les desks de Londres ferment leurs positions et prennent leurs profits. Si tu attends trop, le prix recule. Sors avant leur sortie massive. Ton profit est fait.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #c084fc"}}>
+            <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:3}}>🔗 Comment les banques se passent le relais — sans se parler</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Les banques de NY n'ont pas besoin d'appeler Londres. Elles voient le même chart que toi : EUR/JPY monte depuis 3h, divergence confirmée, tendance haussière. Goldman NY entre dans le même sens — automatiquement. Les raisons fondamentales qui ont poussé Londres à acheter EUR (données économiques européennes) n'ont pas changé en 5 heures. NY amplifie ce que Londres a commencé. C'est le passage de bâton — automatique, prévisible, répétable chaque jour.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #f87171"}}>
+            <div style={{fontSize:9, color:"#f87171", fontWeight:700, marginBottom:3}}>🎭 Le retail — la preuve que les institutionnels sont dans le trade</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Quand 80% du retail est SHORT sur EUR/JPY pendant que Londres monte, c'est la preuve que les institutionnels sont LONG. Le retail a pris la mauvaise direction — leurs stops qui sautent alimentent le mouvement haussier. C'est exactement ce que ton filtre retail ≥70% capte.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2444"}}>
+            <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>💡 La règle d'or</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tu ne sais jamais exactement ce que les banques font. Mais MarketMilk te montre CE QU'ELLES ONT DÉJÀ FAIT. Tes 6 filtres confirment que le mouvement est réel. Tu ne devines pas — tu confirmes et tu suis. Tu n'es pas la liquidité. Tu suis la liquidité.</div>
+          </div>
+        </div>
+      </div>
+
       {/* RITUEL DU MATIN - 4 LIENS */}
       <div style={{padding:"14px", background:"linear-gradient(135deg, #001a0d 0%, #003319 100%)", borderRadius:8, border:"2px solid #00ff88", borderLeft:"5px solid #00ff88", boxShadow:"0 0 16px rgba(0,255,136,0.4)"}}>
         <div style={{fontSize:11, color:"#00ff88", fontWeight:700, marginBottom:4}}>☀️ TON RITUEL DU MATIN — 6h ET</div>
