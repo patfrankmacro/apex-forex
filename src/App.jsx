@@ -2649,6 +2649,8 @@ function DayTradeAnalyzer() {
         if (!WHITELIST.includes(p.pair)) return;
         // CRITERE 4 - pas Least Volatile
         if (leastVol.includes(p.pair)) return;
+        // CRITERE 4b - DOIT etre dans Most Volatile (top 5 affiche)
+        if (!volRankPair[p.pair]) return; // pas dans les 5 plus volatiles -> rejete
         // CRITERE 5 - RETAIL CONTRARIEN >= 70% (obligatoire si dispo)
         const rt = (window.__apexRetail||{})[p.pair] || (window.__apexRetail||{})[p.base+p.quote];
         let retailOk=false, retailPct=null, retailSide=null, retailMissing=false;
