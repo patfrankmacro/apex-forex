@@ -2769,24 +2769,13 @@ function DayTradeAnalyzer() {
   );
 }
 
-function useDesktop() {
-  const [desk, setDesk] = React.useState(window.innerWidth >= 768);
-  React.useEffect(() => {
-    const h = () => setDesk(window.innerWidth >= 768);
-    window.addEventListener("resize", h);
-    return () => window.removeEventListener("resize", h);
-  }, []);
-  return desk;
-}
-
 function DayTradeView() {
   const ACCENT="#38bdf8", TEXT="#c8d4f0", TEXT_DIM="#4a5070", BORDER="#1a1a2e";
-  const isDesktop = useDesktop();
   return (
     <div style={{padding:16, maxWidth:1200, margin:"0 auto"}}>
       <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE FX — CURRENCY STRENGTH MOMENTUM</div>
       <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (intraday / 1-3 jours) basé sur la force et la volatilité du jour · Séparé de la méthode COT swing</div>
-      <div style={{display:"grid", gridTemplateColumns:isDesktop?"minmax(0,1fr) minmax(0,1fr)":"1fr", gap:20, alignItems:"start"}}>
+      <div style={{display:"grid", gridTemplateColumns:"minmax(0,1fr) minmax(0,1fr)", gap:20, alignItems:"start"}}>
       <div>
       <DayTradeAnalyzer />
 
