@@ -2628,6 +2628,7 @@ function DayTradeAnalyzer() {
       const SESSION_CURS = ["EUR","GBP","USD","CHF","CAD"]; // actives 6h-11h ET
       const nStr = strength.length;
       const LONDON_CURS = ["EUR","GBP","CHF"];   // actives a ton entree 6h30
+      const WHITELIST = ["EURAUD","GBPAUD","EURNZD","GBPNZD","GBPJPY","EURJPY","CHFJPY"]; // les 7 paires autorisees (format sans slash)
       const NY_CURS = ["USD","CAD"];             // amplifient quand NY ouvre a 8h
       const GAP_MIN = 4;                          // divergence min (sur 8 devises)
       const consider = (p, direction) => {
@@ -2643,9 +2644,9 @@ function DayTradeAnalyzer() {
         // CRITERE 2 - MOMENTUM: top 2 gainers/losers
         if (p.rank > TOP_RANK) return;
         if (p.chg===null) return;
-        // CRITERE 3 - SESSION LONDRES: au moins une devise EUR/GBP/CHF
+        // CRITERE 3 - LISTE BLANCHE: uniquement les 7 paires autorisees
         const hasLondon = LONDON_CURS.includes(p.base) || LONDON_CURS.includes(p.quote);
-        if (!hasLondon) return;
+        if (!WHITELIST.includes(p.pair)) return;
         // CRITERE 4 - pas Least Volatile
         if (leastVol.includes(p.pair)) return;
         // CRITERE 5 - RETAIL CONTRARIEN >= 70% (obligatoire si dispo)
