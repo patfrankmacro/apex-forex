@@ -2943,7 +2943,7 @@ function DayTradeView() {
       </div>
 
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🏦 COMMENT SUIVRE LES GROS JOUEURS — PRENDS-MOI PAR LA MAIN</div>
+        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🏦 COMPRENDRE L'AGENDA INSTITUTIONNEL — COMMENT LES SUIVRE</div>
         <div style={{display:"flex", flexDirection:"column", gap:10}}>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #38bdf8"}}>
             <div style={{fontSize:9, color:"#38bdf8", fontWeight:700, marginBottom:3}}>3h ET — Londres entre en premier</div>
