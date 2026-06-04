@@ -52,6 +52,12 @@ export default function DayTradeOrView() {
 
       const strength = grabStrength(); // 0 = plus fort
       const sRank = {}; strength.forEach((c,i)=>sRank[c]=i);
+      const comVolMeter=[]; let onCV=false;
+      for (const l of cLines){
+        if (l.includes("Commodity Volatility Meter")){ onCV=true; continue; }
+        if (onCV){ if (l.startsWith("As of")) break; const x=COMS.find(c=>l===c); if (x&&!comVolMeter.includes(x)) comVolMeter.push(x); }
+      }
+      const cvRank={}; comVolMeter.forEach((c,i)=>cvRank[c]=i); // 0=plus volatile
       const gainers  = grabComPairs("Top Gainers", ["Top Losers","Volatility"]);
       const losers   = grabComPairs("Top Losers", ["Volatility","Commodity Volatility"]);
       const mostVol  = grabComPairs("Most Volatile", ["Least Volatile","MarketMilk","Copyright"]);
@@ -63,21 +69,24 @@ export default function DayTradeOrView() {
       const TRADE = ["XAU"]; // on trade uniquement l or
       const candidates = [];
 
-      const MOVE_MIN = 0.5; // seuil de mouvement absolu de l or (%)
       const consider = (com, direction) => {
         if (!TRADE.includes(com)) return;
         const cRank = sRank[com]; if (cRank==null) return;
         const list = direction==="LONG" ? gainers : losers;
         const found = list.find(p=>p.com===com);
         const chg = found ? found.chg : null;
-        // FILTRE 1 - DIVERGENCE OR/USD : LONG -> or fort (top3) + USD faible (3 plus faibles) ; SHORT -> inverse
+        // FILTRE 1 - DIVERGENCE : or top3 Commodity Strength + USD 3 plus faibles (LONG) ; inverse SHORT
         let divOk=false;
         if (direction==="LONG") divOk = (cRank<=2) && (usdRank>=usdTotal-3);
         else divOk = (cRank>=strength.length-3) && (usdRank<=2);
         if (!divOk) return;
-        // FILTRE 2 - DOIT etre dans le TOP 3 des gainers (achat) ou losers (vente)
+        // FILTRE 2 - TOP 3 MOMENTUM gainers ou losers
         const inTop3 = list.slice(0,3).some(p=>p.com===com);
         if (!inTop3) return;
+        // FILTRE 3 - VOLATILITE : dans Most Volatile + dans top4 Volatility Meter + pas Least Volatile
+        if (!volSet[com]) return; // pas dans Most Volatile (top5 affiche)
+        if (cvRank[com]==null || cvRank[com]>3) return; // pas dans top4 Volatility Meter
+        if (leastVol.includes(com)) return; // dans Least Volatile
         candidates.push({com, direction, cRank, usdRank, usdTotal, chg, inMostVol:!!volSet[com]});
       };
 
@@ -111,8 +120,8 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
       {result && !result.error && (
         <div style={{marginTop:10}}>
           <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>USD : rang {result.usdRank+1}/{result.usdTotal} au Currency Strength {result.usdRank>=result.usdTotal-3?"(faible → favorise l'OR haussier)":result.usdRank<=2?"(fort → favorise l'OR baissier)":"(neutre)"}</div>
-          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} OR (les 2 filtres réunis)</div>
-          {result.top.length===0 && <div style={{padding:"12px", background:"#0a1628", borderRadius:8, fontSize:9, color:TEXT_DIM, lineHeight:1.6}}>AUCUNE opportunité OR maintenant. Soit l'or n'a pas la divergence avec l'USD, soit il n'est pas dans le top 3 des gainers/losers. Pas de trade = discipline.</div>}
+          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} OR (les 3 filtres réunis)</div>
+          {result.top.length===0 && <div style={{padding:"12px", background:"#0a1628", borderRadius:8, fontSize:9, color:TEXT_DIM, lineHeight:1.6}}>AUCUNE opportunité OR maintenant. Soit l'or n'a pas la divergence avec l'USD, soit il n'est pas dans le top 3 des gainers/losers, soit il ne bouge pas assez (pas dans Most Volatile). Pas de trade = discipline — quand l'or sort, c'est un vrai mouvement.</div>}
           {result.top.map((o,i)=>{
             const isLong=o.direction==="LONG"; const name=o.com==="XAU"?"OR (XAU/USD)":"ARGENT (XAG/USD)";
             return (
@@ -136,13 +145,26 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
       </div>
 
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LES 2 FILTRES</div>
+        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LES 3 FILTRES</div>
         <div style={{display:"flex", flexDirection:"column", gap:9}}>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE OR/USD</b> : achat = or dans le TOP 3 des commodités + USD dans les 3 PLUS FAIBLES du forex ; vente = or dans les 3 plus faibles + USD dans le top 3. C est LE moteur de l or</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>TOP 3 MOMENTUM</b> : l'or est dans le top 3 des Top Gainers (achat) ou Top Losers (vente) des commodités. Le mouvement est lancé</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>VOLATILITÉ RÉELLE</b> : l'or doit être dans le <b>Most Volatile</b> (top 5 affiché) + dans le <b>top 4 du Commodity Volatility Meter</b> + pas dans Least Volatile. Quand l'or passe ce filtre, c'est un vrai mouvement — rare mais solide</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#4ade80", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#4ade80"}}>ENTRÉE</b> : repli sur H1/M15 dans le sens du momentum. Stop serré, target 1.5-2×. Surveille les news US à 8h30</span></div>
         </div>
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>Pas de filtre retail sur l'or : le retail est presque toujours long sur le métal, donc moins fiable que sur le forex.</div>
+      </div>
+
+      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:6}}>📐 EXEMPLE RÉEL — XAU/USD ACHAT · 4 juin 2026</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10, lineHeight:1.4}}>Commodity Strength : XAU #3 · USD #8/8 au forex · XAU top gainer #3 (+1.06%). Voici pourquoi XAU/USD ACHAT cochait les 3 filtres.</div>
+        <div style={{display:"flex", flexDirection:"column", gap:7}}>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>Divergence ✓</b> — XAU #3 au Commodity Strength (top 3) + USD #8/8 au forex (3 plus faibles). L'or FORT + dollar FAIBLE = les deux tirent dans le même sens. C'est le moteur du trade.</span></div>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>Momentum ✓</b> — XAU top gainer #3 (+1.06%) des commodités. Le mouvement haussier est déjà lancé. L'or grimpe pendant que le dollar s'effondre.</span></div>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>Volatilité ✓</b> — XAU dans Most Volatile + top 4 Commodity Volatility Meter. L'or bouge vraiment ce jour-là — pas une montée molle. Un vrai mouvement tradable.</span></div>
+        </div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 3 filtres réunis = ALERTE ACHAT. XAU/USD a monté de +1.06% pendant la session NY. Le dollar s'effondrait (USD #8/8), l'or était fort ET volatile. Tu ne devines pas — tu suis un flux institutionnel déjà lancé et confirmé par les 3 filtres.</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8, lineHeight:1.4}}>💡 Pourquoi ce trade était gagnant : quand le dollar est la devise la plus faible ET que l'or est dans Most Volatile, les institutionnels achètent l'or massivement comme valeur refuge. Tes 3 filtres captent exactement ce moment.</div>
       </div>
 
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
