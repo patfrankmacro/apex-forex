@@ -2577,8 +2577,6 @@ function JournalView() {
 function DayTradeAnalyzer() {
   const [raw, setRaw] = useState("");
   const [result, setResult] = useState(null);
-  const [thesis, setThesis] = useState({});
-  const [thesisLoading, setThesisLoading] = useState(false);
   const TEXT="#c8d4f0", TEXT_DIM="#4a5070";
 
   const analyze = () => {
@@ -2686,23 +2684,6 @@ function DayTradeAnalyzer() {
 
       if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session (London-NY 6h-11h ET) — aucune paire active ne converge. Pas de trade = bonne décision.", strongest, weakest}); return; }
       setResult({ strongest, weakest, top });
-      // Appel thèse institutionnelle
-      if (top.length > 0) {
-        setThesis({});
-        setThesisLoading(true);
-        const pairs = top.map(t => ({ pair: t.base+"/"+t.quote, direction: t.direction, strongCur: t.strongCur, weakCur: t.weakCur }));
-        fetch("/api/thesis", {
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({ pairs, type:"FX" })
-        }).then(r=>r.json()).then(d=>{
-          setThesis(d.thesis ? { text: d.thesis } : { text: "Pas de catalyseur fondamental identifié ce matin — mouvement technique de session de Londres." });
-          setThesisLoading(false);
-        }).catch(()=>{
-          setThesis({ text: "Analyse fondamentale non disponible." });
-          setThesisLoading(false);
-        });
-      }
     } catch(e){ setResult({error:"Erreur: "+e.message}); }
   };
 
@@ -2749,17 +2730,6 @@ function DayTradeAnalyzer() {
               </div>
             </div>
           );})}
-          {thesisLoading && (
-            <div style={{marginTop:8, padding:"10px 12px", background:"#0a1020", borderRadius:6, border:"1px solid #c084fc44", fontSize:8, color:"#c084fc", lineHeight:1.5}}>
-              🔍 Analyse institutionnelle en cours — recherche des news des dernières 12h...
-            </div>
-          )}
-          {!thesisLoading && thesis.text && (
-            <div style={{marginTop:8, padding:"10px 12px", background:"#0a0a1a", borderRadius:6, border:"1px solid #c084fc66", borderLeft:"4px solid #c084fc"}}>
-              <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:6}}>🏦 THÈSE INSTITUTIONNELLE — CE MATIN</div>
-              <div style={{fontSize:8.5, color:"#c8d4f0", lineHeight:1.6, whiteSpace:"pre-wrap"}}>{thesis.text}</div>
-            </div>
-          )}
           <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
             ⚠ Chaque paire coche les 6 critères (divergence ≥4 rangs + top 2 momentum + une de tes paires + pas least volatile + dans Most Volatile + retail contrarien ≥70%). Classées par divergence et continuation NY. Entre au repli, garde jusqu'à ~11h pendant que NY amplifie.
           </div>
@@ -2775,12 +2745,10 @@ function DayTradeView() {
     <div style={{padding:16, maxWidth:760, margin:"0 auto"}}>
       <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE FX — CURRENCY STRENGTH MOMENTUM</div>
       <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (intraday / 1-3 jours) basé sur la force et la volatilité du jour · Séparé de la méthode COT swing</div>
-      <div>
-      <div>
+
       <DayTradeAnalyzer />
 
 
-      </div><div>
       {/* LOGIQUE */}
       <div style={{padding:"12px 14px", background:"#1a1500", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 LA LOGIQUE</div>
@@ -2983,7 +2951,7 @@ function DayTradeView() {
           </div>
           <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
             <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>6h30 ET — Tu lis leur trace et tu les suis</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 6 filtres confirment que le mouvement est réel.<br/><b style={{color:"#4ade80"}}>▲ ACHETER :</b> devise forte en haut + devise faible en bas = les banques achètent la forte contre la faible. Tu entres derrière eux sur EUR/JPY, EUR/CAD, GBP/JPY...<br/><b style={{color:"#f87171"}}>▼ VENDRE :</b> devise faible en haut + devise forte en bas = les banques vendent la faible contre la forte. Tu vends derrière eux sur EUR/JPY, EUR/CAD, GBP/JPY...<br/>Tu ne devines pas — tu confirmes et tu suis. Comme un sniper.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 6 filtres confirment que le mouvement est réel. Tu entres derrière eux sur ta meilleure paire (EUR/JPY, EUR/CAD, GBP/JPY...). Tu ne devines pas — tu confirmes et tu suis. Comme un sniper qui attend le bon moment.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>8h ET — New York amplifie TES paires</div>
@@ -3008,7 +2976,6 @@ function DayTradeView() {
         </div>
       </div>
 
-      </div></div>
       {/* RITUEL DU MATIN - 4 LIENS */}
       <div style={{padding:"14px", background:"linear-gradient(135deg, #001a0d 0%, #003319 100%)", borderRadius:8, border:"2px solid #00ff88", borderLeft:"5px solid #00ff88", boxShadow:"0 0 16px rgba(0,255,136,0.4)"}}>
         <div style={{fontSize:11, color:"#00ff88", fontWeight:700, marginBottom:4}}>☀️ TON RITUEL DU MATIN — 6h ET</div>

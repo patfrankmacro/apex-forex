@@ -4,8 +4,6 @@ export default function DayTradeOrView() {
   const [rawCom, setRawCom] = useState("");
   const [rawFx, setRawFx] = useState("");
   const [result, setResult] = useState(null);
-  const [thesis, setThesis] = useState({});
-  const [thesisLoading, setThesisLoading] = useState(false);
   const TEXT="#c8d4f0", TEXT_DIM="#4a5070";
 
   const analyze = () => {
@@ -98,21 +96,6 @@ export default function DayTradeOrView() {
       if (candidates[0]) candidates[0].best=true;
 
       setResult({ top:candidates, usdRank, usdTotal, usdOrder, strength });
-      if (candidates.length > 0) {
-        setThesis({});
-        setThesisLoading(true);
-        fetch("/api/thesis", {
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({ pairs:[{pair:"XAU/USD", direction: candidates[0].direction}], type:"OR" })
-        }).then(r=>r.json()).then(d=>{
-          setThesis(d.thesis ? { text: d.thesis } : { text: "Pas de catalyseur fondamental identifié ce matin — mouvement technique de session." });
-          setThesisLoading(false);
-        }).catch(()=>{
-          setThesis({ text: "Analyse fondamentale non disponible." });
-          setThesisLoading(false);
-        });
-      }
     } catch(e){ setResult({error:"Erreur d'analyse : "+e.message}); }
   };
 
@@ -125,8 +108,6 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
     <div style={{maxWidth:760, margin:"0 auto", padding:"4px 2px"}}>
       <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE OR — XAU/USD MOMENTUM</div>
       <div style={{fontSize:9, color:TEXT_DIM, marginBottom:14}}>Système intraday pour l'or (XAU/USD) · basé sur la force de l'or + la faiblesse/force de l'USD · Séparé du Day Trade FX</div>
-      <div>
-      <div>
 
       <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:6}}>🥇 1. COLLE LA PAGE COMMODITIES</div>
       <textarea value={rawCom} onChange={e=>setRawCom(e.target.value)} placeholder="Colle ici la page Commodities de MarketMilk (Commodity Strength, Gainers, Losers, Most/Least Volatile)..." style={box} />
@@ -158,26 +139,9 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
         </div>
       )}
 
-      </div><div>
-      {thesisLoading && (
-        <div style={{marginTop:8, padding:"10px 12px", background:"#0a1020", borderRadius:6, border:"1px solid #fbbf2444", fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
-          🔍 Analyse institutionnelle en cours — recherche des news OR des dernières 12h...
-        </div>
-      )}
-      {!thesisLoading && thesis.text && result && result.top && result.top.length > 0 && (
-        <div style={{marginTop:8, marginBottom:14, padding:"10px 12px", background:"#0a0a1a", borderRadius:6, border:"1px solid #fbbf2466", borderLeft:"4px solid #fbbf24"}}>
-          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:6}}>🏦 THÈSE INSTITUTIONNELLE OR — CE MATIN</div>
-          <div style={{fontSize:8.5, color:"#c8d4f0", lineHeight:1.6, whiteSpace:"pre-wrap"}}>{thesis.text}</div>
-        </div>
-      )}
       <div style={{marginTop:18, padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 LA LOGIQUE DE L'OR</div>
-        <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>
-          Les <b style={{color:"#fbbf24"}}>gros joueurs</b> (banques bullion, fonds souverains, banques centrales) déplacent des milliards sur l'or chaque jour. Leur moteur principal : la relation inversée entre l'or et le dollar. On ne devine pas — on <b>SUIT ce flux</b>.<br/><br/>
-          <b style={{color:"#4ade80"}}>▲ ACHETER l'or</b> : quand le dollar s'effondre (USD faible), les institutionnels achètent l'or comme valeur refuge. L'or monte.<br/>
-          <b style={{color:"#f87171"}}>▼ VENDRE l'or</b> : quand le dollar monte fort (USD fort), les institutionnels vendent l'or pour acheter du dollar. L'or chute.<br/><br/>
-          <b style={{color:"#38bdf8"}}>⏰ Ton timing — vérifie à 6h30, trade jusqu'à 12h :</b> les banques bullion de Londres ont déjà bougé l'or depuis 2h ET. À 6h30, tu lis leur trace sur MarketMilk. Si tes 3 filtres confirment → tu entres derrière eux. New York amplifie à 8h.
-        </div>
+        <div style={{fontSize:9, color:TEXT, lineHeight:1.6}}>L'or (XAU) et le dollar (USD) sont des frères ennemis : quand l'USD baisse, l'or monte, et inversement. C'est la relation la plus fiable du métal jaune. On ne devine pas : on attend que l'or bouge DÉJÀ (momentum) dans le sens de la faiblesse/force du dollar.<br/><br/>Contrairement au forex de Londres, l'or se joue surtout en <b style={{color:"#fbbf24"}}>session New York (8h-12h ET)</b> : c'est là que le dollar et les taux US bougent le plus. L'or réagit violemment aux news US (inflation, emploi, Fed) — d'où l'importance de vérifier le calendrier avant d'entrer.</div>
       </div>
 
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
@@ -323,11 +287,11 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
         <div style={{display:"flex", flexDirection:"column", gap:10}}>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #38bdf8"}}>
             <div style={{fontSize:9, color:"#38bdf8", fontWeight:700, marginBottom:3}}>2h-5h ET — Les banques bullion de Londres entrent</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Goldman Sachs London, HSBC, UBS placent leurs premières positions sur l'or. <b style={{color:"#4ade80"}}>Si l'USD est faible → ils achètent l'or massivement.</b> <b style={{color:"#f87171"}}>Si l'USD est fort → ils vendent l'or.</b> À 5h30 ET, le London AM Gold Fix fixe le premier prix officiel de l'or du jour.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Goldman Sachs London, HSBC, UBS placent leurs premières positions sur l'or. Si l'USD est faible, ils achètent massivement. À 5h30 ET, le London AM Gold Fix fixe le premier prix officiel de l'or du jour.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
             <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>6h30 ET — Tu lis leur trace et tu les suis</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}><b style={{color:"#4ade80"}}>▲ ACHAT :</b> or fort (top 3) + USD faible (3 plus faibles) = les banques ont acheté depuis 2h. Tu entres derrière eux au repli.<br/><b style={{color:"#f87171"}}>▼ VENTE :</b> or faible (3 plus faibles) + USD fort (top 3) = les banques ont vendu l'or depuis 2h. Tu vends derrière eux au rebond.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Or fort + USD faible = les banques bullion ont acheté depuis 2h. Tes 3 filtres confirment. Tu entres derrière eux au repli sur H1/M15.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>8h ET — New York amplifie le mouvement</div>
@@ -346,8 +310,8 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
             <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Goldman London achète l'or à 3h. Goldman NY voit le même chart à 8h : or fort, USD faible, tendance confirmée. Il entre dans le même sens — sans appeler Londres. Les raisons fondamentales (USD faible, inflation) n'ont pas changé. NY amplifie ce que Londres a commencé. Automatique, prévisible, répétable.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2444"}}>
-            <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>💡 La règle d'or</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}><b style={{color:"#4ade80"}}>USD faible :</b> les banques centrales (Chine, Russie, Inde) et les fonds institutionnels achètent l'or massivement comme valeur refuge — l'or monte.<br/><b style={{color:"#f87171"}}>USD fort :</b> les institutionnels vendent l'or pour acheter du dollar — l'or chute.<br/>Tes 3 filtres captent exactement ces deux moments. Tu ne devines pas — tu confirmes et tu suis.</div>
+            <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>💡 La règle d'or de l'or</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Quand l'USD s'effondre, les banques centrales (Chine, Russie, Inde) et les fonds institutionnels achètent l'or massivement comme valeur refuge. Tes 3 filtres captent exactement ce moment. Tu ne devines pas — tu suis un flux déjà lancé et confirmé.</div>
           </div>
         </div>
       </div>
@@ -357,7 +321,6 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
         <div style={{fontSize:9, color:TEXT, lineHeight:1.6}}>L'or est PLUS volatil que le forex : il bouge vite et fort. Stop serré obligatoire. Ne chasse jamais un mouvement déjà très avancé. Et rappelle-toi : l'or peut renverser brutalement sur une news US — si tu es en position pendant une annonce, sois prêt.</div>
       </div>
 
-      </div></div>
       <div style={{padding:"14px", background:"linear-gradient(135deg, #001a0d 0%, #003319 100%)", borderRadius:8, border:"2px solid #00ff88", borderLeft:"5px solid #00ff88", boxShadow:"0 0 16px rgba(0,255,136,0.4)"}}>
         <div style={{fontSize:11, color:"#00ff88", fontWeight:700, marginBottom:4}}>☀️ TON RITUEL OR — avant la session NY (8h ET)</div>
         <div style={{fontSize:8.5, color:"#a7f3d0", marginBottom:12, lineHeight:1.4}}>Ouvre les 2 pages MarketMilk (Commodities + Forex), puis vérifie les news US avant de prendre position.</div>
