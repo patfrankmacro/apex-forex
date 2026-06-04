@@ -167,12 +167,118 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:8, lineHeight:1.4}}>💡 Pourquoi ce trade était gagnant : quand le dollar est la devise la plus faible ET que l'or est dans Most Volatile, les institutionnels achètent l'or massivement comme valeur refuge. Tes 3 filtres captent exactement ce moment.</div>
       </div>
 
-      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>🕐 MEILLEURES HEURES — OR (heure de New York)</div>
-        <div style={{display:"flex", flexDirection:"column", gap:8}}>
-          <div style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#4ade80"}}>⭐ 8h00 – 12h00 ET — TON CRÉNEAU OR.</b> New York ouvre, le dollar et les taux US bougent : c'est là que l'or fait ses plus gros mouvements.</div>
-          <div style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>8h30 – 10h00 ET — News US.</b> Inflation, emploi, Fed : l'or réagit violemment. Énorme opportunité MAIS gros risque — vérifie le calendrier.</div>
-          <div style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#f87171"}}>⛔ Soir / nuit.</b> Volume faible, spreads larges. L'or bouge peu et de façon erratique. Évite.</div>
+      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:4}}>🗺️ GPS — L'AGENDA DES INSTITUTIONNELS SUR L'OR</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginBottom:12}}>Suis leur calendrier. Entre derrière eux après confirmation. Sniper precision.</div>
+        <div style={{display:"flex", flexDirection:"column", gap:0}}>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1e3a5f", border:"2px solid #38bdf8", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#38bdf8", fontWeight:700}}>2h</div>
+              <div style={{width:2, height:32, background:"#1e3a5f"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#38bdf8", fontWeight:700}}>2h00-5h00 ET — LONDON KILL ZONE</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Banques bullion de Londres (Goldman, HSBC, UBS) placent leurs premières positions. Londres est le plus grand marché OTC d'or au monde.</div>
+              <div style={{fontSize:8, color:"#4a5070", marginTop:2}}>→ Dors. Les gros joueurs construisent.</div>
+            </div>
+          </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1e3a5f", border:"2px solid #c084fc", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#c084fc", fontWeight:700}}>5h30</div>
+              <div style={{width:2, height:32, background:"#c084fc44"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#c084fc", fontWeight:700}}>5h30 ET — LONDON AM GOLD FIX ⚡</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Les grandes banques bullion fixent le premier prix de référence officiel de l'or. Pic de volume institutionnel. La direction du jour se confirme.</div>
+              <div style={{fontSize:8, color:"#c084fc", marginTop:2}}>→ Dors. Observe le biais directionnel.</div>
+            </div>
+          </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#052010", border:"2px solid #00ff88", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#00ff88", fontWeight:700}}>6h</div>
+              <div style={{width:2, height:32, background:"#00ff8844"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#00ff88", fontWeight:700}}>6h00 ET — PRÉPARE-TOI</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Ouvre MarketMilk Commodities + Forex. Vérifie la force de l'or et la faiblesse de l'USD. Vérifie le calendrier éco US.</div>
+              <div style={{fontSize:8, color:"#00ff88", marginTop:2}}>→ Rituel OR. Check tes 2 pages.</div>
+            </div>
+          </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#fbbf24,#f59e0b)", border:"3px solid #fbbf24", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#1a1500", fontWeight:900, boxShadow:"0 0 12px rgba(251,191,36,0.6)"}}>6h30</div>
+              <div style={{width:2, height:40, background:"#fbbf2466"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8, padding:"8px 10px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2466", marginBottom:4}}>
+              <div style={{fontSize:10, color:"#fbbf24", fontWeight:900}}>⚡ 6h30 ET — VÉRIFIE TES 3 FILTRES</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres a déjà bougé l'or depuis 2h. Si tes 3 filtres passent → le mouvement institutionnel est confirmé. Entre au repli.</div>
+              <div style={{fontSize:8.5, color:"#fbbf24", fontWeight:700, marginTop:4}}>→ Alerte = entre au repli sur H1/M15</div>
+            </div>
+          </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a2a00", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#4ade80", fontWeight:700}}>8h</div>
+              <div style={{width:2, height:32, background:"#4ade8044"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#4ade80", fontWeight:700}}>8h00 ET — GOLDEN OVERLAP ⭐</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>NY ouvre. COMEX s'active. 70% des highs/lows journaliers de l'or se forment ici. Le mouvement de Londres s'amplifie massivement.</div>
+              <div style={{fontSize:8, color:"#4ade80", marginTop:2}}>→ Tiens ta position. Remonte ton stop.</div>
+            </div>
+          </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a1500", border:"2px solid #fbbf24", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fbbf24", fontWeight:700}}>8h30</div>
+              <div style={{width:2, height:32, background:"#fbbf2422"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#fbbf24", fontWeight:700}}>8h30 ET — NEWS US ⚠️</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>CPI, NFP, FOMC. L'or réagit violemment. Mercredi/Jeudi = jours les plus actifs (FOMC, données emploi).</div>
+              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Stop au break-even si en profit.</div>
+            </div>
+          </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1e1a2e", border:"2px solid #c084fc", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#c084fc", fontWeight:700}}>10h</div>
+              <div style={{width:2, height:32, background:"#c084fc33"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#c084fc", fontWeight:700}}>10h00 ET — LONDON PM GOLD FIX ⚡</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Deuxième prix de référence officiel fixé par les banques bullion. Deuxième pic de volume. Souvent une accélération ou confirmation du mouvement.</div>
+              <div style={{fontSize:8, color:"#c084fc", marginTop:2}}>→ Surveille. Possible accélération finale.</div>
+            </div>
+          </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#052010", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#4ade80", fontWeight:700}}>11h</div>
+              <div style={{width:2, height:32, background:"#f8717133"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#4ade80", fontWeight:700}}>11h-12h ET — SÉCURISE ET SORS</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Londres ferme ses positions sur l'or. Les desks européens prennent leurs profits. Risque de renversement.</div>
+              <div style={{fontSize:8, color:"#4ade80", marginTop:2}}>→ Sors avant 12h. Trade terminé.</div>
+            </div>
+          </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a0000", border:"2px solid #f87171", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#f87171", fontWeight:700}}>12h+</div>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:9, color:"#f87171", fontWeight:700}}>⛔ APRÈS 12h — ÉVITE</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Volume baisse, spreads s'élargissent. Les institutionnels sont sortis. Faux signaux.</div>
+              <div style={{fontSize:8, color:"#f87171", marginTop:2}}>→ Ne trade pas.</div>
+            </div>
+          </div>
+
         </div>
       </div>
 

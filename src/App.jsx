@@ -2838,31 +2838,107 @@ function DayTradeView() {
         </div>
       </div>
 
-      {/* MEILLEURES HEURES (heure de New York / ET) */}
+      {/* TIMELINE GPS FX */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #4ade8044", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:8}}>🕐 MEILLEURES HEURES POUR SUIVRE LES GROS JOUEURS (heure de New York)</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:8}}>Dans l'ordre de la journée. Ton créneau de trade est mis en évidence.</div>
-        <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
-          <div style={{padding:"6px 8px", background:"#001018", borderRadius:4, marginBottom:6}}>
-            <b style={{color:"#38bdf8"}}>3h00 ET — Ouverture de Londres</b><br/>
-            EUR, GBP, CHF se réveillent. Les ordres institutionnels affluent, la tendance du jour se forme.
+        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:4}}>🗺️ GPS — L'AGENDA DES GROS JOUEURS FX</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginBottom:12}}>Suis leur agenda. Entre derrière eux. Comme un sniper.</div>
+        <div style={{display:"flex", flexDirection:"column", gap:0}}>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1e3a5f", border:"2px solid #38bdf8", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#38bdf8", fontWeight:700}}>3h</div>
+              <div style={{width:2, height:32, background:"#1e3a5f"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#38bdf8", fontWeight:700}}>3h00 ET — OUVERTURE LONDRES</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Banques européennes entrent sur EUR/GBP/CHF. La tendance du jour se forme en silence.</div>
+              <div style={{fontSize:8, color:"#4a5070", marginTop:2}}>→ Dors. Laisse-les travailler.</div>
+            </div>
           </div>
-          <div style={{padding:"8px 10px", background:"#052010", borderRadius:4, marginBottom:6, border:"2px solid #4ade80"}}>
-            <b style={{color:"#4ade80"}}>⭐ 6h30 – 11h00 ET — TON CRÉNEAU</b><br/>
-            Tu entres à 6h30 (Londres bien lancé) et tu tiens jusqu'à ~11h. Tu profites de la tendance de Londres PUIS de l'amplification de New York. C'est ta fenêtre.
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1e3a5f", border:"2px solid #38bdf8", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#38bdf8", fontWeight:700}}>5h</div>
+              <div style={{width:2, height:32, background:"#1e3a5f"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#38bdf8", fontWeight:700}}>3h-6h ET — NEWS EUROPÉENNES</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Inflation, emploi, PIB de la zone euro tombent. Les institutionnels digèrent et confirment leur direction.</div>
+              <div style={{fontSize:8, color:"#4a5070", marginTop:2}}>→ Dors. La tendance s'établit.</div>
+            </div>
           </div>
-          <div style={{padding:"6px 8px", background:"#001018", borderRadius:4, marginBottom:6}}>
-            <b style={{color:"#38bdf8"}}>8h00 ET — Ouverture de New York</b><br/>
-            USD et CAD se réveillent. Chevauchement Londres+NY = ~50% du volume quotidien, le pic de liquidité. Ta position de Londres s'amplifie.
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#052010", border:"2px solid #00ff88", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#00ff88", fontWeight:700}}>6h</div>
+              <div style={{width:2, height:32, background:"#00ff8844"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#00ff88", fontWeight:700}}>6h00 ET — PRÉPARE-TOI</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Ouvre ton rituel. MarketMilk + calendrier éco + news. Lis la tendance de Londres.</div>
+              <div style={{fontSize:8, color:"#00ff88", marginTop:2}}>→ Rituel du matin. Check tes ressources.</div>
+            </div>
           </div>
-          <div style={{padding:"6px 8px", background:"#001018", borderRadius:4, marginBottom:6}}>
-            <b style={{color:"#fbbf24"}}>8h30 – 10h00 ET — News US (NFP, CPI, FOMC)</b><br/>
-            Les grosses nouvelles US → mouvements violents. Peut accélérer ou renverser la tendance. Prudence si tu es déjà en position.
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#00ff88,#4ade80)", border:"3px solid #00ff88", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#001a0d", fontWeight:900, boxShadow:"0 0 12px rgba(0,255,136,0.6)"}}>6h30</div>
+              <div style={{width:2, height:40, background:"#00ff8866"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8, padding:"8px 10px", background:"#052010", borderRadius:6, border:"1px solid #00ff8866", marginBottom:4}}>
+              <div style={{fontSize:10, color:"#00ff88", fontWeight:900}}>⚡ 6h30 ET — TON ENTRÉE</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres roule depuis 3h30. Tendance confirmée. Retail piégé à contre-sens. Tes 6 filtres te disent si les gros joueurs sont dans le trade.</div>
+              <div style={{fontSize:8.5, color:"#00ff88", fontWeight:700, marginTop:4}}>→ Analyse + entre au repli sur H1/M15</div>
+            </div>
           </div>
-          <div style={{padding:"6px 8px", background:"#1a0000", borderRadius:4, border:"1px solid #f8717133"}}>
-            <b style={{color:"#f87171"}}>⛔ APRÈS 17h00 ET — ZONE MORTE</b><br/>
-            Les fournisseurs de liquidité réinitialisent, spreads larges (10-20 pips), faux mouvements. Ne trade pas — l'app te dira d'ailleurs qu'il n'y a aucune opportunité.
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a2a00", border:"2px solid #fbbf24", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#fbbf24", fontWeight:700}}>8h</div>
+              <div style={{width:2, height:32, background:"#fbbf2444"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#fbbf24", fontWeight:700}}>8h00 ET — NY AMPLIFIE</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>New York ouvre. 50% du volume quotidien. Goldman, JPMorgan, Citi entrent. Ton trade de Londres s'amplifie.</div>
+              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Tiens ta position. Remonte ton stop.</div>
+            </div>
           </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a1500", border:"2px solid #fbbf24", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fbbf24", fontWeight:700}}>8h30</div>
+              <div style={{width:2, height:32, background:"#fbbf2422"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#fbbf24", fontWeight:700}}>8h30 ET — NEWS US ⚠️</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>NFP, CPI, FOMC. Peut accélérer OU renverser brutalement. Ne pas entrer après une news.</div>
+              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Stop au break-even si en profit.</div>
+            </div>
+          </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#052010", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#4ade80", fontWeight:700}}>11h</div>
+              <div style={{width:2, height:32, background:"#f8717133"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#4ade80", fontWeight:700}}>11h00 ET — SÉCURISE ET SORS</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Londres ferme. Les institutionnels européens prennent leurs profits. Le momentum meurt.</div>
+              <div style={{fontSize:8, color:"#4ade80", marginTop:2}}>→ Sors. Trade terminé.</div>
+            </div>
+          </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a0000", border:"2px solid #f87171", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#f87171", fontWeight:700}}>17h+</div>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:9, color:"#f87171", fontWeight:700}}>⛔ APRÈS 17h — ZONE MORTE</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Spreads larges, faux signaux, liquidité morte. Aucune opportunité possible.</div>
+              <div style={{fontSize:8, color:"#f87171", marginTop:2}}>→ Ne trade pas.</div>
+            </div>
+          </div>
+
         </div>
       </div>
 
