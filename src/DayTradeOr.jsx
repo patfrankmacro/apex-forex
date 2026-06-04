@@ -70,10 +70,10 @@ export default function DayTradeOrView() {
         const list = direction==="LONG" ? gainers : losers;
         const found = list.find(p=>p.com===com);
         const chg = found ? found.chg : null;
-        // FILTRE 1 - DIVERGENCE OR/USD : LONG -> or fort (top4) + USD faible (4 plus faibles) ; SHORT -> inverse
+        // FILTRE 1 - DIVERGENCE OR/USD : LONG -> or fort (top3) + USD faible (3 plus faibles) ; SHORT -> inverse
         let divOk=false;
-        if (direction==="LONG") divOk = (cRank<=3) && (usdRank>=usdTotal-4);
-        else divOk = (cRank>=strength.length-4) && (usdRank<=3);
+        if (direction==="LONG") divOk = (cRank<=2) && (usdRank>=usdTotal-3);
+        else divOk = (cRank>=strength.length-3) && (usdRank<=2);
         if (!divOk) return;
         // FILTRE 2 - DOIT etre dans le TOP 3 des gainers (achat) ou losers (vente)
         const inTop3 = list.slice(0,3).some(p=>p.com===com);
@@ -138,7 +138,7 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LES 2 FILTRES</div>
         <div style={{display:"flex", flexDirection:"column", gap:9}}>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE OR/USD</b> : achat = or FORT (top 4 commodités) + USD FAIBLE (4 plus faibles au forex) ; vente = or FAIBLE + USD FORT. C est LE moteur de l or</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE OR/USD</b> : achat = or dans le TOP 3 des commodités + USD dans les 3 PLUS FAIBLES du forex ; vente = or dans les 3 plus faibles + USD dans le top 3. C est LE moteur de l or</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>TOP 3 MOMENTUM</b> : l'or est dans le top 3 des Top Gainers (achat) ou Top Losers (vente) des commodités. Le mouvement est lancé</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#4ade80", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#4ade80"}}>ENTRÉE</b> : repli sur H1/M15 dans le sens du momentum. Stop serré, target 1.5-2×. Surveille les news US à 8h30</span></div>
         </div>
