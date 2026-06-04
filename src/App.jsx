@@ -2697,7 +2697,7 @@ function DayTradeAnalyzer() {
       {result && !result.error && (
         <div style={{marginTop:10}}>
           <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>FORCE DU JOUR : <b style={{color:"#4ade80"}}>{result.strongest} (la plus forte)</b> → <b style={{color:"#f87171"}}>{result.weakest} (la plus faible)</b></div>
-          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} APEX (les 5 filtres réunis)</div>
+          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} APEX (les 6 filtres réunis)</div>
           {result.top.map((o,i)=>{
             const isLong = o.direction==="LONG";
             const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
@@ -2730,7 +2730,7 @@ function DayTradeAnalyzer() {
             </div>
           );})}
           <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
-            ⚠ Chaque paire coche les 4 critères Session Londres (divergence ≥4 rangs + top 2 gainers/losers + devise de Londres + pas least volatile). Classées par divergence et continuation NY. Entre au repli, garde jusqu'à ~11h pendant que NY amplifie.
+            ⚠ Chaque paire coche les 6 critères (divergence ≥4 rangs + top 2 momentum + une de tes paires + pas least volatile + dans Most Volatile + retail contrarien ≥70%). Classées par divergence et continuation NY. Entre au repli, garde jusqu'à ~11h pendant que NY amplifie.
           </div>
         </div>
       )}
@@ -2754,15 +2754,15 @@ function DayTradeView() {
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
           Les <b style={{color:"#fbbf24"}}>gros joueurs</b> (banques, fonds) déplacent des milliards chaque jour. Leurs flux créent des tendances intraday : une devise qu'ils achètent devient FORTE, une qu'ils vendent devient FAIBLE — et ça dure quelques heures à quelques jours. On ne devine pas, <b>on SUIT ce flux</b>.<br/><br/>
           Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> du jour contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence), quand le mouvement est déjà lancé (momentum) et que la paire bouge assez (volatilité).<br/><br/>
-          <b style={{color:"#38bdf8"}}>⏰ Ton timing — entrée 6h30, tenue jusqu'à 11h :</b> tu entres en pleine session de <b>Londres</b> (ouverte depuis 3h ET), donc tu cherches les paires qui bougent DÉJÀ avec une devise de Londres (<b>EUR, GBP, CHF</b>) contre une devise faible (vraie divergence). Tu te positionnes AVANT que New York (8h ET) amplifie ta position. Tes 7 paires opposent toutes une devise de Londres (EUR/GBP/CHF) à une devise du Pacifique (AUD/NZD/JPY) — les seules qui bougent vraiment à ton heure.<br/><br/><b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> dernière confirmation. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant.
+          <b style={{color:"#38bdf8"}}>⏰ Ton timing — entrée 6h30, tenue jusqu'à 11h :</b> tu entres en pleine session de <b>Londres</b> (ouverte depuis 3h ET), donc tu cherches les paires qui bougent DÉJÀ avec une devise de Londres (<b>EUR, GBP, CHF</b>) contre une devise faible (vraie divergence). Tu te positionnes AVANT que New York (8h ET) amplifie ta position. Tes 9 paires opposent une devise de Londres (EUR/GBP/CHF) à une devise plus faible (AUD/NZD/JPY/CAD) — celles qui bougent à ton heure.<br/><br/><b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> dernière confirmation. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant.
         </div>
       </div>
 
       {/* POURQUOI CES 7 PAIRES */}
       <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:8}}>🎯 POURQUOI CES 7 PAIRES À 6h30</div>
+        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:8}}>🎯 POURQUOI CES 9 PAIRES À 6h30</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.6, marginBottom:10}}>
-          On trade UNIQUEMENT : <b style={{color:"#4ade80"}}>EUR/AUD · GBP/AUD · EUR/NZD · GBP/NZD · GBP/JPY · EUR/JPY · CHF/JPY</b>. Chacune oppose une devise de Londres (EUR, GBP, CHF) à une devise du Pacifique/Asie (AUD, NZD, JPY).
+          On trade UNIQUEMENT : <b style={{color:"#4ade80"}}>EUR/AUD · GBP/AUD · EUR/NZD · GBP/NZD · GBP/JPY · EUR/JPY · CHF/JPY · EUR/CAD · GBP/CAD</b>. Chacune oppose une devise de Londres (EUR, GBP, CHF) à une devise plus faible (AUD, NZD, JPY, CAD).
         </div>
         <div style={{display:"flex", flexDirection:"column", gap:7}}>
           <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>1.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Les news sont déjà sorties.</b> À 6h30 ET il est 11h30 à Londres : les chiffres éco européens du matin (inflation, emploi, PIB UK/EU) sont tombés entre 2h et 5h. Les institutions les ont digérés et ont déjà pris position. Tu entres dans une tendance confirmée, pas dans l'incertitude.</span></div>
@@ -2776,13 +2776,14 @@ function DayTradeView() {
       {/* SEQUENCE */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LA SÉQUENCE — ÉTAPE PAR ÉTAPE</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie ces 5 filtres pour toi quand tu colles tes données. Une alerte n'apparaît que si les 5 sont cochés.</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie ces 6 filtres pour toi quand tu colles tes données. Une alerte n'apparaît que si les 6 sont cochés.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE ≥ 4 rangs</b> au Currency Strength : la devise forte et la faible séparées d'au moins 4 places (vraie divergence, pas 2 voisines)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>TOP 2 momentum</b> : la paire est #1 ou #2 des Top Gainers (→ achat) ou Top Losers (→ vente). Le mouvement est déjà lancé</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>UNE DE TES 7 PAIRES</b> : EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD, GBP/JPY, EUR/JPY ou CHF/JPY (Londres contre Pacifique). Toute autre paire est écartée</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>UNE DE TES 9 PAIRES</b> : EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD, GBP/JPY, EUR/JPY, CHF/JPY, EUR/CAD ou GBP/CAD. Toute autre paire est écartée</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>PAS Least Volatile</b> : on écarte ce qui stagne (pas de pips à faire)</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>RETAIL CONTRARIEN ≥ 70%</b> : si tu achètes, le retail doit être short 70%+ ; si tu vends, long 70%+. Ils se font piéger, leurs stops alimentent ton mouvement</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DANS MOST VOLATILE</b> : la paire doit figurer dans la liste Most Volatile (elle bouge vraiment, il y a des pips à faire)</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>RETAIL CONTRARIEN ≥ 70%</b> : si tu achètes, le retail doit être short 70%+ ; si tu vends, long 70%+. Ils se font piéger, leurs stops alimentent ton mouvement</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#c084fc", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>ENTRÉE</b> : sur H1/M15, attends un repli (pullback) puis entre. Stop serré, target 1.5-2× le risque. Garde jusqu'à ~11h (NY amplifie)</span></div>
         </div>
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ BONUS (surbrillance) : la paire est aussi dans Most Volatile + divergence maximale du jour.</div>
@@ -2791,7 +2792,7 @@ function DayTradeView() {
       {/* EXEMPLE REEL - GBP/NZD */}
       <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
         <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:4}}>📐 EXEMPLE RÉEL — GBP/NZD ce matin 6h30</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength du matin : NZD #8 (le plus faible), GBP #4. Voici pourquoi GBP/NZD ACHAT cochait les 5 filtres.</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength du matin : NZD #8 (le plus faible), GBP #4. Voici pourquoi GBP/NZD ACHAT cochait les 6 filtres.</div>
         <div style={{display:"flex", flexDirection:"column", gap:6}}>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Divergence ✓</b> — GBP #4 vs NZD #8 = écart de 4 rangs. Vraie divergence (forte en haut, faible au fond), pas 2 voisines.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Momentum ✓</b> — top gainer #1 (+0.47%). Le mouvement de Londres était déjà lancé.</span></div>
@@ -2799,7 +2800,7 @@ function DayTradeView() {
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Pas Least Volatile ✓</b> — la paire bougeait bien, pas dans les stagnantes.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Retail contrarien ✓</b> — le retail était SHORT à 70%+ pendant que toi tu achetais. Ils se faisaient piéger.</span></div>
         </div>
-        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 5 filtres réunis = ALERTE à 6h30. Résultat : GBP/NZD a grimpé jusqu'à +0.88% dans la journée pendant que NY amplifiait. C'est exactement le type de trade que le système cherche.</div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 6 filtres réunis = ALERTE à 6h30. Résultat : GBP/NZD a grimpé jusqu'à +0.88% dans la journée pendant que NY amplifiait. C'est exactement le type de trade que le système cherche.</div>
       </div>
 
       {/* TABLEAU RECAP - PLAN DE TRADE */}
