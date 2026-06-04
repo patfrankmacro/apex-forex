@@ -1,4 +1,5 @@
 import SentimentView from "./SentimentView";
+import DayTradeOrView from "./DayTradeOr";
 import { useState, useMemo, useEffect } from "react";
 import { db } from "./firebase.js";
 import { ref, onValue, set } from "firebase/database";
@@ -3239,6 +3240,7 @@ export default function App() {
         </div>
         <div style={{ display:"flex", gap:6, flexWrap:"wrap", alignItems:"center" }}>
           <button onClick={()=>setView("daytrade")} style={{ padding:"6px 12px", borderRadius:6, fontSize:10, fontWeight:800, letterSpacing:1, cursor:"pointer", border: view==="daytrade"?"2px solid #fbbf24":"2px solid #fbbf2466", background: view==="daytrade"?"#fbbf24":"#1a1500", color: view==="daytrade"?"#1a1500":"#fbbf24", fontFamily:"'IBM Plex Mono'", boxShadow:"0 0 8px rgba(251,191,36,0.3)" }}>⚡ DAY TRADE FX</button>
+          <button onClick={()=>setView("daytradeor")} style={{ padding:"6px 12px", borderRadius:6, fontSize:10, fontWeight:800, letterSpacing:1, cursor:"pointer", border: view==="daytradeor"?"2px solid #fbbf24":"2px solid #fbbf2466", background: view==="daytradeor"?"#fbbf24":"#1a1500", color: view==="daytradeor"?"#1a1500":"#fbbf24", fontFamily:"'IBM Plex Mono'", boxShadow:"0 0 8px rgba(251,191,36,0.3)" }}>⚡ DAY TRADE OR</button>
           <div style={{ width:1, height:20, background:BORDER, margin:"0 2px" }} />
           {TABS.map(t=><button key={t.id} style={tabStyle(view===t.id)} onClick={()=>setView(t.id)}>{t.label}</button>)}
         </div>
@@ -4023,6 +4025,7 @@ const retailLoaded = opps.some(o => o.retailData);
       {view==="journal" && <JournalView />}
       {view==="calc"    && <PositionCalc />}
       {view==="daytrade" && <DayTradeView />}
+      {view==="daytradeor" && <DayTradeOrView />}
     </div>
   );
 }
