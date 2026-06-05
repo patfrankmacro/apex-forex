@@ -2920,7 +2920,7 @@ function DayTradeView() {
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#052010", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#4ade80", fontWeight:700}}>11h</div>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#160a2e", border:"2px solid #a78bfa", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#a78bfa", fontWeight:700}}>Soir</div>
               <div style={{width:2, height:32, background:"#f8717133"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
@@ -2932,7 +2932,7 @@ function DayTradeView() {
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a0000", border:"2px solid #f87171", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#f87171", fontWeight:700}}>17h+</div>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#052010", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#4ade80", fontWeight:700}}>J+1</div>
             </div>
             <div style={{flex:1}}>
               <div style={{fontSize:9, color:"#4ade80", fontWeight:700}}>LENDEMAIN 6h30 — LONDRES REPREND</div>
