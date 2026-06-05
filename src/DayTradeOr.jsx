@@ -8,6 +8,14 @@ export default function DayTradeOrView() {
 
   const analyze = () => {
     try {
+      // Blocage horaire : OR seulement de 9h a 12h ET (Golden Overlap, COMEX ouvert + news 8h30 passee)
+      const nowET = new Date(new Date().toLocaleString("en-US", {timeZone:"America/New_York"}));
+      const minsET = nowET.getHours()*60 + nowET.getMinutes();
+      if (minsET < 540 || minsET > 720) {
+        const hh = String(nowET.getHours()).padStart(2,"0"), mm = String(nowET.getMinutes()).padStart(2,"0");
+        setResult({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade OR s'analyse entre 9h et 12h ET (Golden Overlap). Avant 9h, le COMEX vient d'ouvrir et la news de 8h30 n'est pas digérée — la direction des desks NY n'est pas lisible. Après 12h, le volume retombe. Reviens dans la fenêtre.`});
+        return;
+      }
       const COMS = ["XAU","XAG","NGAS","Copper","WHEATF","CORNF","SOYF","UKOil","USOil"];
       const CURS = ["USD","EUR","GBP","JPY","CHF","CAD","AUD","NZD"];
 
