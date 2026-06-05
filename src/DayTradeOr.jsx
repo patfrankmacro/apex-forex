@@ -115,7 +115,7 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
   return (
     <div style={{maxWidth:760, margin:"0 auto", padding:"4px 2px"}}>
       <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE OR — XAU/USD MOMENTUM</div>
-      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:14}}>Système intraday pour l'or (XAU/USD) · basé sur la force de l'or + la faiblesse/force de l'USD · Séparé du Day Trade FX</div>
+      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:14}}>Système intraday pour l'or (XAU/USD) · session New York / COMEX · entrée 9h ET · basé sur la force de l'or + la faiblesse/force de l'USD · Séparé du Day Trade FX</div>
 
       <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:6}}>🥇 1. COLLE LA PAGE COMMODITIES</div>
       <textarea value={rawCom} onChange={e=>setRawCom(e.target.value)} placeholder="Colle ici la page Commodities de MarketMilk (Commodity Strength, Gainers, Losers, Most/Least Volatile)..." style={box} />
@@ -149,7 +149,21 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
 
       <div style={{marginTop:18, padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 LA LOGIQUE DE L'OR</div>
-        <div style={{fontSize:9, color:TEXT, lineHeight:1.6}}>L'or (XAU) et le dollar (USD) sont des frères ennemis : quand l'USD baisse, l'or monte, et inversement. C'est la relation la plus fiable du métal jaune. On ne devine pas : on attend que l'or bouge DÉJÀ (momentum) dans le sens de la faiblesse/force du dollar.<br/><br/>Contrairement au forex de Londres, l'or se joue surtout en <b style={{color:"#fbbf24"}}>session New York (8h-12h ET)</b> : c'est là que le dollar et les taux US bougent le plus. L'or réagit violemment aux news US (inflation, emploi, Fed) — d'où l'importance de vérifier le calendrier avant d'entrer.</div>
+        <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>L'or (XAU) et le dollar (USD) sont des frères ennemis : quand l'USD baisse, l'or monte, et inversement. C'est la relation la plus fiable du métal jaune. L'or est investi principalement depuis les États-Unis — c'est un actif <b style={{color:"#fbbf24"}}>américain</b>, pas un actif de Londres ou d'Asie comme tes paires FX.<br/><br/>
+        <b style={{color:"#38bdf8"}}>⏰ Ton entrée — 9h ET, une fois la direction NY lisible :</b> contrairement au FX (entrée 6h30 sur la trace de Londres), l'or se joue sur le <b>COMEX de New York</b>. Le COMEX ouvre à 8h20, les news US tombent à 8h30 (l'or réagit violemment), puis la poussière retombe. À <b>9h</b>, les desks institutionnels de NY ont révélé leur direction et la news est digérée. C'est TON moment : tu lis leur trace sur MarketMilk et tu entres derrière eux.<br/><br/>
+        <b style={{color:"#f87171"}}>📅 L'or n'est PAS un swing comme le FX :</b> la session asiatique du soir TUE le volume de l'or au lieu de le relayer. L'or se trade dans la fenêtre <b>9h-12h ET</b> (Golden Overlap), puis tu sors avant midi. C'est un trade de journée, propre et net — pas une position gardée plusieurs jours. Mercredi (FOMC) et jeudi sont les jours les plus forts.</div>
+      </div>
+
+      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:8}}>📊 LES NEWS US QUI BOUGENT L'OR</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10, lineHeight:1.5}}>L'or bouge à l'inverse du dollar. Ce qui compte = le chiffre RÉEL vs les ATTENTES (consensus), pas juste bon ou mauvais.</div>
+        <div style={{display:"flex", flexDirection:"column", gap:8}}>
+          <div style={{padding:"7px 9px", background:"#001018", borderRadius:5}}><div style={{fontSize:9, color:"#f87171", fontWeight:700, marginBottom:2}}>🔴 CPI / Inflation</div><div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Plus HAUT que prévu → Fed agressive (taux hauts) → <b style={{color:"#4ade80"}}>USD ↑ / OR ↓</b><br/>Plus BAS que prévu → Fed assouplit → <b style={{color:"#fbbf24"}}>USD ↓ / OR ↑</b></div></div>
+          <div style={{padding:"7px 9px", background:"#001018", borderRadius:5}}><div style={{fontSize:9, color:"#38bdf8", fontWeight:700, marginBottom:2}}>🔵 Non-Farm Payrolls (NFP) / Emploi</div><div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Plus HAUT que prévu (économie forte) → <b style={{color:"#4ade80"}}>USD ↑ / OR ↓</b><br/>Plus BAS que prévu (économie molle) → <b style={{color:"#fbbf24"}}>USD ↓ / OR ↑</b></div></div>
+          <div style={{padding:"7px 9px", background:"#001018", borderRadius:5}}><div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:2}}>🟡 Taux de chômage — LOGIQUE INVERSÉE</div><div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Plus BAS que prévu (moins de chômeurs = économie forte) → <b style={{color:"#4ade80"}}>USD ↑ / OR ↓</b><br/>Plus HAUT que prévu (économie molle) → <b style={{color:"#fbbf24"}}>USD ↓ / OR ↑</b></div></div>
+          <div style={{padding:"7px 9px", background:"#001018", borderRadius:5}}><div style={{fontSize:9, color:"#4ade80", fontWeight:700, marginBottom:2}}>🟢 PMI (manufacturier / services)</div><div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Au-dessus de 50 et mieux que prévu (expansion) → <b style={{color:"#4ade80"}}>USD ↑ / OR ↓</b><br/>Sous 50 ou pire que prévu (contraction) → <b style={{color:"#fbbf24"}}>USD ↓ / OR ↑</b></div></div>
+        </div>
+        <div style={{fontSize:8, color:"#fbbf24", marginTop:8, padding:"7px 9px", background:"#1a1500", borderRadius:5, lineHeight:1.5}}>💡 Règle simple : économie US forte = dollar fort = or faible. Économie US molle = dollar faible = or fort. L'or réagit à la SURPRISE (réel vs consensus) — si tout sort comme prévu, l'or bouge peu. ⚠️ N'entre JAMAIS juste avant une news : attends qu'elle passe (8h30) puis entre à 9h.</div>
       </div>
 
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
@@ -186,81 +200,69 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
               <div style={{width:2, height:32, background:"#1e3a5f"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#38bdf8", fontWeight:700}}>2h00-5h00 ET — LONDON KILL ZONE</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Banques bullion de Londres (Goldman, HSBC, UBS) placent leurs premières positions. Londres est le plus grand marché OTC d'or au monde.</div>
-              <div style={{fontSize:8, color:"#4a5070", marginTop:2}}>→ Dors. Les gros joueurs construisent.</div>
+              <div style={{fontSize:9, color:"#38bdf8", fontWeight:700}}>Nuit — Londres prépare (PAS ton heure)</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Londres bouge l'or pendant la nuit, mais le vrai marché de l'or (le COMEX de New York) n'est pas encore ouvert. La direction n'est pas fiable. Ce n'est pas ton moment.</div>
+              <div style={{fontSize:8, color:"#4a5070", marginTop:2}}>→ Dors. Tu n'entres pas la nuit.</div>
             </div>
           </div>
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#1e3a5f", border:"2px solid #c084fc", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#c084fc", fontWeight:700}}>5h30</div>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1e3a5f", border:"2px solid #c084fc", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#c084fc", fontWeight:700}}>8h20</div>
               <div style={{width:2, height:32, background:"#c084fc44"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#c084fc", fontWeight:700}}>5h30 ET — LONDON AM GOLD FIX ⚡</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Les grandes banques bullion fixent le premier prix de référence officiel de l'or. Pic de volume institutionnel. La direction du jour se confirme.</div>
-              <div style={{fontSize:8, color:"#c084fc", marginTop:2}}>→ Dors. Observe le biais directionnel.</div>
-            </div>
-          </div>
-
-          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
-            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#052010", border:"2px solid #00ff88", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#00ff88", fontWeight:700}}>6h</div>
-              <div style={{width:2, height:32, background:"#00ff8844"}}/>
-            </div>
-            <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#00ff88", fontWeight:700}}>6h00 ET — PRÉPARE-TOI</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Ouvre MarketMilk Commodities + Forex. Vérifie la force de l'or et la faiblesse de l'USD. Vérifie le calendrier éco US.</div>
-              <div style={{fontSize:8, color:"#00ff88", marginTop:2}}>→ Rituel OR. Check tes 2 pages.</div>
-            </div>
-          </div>
-
-          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
-            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#fbbf24,#f59e0b)", border:"3px solid #fbbf24", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#1a1500", fontWeight:900, boxShadow:"0 0 12px rgba(251,191,36,0.6)"}}>6h30</div>
-              <div style={{width:2, height:40, background:"#fbbf2466"}}/>
-            </div>
-            <div style={{flex:1, paddingBottom:8, padding:"8px 10px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2466", marginBottom:4}}>
-              <div style={{fontSize:10, color:"#fbbf24", fontWeight:900}}>⚡ 6h30 ET — VÉRIFIE TES 3 FILTRES</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres a déjà bougé l'or depuis 2h. Si tes 3 filtres passent → le mouvement institutionnel est confirmé. Entre au repli.</div>
-              <div style={{fontSize:8.5, color:"#fbbf24", fontWeight:700, marginTop:4}}>→ Alerte = entre au repli sur H1/M15</div>
-            </div>
-          </div>
-
-          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
-            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a2a00", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#4ade80", fontWeight:700}}>8h</div>
-              <div style={{width:2, height:32, background:"#4ade8044"}}/>
-            </div>
-            <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#4ade80", fontWeight:700}}>8h00 ET — GOLDEN OVERLAP ⭐</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>NY ouvre. COMEX s'active. 70% des highs/lows journaliers de l'or se forment ici. Le mouvement de Londres s'amplifie massivement.</div>
-              <div style={{fontSize:8, color:"#4ade80", marginTop:2}}>→ Tiens ta position. Remonte ton stop.</div>
+              <div style={{fontSize:9, color:"#c084fc", fontWeight:700}}>8h20 ET — LE COMEX OUVRE ⚡</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Le marché à terme de l'or de New York ouvre. Les desks institutionnels (banques, hedge funds) commencent à se positionner. Le vrai volume de l'or arrive.</div>
+              <div style={{fontSize:8, color:"#c084fc", marginTop:2}}>→ Observe. Ne touche à rien encore.</div>
             </div>
           </div>
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
               <div style={{width:28, height:28, borderRadius:"50%", background:"#1a1500", border:"2px solid #fbbf24", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fbbf24", fontWeight:700}}>8h30</div>
-              <div style={{width:2, height:32, background:"#fbbf2422"}}/>
+              <div style={{width:2, height:32, background:"#fbbf2444"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
               <div style={{fontSize:9, color:"#fbbf24", fontWeight:700}}>8h30 ET — NEWS US ⚠️</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>CPI, NFP, FOMC. L'or réagit violemment. Mercredi/Jeudi = jours les plus actifs (FOMC, données emploi).</div>
-              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Stop au break-even si en profit.</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>CPI, NFP, chômage, PMI, FOMC tombent. L'or réagit violemment. Mercredi (FOMC) et jeudi = jours les plus actifs. NE PAS entrer maintenant — laisse la news passer.</div>
+              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Attends. Lis la réaction (voir guide news US).</div>
             </div>
           </div>
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#1e1a2e", border:"2px solid #c084fc", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#c084fc", fontWeight:700}}>10h</div>
+              <div style={{width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#fbbf24,#f59e0b)", border:"3px solid #fbbf24", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#1a1500", fontWeight:900, boxShadow:"0 0 12px rgba(251,191,36,0.6)"}}>9h</div>
+              <div style={{width:2, height:40, background:"#fbbf2466"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8, padding:"8px 10px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2466", marginBottom:4}}>
+              <div style={{fontSize:10, color:"#fbbf24", fontWeight:900}}>⚡ 9h00 ET — TON ENTRÉE</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Le COMEX roule depuis 8h20, la news de 8h30 est passée. Les desks NY ont révélé leur direction. Tu colles MarketMilk, tu lances l'analyse. Si tes 3 filtres passent → tu entres au repli derrière eux.</div>
+              <div style={{fontSize:8.5, color:"#fbbf24", fontWeight:700, marginTop:4}}>→ Colle + analyse + entre au repli sur H1/M15</div>
+            </div>
+          </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a2a00", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#4ade80", fontWeight:700}}>10h</div>
+              <div style={{width:2, height:32, background:"#4ade8044"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#4ade80", fontWeight:700}}>9h-12h ET — GOLDEN OVERLAP ⭐</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Londres + New York actifs en même temps, COMEX à plein régime. 70% des highs/lows journaliers de l'or se forment dans cette fenêtre. C'est là que ton trade travaille.</div>
+              <div style={{fontSize:8, color:"#4ade80", marginTop:2}}>→ Tiens ta position. Remonte ton stop.</div>
+            </div>
+          </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1e1a2e", border:"2px solid #c084fc", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#c084fc", fontWeight:700}}>11h</div>
               <div style={{width:2, height:32, background:"#c084fc33"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#c084fc", fontWeight:700}}>10h00 ET — LONDON PM GOLD FIX ⚡</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Deuxième prix de référence officiel fixé par les banques bullion. Deuxième pic de volume. Souvent une accélération ou confirmation du mouvement.</div>
-              <div style={{fontSize:8, color:"#c084fc", marginTop:2}}>→ Surveille. Possible accélération finale.</div>
+              <div style={{fontSize:9, color:"#c084fc", fontWeight:700}}>11h ET — Pic de volume final</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Dernière poussée du Golden Overlap avant la fermeture de Londres. Souvent une accélération ou confirmation du mouvement. Sécurise tes gains.</div>
+              <div style={{fontSize:8, color:"#c084fc", marginTop:2}}>→ Surveille. Remonte ton stop.</div>
             </div>
           </div>
 
@@ -270,8 +272,8 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
               <div style={{width:2, height:32, background:"#f8717133"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#4ade80", fontWeight:700}}>11h-12h ET — SÉCURISE ET SORS</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Londres ferme ses positions sur l'or. Les desks européens prennent leurs profits. Risque de renversement.</div>
+              <div style={{fontSize:9, color:"#4ade80", fontWeight:700}}>12h ET — SÉCURISE ET SORS</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Le Golden Overlap se termine, Londres ferme. Le volume de l'or retombe. Les institutionnels prennent leurs profits. Risque de renversement.</div>
               <div style={{fontSize:8, color:"#4ade80", marginTop:2}}>→ Sors avant 12h. Trade terminé.</div>
             </div>
           </div>
@@ -294,28 +296,24 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🏦 COMMENT SUIVRE LES INSTITUTIONNELS SUR L'OR</div>
         <div style={{display:"flex", flexDirection:"column", gap:10}}>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #38bdf8"}}>
-            <div style={{fontSize:9, color:"#38bdf8", fontWeight:700, marginBottom:3}}>2h-5h ET — Les banques bullion de Londres entrent</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Goldman Sachs London, HSBC, UBS placent leurs premières positions sur l'or. Si l'USD est faible, ils achètent massivement. À 5h30 ET, le London AM Gold Fix fixe le premier prix officiel de l'or du jour.</div>
+            <div style={{fontSize:9, color:"#38bdf8", fontWeight:700, marginBottom:3}}>8h20 ET — Le COMEX ouvre, les desks NY entrent</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>L'or se trade vraiment sur le COMEX de New York. À 8h20, Goldman NY, JPMorgan, les hedge funds et fonds souverains commencent à se positionner. Si l'USD est faible, ils achètent l'or ; s'il est fort, ils le vendent.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
-            <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>6h30 ET — Tu lis leur trace et tu les suis</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Or fort + USD faible = les banques bullion ont acheté depuis 2h. Tes 3 filtres confirment. Tu entres derrière eux au repli sur H1/M15.</div>
+            <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>9h ET — Tu lis leur trace et tu les suis</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Le COMEX roule depuis 8h20, la news US de 8h30 est passée. Or fort + USD faible = les desks NY ont acheté ; or faible + USD fort = ils ont vendu. Tes 3 filtres confirment. Tu entres derrière eux au repli sur H1/M15.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
-            <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>8h ET — New York amplifie le mouvement</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Les contrats or COMEX s'activent. Goldman NY, JPMorgan, les fonds souverains voient le même chart : or fort, USD faible. Ils entrent automatiquement dans le même sens. 70% des highs/lows journaliers de l'or se forment ici.</div>
-          </div>
-          <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #c084fc"}}>
-            <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:3}}>10h ET — London PM Gold Fix</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Deuxième prix de référence officiel fixé par les banques bullion. Deuxième pic de volume — souvent une accélération finale du mouvement avant la fermeture de Londres.</div>
+            <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>9h-12h ET — Le Golden Overlap travaille</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Londres + New York actifs en même temps, COMEX à plein régime. 70% des highs/lows journaliers de l'or se forment dans cette fenêtre. Ton trade travaille pendant que le volume institutionnel pousse le mouvement.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #4ade80"}}>
-            <div style={{fontSize:9, color:"#4ade80", fontWeight:700, marginBottom:3}}>11h-12h ET — Tu sors AVANT la fermeture</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Les desks or de Londres ferment leurs positions. Volume de vente qui ralentit ou renverse. Sors avant 12h — ton profit est fait.</div>
+            <div style={{fontSize:9, color:"#4ade80", fontWeight:700, marginBottom:3}}>12h ET — Tu sors AVANT la fin du Golden Overlap</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>À midi, le Golden Overlap se termine et Londres ferme. Le volume de l'or retombe, les spreads s'élargissent, le mouvement peut se renverser. Sors avant 12h — ton profit est fait. L'or n'est pas un swing : on ne le garde pas le soir.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #c084fc"}}>
-            <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:3}}>🔗 Comment les banques se passent le relais</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Goldman London achète l'or à 3h. Goldman NY voit le même chart à 8h : or fort, USD faible, tendance confirmée. Il entre dans le même sens — sans appeler Londres. Les raisons fondamentales (USD faible, inflation) n'ont pas changé. NY amplifie ce que Londres a commencé. Automatique, prévisible, répétable.</div>
+            <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:3}}>🔗 Pourquoi tu suis le dollar pour trader l'or</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tu ne devines pas la direction de l'or — tu la lis dans le dollar. Quand une news US sort à 8h30 (inflation, emploi), les desks NY achètent ou vendent le dollar selon le résultat. L'or fait l'inverse, automatiquement. À 9h, MarketMilk te montre déjà cette direction (or fort/faible + USD fort/faible). Tu confirmes avec tes 3 filtres et tu suis.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2444"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>💡 La règle d'or de l'or</div>
@@ -330,7 +328,7 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
       </div>
 
       <div style={{padding:"14px", background:"linear-gradient(135deg, #001a0d 0%, #003319 100%)", borderRadius:8, border:"2px solid #00ff88", borderLeft:"5px solid #00ff88", boxShadow:"0 0 16px rgba(0,255,136,0.4)"}}>
-        <div style={{fontSize:11, color:"#00ff88", fontWeight:700, marginBottom:4}}>☀️ TON RITUEL OR — avant la session NY (8h ET)</div>
+        <div style={{fontSize:11, color:"#00ff88", fontWeight:700, marginBottom:4}}>☀️ TON RITUEL OR — avant ton entrée (9h ET)</div>
         <div style={{fontSize:8.5, color:"#a7f3d0", marginBottom:12, lineHeight:1.4}}>Ouvre les 2 pages MarketMilk (Commodities + Forex), puis vérifie les news US avant de prendre position.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <a href="https://marketmilk.babypips.com/commodities" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001a10", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #fbbf24"}}>🥇 1. MarketMilk Commodités <span style={{color:TEXT_DIM, fontWeight:400, fontSize:9}}>— or, argent, force, volatilité (boîte 1)</span></a>
