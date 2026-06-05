@@ -2992,7 +2992,7 @@ function DayTradeView() {
             <div style={{flex:1, paddingBottom:8}}>
               <div style={{fontSize:9, color:"#fbbf24", fontWeight:700}}>8h30 ET — NEWS US ⚠️</div>
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>NFP, CPI, FOMC. Peut accélérer OU renverser brutalement. Ne pas entrer après une news.</div>
-              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Stop au break-even si en profit.</div>
+              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Ne panique pas sur un pic. Ton fondamental Londres↔Asie n'a pas changé. Ton stop protège déjà ta position.</div>
             </div>
           </div>
 
