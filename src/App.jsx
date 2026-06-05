@@ -2723,7 +2723,7 @@ function DayTradeAnalyzer() {
               </div>
               <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>
                 <b style={{color:o.direction==="LONG"?"#4ade80":"#f87171"}}>POURQUOI {o.direction==="LONG"?"ACHETER":"VENDRE"} :</b> {o.strongCur} est {o.strongRank===0?"la devise la plus FORTE":"forte ("+(o.strongRank+1)+"e)"} et {o.weakCur} {o.weakRank===o.strengthLen-1?"la plus FAIBLE":"faible ("+(o.weakRank+1)+"e)"}. La {o.direction==="LONG"?"forte monte contre la faible → on achète":"faible chute contre la forte → on vend"}.<br/>
-                <b style={{color:"#38bdf8"}}>POURQUOI CETTE PAIRE :</b> {o.isMaxDiv?"divergence MAXIMALE (les 2 extrêmes absolus du classement). ":`divergence de ${o.forceGap} rangs au Currency Strength. `}Contient une devise de Londres = active à ton entrée 6h30.{o.hasNY?" Et une devise NY = le mouvement s'amplifiera quand New York ouvre à 8h (tu gardes jusqu'à 11h).":""}<br/>
+                <b style={{color:"#38bdf8"}}>POURQUOI CETTE PAIRE :</b> {o.isMaxDiv?"divergence MAXIMALE (les 2 extrêmes absolus du classement). ":`divergence de ${o.forceGap} rangs au Currency Strength. `}Contient une devise de Londres = active à ton entrée 6h30, opposée à une devise d'Asie-Pacifique qui prend le relais le soir.<br/>
                 <b style={{color:"#fbbf24"}}>LE SIGNAL :</b> {o.direction==="LONG"?"top gainer":"top loser"} #{o.rank} ({o.chg>0?"+":""}{o.chg}%, mouvement de Londres lancé) · divergence {o.forceGap} rangs{o.isVolatile?` · Most Volatile #${o.volRank+1} (${o.volChg}%)`:""}<br/>
                 <b style={{color:"#34d399"}}>RETAIL CONTRARIEN :</b> {o.retailMissing?"⚠ Myfxbook non connecté — retail non vérifié":`${o.retailPct}% du retail est ${o.retailSide} = à contre-sens de toi. Ils se font piéger, leurs stops alimentent ton mouvement ✓`}<br/>
                 <b style={{color:"#c084fc"}}>EXÉCUTION :</b> attends un repli {o.direction==="LONG"?"baissier puis achète quand ça repart vers le haut":"haussier puis vends quand ça repart vers le bas"} (H1/M15). Stop serré {o.direction==="LONG"?"sous le dernier creux":"au-dessus du dernier sommet"} · target 1.5-2× le risque.
@@ -2788,7 +2788,7 @@ function DayTradeView() {
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>RETAIL CONTRARIEN ≥ 70%</b> : si tu achètes, le retail doit être short 70%+ ; si tu vends, long 70%+. Ils se font piéger, leurs stops alimentent ton mouvement</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#c084fc", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>ENTRÉE</b> : sur H1/M15, attends un repli (pullback) puis entre. Stop serré, target 1.5-2× le risque. Tu gardes en swing 1 à 3 jours — réévalue chaque matin à 6h30</span></div>
         </div>
-        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ BONUS (surbrillance) : la paire est aussi dans Most Volatile + divergence maximale du jour.</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ MEILLEURE (surbrillance) : parmi les paires qui passent les 6 filtres, celle qui a la plus forte divergence (souvent les 2 extrêmes absolus du classement). C'est le signal le plus net du jour.</div>
       </div>
 
       {/* EXEMPLE REEL - GBP/NZD */}
