@@ -2763,7 +2763,7 @@ function DayTradeView() {
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
           Les <b style={{color:"#fbbf24"}}>gros joueurs</b> (banques, fonds) déplacent des milliards chaque jour. Quand ils achètent une devise elle devient <b style={{color:"#4ade80"}}>FORTE</b>, quand ils la vendent elle devient <b style={{color:"#f87171"}}>FAIBLE</b>. Ces positions ne se débouclent pas en une heure — les institutions sont puissantes mais lentes. Un mouvement qu'elles lancent peut durer <b>plusieurs jours</b>. On ne devine pas, <b>on SUIT ce flux</b>.<br/><br/>
           Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence), quand le mouvement est déjà lancé (momentum) et que la paire bouge assez (volatilité).<br/><br/>
-          <b style={{color:"#38bdf8"}}>⏰ Ton entrée — 6h30 ET, en pleine session de Londres :</b> Londres est ouvert depuis 3h, les news européennes du matin sont tombées, les banques ont déjà pris position. À 6h30 tu lis leur trace sur MarketMilk et tu entres derrière eux, dans une tendance déjà confirmée.<br/><br/>
+          <b style={{color:"#38bdf8"}}>⏰ Ton entrée — 6h30 ET, en pleine session de Londres :</b> Londres est ouvert depuis 3h, les news européennes du matin sont tombées, les banques ont déjà pris position. À 6h30 tu lis leur trace sur MarketMilk — la tendance est confirmée. Tu identifies l'impulsion et tu attends le pullback au Golden Pocket (61.8%-65%) pour entrer derrière eux au meilleur prix.<br/><br/>
           <b style={{color:"#a78bfa"}}>🔁 Pourquoi tes positions durent 1 à 3 jours :</b> tes 7 paires opposent une devise de Londres (<b>EUR/GBP/CHF</b>) à une devise du bloc asiatique-Pacifique (<b>AUD/NZD/JPY</b>). Aucune n'est une paire du dollar. Le mouvement passe de main en main sans s'éteindre : <b>Londres</b> le lance le matin, tu gardes ta position pendant <b>New York</b> (8h), puis la <b>session asiatique</b> (Tokyo + Sydney) prend le relais le soir sur AUD/NZD/JPY — mêmes raisons fondamentales, même direction. Le lendemain Londres reprend.<br/><br/><b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> dernière confirmation. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant.
         </div>
       </div>
@@ -2801,7 +2801,7 @@ function DayTradeView() {
 
       {/* EXEMPLE REEL - GBP/NZD */}
       <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:4}}>📐 EXEMPLE RÉEL — CHF/JPY ACHAT à 6h30</div>
+        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:4}}>📐 EXEMPLE RÉEL — CHF/JPY ACHAT (entrée au Golden Pocket)</div>
         <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength à 6h30 : CHF #1 (le plus fort, refuge Europe), JPY #6 (faible). Pourquoi CHF/JPY ACHAT cochait les 6 filtres — et pourquoi la position a tenu plusieurs jours.</div>
         <div style={{display:"flex", flexDirection:"column", gap:6}}>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Divergence ✓</b> — CHF #1 vs JPY #6 = écart de 5 rangs. Les banques de Londres ont acheté le CHF (refuge européen) depuis 3h.</span></div>
@@ -2811,7 +2811,7 @@ function DayTradeView() {
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Most Volatile ✓</b> — CHF/JPY figurait dans la liste Most Volatile. Des pips à faire.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Retail contrarien ✓</b> — le retail était SHORT à 70%+ pendant que toi tu achetais. Ils se faisaient piéger.</span></div>
         </div>
-        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 6 filtres réunis = ALERTE ACHAT à 6h30. Tu entres au repli. Londres porte le mouvement le matin, tu gardes pendant NY, puis Tokyo reprend le JPY le soir et continue de le vendre. La position a tenu plusieurs jours tant que CHF restait fort et JPY faible. C'est exactement le type de swing que le système cherche.</div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 6 filtres réunis = ALERTE à 6h30. Tu observes l'impulsion de Londres (CHF fort, JPY faible) et tu traces le Fibonacci. Le pullback arrive pendant Tokyo — tu attends les 2-3 rejets dans le Golden Pocket (61.8%-65%) puis tu entres. Londres reprend le lendemain et continue dans le même sens. La position a tenu plusieurs jours tant que CHF restait fort et JPY faible. C'est exactement le type de swing que le système cherche : impulsion Londres → Golden Pocket Tokyo → continuation J+1.</div>
       </div>
 
       {/* TABLEAU RECAP - PLAN DE TRADE */}
@@ -3031,7 +3031,7 @@ function DayTradeView() {
           </div>
           <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
             <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>6h30 ET — Tu lis leur trace, tu identifies l'impulsion, tu attends le Golden Pocket</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 6 filtres confirment que le mouvement est réel. Tu entres derrière eux sur ta meilleure paire (EUR/JPY, GBP/JPY, EUR/AUD...). Tu ne devines pas — tu confirmes et tu suis. Comme un sniper qui attend le bon moment.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 6 filtres confirment que le mouvement est réel. Tu identifies l'impulsion et tu attends le Golden Pocket (61.8%-65%) pour entrer au meilleur prix — pendant Londres, NY, ou Tokyo. Tu ne devines pas — tu confirmes, tu attends l'escompte, et tu suis. Comme un sniper qui attend le bon moment.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>8h ET — New York ouvre, tu gardes</div>
