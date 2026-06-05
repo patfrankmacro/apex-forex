@@ -2821,7 +2821,7 @@ function DayTradeView() {
           {[
             {t:"6h30 ET", a:"Colle MarketMilk + lance l'analyse", p:"Londres bouge, la tendance est déjà lancée", col:"#4ade80"},
             {t:"Si alerte", a:"Attends le Golden Pocket (61.8-65%) sur H1 — peut arriver à NY ou Tokyo", p:"Meilleur prix — jamais sur l'extension", col:"#4ade80"},
-            {t:"8h ET", a:"Tiens ta position pendant NY", p:"New York ouvre — tu gardes, tu n'ajoutes pas", col:"#38bdf8"},
+            {t:"8h ET", a:"Si en position : tu gardes. Si tu attends encore le Golden Pocket : NY peut te le donner", p:"Le fondamental de Londres n'a pas changé — tu ne prends aucune nouvelle position", col:"#38bdf8"},
             {t:"Le soir", a:"Tu gardes — Asie prend le relais", p:"Tokyo continue sur JPY · Sydney continue sur AUD et NZD — toujours contre une devise de Londres", col:"#a78bfa"},
             {t:"Chaque matin 6h30", a:"Réévalue ta position", p:"Devise forte toujours forte ? Tu gardes. Sinon tu sors. Stop remonté.", col:"#fbbf24"}
           ].map((r,i)=>(
@@ -2979,8 +2979,8 @@ function DayTradeView() {
             </div>
             <div style={{flex:1, paddingBottom:8}}>
               <div style={{fontSize:9, color:"#fbbf24", fontWeight:700}}>8h00 ET — NEW YORK OUVRE</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>New York entre. Tes paires n'ont pas de dollar, donc NY ne les trade pas directement — mais tu gardes ta position, le mouvement de Londres tient.</div>
-              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Tu gardes. Remonte ton stop.</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>New York entre. Tes paires n'ont pas de dollar, donc NY ne les trade pas directement. Le fondamental de Londres n'a pas changé — tu ne prends aucune nouvelle position à 8h. Si tu as déjà un trade ouvert (Golden Pocket atteint pendant Londres) : tu gardes. Si tu attends encore le pullback : NY peut te le donner.</div>
+              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Si en position : tu gardes, remonte ton stop. Si tu attends le pocket : observe, NY peut le donner.</div>
             </div>
           </div>
 
@@ -2992,7 +2992,7 @@ function DayTradeView() {
             <div style={{flex:1, paddingBottom:8}}>
               <div style={{fontSize:9, color:"#fbbf24", fontWeight:700}}>8h30 ET — NEWS US ⚠️</div>
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>NFP, CPI, FOMC. Peut accélérer OU renverser brutalement. Ne pas entrer après une news.</div>
-              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Ne panique pas sur un pic. Ton fondamental Londres↔Asie n'a pas changé. Ton stop protège déjà ta position.</div>
+              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Si en position : ne panique pas sur un pic, ton fondamental Londres↔Asie n'a pas changé, ton stop protège déjà ta position. Si pas encore entré : n'entre PAS pendant une news — attends que la poussière retombe.</div>
             </div>
           </div>
 
@@ -3035,7 +3035,7 @@ function DayTradeView() {
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>8h ET — New York ouvre, tu gardes</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tes paires n'ont pas de dollar, donc NY ne les trade pas directement. Mais le dollar bouge l'EUR et le GBP de façon indirecte, et surtout : rien n'a changé au fondamental de Londres. Tu ne prends pas de nouvelle position à 8h — tu tiens celle de 6h30. Le mouvement continue.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tes paires n'ont pas de dollar, donc NY ne les trade pas directement. Rien n'a changé au fondamental de Londres. Tu ne prends aucune nouvelle position à 8h. Si le Golden Pocket est arrivé pendant Londres et que tu es en position : tu gardes. Si tu attends encore le pullback : NY peut te le donner — observe. Dans les deux cas, le fondamental de Londres tient.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #4ade80"}}>
             <div style={{fontSize:9, color:"#a78bfa", fontWeight:700, marginBottom:3}}>Le soir — La session asiatique reprend le flambeau</div>
