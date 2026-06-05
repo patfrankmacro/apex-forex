@@ -2837,6 +2837,76 @@ function DayTradeView() {
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:8, lineHeight:1.5}}>Si aucune alerte ne sort à 6h30 = pas de trade ce jour. La discipline d'attendre le bon setup fait partie de la stratégie.</div>
       </div>
 
+      {/* ENTREE TECHNIQUE GOLDEN POCKET */}
+      <div style={{padding:"12px 14px", background:"#001a2e", borderRadius:8, border:"1px solid #38bdf855", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, letterSpacing:1, marginBottom:4}}>📐 TON ENTRÉE — LA MÉCANIQUE (Golden Pocket)</div>
+        <div style={{fontSize:8, color:"#475569", marginBottom:12}}>6h30 = tu analyses et tu observes · tu n'entres PAS immédiatement · tu attends l'impulsion puis le pullback</div>
+
+        <div style={{fontSize:9, color:TEXT, lineHeight:1.8, marginBottom:12, padding:"10px 12px", background:"#001a0d", borderRadius:4, borderLeft:"3px solid #4ade80"}}>
+          <b style={{color:"#38bdf8"}}>🎯 LA NUANCE CLÉ</b><br/><br/>
+          À 6h30, MarketMilk te montre l'<b>impulsion que Londres a déjà créée</b> depuis 3h. Tu identifies la direction (devise forte vs faible) et tu attends que le prix <b>recule dans le Golden Pocket (61.8%–65%)</b> avant d'entrer. Ce pullback peut arriver pendant Londres, pendant New York, ou même pendant Tokyo le soir — tu es patient. <b style={{color:"#fbbf24"}}>Tu n'entres jamais sur l'extension, toujours sur l'escompte.</b>
+        </div>
+
+        <div style={{display:"flex", flexDirection:"column", gap:8, marginBottom:14}}>
+          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#38bdf8", fontWeight:700, fontSize:12, minWidth:20}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#38bdf8"}}>6h30 — Impulsion confirmée</b> : MarketMilk montre la direction. Devise forte vs faible = l'impulsion de Londres. Tu identifies, tu n'entres pas encore.</span></div>
+          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#c084fc", fontWeight:700, fontSize:12, minWidth:20}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>Trace le Fibonacci</b> sur la dernière impulsion (H1). Tu attends que le prix recule dans le <b style={{color:"#c084fc"}}>Golden Pocket (61.8%–65%)</b> — la zone où les fonds rachètent à escompte. Ça peut prendre des heures.</span></div>
+          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#fbbf24", fontWeight:700, fontSize:12, minWidth:20}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>2-3 rejets dans le pocket</b> : mèches de rejet + volume qui monte = les fonds accumulent. C'est leur empreinte. Tu entres avec eux au même prix.</span></div>
+        </div>
+
+        <div style={{marginBottom:12, padding:"12px", background:"#001a0d", borderRadius:6, border:"1px solid #4ade8044"}}>
+          <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8}}>▲ ACHAT — IMPULSION HAUSSIÈRE LONDRES + PULLBACK</div>
+          <svg viewBox="0 0 320 180" style={{width:"100%", maxWidth:340, display:"block", margin:"0 auto 10px"}}>
+            <line x1="40" y1="20" x2="300" y2="20" stroke="#555" strokeWidth="0.8" strokeDasharray="3,3"/>
+            <text x="2" y="23" fill="#888" fontSize="7" fontFamily="monospace">100%</text>
+            <line x1="40" y1="65" x2="300" y2="65" stroke="#888" strokeWidth="0.8" strokeDasharray="3,3"/>
+            <text x="6" y="68" fill="#aaa" fontSize="7" fontFamily="monospace">50%</text>
+            <rect x="40" y="88" width="260" height="18" fill="#a855f733" stroke="#a855f7" strokeWidth="1.2"/>
+            <text x="44" y="84" fill="#c084fc" fontSize="7" fontFamily="monospace" fontWeight="700">GOLDEN POCKET 61.8-65%</text>
+            <line x1="40" y1="130" x2="300" y2="130" stroke="#ff6666" strokeWidth="0.8" strokeDasharray="3,3"/>
+            <text x="2" y="133" fill="#ff6666" fontSize="7" fontFamily="monospace">78.6%</text>
+            <polyline points="45,135 80,90 110,45 135,25 155,50 165,95 175,88 185,97 195,89 215,50 250,25 280,15" fill="none" stroke="#4ade80" strokeWidth="2"/>
+            <text x="148" y="115" fill="#4ade80" fontSize="9">↑</text>
+            <text x="178" y="115" fill="#4ade80" fontSize="9">↑</text>
+            <circle cx="195" cy="89" r="4" fill="#00ff88"/>
+            <text x="200" y="87" fill="#00ff88" fontSize="7" fontFamily="monospace" fontWeight="700">ENTRÉE</text>
+            <text x="44" y="170" fill="#38bdf8" fontSize="7" fontFamily="monospace">◀ Londres</text>
+            <text x="140" y="170" fill="#fbbf24" fontSize="7" fontFamily="monospace">◀ NY ou Tokyo</text>
+            <text x="220" y="170" fill="#4ade80" fontSize="7" fontFamily="monospace">◀ J+1</text>
+          </svg>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>① Impulsion haussière de Londres → ② pullback dans le Golden Pocket (NY ou Tokyo) → ③ rejets + entrée → ④ continuation J+1 Londres reprend</div>
+          <div style={{fontSize:8, color:"#4ade80", marginTop:4}}><b>Entrée LONG</b> au rejet dans le pocket · Stop sous 78.6% · Target extension 1.618</div>
+        </div>
+
+        <div style={{marginBottom:12, padding:"12px", background:"#1a0000", borderRadius:6, border:"1px solid #f8717144"}}>
+          <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:8}}>▼ VENTE — IMPULSION BAISSIÈRE LONDRES + PULLBACK</div>
+          <svg viewBox="0 0 320 180" style={{width:"100%", maxWidth:340, display:"block", margin:"0 auto 10px"}}>
+            <line x1="40" y1="45" x2="300" y2="45" stroke="#ff6666" strokeWidth="0.8" strokeDasharray="3,3"/>
+            <text x="2" y="48" fill="#ff6666" fontSize="7" fontFamily="monospace">78.6%</text>
+            <rect x="40" y="62" width="260" height="18" fill="#a855f733" stroke="#a855f7" strokeWidth="1.2"/>
+            <text x="44" y="58" fill="#c084fc" fontSize="7" fontFamily="monospace" fontWeight="700">GOLDEN POCKET 61.8-65%</text>
+            <line x1="40" y1="105" x2="300" y2="105" stroke="#888" strokeWidth="0.8" strokeDasharray="3,3"/>
+            <text x="6" y="108" fill="#aaa" fontSize="7" fontFamily="monospace">50%</text>
+            <line x1="40" y1="155" x2="300" y2="155" stroke="#555" strokeWidth="0.8" strokeDasharray="3,3"/>
+            <text x="2" y="158" fill="#888" fontSize="7" fontFamily="monospace">100%</text>
+            <polyline points="45,40 80,80 110,120 135,150 155,110 165,72 175,64 185,73 195,65 215,105 250,140 280,160" fill="none" stroke="#f87171" strokeWidth="2"/>
+            <text x="148" y="52" fill="#f87171" fontSize="9">↓</text>
+            <text x="178" y="52" fill="#f87171" fontSize="9">↓</text>
+            <circle cx="195" cy="65" r="4" fill="#ff3b3b"/>
+            <text x="200" y="63" fill="#ff3b3b" fontSize="7" fontFamily="monospace" fontWeight="700">ENTRÉE</text>
+            <text x="44" y="175" fill="#38bdf8" fontSize="7" fontFamily="monospace">◀ Londres</text>
+            <text x="140" y="175" fill="#fbbf24" fontSize="7" fontFamily="monospace">◀ NY ou Tokyo</text>
+            <text x="220" y="175" fill="#f87171" fontSize="7" fontFamily="monospace">◀ J+1</text>
+          </svg>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>① Impulsion baissière de Londres → ② pullback dans le Golden Pocket (NY ou Tokyo) → ③ rejets + entrée → ④ continuation J+1 Londres reprend</div>
+          <div style={{fontSize:8, color:"#f87171", marginTop:4}}><b>Entrée SHORT</b> au rejet dans le pocket · Stop au-dessus du 78.6% · Target extension 1.618</div>
+        </div>
+
+        <div style={{padding:"10px 12px", background:"#1a1500", borderRadius:4, border:"1px solid #fbbf2444", fontSize:9, color:TEXT, lineHeight:1.7}}>
+          <b style={{color:"#fbbf24"}}>⏱️ LA PATIENCE EST L'EDGE</b><br/>
+          Le pullback peut mettre des heures à arriver. Londres crée l'impulsion à 6h30, New York peut donner le pullback à 9h, et Tokyo peut finir le retracement le soir. <b style={{color:"#fbbf24"}}>Tu n'es pas pressé — tu attends le bon prix.</b> Si le pullback n'arrive jamais (le prix part directement sans revenir), tu laisses passer. Un trade raté est meilleur qu'un trade pris au mauvais prix.
+        </div>
+      </div>
+
       {/* PSYCHOLOGIE */}
       <div style={{padding:"12px 14px", background:"#1a0a2e", borderRadius:8, border:"1px solid #a855f744", marginBottom:14}}>
         <div style={{fontSize:11, color:"#c084fc", fontWeight:700, marginBottom:8}}>🧠 LA PSYCHOLOGIE</div>

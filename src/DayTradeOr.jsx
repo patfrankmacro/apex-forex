@@ -79,20 +79,19 @@ export default function DayTradeOrView() {
 
       const consider = (com, direction) => {
         if (!TRADE.includes(com)) return;
-        const cRank = sRank[com]; if (cRank==null) return;
+        const cRank = sRank[com];
+        // NOUVELLE LOGIQUE : l'or se compare au DOLLAR, pas aux autres commodites.
+        // On regarde 2 choses : (1) le dollar est-il en tete/queue du Currency Strength,
+        // (2) l'or confirme-t-il (present dans gainers pour LONG, losers pour SHORT).
         const list = direction==="LONG" ? gainers : losers;
         const found = list.find(p=>p.com===com);
-        const chg = found ? found.chg : null;
-        // FILTRE 1 - DIVERGENCE : or top3 Commodity Strength + USD 3 plus faibles (LONG) ; inverse SHORT
-        let divOk=false;
-        if (direction==="LONG") divOk = (cRank<=2) && (usdRank>=usdTotal-3);
-        else divOk = (cRank>=strength.length-3) && (usdRank<=2);
-        if (!divOk) return;
-        // FILTRE 2 - TOP 3 MOMENTUM gainers ou losers
-        const inTop3 = list.slice(0,3).some(p=>p.com===com);
-        if (!inTop3) return;
-        // (Volet volatilite retire : l'or est structurellement calme vs gaz/petrole/argent,
-        //  il finit presque toujours dans Least Volatile. On le juge sur direction + momentum.)
+        if (!found) return; // l'or n'est pas du bon cote (ou trop plat pour etre liste) -> pas de trade
+        const chg = found.chg;
+        // FILTRE DOLLAR : USD doit etre dans le TOP 2 fort (SHORT or) ou TOP 2 faible (LONG or)
+        let usdOk=false;
+        if (direction==="LONG") usdOk = (usdRank >= usdTotal-2);   // USD #7 ou #8 sur 8 = tres faible -> or monte
+        else usdOk = (usdRank <= 1);                               // USD #1 ou #2 = tres fort -> or baisse
+        if (!usdOk) return;
         candidates.push({com, direction, cRank, usdRank, usdTotal, chg, inMostVol:!!volSet[com]});
       };
 
@@ -167,8 +166,8 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LES 2 FILTRES</div>
         <div style={{display:"flex", flexDirection:"column", gap:9}}>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE OR/USD</b> : achat = or dans le TOP 3 des commodités + USD dans les 3 PLUS FAIBLES du forex ; vente = or dans les 3 plus faibles + USD dans le top 3. C est LE moteur de l or</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>TOP 3 MOMENTUM</b> : l'or est dans le top 3 des Top Gainers (achat) ou Top Losers (vente) des commodités. Le mouvement est lancé</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DOLLAR TOP 2</b> : achat = USD dans les 2 PLUS FAIBLES du forex (#7 ou #8) ; vente = USD dans les 2 PLUS FORTS (#1 ou #2). L'or est l'inverse du dollar — quand le dollar est clairement fort ou faible, l'or suit mécaniquement. C'est LE moteur.</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>L'OR CONFIRME</b> : l'or doit être présent dans les Top Gainers (achat) ou Top Losers (vente) de la page Commodities. S'il est trop plat pour y figurer = pas de trade. Ce filtre confirme que l'or bouge vraiment dans le même sens que la divergence dollar.</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#4ade80", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#4ade80"}}>ENTRÉE</b> : repli sur H1/M15 dans le sens du momentum. Stop serré, target 1.5-2×. Surveille les news US à 8h30</span></div>
         </div>
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>Pas de filtre retail sur l'or : le retail est presque toujours long sur le métal, donc moins fiable que sur le forex.</div>
@@ -178,8 +177,8 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:6}}>📐 EXEMPLE RÉEL — XAU/USD ACHAT · 4 juin 2026</div>
         <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10, lineHeight:1.4}}>Commodity Strength : XAU #3 · USD #8/8 au forex · XAU top gainer #3 (+0.90%). Voici pourquoi XAU/USD ACHAT cochait les 2 filtres.</div>
         <div style={{display:"flex", flexDirection:"column", gap:7}}>
-          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>Divergence ✓</b> — XAU #3 au Commodity Strength (top 3) + USD #8/8 au forex (3 plus faibles). L'or FORT + dollar FAIBLE = les deux tirent dans le même sens. C'est le moteur du trade.</span></div>
-          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>Momentum ✓</b> — XAU top gainer #3 (+1.06%) des commodités. Le mouvement haussier est déjà lancé. L'or grimpe pendant que le dollar s'effondre.</span></div>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>Dollar top 2 faible ✓</b> — USD #8/8 au forex = le dollar est dans les 2 plus faibles. Dollar au plancher → l'or monte mécaniquement. C'est le moteur du trade.</span></div>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>L'or confirme ✓</b> — XAU présent dans les Top Gainers (+0.90%). L'or monte pendant que le dollar s'effondre — il confirme la divergence. Le mouvement est lancé.</span></div>
         </div>
         <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 2 filtres réunis = ALERTE ACHAT. Le dollar s'effondrait (USD #8/8) et l'or était fort (top 3) et déjà en mouvement (top gainer #3). Tu ne devines pas — tu suis un flux institutionnel déjà lancé et confirmé par les 2 filtres.</div>
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:8, lineHeight:1.4}}>💡 Pourquoi ce trade était gagnant : quand le dollar est la devise la plus faible ET que l'or grimpe déjà (top gainer), les institutionnels achètent l'or comme valeur refuge. Tes 2 filtres captent exactement ce moment — la direction, pas le bruit.</div>
