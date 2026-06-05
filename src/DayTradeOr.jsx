@@ -91,10 +91,8 @@ export default function DayTradeOrView() {
         // FILTRE 2 - TOP 3 MOMENTUM gainers ou losers
         const inTop3 = list.slice(0,3).some(p=>p.com===com);
         if (!inTop3) return;
-        // FILTRE 3 - VOLATILITE : dans Most Volatile + dans top4 Volatility Meter + pas Least Volatile
-        if (!volSet[com]) return; // pas dans Most Volatile (top5 affiche)
-        if (cvRank[com]==null || cvRank[com]>4) return; // pas dans top5 Volatility Meter
-        if (leastVol.includes(com)) return; // dans Least Volatile
+        // (Volet volatilite retire : l'or est structurellement calme vs gaz/petrole/argent,
+        //  il finit presque toujours dans Least Volatile. On le juge sur direction + momentum.)
         candidates.push({com, direction, cRank, usdRank, usdTotal, chg, inMostVol:!!volSet[com]});
       };
 
@@ -128,8 +126,8 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
       {result && !result.error && (
         <div style={{marginTop:10}}>
           <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>USD : rang {result.usdRank+1}/{result.usdTotal} au Currency Strength {result.usdRank>=result.usdTotal-3?"(faible → favorise l'OR haussier)":result.usdRank<=2?"(fort → favorise l'OR baissier)":"(neutre)"}</div>
-          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} OR (les 3 filtres réunis)</div>
-          {result.top.length===0 && <div style={{padding:"12px", background:"#0a1628", borderRadius:8, fontSize:9, color:TEXT_DIM, lineHeight:1.6}}>AUCUNE opportunité OR maintenant. Soit l'or n'a pas la divergence avec l'USD, soit il n'est pas dans le top 3 des gainers/losers, soit il ne bouge pas assez (pas dans Most Volatile). Pas de trade = discipline — quand l'or sort, c'est un vrai mouvement.</div>}
+          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} OR (les 2 filtres réunis)</div>
+          {result.top.length===0 && <div style={{padding:"12px", background:"#0a1628", borderRadius:8, fontSize:9, color:TEXT_DIM, lineHeight:1.6}}>AUCUNE opportunité OR maintenant. Soit l'or n'a pas la divergence avec l'USD (or fort + dollar faible, ou l'inverse), soit il n'est pas dans le top 3 des gainers/losers. Pas de trade = discipline — quand l'or sort, la direction est nette.</div>}
           {result.top.map((o,i)=>{
             const isLong=o.direction==="LONG"; const name=o.com==="XAU"?"OR (XAU/USD)":"ARGENT (XAG/USD)";
             return (
@@ -167,11 +165,10 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
       </div>
 
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LES 3 FILTRES</div>
+        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LES 2 FILTRES</div>
         <div style={{display:"flex", flexDirection:"column", gap:9}}>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE OR/USD</b> : achat = or dans le TOP 3 des commodités + USD dans les 3 PLUS FAIBLES du forex ; vente = or dans les 3 plus faibles + USD dans le top 3. C est LE moteur de l or</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>TOP 3 MOMENTUM</b> : l'or est dans le top 3 des Top Gainers (achat) ou Top Losers (vente) des commodités. Le mouvement est lancé</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>VOLATILITÉ RÉELLE</b> : l'or doit être dans le <b>Most Volatile</b> (top 5 affiché) + dans le <b>top 5 du Commodity Volatility Meter</b> + pas dans Least Volatile. Quand l'or passe ce filtre, c'est un vrai mouvement — rare mais solide</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#4ade80", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#4ade80"}}>ENTRÉE</b> : repli sur H1/M15 dans le sens du momentum. Stop serré, target 1.5-2×. Surveille les news US à 8h30</span></div>
         </div>
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>Pas de filtre retail sur l'or : le retail est presque toujours long sur le métal, donc moins fiable que sur le forex.</div>
@@ -179,14 +176,13 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
 
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:6}}>📐 EXEMPLE RÉEL — XAU/USD ACHAT · 4 juin 2026</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10, lineHeight:1.4}}>Commodity Strength : XAU #3 · USD #8/8 au forex · XAU top gainer #3 (+1.06%). Voici pourquoi XAU/USD ACHAT cochait les 3 filtres.</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10, lineHeight:1.4}}>Commodity Strength : XAU #3 · USD #8/8 au forex · XAU top gainer #3 (+0.90%). Voici pourquoi XAU/USD ACHAT cochait les 2 filtres.</div>
         <div style={{display:"flex", flexDirection:"column", gap:7}}>
           <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>Divergence ✓</b> — XAU #3 au Commodity Strength (top 3) + USD #8/8 au forex (3 plus faibles). L'or FORT + dollar FAIBLE = les deux tirent dans le même sens. C'est le moteur du trade.</span></div>
           <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>Momentum ✓</b> — XAU top gainer #3 (+1.06%) des commodités. Le mouvement haussier est déjà lancé. L'or grimpe pendant que le dollar s'effondre.</span></div>
-          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>Volatilité ✓</b> — XAU dans Most Volatile + top 5 Commodity Volatility Meter. L'or bouge vraiment ce jour-là — pas une montée molle. Un vrai mouvement tradable.</span></div>
         </div>
-        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 3 filtres réunis = ALERTE ACHAT. XAU/USD a monté de +1.06% pendant la session NY. Le dollar s'effondrait (USD #8/8), l'or était fort ET volatile. Tu ne devines pas — tu suis un flux institutionnel déjà lancé et confirmé par les 3 filtres.</div>
-        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8, lineHeight:1.4}}>💡 Pourquoi ce trade était gagnant : quand le dollar est la devise la plus faible ET que l'or est dans Most Volatile, les institutionnels achètent l'or massivement comme valeur refuge. Tes 3 filtres captent exactement ce moment.</div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 2 filtres réunis = ALERTE ACHAT. Le dollar s'effondrait (USD #8/8) et l'or était fort (top 3) et déjà en mouvement (top gainer #3). Tu ne devines pas — tu suis un flux institutionnel déjà lancé et confirmé par les 2 filtres.</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8, lineHeight:1.4}}>💡 Pourquoi ce trade était gagnant : quand le dollar est la devise la plus faible ET que l'or grimpe déjà (top gainer), les institutionnels achètent l'or comme valeur refuge. Tes 2 filtres captent exactement ce moment — la direction, pas le bruit.</div>
       </div>
 
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
@@ -237,7 +233,7 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
             </div>
             <div style={{flex:1, paddingBottom:8, padding:"8px 10px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2466", marginBottom:4}}>
               <div style={{fontSize:10, color:"#fbbf24", fontWeight:900}}>⚡ 9h00 ET — TON ENTRÉE</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Le COMEX roule depuis 8h20, la news de 8h30 est passée. Les desks NY ont révélé leur direction. Tu colles MarketMilk, tu lances l'analyse. Si tes 3 filtres passent → tu entres au repli derrière eux.</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Le COMEX roule depuis 8h20, la news de 8h30 est passée. Les desks NY ont révélé leur direction. Tu colles MarketMilk, tu lances l'analyse. Si tes 2 filtres passent → tu entres au repli derrière eux.</div>
               <div style={{fontSize:8.5, color:"#fbbf24", fontWeight:700, marginTop:4}}>→ Colle + analyse + entre au repli sur H1/M15</div>
             </div>
           </div>
@@ -301,7 +297,7 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
           </div>
           <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
             <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>9h ET — Tu lis leur trace et tu les suis</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Le COMEX roule depuis 8h20, la news US de 8h30 est passée. Or fort + USD faible = les desks NY ont acheté ; or faible + USD fort = ils ont vendu. Tes 3 filtres confirment. Tu entres derrière eux au repli sur H1/M15.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Le COMEX roule depuis 8h20, la news US de 8h30 est passée. Or fort + USD faible = les desks NY ont acheté ; or faible + USD fort = ils ont vendu. Tes 2 filtres confirment. Tu entres derrière eux au repli sur H1/M15.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>9h-12h ET — Le Golden Overlap travaille</div>
@@ -313,25 +309,25 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #c084fc"}}>
             <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:3}}>🔗 Pourquoi tu suis le dollar pour trader l'or</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tu ne devines pas la direction de l'or — tu la lis dans le dollar. Quand une news US sort à 8h30 (inflation, emploi), les desks NY achètent ou vendent le dollar selon le résultat. L'or fait l'inverse, automatiquement. À 9h, MarketMilk te montre déjà cette direction (or fort/faible + USD fort/faible). Tu confirmes avec tes 3 filtres et tu suis.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tu ne devines pas la direction de l'or — tu la lis dans le dollar. Quand une news US sort à 8h30 (inflation, emploi), les desks NY achètent ou vendent le dollar selon le résultat. L'or fait l'inverse, automatiquement. À 9h, MarketMilk te montre déjà cette direction (or fort/faible + USD fort/faible). Tu confirmes avec tes 2 filtres et tu suis.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2444"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>💡 La règle d'or de l'or</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Quand l'USD s'effondre, les banques centrales (Chine, Russie, Inde) et les fonds institutionnels achètent l'or massivement comme valeur refuge. Tes 3 filtres captent exactement ce moment. Tu ne devines pas — tu suis un flux déjà lancé et confirmé.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Quand l'USD s'effondre, les banques centrales (Chine, Russie, Inde) et les fonds institutionnels achètent l'or massivement comme valeur refuge. Tes 2 filtres captent exactement ce moment. Tu ne devines pas — tu suis un flux déjà lancé et confirmé.</div>
           </div>
         </div>
       </div>
 
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:8}}>🧠 PSYCHOLOGIE OR</div>
-        <div style={{fontSize:9, color:TEXT, lineHeight:1.6}}>L'or est PLUS volatil que le forex : il bouge vite et fort. Stop serré obligatoire. Ne chasse jamais un mouvement déjà très avancé. Et rappelle-toi : l'or peut renverser brutalement sur une news US — si tu es en position pendant une annonce, sois prêt.</div>
+        <div style={{fontSize:9, color:TEXT, lineHeight:1.6}}>L'or est un actif CALME et propre : il trend sans le bruit du gaz ou de l'argent. C'est sa force — des mouvements lisibles, pas erratiques. Mais il peut renverser brutalement sur une news US : ne sois jamais en position juste avant une annonce, et ne chasse pas un mouvement déjà très avancé. Stop serré, target réaliste (l'or fait ~1%/jour, pas 3%).</div>
       </div>
 
       <div style={{padding:"14px", background:"linear-gradient(135deg, #001a0d 0%, #003319 100%)", borderRadius:8, border:"2px solid #00ff88", borderLeft:"5px solid #00ff88", boxShadow:"0 0 16px rgba(0,255,136,0.4)"}}>
         <div style={{fontSize:11, color:"#00ff88", fontWeight:700, marginBottom:4}}>☀️ TON RITUEL OR — avant ton entrée (9h ET)</div>
         <div style={{fontSize:8.5, color:"#a7f3d0", marginBottom:12, lineHeight:1.4}}>Ouvre les 2 pages MarketMilk (Commodities + Forex), puis vérifie les news US avant de prendre position.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
-          <a href="https://marketmilk.babypips.com/commodities" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001a10", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #fbbf24"}}>🥇 1. MarketMilk Commodités <span style={{color:TEXT_DIM, fontWeight:400, fontSize:9}}>— or, argent, force, volatilité (boîte 1)</span></a>
+          <a href="https://marketmilk.babypips.com/commodities" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001a10", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #fbbf24"}}>🥇 1. MarketMilk Commodités <span style={{color:TEXT_DIM, fontWeight:400, fontSize:9}}>— or + force/momentum (boîte 1)</span></a>
           <a href="https://marketmilk.babypips.com/" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001a10", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #00ff88"}}>💵 2. MarketMilk Forex <span style={{color:TEXT_DIM, fontWeight:400, fontSize:9}}>— pour la force de l'USD (boîte 2)</span></a>
           <a href="https://www.babypips.com/economic-calendar?week=2026-W23" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001a10", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #f87171"}}>📅 3. Calendrier économique <span style={{color:TEXT_DIM, fontWeight:400, fontSize:9}}>— news US (inflation, emploi, Fed)</span></a>
           <a href="https://investinglive.com/" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001a10", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #38bdf8"}}>📰 4. InvestingLive <span style={{color:TEXT_DIM, fontWeight:400, fontSize:9}}>— actualité en direct</span></a>
