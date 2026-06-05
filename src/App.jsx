@@ -2794,7 +2794,7 @@ function DayTradeView() {
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>PAS Least Volatile</b> : on écarte ce qui stagne (pas de pips à faire)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DANS MOST VOLATILE</b> : la paire doit figurer dans la liste Most Volatile (elle bouge vraiment, il y a des pips à faire)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>RETAIL CONTRARIEN ≥ 70%</b> : si tu achètes, le retail doit être short 70%+ ; si tu vends, long 70%+. Ils se font piéger, leurs stops alimentent ton mouvement</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#c084fc", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>ENTRÉE</b> : sur H1/M15, attends un repli (pullback) puis entre. Stop serré, target 1.5-2× le risque. Tu gardes en swing 1 à 3 jours — réévalue chaque matin à 6h30</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#c084fc", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>ENTRÉE</b> : attends le pullback au <b style={{color:"#c084fc"}}>Golden Pocket (61.8%–65%)</b> sur H1. Le pullback peut arriver pendant Londres, NY ou Tokyo — tu es patient. 2-3 rejets dans la zone puis tu entres. Stop serré, target 1.5-2×. Tu gardes en swing 1 à 3 jours — réévalue chaque matin à 6h30</span></div>
         </div>
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ MEILLEURE (surbrillance) : parmi les paires qui passent les 6 filtres, celle qui a la plus forte divergence (souvent les 2 extrêmes absolus du classement). C'est le signal le plus net du jour.</div>
       </div>
@@ -2820,7 +2820,7 @@ function DayTradeView() {
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           {[
             {t:"6h30 ET", a:"Colle MarketMilk + lance l'analyse", p:"Londres bouge, la tendance est déjà lancée", col:"#4ade80"},
-            {t:"Si alerte", a:"Entre au repli (pullback) sur H1/M15", p:"Meilleur prix — jamais sur l'extension", col:"#4ade80"},
+            {t:"Si alerte", a:"Attends le Golden Pocket (61.8-65%) sur H1 — peut arriver à NY ou Tokyo", p:"Meilleur prix — jamais sur l'extension", col:"#4ade80"},
             {t:"8h ET", a:"Tiens ta position pendant NY", p:"New York ouvre — tu gardes, tu n'ajoutes pas", col:"#38bdf8"},
             {t:"Le soir", a:"Tu gardes — Asie prend le relais", p:"Tokyo + Sydney continuent sur AUD/NZD/JPY", col:"#a78bfa"},
             {t:"Chaque matin 6h30", a:"Réévalue ta position", p:"Devise forte toujours forte ? Tu gardes. Sinon tu sors. Stop remonté.", col:"#fbbf24"}
@@ -3030,7 +3030,7 @@ function DayTradeView() {
             <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Deutsche Bank, HSBC, BNP, Barclays ouvrent leurs desks. Ils achètent EUR, GBP ou CHF selon les données économiques européennes du matin. Ce sont eux qui créent la divergence que tu vas lire à 6h30 sur MarketMilk. Tu ne les vois pas entrer — mais tu vois leur résultat : EUR #1, JPY #8 = ils ont acheté EUR depuis 3h.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
-            <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>6h30 ET — Tu lis leur trace et tu les suis</div>
+            <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>6h30 ET — Tu lis leur trace, tu identifies l'impulsion, tu attends le Golden Pocket</div>
             <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 6 filtres confirment que le mouvement est réel. Tu entres derrière eux sur ta meilleure paire (EUR/JPY, GBP/JPY, EUR/AUD...). Tu ne devines pas — tu confirmes et tu suis. Comme un sniper qui attend le bon moment.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
