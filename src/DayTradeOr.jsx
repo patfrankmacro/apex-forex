@@ -244,7 +244,7 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a2a00", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#4ade80", fontWeight:700}}>10h</div>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a2a00", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:6, color:"#4ade80", fontWeight:700}}>9-12h</div>
               <div style={{width:2, height:32, background:"#4ade8044"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
@@ -268,7 +268,7 @@ function DayTradeOrUI({ rawCom, setRawCom, rawFx, setRawFx, result, analyze, TEX
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#052010", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#4ade80", fontWeight:700}}>11h</div>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#052010", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#4ade80", fontWeight:700}}>12h</div>
               <div style={{width:2, height:32, background:"#f8717133"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
