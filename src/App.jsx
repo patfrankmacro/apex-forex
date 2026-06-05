@@ -2629,7 +2629,7 @@ function DayTradeAnalyzer() {
       const SESSION_CURS = ["EUR","GBP","USD","CHF","CAD"]; // actives 6h-11h ET
       const nStr = strength.length;
       const LONDON_CURS = ["EUR","GBP","CHF"];   // actives a ton entree 6h30
-      const WHITELIST = ["EURAUD","GBPAUD","EURNZD","GBPNZD","GBPJPY","EURJPY","CHFJPY","EURCAD","GBPCAD"]; // les 9 paires autorisees (format sans slash)
+      const WHITELIST = ["EURAUD","GBPAUD","EURNZD","GBPNZD","GBPJPY","EURJPY","CHFJPY"]; // les 7 paires autorisees (Londres EUR/GBP/CHF contre Asie-Pacifique AUD/NZD/JPY) - format sans slash
       const NY_CURS = ["USD","CAD"];             // amplifient quand NY ouvre a 8h
       const GAP_MIN = 4;                          // divergence min (sur 8 devises)
       const consider = (p, direction) => {
@@ -2755,15 +2755,15 @@ function DayTradeView() {
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
           Les <b style={{color:"#fbbf24"}}>gros joueurs</b> (banques, fonds) déplacent des milliards chaque jour. Leurs flux créent des tendances intraday : une devise qu'ils achètent devient FORTE, une qu'ils vendent devient FAIBLE — et ça dure quelques heures à quelques jours. On ne devine pas, <b>on SUIT ce flux</b>.<br/><br/>
           Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> du jour contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence), quand le mouvement est déjà lancé (momentum) et que la paire bouge assez (volatilité).<br/><br/>
-          <b style={{color:"#38bdf8"}}>⏰ Ton timing — entrée 6h30, tenue jusqu'à 11h :</b> tu entres en pleine session de <b>Londres</b> (ouverte depuis 3h ET), donc tu cherches les paires qui bougent DÉJÀ avec une devise de Londres (<b>EUR, GBP, CHF</b>) contre une devise faible (vraie divergence). Tu te positionnes AVANT que New York (8h ET) amplifie ta position. Tes 9 paires opposent une devise de Londres (EUR/GBP/CHF) à une devise plus faible (AUD/NZD/JPY/CAD) — celles qui bougent à ton heure.<br/><br/><b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> dernière confirmation. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant.
+          <b style={{color:"#38bdf8"}}>⏰ Ton timing — entrée 6h30, tenue jusqu'à 11h :</b> tu entres en pleine session de <b>Londres</b> (ouverte depuis 3h ET), donc tu cherches les paires qui bougent DÉJÀ avec une devise de Londres (<b>EUR, GBP, CHF</b>) contre une devise faible (vraie divergence). Tu te positionnes AVANT que New York (8h ET) amplifie ta position. Tes 7 paires opposent une devise de Londres (EUR/GBP/CHF) à une devise du bloc Asie-Pacifique (AUD/NZD/JPY) — celles qui bougent à ton heure.<br/><br/><b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> dernière confirmation. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant.
         </div>
       </div>
 
       {/* POURQUOI CES 7 PAIRES */}
       <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:8}}>🎯 POURQUOI CES 9 PAIRES À 6h30</div>
+        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:8}}>🎯 POURQUOI CES 7 PAIRES À 6h30</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.6, marginBottom:10}}>
-          On trade UNIQUEMENT : <b style={{color:"#4ade80"}}>EUR/AUD · GBP/AUD · EUR/NZD · GBP/NZD · GBP/JPY · EUR/JPY · CHF/JPY · EUR/CAD · GBP/CAD</b>. Chacune oppose une devise de Londres (EUR, GBP, CHF) à une devise plus faible (AUD, NZD, JPY, CAD).
+          On trade UNIQUEMENT : <b style={{color:"#4ade80"}}>EUR/AUD · GBP/AUD · EUR/NZD · GBP/NZD · GBP/JPY · EUR/JPY · CHF/JPY</b>. Chacune oppose une devise de Londres (EUR, GBP, CHF) à une devise du bloc Asie-Pacifique (AUD, NZD, JPY). Pas de paires CAD : le CAD est une devise de session New York, pas de notre relais Londres↔Asie.
         </div>
         <div style={{display:"flex", flexDirection:"column", gap:7}}>
           <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>1.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Les news sont déjà sorties.</b> À 6h30 ET il est 11h30 à Londres : les chiffres éco européens du matin (inflation, emploi, PIB UK/EU) sont tombés entre 2h et 5h. Les institutions les ont digérés et ont déjà pris position. Tu entres dans une tendance confirmée, pas dans l'incertitude.</span></div>
@@ -2781,7 +2781,7 @@ function DayTradeView() {
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE ≥ 4 rangs</b> au Currency Strength : la devise forte et la faible séparées d'au moins 4 places (vraie divergence, pas 2 voisines)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>TOP 2 momentum</b> : la paire est #1 ou #2 des Top Gainers (→ achat) ou Top Losers (→ vente). Le mouvement est déjà lancé</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>UNE DE TES 9 PAIRES</b> : EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD, GBP/JPY, EUR/JPY, CHF/JPY, EUR/CAD ou GBP/CAD. Toute autre paire est écartée</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>UNE DE TES 7 PAIRES</b> : EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD, GBP/JPY, EUR/JPY ou CHF/JPY. Toute autre paire est écartée</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>PAS Least Volatile</b> : on écarte ce qui stagne (pas de pips à faire)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DANS MOST VOLATILE</b> : la paire doit figurer dans la liste Most Volatile (elle bouge vraiment, il y a des pips à faire)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>RETAIL CONTRARIEN ≥ 70%</b> : si tu achètes, le retail doit être short 70%+ ; si tu vends, long 70%+. Ils se font piéger, leurs stops alimentent ton mouvement</span></div>
@@ -2951,11 +2951,11 @@ function DayTradeView() {
           </div>
           <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
             <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>6h30 ET — Tu lis leur trace et tu les suis</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 6 filtres confirment que le mouvement est réel. Tu entres derrière eux sur ta meilleure paire (EUR/JPY, EUR/CAD, GBP/JPY...). Tu ne devines pas — tu confirmes et tu suis. Comme un sniper qui attend le bon moment.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 6 filtres confirment que le mouvement est réel. Tu entres derrière eux sur ta meilleure paire (EUR/JPY, GBP/JPY, EUR/AUD...). Tu ne devines pas — tu confirmes et tu suis. Comme un sniper qui attend le bon moment.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>8h ET — New York amplifie TES paires</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Goldman Sachs, JPMorgan, Citibank entrent. Ils tradent EUR/USD massivement → l'EUR monte → tes EUR/JPY, EUR/CAD, EUR/AUD profitent. Ils tradent aussi directement EUR/JPY, GBP/JPY, EUR/CAD — exactement tes paires. Tu ne prends pas de nouvelles positions à 8h. Tu tiens celles de 6h30 et tu laisses NY travailler pour toi.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Goldman Sachs, JPMorgan, Citibank entrent. Ils tradent EUR/USD massivement → l'EUR monte → tes EUR/JPY, EUR/AUD, EUR/NZD profitent. Ils tradent aussi directement EUR/JPY, GBP/JPY — exactement tes paires. Tu ne prends pas de nouvelles positions à 8h. Tu tiens celles de 6h30 et tu laisses NY travailler pour toi.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #4ade80"}}>
             <div style={{fontSize:9, color:"#4ade80", fontWeight:700, marginBottom:3}}>11h ET — Tu sors AVANT eux</div>
