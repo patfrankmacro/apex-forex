@@ -2640,6 +2640,7 @@ function DayTradeAnalyzer() {
       const WHITELIST = ["EURAUD","GBPAUD","EURNZD","GBPNZD","GBPJPY","EURJPY","CHFJPY"]; // les 7 paires autorisees (Londres EUR/GBP/CHF contre Asie-Pacifique AUD/NZD/JPY) - format sans slash
       const NY_CURS = ["USD","CAD"];             // amplifient quand NY ouvre a 8h
       const GAP_MIN = 4;                          // divergence min (sur 8 devises)
+      const diagnostic = []; // trace chaque paire whitelist : ou elle passe, ou elle bloque
       const consider = (p, direction) => {
         // CRITERE 1 - DIVERGENCE SUFFISANTE (ecart >= 4 rangs)
         const rb=sRank[p.base], rq=sRank[p.quote];
@@ -2647,28 +2648,55 @@ function DayTradeAnalyzer() {
         const strongCur = direction==="LONG"?p.base:p.quote;
         const weakCur   = direction==="LONG"?p.quote:p.base;
         const forceGap = Math.abs(rb-rq);
-        if (forceGap < GAP_MIN) return;            // pas assez de divergence -> rejete
-        // la forte doit etre en moitie haute, la faible en moitie basse
+        const isWL = WHITELIST.includes(p.pair);
+        // on ne trace au diagnostic QUE les 7 paires de la whitelist
+        const dg = {pair:p.pair, direction, f1:false, f2:false, f3:isWL, f4:false, f5:false, bonus:false, reason:""};
+        const f1ok = (forceGap >= GAP_MIN) && (sRank[strongCur] < sRank[weakCur]);
+        dg.f1 = f1ok; dg.forceGap = forceGap;
+        const f2ok = (p.rank <= TOP_RANK) && (p.chg!==null);
+        dg.f2 = f2ok; dg.rank = p.rank;
+        const f4ok = !leastVol.includes(p.pair);
+        dg.f4 = f4ok;
+        // retail
+        const rt0 = (window.__apexRetail||{})[p.pair] || (window.__apexRetail||{})[p.base+p.quote];
+        let f5ok=false, dgPct=null, dgSide=null, dgMissing=false;
+        if (rt0 && rt0.longPercentage!=null && rt0.shortPercentage!=null){
+          const lp0=Math.round(rt0.longPercentage), sp0=Math.round(rt0.shortPercentage);
+          if (direction==="LONG"){ dgPct=sp0; dgSide="SHORT"; f5ok = sp0>=70; }
+          else { dgPct=lp0; dgSide="LONG"; f5ok = lp0>=70; }
+        } else { dgMissing=true; f5ok=true; }
+        dg.f5 = f5ok; dg.retailPct=dgPct; dg.retailSide=dgSide; dg.retailMissing=dgMissing;
+        dg.bonus = !!volRankPair[p.pair];
+        if (isWL){
+          if (!dg.f1) dg.reason = forceGap<GAP_MIN ? ("divergence "+forceGap+" rangs (<4)") : "force pas du bon cote";
+          else if (!dg.f2) dg.reason = "pas dans le top 5 "+(direction==="LONG"?"gainers":"losers");
+          else if (!dg.f4) dg.reason = "dans Least Volatile (stagne)";
+          else if (!dg.f5) dg.reason = "retail "+dgPct+"% "+dgSide+" (<70%)";
+          else dg.reason = "PASSE TOUT ✓";
+          diagnostic.push(dg);
+        }
+        // CRITERE 1 (rejet reel)
+        if (rb===undefined||rq===undefined) return;
+        if (forceGap < GAP_MIN) return;
         if (!(sRank[strongCur] < sRank[weakCur])) return;
-        // CRITERE 2 - MOMENTUM: present dans le top 5 gainers/losers
+        // CRITERE 2
         if (p.rank > TOP_RANK) return;
         if (p.chg===null) return;
-        // CRITERE 3 - LISTE BLANCHE: uniquement les 7 paires autorisees
+        // CRITERE 3
         const hasLondon = LONDON_CURS.includes(p.base) || LONDON_CURS.includes(p.quote);
         if (!WHITELIST.includes(p.pair)) return;
-        // CRITERE 4 - pas Least Volatile
+        // CRITERE 4
         if (leastVol.includes(p.pair)) return;
-        // Most Volatile = BONUS seulement (plus un filtre obligatoire) - une tendance propre directionnelle compte autant qu une paire volatile
-        // CRITERE 5 - RETAIL CONTRARIEN >= 70% (obligatoire si dispo)
+        // CRITERE 5 - RETAIL
         const rt = (window.__apexRetail||{})[p.pair] || (window.__apexRetail||{})[p.base+p.quote];
         let retailOk=false, retailPct=null, retailSide=null, retailMissing=false;
         if (rt && rt.longPercentage!=null && rt.shortPercentage!=null){
           const lp=Math.round(rt.longPercentage), sp=Math.round(rt.shortPercentage);
           if (direction==="LONG"){ retailPct=sp; retailSide="SHORT"; retailOk = sp>=70; }
           else { retailPct=lp; retailSide="LONG"; retailOk = lp>=70; }
-          if (!retailOk) return; // retail pas assez a contre-sens -> alerte non validee
+          if (!retailOk) return;
         } else {
-          retailMissing=true; // Myfxbook deconnecte -> on affiche avec mention
+          retailMissing=true;
         }
         // BONUS (classement + surbrillance)
         const v = volRankPair[p.pair];
@@ -2689,8 +2717,8 @@ function DayTradeAnalyzer() {
       const top = candidates.slice(0,3);
       if (top.length>0) top[0].surbrillance = true; // la meilleure = surbrillance
 
-      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session (London-NY 6h-11h ET) — aucune paire active ne converge. Pas de trade = bonne décision.", strongest, weakest}); return; }
-      setResult({ strongest, weakest, top });
+      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session (London-NY 6h-11h ET) — aucune paire active ne converge. Pas de trade = bonne décision.", strongest, weakest, diagnostic}); return; }
+      setResult({ strongest, weakest, top, diagnostic });
     } catch(e){ setResult({error:"Erreur: "+e.message}); }
   };
 
@@ -2701,6 +2729,20 @@ function DayTradeAnalyzer() {
       <button onClick={analyze} style={{marginTop:8, width:"100%", padding:"10px", background:"#fbbf24", color:"#1a1500", border:"none", borderRadius:6, fontSize:11, fontWeight:700, letterSpacing:1, cursor:"pointer"}}>⚡ ANALYSER</button>
 
       {result && result.error && (<div style={{marginTop:10, padding:"10px", background:"#1a0a00", borderRadius:6, fontSize:9, color:"#fbbf24", lineHeight:1.6}}>{result.error}{result.strongest?<div style={{color:TEXT_DIM, marginTop:6, fontSize:8}}>Force du jour : {result.strongest} fort → {result.weakest} faible</div>:""}</div>)}
+
+      {result && result.diagnostic && result.diagnostic.length>0 && (
+        <div style={{marginTop:10, padding:"10px", background:"#0a1020", borderRadius:6, border:"1px solid #1e3a5f"}}>
+          <div style={{fontSize:9, color:"#7dd3fc", fontWeight:700, marginBottom:6}}>🔍 DIAGNOSTIC — pourquoi chaque paire passe ou bloque</div>
+          {result.diagnostic.map((d,i)=>(
+            <div key={i} style={{display:"flex", flexDirection:"column", gap:2, padding:"5px 7px", marginBottom:4, background:d.reason==="PASSE TOUT ✓"?"#052010":"#1a0a00", borderRadius:4, borderLeft:d.reason==="PASSE TOUT ✓"?"3px solid #4ade80":"3px solid #f87171"}}>
+              <div style={{fontSize:9, color:TEXT, fontWeight:700}}>{d.pair} <span style={{color:d.direction==="LONG"?"#4ade80":"#f87171"}}>{d.direction==="LONG"?"▲ ACHAT":"▼ VENTE"}</span></div>
+              <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} div {d.forceGap}r · ② {d.f2?"✓":"✗"} top5(#{d.rank}) · ④ {d.f4?"✓":"✗"} vol · ⑤ {d.f5?"✓":"✗"} retail{d.retailMissing?" n/a":d.retailPct!=null?(" "+d.retailPct+"% "+d.retailSide):""} {d.bonus?"· ⭐MV":""}</div>
+              <div style={{fontSize:8, color:d.reason==="PASSE TOUT ✓"?"#4ade80":"#fca5a5", fontWeight:600}}>{d.reason==="PASSE TOUT ✓"?"✓ PASSE TOUT":"✗ bloque : "+d.reason}</div>
+            </div>
+          ))}
+          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Seules tes 7 paires whitelist présentes dans les Top Gainers/Losers sont tracées ici.</div>
+        </div>
+      )}
 
       {result && !result.error && (
         <div style={{marginTop:10}}>
