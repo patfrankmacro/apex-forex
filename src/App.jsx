@@ -2781,7 +2781,7 @@ function DayTradeAnalyzer() {
             <div key={i} style={{display:"flex", flexDirection:"column", gap:2, padding:"5px 7px", marginBottom:4, background:bg, borderRadius:4, borderLeft:"3px solid "+col, opacity:d.status==="dort"?0.6:1}}>
               <div style={{fontSize:9, color:TEXT, fontWeight:700}}>{pp} {d.direction&&d.status!=="dort"?<span style={{color:d.direction==="LONG"?"#4ade80":"#f87171"}}>{d.direction==="LONG"?"▲ ACHAT":"▼ VENTE"}</span>:""}</div>
               {d.status!=="dort" && (
-                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} div {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f2?"✓":"✗"} top5{d.rank?"(#"+d.rank+")":""} · ④ {d.f4?"✓":"✗"} pas-stagne · ⑤ {d.f5?"✓":"✗"} retail{d.rMiss?" n/a":d.rPct!=null?(" "+d.rPct+"% "+d.rSide):""} {d.bonus?"· ⭐MV":""}</div>
+                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Strength {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f2?"✓":"✗"} {d.direction==="LONG"?"Top Gainers":"Top Losers"}{d.rank?" #"+d.rank:""} · ④ {d.f4?"✓":"✗"} hors Least Vol · ⑤ {d.f5?"✓":"✗"} Retail{d.rMiss?" n/a":d.rPct!=null?(" "+d.rPct+"% "+d.rSide):""} {d.bonus?"· ⭐ Most Vol":""}</div>
               )}
               <div style={{fontSize:8, color:col, fontWeight:600}}>{d.status==="passe"?"✓ PASSE TOUT — alerte !":d.status==="dort"?"💤 "+d.reason:"✗ bloque : "+d.reason}</div>
             </div>
