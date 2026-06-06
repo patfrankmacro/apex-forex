@@ -2632,7 +2632,7 @@ function DayTradeAnalyzer() {
       if (!strongest || !weakest){ setResult({error:"Format non reconnu — colle le bloc MarketMilk complet (Currency Strength inclus)."}); return; }
 
       const leastVol = grabPairs("Least Volatile", ["MarketMilk","Copyright","Manage"]).map(p=>p.pair);
-      const TOP_RANK = 2; // on ne garde que le top 2 des gainers et losers
+      const TOP_RANK = 5; // la paire doit etre presente dans le top 5 des gainers/losers (peu importe le rang exact)
       const candidates = [];
       const SESSION_CURS = ["EUR","GBP","USD","CHF","CAD"]; // actives 6h-11h ET
       const nStr = strength.length;
@@ -2650,7 +2650,7 @@ function DayTradeAnalyzer() {
         if (forceGap < GAP_MIN) return;            // pas assez de divergence -> rejete
         // la forte doit etre en moitie haute, la faible en moitie basse
         if (!(sRank[strongCur] < sRank[weakCur])) return;
-        // CRITERE 2 - MOMENTUM: top 2 gainers/losers
+        // CRITERE 2 - MOMENTUM: present dans le top 5 gainers/losers
         if (p.rank > TOP_RANK) return;
         if (p.chg===null) return;
         // CRITERE 3 - LISTE BLANCHE: uniquement les 7 paires autorisees
@@ -2658,8 +2658,7 @@ function DayTradeAnalyzer() {
         if (!WHITELIST.includes(p.pair)) return;
         // CRITERE 4 - pas Least Volatile
         if (leastVol.includes(p.pair)) return;
-        // CRITERE 4b - DOIT etre dans Most Volatile (top 5 affiche)
-        if (!volRankPair[p.pair]) return; // pas dans les 5 plus volatiles -> rejete
+        // Most Volatile = BONUS seulement (plus un filtre obligatoire) - une tendance propre directionnelle compte autant qu une paire volatile
         // CRITERE 5 - RETAIL CONTRARIEN >= 70% (obligatoire si dispo)
         const rt = (window.__apexRetail||{})[p.pair] || (window.__apexRetail||{})[p.base+p.quote];
         let retailOk=false, retailPct=null, retailSide=null, retailMissing=false;
@@ -2706,7 +2705,7 @@ function DayTradeAnalyzer() {
       {result && !result.error && (
         <div style={{marginTop:10}}>
           <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>FORCE DU JOUR : <b style={{color:"#4ade80"}}>{result.strongest} (la plus forte)</b> → <b style={{color:"#f87171"}}>{result.weakest} (la plus faible)</b></div>
-          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} APEX (les 6 filtres réunis)</div>
+          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} APEX (les 5 filtres réunis)</div>
           {result.top.map((o,i)=>{
             const isLong = o.direction==="LONG";
             const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
@@ -2762,7 +2761,7 @@ function DayTradeView() {
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 LA LOGIQUE</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
           Les <b style={{color:"#fbbf24"}}>gros joueurs</b> (banques, fonds) déplacent des milliards chaque jour. Quand ils achètent une devise elle devient <b style={{color:"#4ade80"}}>FORTE</b>, quand ils la vendent elle devient <b style={{color:"#f87171"}}>FAIBLE</b>. Ces positions ne se débouclent pas en une heure — les institutions sont puissantes mais lentes. Un mouvement qu'elles lancent peut durer <b>plusieurs jours</b>. On ne devine pas, <b>on SUIT ce flux</b>.<br/><br/>
-          Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence), quand le mouvement est déjà lancé (momentum) et que la paire bouge assez (volatilité).<br/><br/>
+          Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence), quand le mouvement est déjà lancé (momentum) et qu'elle n'est pas dans les paires qui stagnent.<br/><br/>
           <b style={{color:"#38bdf8"}}>⏰ 6h30 ET — ton moment d'analyse, en pleine session de Londres :</b> Londres roule depuis 3h, les news européennes sont tombées, les banques ont déjà pris position. À 6h30 tu lis leur trace sur MarketMilk — la direction est confirmée. Tu identifies l'impulsion de Londres et tu attends le pullback au Golden Pocket (61.8%-65%) pour entrer derrière eux au meilleur prix. Tu n'entres pas à 6h30 — tu observes et tu te prépares. À 6h30, MarketMilk te montre le résultat d'une <b style={{color:"#fbbf24"}}>double analyse</b> : les big boys de Londres ont lu la session asiatique (JPY/AUD/NZD pendant la nuit) ET les news européennes du matin. Tu arrives avec le consensus de deux sessions déjà intégré dans les prix — pas une décision d'une session, mais la conviction de deux sessions combinées.<br/><br/>
           <b style={{color:"#a78bfa"}}>🔁 Pourquoi tes positions durent 1 à 3 jours :</b> tes 7 paires opposent une devise de Londres (<b>EUR/GBP/CHF</b>) à une devise du bloc asiatique-Pacifique (<b>AUD/NZD/JPY</b>). Aucune n'est une paire du dollar. Le mouvement passe de main en main sans s'éteindre : <b>Londres</b> le lance le matin, tu gardes ta position pendant <b>New York</b> (8h), puis la <b>session asiatique</b> (Tokyo + Sydney) prend le relais le soir — les devises d'Asie (JPY à Tokyo, AUD/NZD à Sydney) continuent leur mouvement contre les devises de Londres. Le lendemain Londres reprend.<br/><br/><b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> dernière confirmation. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant.
         </div>
@@ -2786,32 +2785,32 @@ function DayTradeView() {
       {/* SEQUENCE */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LA SÉQUENCE — ÉTAPE PAR ÉTAPE</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie ces 6 filtres pour toi quand tu colles tes données. Une alerte n'apparaît que si les 6 sont cochés.</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie ces 5 filtres pour toi quand tu colles tes données. Une alerte n'apparaît que si les 5 sont cochés. Most Volatile devient un bonus (pas un filtre) — une tendance propre et directionnelle vaut autant qu'une paire volatile.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE ≥ 4 rangs</b> au Currency Strength : la devise forte et la faible séparées d'au moins 4 places (vraie divergence, pas 2 voisines)</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>TOP 2 momentum</b> : la paire est #1 ou #2 des Top Gainers (→ achat) ou Top Losers (→ vente). Le mouvement est déjà lancé</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DANS LE TOP 5 momentum</b> : la paire figure dans les Top Gainers (→ achat) ou Top Losers (→ vente). Présence dans la liste = le mouvement est lancé. Peu importe le rang exact ou le % — une paire à haut prix (GBP/NZD) peut faire 128 pips et n'être que #4 en %</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>UNE DE TES 7 PAIRES</b> : EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD, GBP/JPY, EUR/JPY ou CHF/JPY. Toute autre paire est écartée</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>PAS Least Volatile</b> : on écarte ce qui stagne (pas de pips à faire)</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DANS MOST VOLATILE</b> : preuve que les banques de Londres ont mis des milliards dans cette paire aujourd'hui (une paire ne bouge pas fort sans capital institutionnel)</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>RETAIL CONTRARIEN ≥ 70%</b> : si tu achètes, le retail doit être short 70%+ ; si tu vends, long 70%+. Ils se font piéger, leurs stops alimentent ton mouvement</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#34d399", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>RETAIL CONTRARIEN ≥ 70%</b> : si tu achètes, le retail doit être short 70%+ ; si tu vends, long 70%+. Ils se font piéger, leurs stops alimentent ton mouvement</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#a78bfa", fontWeight:700, minWidth:16}}>⭐</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#a78bfa"}}>BONUS — MOST VOLATILE</b> : si la paire est AUSSI dans Most Volatile, conviction maximale (gros volume + oscillation). Score plus élevé, mais son absence ne rejette pas le trade</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#c084fc", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>ENTRÉE</b> : attends le pullback au <b style={{color:"#c084fc"}}>Golden Pocket (61.8%–65%)</b> sur H1. Le pullback peut arriver pendant Londres, NY ou Tokyo — tu es patient. 2-3 rejets dans la zone puis tu entres. Stop serré, target 1.5-2×. Tu gardes en swing 1 à 3 jours — réévalue chaque matin à 6h30</span></div>
         </div>
-        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ MEILLEURE (surbrillance) : parmi les paires qui passent les 6 filtres, celle qui a la plus forte divergence (souvent les 2 extrêmes absolus du classement). C'est le signal le plus net du jour.</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ MEILLEURE (surbrillance) : parmi les paires qui passent les 5 filtres, celle qui a la plus forte divergence (souvent les 2 extrêmes absolus du classement). C'est le signal le plus net du jour.</div>
       </div>
 
       {/* EXEMPLE REEL - GBP/NZD */}
       <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
         <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:4}}>📐 EXEMPLE RÉEL — CHF/JPY ACHAT (entrée au Golden Pocket)</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength à 6h30 : CHF #1 (le plus fort, refuge Europe), JPY #6 (faible). Pourquoi CHF/JPY ACHAT cochait les 6 filtres — et pourquoi la position a tenu plusieurs jours.</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength à 6h30 : CHF #1 (le plus fort, refuge Europe), JPY #6 (faible). Pourquoi CHF/JPY ACHAT cochait les 5 filtres (+ bonus Most Volatile) — et pourquoi la position a tenu plusieurs jours.</div>
         <div style={{display:"flex", flexDirection:"column", gap:6}}>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Divergence ✓</b> — CHF #1 vs JPY #6 = écart de 5 rangs. Les banques de Londres ont acheté le CHF (refuge européen) depuis 3h.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Momentum ✓</b> — top gainer #1. Le mouvement de Londres était déjà lancé à ton entrée.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Top 5 momentum ✓</b> — CHF/JPY figurait dans les Top Gainers. Le mouvement de Londres était déjà lancé.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Une de tes 7 paires ✓</b> — CHF/JPY oppose une devise de Londres (CHF) à une devise d'Asie (JPY). Pile ton type de paire.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Pas Least Volatile ✓</b> — CHF/JPY bougeait activement, pas dans les stagnantes.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Most Volatile ✓</b> — CHF/JPY figurait dans la liste Most Volatile. Des pips à faire.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Retail contrarien ✓</b> — le retail était SHORT à 70%+ pendant que toi tu achetais. Ils se faisaient piéger.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Retail contrarien ✓</b> — le retail était SHORT à 70%+ pendant que toi tu achetais. Ils se faisaient piéger.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#a78bfa", fontWeight:700, minWidth:14}}>⭐</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Bonus Most Volatile ✓</b> — CHF/JPY était aussi dans Most Volatile = conviction maximale ce jour-là.</span></div>
         </div>
-        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 6 filtres réunis = ALERTE à 6h30. Tu observes l'impulsion de Londres (CHF fort, JPY faible) et tu traces le Fibonacci. Le pullback arrive pendant Tokyo — tu attends les 2-3 rejets dans le Golden Pocket (61.8%-65%) puis tu entres. Londres reprend le lendemain et continue dans le même sens. La position a tenu plusieurs jours tant que CHF restait fort et JPY faible. C'est exactement le type de swing que le système cherche : impulsion Londres → Golden Pocket Tokyo → continuation J+1.</div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 5 filtres réunis = ALERTE à 6h30. Tu observes l'impulsion de Londres (CHF fort, JPY faible) et tu traces le Fibonacci. Le pullback arrive pendant Tokyo — tu attends les 2-3 rejets dans le Golden Pocket (61.8%-65%) puis tu entres. Londres reprend le lendemain et continue dans le même sens. La position a tenu plusieurs jours tant que CHF restait fort et JPY faible. C'est exactement le type de swing que le système cherche : impulsion Londres → Golden Pocket Tokyo → continuation J+1.</div>
       </div>
 
       {/* TABLEAU RECAP - PLAN DE TRADE */}
@@ -2967,7 +2966,7 @@ function DayTradeView() {
             </div>
             <div style={{flex:1, paddingBottom:8, padding:"8px 10px", background:"#052010", borderRadius:6, border:"1px solid #00ff8866", marginBottom:4}}>
               <div style={{fontSize:10, color:"#00ff88", fontWeight:900}}>⚡ 6h30 ET — TU ANALYSES ET OBSERVES</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres roule depuis 3h30. Tendance confirmée. Retail piégé à contre-sens. Tes 6 filtres te disent si les gros joueurs sont dans le trade.</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres roule depuis 3h30. Tendance confirmée. Retail piégé à contre-sens. Tes 5 filtres te disent si les gros joueurs sont dans le trade.</div>
               <div style={{fontSize:8.5, color:"#00ff88", fontWeight:700, marginTop:4}}>→ Analyse la direction · identifie l'impulsion · attends le pullback Golden Pocket</div>
             </div>
           </div>
@@ -3031,7 +3030,7 @@ function DayTradeView() {
           </div>
           <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
             <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>6h30 ET — Tu lis leur trace, tu identifies l'impulsion, tu attends le Golden Pocket</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 6 filtres confirment que le mouvement est réel. Tu identifies l'impulsion et tu attends le Golden Pocket (61.8%-65%) pour entrer au meilleur prix — pendant Londres, NY, ou Tokyo. Tu ne devines pas — tu confirmes, tu attends l'escompte, et tu suis. Comme un sniper qui attend le bon moment.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 5 filtres confirment que le mouvement est réel. Tu identifies l'impulsion et tu attends le Golden Pocket (61.8%-65%) pour entrer au meilleur prix — pendant Londres, NY, ou Tokyo. Tu ne devines pas — tu confirmes, tu attends l'escompte, et tu suis. Comme un sniper qui attend le bon moment.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>8h ET — New York ouvre, tu gardes</div>
@@ -3063,7 +3062,7 @@ function DayTradeView() {
           </div>
           <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2444"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>💡 La règle d'or</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tu ne sais jamais exactement ce que les banques font. Mais MarketMilk te montre CE QU'ELLES ONT DÉJÀ FAIT. Tes 6 filtres confirment que le mouvement est réel. Tu ne devines pas — tu confirmes et tu suis. Tu n'es pas la liquidité. Tu suis la liquidité.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tu ne sais jamais exactement ce que les banques font. Mais MarketMilk te montre CE QU'ELLES ONT DÉJÀ FAIT. Tes 5 filtres confirment que le mouvement est réel. Tu ne devines pas — tu confirmes et tu suis. Tu n'es pas la liquidité. Tu suis la liquidité.</div>
           </div>
         </div>
       </div>
