@@ -2717,8 +2717,48 @@ function DayTradeAnalyzer() {
       const top = candidates.slice(0,3);
       if (top.length>0) top[0].surbrillance = true; // la meilleure = surbrillance
 
-      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session (London-NY 6h-11h ET) — aucune paire active ne converge. Pas de trade = bonne décision.", strongest, weakest, diagnostic}); return; }
-      setResult({ strongest, weakest, top, diagnostic });
+      // DIAGNOSTIC COMPLET DES 7 PAIRES (toujours affiche, meme celles sans momentum)
+      const diag7 = [];
+      WHITELIST.forEach(wpair => {
+        const base = wpair.slice(0,3), quote = wpair.slice(3,6);
+        const rb = sRank[base], rq = sRank[quote];
+        // chercher la paire dans gainers (ACHAT) ou losers (VENTE)
+        const inG = gainers.find(p=>p.pair===wpair);
+        const inL = losers.find(p=>p.pair===wpair);
+        let direction=null, rank=null, chg=null, hasMomentum=false;
+        if (inG){ direction="LONG"; rank=inG.rank; chg=inG.chg; hasMomentum = inG.rank<=TOP_RANK; }
+        else if (inL){ direction="SHORT"; rank=inL.rank; chg=inL.chg; hasMomentum = inL.rank<=TOP_RANK; }
+        // si pas de direction connue, on devine via la force (forte vs faible) pour info
+        if (!direction && rb!==undefined && rq!==undefined){ direction = rb<rq ? "LONG":"SHORT"; }
+        const strongCur = direction==="LONG"?base:quote;
+        const weakCur = direction==="LONG"?quote:base;
+        const forceGap = (rb!==undefined&&rq!==undefined)?Math.abs(rb-rq):null;
+        const f1 = forceGap!==null && forceGap>=GAP_MIN && (sRank[strongCur]<sRank[weakCur]);
+        const f2 = hasMomentum;
+        const f4 = !leastVol.includes(wpair);
+        const rt0 = (window.__apexRetail||{})[wpair];
+        let f5=false, rPct=null, rSide=null, rMiss=false;
+        if (rt0 && rt0.longPercentage!=null && rt0.shortPercentage!=null){
+          const lp0=Math.round(rt0.longPercentage), sp0=Math.round(rt0.shortPercentage);
+          if (direction==="LONG"){ rPct=sp0; rSide="SHORT"; f5=sp0>=70; }
+          else { rPct=lp0; rSide="LONG"; f5=lp0>=70; }
+        } else { rMiss=true; f5=true; }
+        const bonus = !!volRankPair[wpair];
+        let reason="", status="";
+        if (!inG && !inL){ status="dort"; reason="pas de momentum (absente des Top Gainers/Losers)"; }
+        else if (!f1){ status="bloque"; reason = forceGap<GAP_MIN ? ("divergence "+forceGap+" rangs (<4)") : "force pas du bon cote"; }
+        else if (!f2){ status="bloque"; reason="rang #"+rank+" (hors top "+TOP_RANK+")"; }
+        else if (!f4){ status="bloque"; reason="dans Least Volatile (stagne)"; }
+        else if (!f5){ status="bloque"; reason="retail "+rPct+"% "+rSide+" (<70%)"; }
+        else { status="passe"; reason="PASSE TOUT"; }
+        diag7.push({pair:wpair, direction, rank, forceGap, f1,f2,f4,f5, bonus, rPct, rSide, rMiss, reason, status, hasMomentum});
+      });
+      // tri: passe d abord, puis bloque, puis dort
+      const ordre={passe:0,bloque:1,dort:2};
+      diag7.sort((a,b)=> (ordre[a.status]-ordre[b.status]) || ((b.forceGap||0)-(a.forceGap||0)));
+
+      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session (London-NY 6h-11h ET) — aucune paire active ne converge. Pas de trade = bonne décision.", strongest, weakest, diag7}); return; }
+      setResult({ strongest, weakest, top, diag7 });
     } catch(e){ setResult({error:"Erreur: "+e.message}); }
   };
 
@@ -2730,17 +2770,24 @@ function DayTradeAnalyzer() {
 
       {result && result.error && (<div style={{marginTop:10, padding:"10px", background:"#1a0a00", borderRadius:6, fontSize:9, color:"#fbbf24", lineHeight:1.6}}>{result.error}{result.strongest?<div style={{color:TEXT_DIM, marginTop:6, fontSize:8}}>Force du jour : {result.strongest} fort → {result.weakest} faible</div>:""}</div>)}
 
-      {result && result.diagnostic && result.diagnostic.length>0 && (
+      {result && result.diag7 && result.diag7.length>0 && (
         <div style={{marginTop:10, padding:"10px", background:"#0a1020", borderRadius:6, border:"1px solid #1e3a5f"}}>
-          <div style={{fontSize:9, color:"#7dd3fc", fontWeight:700, marginBottom:6}}>🔍 DIAGNOSTIC — pourquoi chaque paire passe ou bloque</div>
-          {result.diagnostic.map((d,i)=>(
-            <div key={i} style={{display:"flex", flexDirection:"column", gap:2, padding:"5px 7px", marginBottom:4, background:d.reason==="PASSE TOUT ✓"?"#052010":"#1a0a00", borderRadius:4, borderLeft:d.reason==="PASSE TOUT ✓"?"3px solid #4ade80":"3px solid #f87171"}}>
-              <div style={{fontSize:9, color:TEXT, fontWeight:700}}>{d.pair} <span style={{color:d.direction==="LONG"?"#4ade80":"#f87171"}}>{d.direction==="LONG"?"▲ ACHAT":"▼ VENTE"}</span></div>
-              <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} div {d.forceGap}r · ② {d.f2?"✓":"✗"} top5(#{d.rank}) · ④ {d.f4?"✓":"✗"} vol · ⑤ {d.f5?"✓":"✗"} retail{d.retailMissing?" n/a":d.retailPct!=null?(" "+d.retailPct+"% "+d.retailSide):""} {d.bonus?"· ⭐MV":""}</div>
-              <div style={{fontSize:8, color:d.reason==="PASSE TOUT ✓"?"#4ade80":"#fca5a5", fontWeight:600}}>{d.reason==="PASSE TOUT ✓"?"✓ PASSE TOUT":"✗ bloque : "+d.reason}</div>
+          <div style={{fontSize:9, color:"#7dd3fc", fontWeight:700, marginBottom:6}}>🔍 DIAGNOSTIC — tes 7 paires (pourquoi chacune passe, bloque ou dort)</div>
+          {result.diag7.map((d,i)=>{
+            const col = d.status==="passe"?"#4ade80":d.status==="bloque"?"#f87171":"#64748b";
+            const bg = d.status==="passe"?"#052010":d.status==="bloque"?"#1a0a00":"#0f1622";
+            const pp = d.pair.slice(0,3)+"/"+d.pair.slice(3,6);
+            return (
+            <div key={i} style={{display:"flex", flexDirection:"column", gap:2, padding:"5px 7px", marginBottom:4, background:bg, borderRadius:4, borderLeft:"3px solid "+col, opacity:d.status==="dort"?0.6:1}}>
+              <div style={{fontSize:9, color:TEXT, fontWeight:700}}>{pp} {d.direction&&d.status!=="dort"?<span style={{color:d.direction==="LONG"?"#4ade80":"#f87171"}}>{d.direction==="LONG"?"▲ ACHAT":"▼ VENTE"}</span>:""}</div>
+              {d.status!=="dort" && (
+                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} div {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f2?"✓":"✗"} top5{d.rank?"(#"+d.rank+")":""} · ④ {d.f4?"✓":"✗"} pas-stagne · ⑤ {d.f5?"✓":"✗"} retail{d.rMiss?" n/a":d.rPct!=null?(" "+d.rPct+"% "+d.rSide):""} {d.bonus?"· ⭐MV":""}</div>
+              )}
+              <div style={{fontSize:8, color:col, fontWeight:600}}>{d.status==="passe"?"✓ PASSE TOUT — alerte !":d.status==="dort"?"💤 "+d.reason:"✗ bloque : "+d.reason}</div>
             </div>
-          ))}
-          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Seules tes 7 paires whitelist présentes dans les Top Gainers/Losers sont tracées ici.</div>
+            );
+          })}
+          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Vert = passe · Rouge = bloque près du but · Gris = dort (pas de momentum). Tri : prêtes en haut.</div>
         </div>
       )}
 
