@@ -2782,7 +2782,15 @@ function DayTradeAnalyzer() {
             <div key={i} style={{display:"flex", flexDirection:"column", gap:2, padding:"5px 7px", marginBottom:4, background:bg, borderRadius:4, borderLeft:"3px solid "+col, opacity:d.status==="dort"?0.6:1}}>
               <div style={{fontSize:9, color:TEXT, fontWeight:700}}>{pp} {d.direction&&d.status!=="dort"?<span style={{color:d.direction==="LONG"?"#4ade80":"#f87171"}}>{d.direction==="LONG"?"▲ ACHAT":"▼ VENTE"}</span>:""}</div>
               {d.status!=="dort" && (
-                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Strength {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f2?"✓":"✗"} {d.direction==="LONG"?"Top Gainers":"Top Losers"}{d.rank?" #"+d.rank:""} · ④ {d.f4?"✓":"✗"} hors Least Vol · ⑤ {d.f5?"✓":"✗"} {d.rMiss?"Retail n/a":d.rShort!=null?("Short "+d.rShort+"% / Long "+d.rLong+"%"):"Retail ?"} {d.bonus?"· ⭐ Most Vol":""}</div>
+                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Strength {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f2?"✓":"✗"} {d.direction==="LONG"?"Top Gainers":"Top Losers"}{d.rank?" #"+d.rank:""} · ④ {d.f4?"✓":"✗"} hors Least Vol · ⑤ {d.f5?"✓":"✗"} retail{d.bonus?" · ⭐ Most Vol":""}</div>
+              )}
+              {d.status!=="dort" && !d.rMiss && d.rLong!=null && (
+                <div style={{marginTop:2}}>
+                  <div style={{display:"flex", height:14, borderRadius:3, overflow:"hidden", border:"1px solid #1e3a5f"}}>
+                    <div style={{width:d.rLong+"%", background:"#16a34a", display:"flex", alignItems:"center", justifyContent:"center"}}>{d.rLong>=20?<span style={{fontSize:7, color:"#fff", fontWeight:700}}>{d.rLong}% Long</span>:""}</div>
+                    <div style={{width:d.rShort+"%", background:"#dc2626", display:"flex", alignItems:"center", justifyContent:"center"}}>{d.rShort>=20?<span style={{fontSize:7, color:"#fff", fontWeight:700}}>{d.rShort}% Short</span>:""}</div>
+                  </div>
+                </div>
               )}
               <div style={{fontSize:8, color:col, fontWeight:600}}>{d.status==="passe"?"✓ PASSE TOUT — alerte !":d.status==="dort"?"💤 "+d.reason:"✗ bloque : "+d.reason}</div>
             </div>
