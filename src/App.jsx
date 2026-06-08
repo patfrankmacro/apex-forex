@@ -2632,7 +2632,7 @@ function DayTradeAnalyzer() {
       if (!strongest || !weakest){ setResult({error:"Format non reconnu — colle le bloc MarketMilk complet (Currency Strength inclus)."}); return; }
 
       const leastVol = grabPairs("Least Volatile", ["MarketMilk","Copyright","Manage"]).map(p=>p.pair);
-      const TOP_RANK = 5; // la paire doit etre presente dans le top 5 des gainers/losers (peu importe le rang exact)
+      const TOP_RANK = 2; // SNIPER ELITE: la paire doit etre #1 ou #2 des gainers/losers (le coeur de la tempete)
       const candidates = [];
       const SESSION_CURS = ["EUR","GBP","USD","CHF","CAD"]; // actives 6h-11h ET
       const nStr = strength.length;
@@ -2669,7 +2669,7 @@ function DayTradeAnalyzer() {
         dg.bonus = !!volRankPair[p.pair];
         if (isWL){
           if (!dg.f1) dg.reason = forceGap<GAP_MIN ? ("divergence "+forceGap+" rangs (<4)") : "force pas du bon cote";
-          else if (!dg.f2) dg.reason = "pas dans le top 5 "+(direction==="LONG"?"gainers":"losers");
+          else if (!dg.f2) dg.reason = "pas dans le top 2 "+(direction==="LONG"?"gainers":"losers");
           else if (!dg.f4) dg.reason = "dans Least Volatile (stagne)";
           else if (!dg.f5) dg.reason = "retail "+dgPct+"% "+dgSide+" (<70%)";
           else dg.reason = "PASSE TOUT ✓";
@@ -2698,7 +2698,8 @@ function DayTradeAnalyzer() {
         } else {
           retailMissing=true;
         }
-        // BONUS (classement + surbrillance)
+        // CRITERE 6 - MOST VOLATILE OBLIGATOIRE (Sniper Elite)
+        if (!volRankPair[p.pair]) return;
         const v = volRankPair[p.pair];
         const isVolatile = !!v;
         const volRank = v?v.rank:null, volChg = v?v.chg:null;
@@ -2744,15 +2745,17 @@ function DayTradeAnalyzer() {
           if (direction==="LONG"){ rPct=sp0; rSide="SHORT"; f5=sp0>=70; }
           else { rPct=lp0; rSide="LONG"; f5=lp0>=70; }
         } else { rMiss=true; f5=true; }
-        const bonus = !!volRankPair[wpair];
+        const f6 = !!volRankPair[wpair]; // SNIPER ELITE: Most Volatile obligatoire
+        const bonus = f6;
         let reason="", status="";
         if (!inG && !inL){ status="dort"; reason="pas de momentum (absente des Top Gainers/Losers)"; }
         else if (!f1){ status="bloque"; reason = forceGap<GAP_MIN ? ("divergence "+forceGap+" rangs (<4)") : "force pas du bon cote"; }
-        else if (!f2){ status="bloque"; reason="rang #"+rank+" (hors top "+TOP_RANK+")"; }
+        else if (!f2){ status="bloque"; reason="rang #"+rank+" (hors top 2)"; }
         else if (!f4){ status="bloque"; reason="dans Least Volatile (stagne)"; }
         else if (!f5){ status="bloque"; reason="retail déjà "+(direction==="LONG"?"Long":"Short")+" (besoin "+(direction==="LONG"?"Short":"Long")+" ≥70%)"; }
+        else if (!f6){ status="bloque"; reason="hors Most Volatile (mouvement pas assez explosif)"; }
         else { status="passe"; reason="PASSE TOUT"; }
-        diag7.push({pair:wpair, direction, rank, forceGap, f1,f2,f4,f5, bonus, rPct, rSide, rMiss, rLong, rShort, reason, status, hasMomentum});
+        diag7.push({pair:wpair, direction, rank, forceGap, f1,f2,f4,f5,f6, bonus, rPct, rSide, rMiss, rLong, rShort, reason, status, hasMomentum});
       });
       // tri: passe d abord, puis bloque, puis dort
       const ordre={passe:0,bloque:1,dort:2};
@@ -2782,7 +2785,7 @@ function DayTradeAnalyzer() {
             <div key={i} style={{display:"flex", flexDirection:"column", gap:2, padding:"5px 7px", marginBottom:4, background:bg, borderRadius:4, borderLeft:"3px solid "+col, opacity:d.status==="dort"?0.6:1}}>
               <div style={{fontSize:9, color:TEXT, fontWeight:700}}>{pp} {d.direction&&d.status!=="dort"?<span style={{color:d.direction==="LONG"?"#4ade80":"#f87171"}}>{d.direction==="LONG"?"▲ ACHAT":"▼ VENTE"}</span>:""}</div>
               {d.status!=="dort" && (
-                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Strength {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f2?"✓":"✗"} {d.direction==="LONG"?"Top Gainers":"Top Losers"}{d.rank?" #"+d.rank:""} · ④ {d.f4?"✓":"✗"} hors Least Vol · ⑤ {d.f5?"✓":"✗"} retail{d.bonus?" · ⭐ Most Vol":""}</div>
+                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Strength {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f2?"✓":"✗"} {d.direction==="LONG"?"Top Gainers":"Top Losers"}{d.rank?" #"+d.rank:""} · ④ {d.f4?"✓":"✗"} hors Least Vol · ⑤ {d.f5?"✓":"✗"} retail · ⑥ {d.f6?"✓":"✗"} Most Vol</div>
               )}
               {d.status!=="dort" && !d.rMiss && d.rLong!=null && (
                 <div style={{marginTop:2}}>
@@ -2803,7 +2806,7 @@ function DayTradeAnalyzer() {
       {result && !result.error && (
         <div style={{marginTop:10}}>
           <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>FORCE DU JOUR : <b style={{color:"#4ade80"}}>{result.strongest} (la plus forte)</b> → <b style={{color:"#f87171"}}>{result.weakest} (la plus faible)</b></div>
-          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} APEX (les 5 filtres réunis)</div>
+          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} SNIPER ELITE (les 6 filtres réunis)</div>
           {result.top.map((o,i)=>{
             const isLong = o.direction==="LONG";
             const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
@@ -2836,7 +2839,7 @@ function DayTradeAnalyzer() {
             </div>
           );})}
           <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
-            ⚠ Chaque paire coche les 5 critères (divergence ≥4 rangs + top 5 momentum + une de tes paires + pas Least Volatile + retail contrarien ≥70%). Most Volatile = bonus. Classées par divergence et continuation NY. Attends le Golden Pocket (61.8-65%) pour entrer — Londres, NY ou Tokyo. Garde en swing 1 à 3 jours.
+            ⚠ SNIPER ELITE — chaque paire coche les 6 critères OBLIGATOIRES (divergence ≥4 rangs + top 2 momentum + une de tes paires + pas Least Volatile + DANS Most Volatile + retail contrarien ≥70%). Le setup le plus explosif et le plus rare. Classées par divergence et continuation NY. Attends le Golden Pocket (61.8-65%) pour entrer — Londres, NY ou Tokyo. Garde en swing 1 à 3 jours.
           </div>
         </div>
       )}
@@ -2848,7 +2851,7 @@ function DayTradeView() {
   const ACCENT="#38bdf8", TEXT="#c8d4f0", TEXT_DIM="#4a5070", BORDER="#1a1a2e";
   return (
     <div style={{padding:16, maxWidth:760, margin:"0 auto"}}>
-      <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE FX — CURRENCY STRENGTH MOMENTUM</div>
+      <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE FX — SNIPER ELITE (6 FILTRES)</div>
       <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (intraday / 1-3 jours) basé sur la force et la volatilité du jour · Séparé de la méthode COT swing</div>
 
       <DayTradeAnalyzer />
@@ -2883,23 +2886,23 @@ function DayTradeView() {
       {/* SEQUENCE */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LA SÉQUENCE — ÉTAPE PAR ÉTAPE</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie ces 5 filtres pour toi quand tu colles tes données. Une alerte n'apparaît que si les 5 sont cochés. Most Volatile devient un bonus (pas un filtre) — une tendance propre et directionnelle vaut autant qu'une paire volatile.</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie ces 6 filtres OBLIGATOIRES pour toi quand tu colles tes données. Une alerte Sniper Elite n'apparaît QUE si les 6 sont cochés — c'est le setup le plus rigoureux et le plus rare. Most Volatile est OBLIGATOIRE : le mouvement doit être explosif, pas juste directionnel.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE ≥ 4 rangs</b> au Currency Strength : la devise forte et la faible séparées d'au moins 4 places (vraie divergence, pas 2 voisines)</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DANS LE TOP 5 momentum</b> : la paire figure dans les Top Gainers (→ achat) ou Top Losers (→ vente). Présence dans la liste = le mouvement est lancé. Peu importe le rang exact ou le % — une paire à haut prix (GBP/NZD) peut faire 128 pips et n'être que #4 en %</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>TOP 2 momentum</b> : la paire doit être #1 ou #2 des Top Gainers (→ achat) ou Top Losers (→ vente). Le cœur de la tempête — pas seulement dans la liste, mais en TÊTE. C'est là que le mouvement institutionnel est le plus fort.</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>UNE DE TES 7 PAIRES</b> : EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD, GBP/JPY, EUR/JPY ou CHF/JPY. Toute autre paire est écartée</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>PAS Least Volatile</b> : on écarte ce qui stagne (pas de pips à faire)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#34d399", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>RETAIL CONTRARIEN ≥ 70%</b> : si tu achètes, le retail doit être short 70%+ ; si tu vends, long 70%+. Ils se font piéger, leurs stops alimentent ton mouvement</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#a78bfa", fontWeight:700, minWidth:16}}>⭐</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#a78bfa"}}>BONUS — MOST VOLATILE</b> : si la paire est AUSSI dans Most Volatile, conviction maximale (gros volume + oscillation). Score plus élevé, mais son absence ne rejette pas le trade</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DANS MOST VOLATILE (OBLIGATOIRE)</b> : la paire DOIT figurer dans les Most Volatile. C'est la preuve que le mouvement est explosif, pas juste directionnel. Si elle n'y est pas, pas de trade Sniper Elite — peu importe le reste.</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#c084fc", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>ENTRÉE</b> : attends le pullback au <b style={{color:"#c084fc"}}>Golden Pocket (61.8%–65%)</b> sur H1. Le pullback peut arriver pendant Londres, NY ou Tokyo — tu es patient. 2-3 rejets dans la zone puis tu entres. Stop serré, target 1.5-2×. Tu gardes en swing 1 à 3 jours — réévalue chaque matin à 7h00</span></div>
         </div>
-        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ MEILLEURE (surbrillance) : parmi les paires qui passent les 5 filtres, celle qui a la plus forte divergence (souvent les 2 extrêmes absolus du classement). C'est le signal le plus net du jour.</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ MEILLEURE (surbrillance) : parmi les paires qui passent les 6 filtres Sniper Elite, celle qui a la plus forte divergence (souvent les 2 extrêmes absolus du classement). C'est le signal le plus net du jour.</div>
       </div>
 
       {/* EXEMPLE REEL - GBP/NZD */}
       <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
         <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:4}}>📐 EXEMPLE RÉEL — CHF/JPY ACHAT (entrée au Golden Pocket)</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength à 7h00 : CHF #1 (le plus fort, refuge Europe), JPY #6 (faible). Pourquoi CHF/JPY ACHAT cochait les 5 filtres (+ bonus Most Volatile) — et pourquoi la position a tenu plusieurs jours.</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength à 7h00 : CHF #1 (le plus fort, refuge Europe), JPY #6 (faible). Pourquoi CHF/JPY ACHAT cochait les 6 filtres Sniper Elite (Most Volatile inclus) — et pourquoi la position a tenu plusieurs jours.</div>
         <div style={{display:"flex", flexDirection:"column", gap:6}}>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Divergence ✓</b> — CHF #1 vs JPY #6 = écart de 5 rangs. Les banques de Londres ont acheté le CHF (refuge européen) depuis 3h.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Top 5 momentum ✓</b> — CHF/JPY figurait dans les Top Gainers. Le mouvement de Londres était déjà lancé.</span></div>
@@ -2908,7 +2911,7 @@ function DayTradeView() {
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Retail contrarien ✓</b> — le retail était SHORT à 70%+ pendant que toi tu achetais. Ils se faisaient piéger.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#a78bfa", fontWeight:700, minWidth:14}}>⭐</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Bonus Most Volatile ✓</b> — CHF/JPY était aussi dans Most Volatile = conviction maximale ce jour-là.</span></div>
         </div>
-        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 5 filtres réunis = ALERTE à 7h00. Tu observes l'impulsion de Londres (CHF fort, JPY faible) et tu traces le Fibonacci. Le pullback arrive pendant Tokyo — tu attends les 2-3 rejets dans le Golden Pocket (61.8%-65%) puis tu entres. Londres reprend le lendemain et continue dans le même sens. La position a tenu plusieurs jours tant que CHF restait fort et JPY faible. C'est exactement le type de swing que le système cherche : impulsion Londres → Golden Pocket Tokyo → continuation J+1.</div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 6 filtres réunis = ALERTE SNIPER ELITE à 7h00. Tu observes l'impulsion de Londres (CHF fort, JPY faible) et tu traces le Fibonacci. Le pullback arrive pendant Tokyo — tu attends les 2-3 rejets dans le Golden Pocket (61.8%-65%) puis tu entres. Londres reprend le lendemain et continue dans le même sens. La position a tenu plusieurs jours tant que CHF restait fort et JPY faible. C'est exactement le type de swing que le système cherche : impulsion Londres → Golden Pocket Tokyo → continuation J+1.</div>
       </div>
 
       {/* TABLEAU RECAP - PLAN DE TRADE */}
@@ -3064,7 +3067,7 @@ function DayTradeView() {
             </div>
             <div style={{flex:1, paddingBottom:8, padding:"8px 10px", background:"#052010", borderRadius:6, border:"1px solid #00ff8866", marginBottom:4}}>
               <div style={{fontSize:10, color:"#00ff88", fontWeight:900}}>⚡ 7h00 ET — TU ANALYSES ET OBSERVES</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres roule depuis 4h (midi à Londres). Tendance mûre et stable. Retail piégé à contre-sens. Tes 5 filtres te disent si les gros joueurs sont dans le trade.</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres roule depuis 4h (midi à Londres). Tendance mûre et stable. Retail piégé à contre-sens. Tes 6 filtres Sniper Elite te disent si les gros joueurs sont dans le trade.</div>
               <div style={{fontSize:8.5, color:"#00ff88", fontWeight:700, marginTop:4}}>→ Analyse la direction · identifie l'impulsion · attends le pullback Golden Pocket</div>
             </div>
           </div>
@@ -3128,7 +3131,7 @@ function DayTradeView() {
           </div>
           <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
             <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>7h00 ET — Tu lis leur trace, tu identifies l'impulsion, tu attends le Golden Pocket</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 5 filtres confirment que le mouvement est réel. Tu identifies l'impulsion et tu attends le Golden Pocket (61.8%-65%) pour entrer au meilleur prix — pendant Londres, NY, ou Tokyo. Tu ne devines pas — tu confirmes, tu attends l'escompte, et tu suis. Comme un sniper qui attend le bon moment.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 6 filtres Sniper Elite confirment que le mouvement est réel. Tu identifies l'impulsion et tu attends le Golden Pocket (61.8%-65%) pour entrer au meilleur prix — pendant Londres, NY, ou Tokyo. Tu ne devines pas — tu confirmes, tu attends l'escompte, et tu suis. Comme un sniper qui attend le bon moment.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>8h ET — New York ouvre, tu gardes</div>
@@ -3160,7 +3163,7 @@ function DayTradeView() {
           </div>
           <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2444"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>💡 La règle d'or</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tu ne sais jamais exactement ce que les banques font. Mais MarketMilk te montre CE QU'ELLES ONT DÉJÀ FAIT. Tes 5 filtres confirment que le mouvement est réel. Tu ne devines pas — tu confirmes et tu suis. Tu n'es pas la liquidité. Tu suis la liquidité.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tu ne sais jamais exactement ce que les banques font. Mais MarketMilk te montre CE QU'ELLES ONT DÉJÀ FAIT. Tes 6 filtres Sniper Elite confirment que le mouvement est réel. Tu ne devines pas — tu confirmes et tu suis. Tu n'es pas la liquidité. Tu suis la liquidité.</div>
           </div>
         </div>
       </div>
