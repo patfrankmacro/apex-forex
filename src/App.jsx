@@ -2836,7 +2836,7 @@ function DayTradeAnalyzer() {
             </div>
           );})}
           <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
-            ⚠ Chaque paire coche les 6 critères (divergence ≥4 rangs + top 2 momentum + une de tes paires + pas least volatile + dans Most Volatile + retail contrarien ≥70%). Classées par divergence et continuation NY. Entre au repli, garde jusqu'à ~11h pendant que NY amplifie.
+            ⚠ Chaque paire coche les 5 critères (divergence ≥4 rangs + top 5 momentum + une de tes paires + pas Least Volatile + retail contrarien ≥70%). Most Volatile = bonus. Classées par divergence et continuation NY. Attends le Golden Pocket (61.8-65%) pour entrer — Londres, NY ou Tokyo. Garde en swing 1 à 3 jours.
           </div>
         </div>
       )}
