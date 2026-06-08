@@ -3064,7 +3064,7 @@ function DayTradeView() {
             </div>
             <div style={{flex:1, paddingBottom:8, padding:"8px 10px", background:"#052010", borderRadius:6, border:"1px solid #00ff8866", marginBottom:4}}>
               <div style={{fontSize:10, color:"#00ff88", fontWeight:900}}>⚡ 7h00 ET — TU ANALYSES ET OBSERVES</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres roule depuis 3h30. Tendance confirmée. Retail piégé à contre-sens. Tes 5 filtres te disent si les gros joueurs sont dans le trade.</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres roule depuis 4h (midi à Londres). Tendance mûre et stable. Retail piégé à contre-sens. Tes 5 filtres te disent si les gros joueurs sont dans le trade.</div>
               <div style={{fontSize:8.5, color:"#00ff88", fontWeight:700, marginTop:4}}>→ Analyse la direction · identifie l'impulsion · attends le pullback Golden Pocket</div>
             </div>
           </div>
