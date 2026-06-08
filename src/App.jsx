@@ -2584,9 +2584,9 @@ function DayTradeAnalyzer() {
       // Blocage horaire : FX seulement de 6h30 a 11h30 ET (session Londres)
       const nowET = new Date(new Date().toLocaleString("en-US", {timeZone:"America/New_York"}));
       const minsET = nowET.getHours()*60 + nowET.getMinutes();
-      if (minsET < 390 || minsET > 690) {
+      if (minsET < 360 || minsET > 690) {
         const hh = String(nowET.getHours()).padStart(2,"0"), mm = String(nowET.getMinutes()).padStart(2,"0");
-        setResult({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade FX s'analyse entre 6h30 et 11h30 ET (session de Londres). Avant 6h30, Londres n'a pas encore révélé la direction ; après 11h30, Londres ferme. Reviens dans la fenêtre — pas de trade hors session.`});
+        setResult({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade FX s'analyse entre 6h00 et 11h30 ET (session de Londres). Avant 6h00, Londres n'a pas encore révélé la direction ; après 11h30, Londres ferme. Reviens dans la fenêtre — pas de trade hors session.`});
         return;
       }
       const lines = raw.split("\n").map(l=>l.trim()).filter(Boolean);
