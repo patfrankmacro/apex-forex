@@ -2737,9 +2737,10 @@ function DayTradeAnalyzer() {
         const f2 = hasMomentum;
         const f4 = !leastVol.includes(wpair);
         const rt0 = (window.__apexRetail||{})[wpair];
-        let f5=false, rPct=null, rSide=null, rMiss=false;
+        let f5=false, rPct=null, rSide=null, rMiss=false, rLong=null, rShort=null;
         if (rt0 && rt0.longPercentage!=null && rt0.shortPercentage!=null){
           const lp0=Math.round(rt0.longPercentage), sp0=Math.round(rt0.shortPercentage);
+          rLong=lp0; rShort=sp0;
           if (direction==="LONG"){ rPct=sp0; rSide="SHORT"; f5=sp0>=70; }
           else { rPct=lp0; rSide="LONG"; f5=lp0>=70; }
         } else { rMiss=true; f5=true; }
@@ -2749,9 +2750,9 @@ function DayTradeAnalyzer() {
         else if (!f1){ status="bloque"; reason = forceGap<GAP_MIN ? ("divergence "+forceGap+" rangs (<4)") : "force pas du bon cote"; }
         else if (!f2){ status="bloque"; reason="rang #"+rank+" (hors top "+TOP_RANK+")"; }
         else if (!f4){ status="bloque"; reason="dans Least Volatile (stagne)"; }
-        else if (!f5){ status="bloque"; reason="retail "+rPct+"% "+rSide+" (<70%)"; }
+        else if (!f5){ status="bloque"; reason="retail déjà "+(direction==="LONG"?"Long":"Short")+" (besoin "+(direction==="LONG"?"Short":"Long")+" ≥70%)"; }
         else { status="passe"; reason="PASSE TOUT"; }
-        diag7.push({pair:wpair, direction, rank, forceGap, f1,f2,f4,f5, bonus, rPct, rSide, rMiss, reason, status, hasMomentum});
+        diag7.push({pair:wpair, direction, rank, forceGap, f1,f2,f4,f5, bonus, rPct, rSide, rMiss, rLong, rShort, reason, status, hasMomentum});
       });
       // tri: passe d abord, puis bloque, puis dort
       const ordre={passe:0,bloque:1,dort:2};
@@ -2781,7 +2782,7 @@ function DayTradeAnalyzer() {
             <div key={i} style={{display:"flex", flexDirection:"column", gap:2, padding:"5px 7px", marginBottom:4, background:bg, borderRadius:4, borderLeft:"3px solid "+col, opacity:d.status==="dort"?0.6:1}}>
               <div style={{fontSize:9, color:TEXT, fontWeight:700}}>{pp} {d.direction&&d.status!=="dort"?<span style={{color:d.direction==="LONG"?"#4ade80":"#f87171"}}>{d.direction==="LONG"?"▲ ACHAT":"▼ VENTE"}</span>:""}</div>
               {d.status!=="dort" && (
-                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Strength {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f2?"✓":"✗"} {d.direction==="LONG"?"Top Gainers":"Top Losers"}{d.rank?" #"+d.rank:""} · ④ {d.f4?"✓":"✗"} hors Least Vol · ⑤ {d.f5?"✓":"✗"} Retail{d.rMiss?" n/a":d.rPct!=null?(" "+d.rPct+"% "+d.rSide):""} {d.bonus?"· ⭐ Most Vol":""}</div>
+                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Strength {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f2?"✓":"✗"} {d.direction==="LONG"?"Top Gainers":"Top Losers"}{d.rank?" #"+d.rank:""} · ④ {d.f4?"✓":"✗"} hors Least Vol · ⑤ {d.f5?"✓":"✗"} {d.rMiss?"Retail n/a":d.rShort!=null?("Short "+d.rShort+"% / Long "+d.rLong+"%"):"Retail ?"} {d.bonus?"· ⭐ Most Vol":""}</div>
               )}
               <div style={{fontSize:8, color:col, fontWeight:600}}>{d.status==="passe"?"✓ PASSE TOUT — alerte !":d.status==="dort"?"💤 "+d.reason:"✗ bloque : "+d.reason}</div>
             </div>
