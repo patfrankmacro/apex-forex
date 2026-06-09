@@ -2803,7 +2803,7 @@ function DayTradeView() {
 
       <DayTradeAnalyzer />
 
-      {/* ===== GROS TABLEAU CONVERGENCE — TES 7 PAIRES (3 filtres) ===== */}
+      {/* ===== TABLEAU LEVERAGED FUNDS + RETAIL + CONVERGENCE ===== */}
       {(() => {
         const CFTC_MAP = {EUR:"099741",GBP:"096742",JPY:"097741",CAD:"090741",AUD:"232741",CHF:"092741",USD:"098662",NZD:"112741"};
         const PAIRS = ["EURAUD","GBPAUD","EURNZD","GBPNZD","GBPJPY","EURJPY","CHFJPY"];
@@ -2813,83 +2813,121 @@ function DayTradeView() {
         const sRank = strength ? strength.rank : null;
         const hasCot = Object.keys(cot).length>0;
         const hasRetail = Object.keys(retail).length>0;
-        // date CFTC + fraicheur
+        // ---- TABLEAU 1 : Leveraged Funds (buys/sells) ----
+        const buys=[], sells=[];
+        Object.entries(CFTC_MAP).forEach(([code,id])=>{
+          const x=cot[id]; if(!x||x.chgNet===undefined) return;
+          if(x.chgNet>0) buys.push({code,chgNet:x.chgNet,sw:x.switchType});
+          else if(x.chgNet<0) sells.push({code,chgNet:x.chgNet,sw:x.switchType});
+        });
+        buys.sort((a,b)=>b.chgNet-a.chgNet); sells.sort((a,b)=>a.chgNet-b.chgNet);
         const cftcDate = Object.values(cot).find(x=>x?.date)?.date;
         let freshLabel=null, freshColor="#475569";
-        if (cftcDate){
-          const days = Math.floor((new Date() - new Date(cftcDate))/(1000*60*60*24));
-          freshColor = days<=7?"#4ade80":days<=10?"#fbbf24":"#f87171";
-          freshLabel = `${cftcDate} (${days}j — ${days<=7?"frais ✓":days<=10?"à surveiller":"périmé ⚠"})`;
-        }
-        const rows = PAIRS.map(wpair => {
-          const base = wpair.slice(0,3), quote = wpair.slice(3,6);
-          // direction via strength si dispo
-          let direction=null, forceGap=null, f1=null, strongCur=null, weakCur=null;
-          if (sRank && sRank[base]!=null && sRank[quote]!=null){
-            direction = sRank[base] < sRank[quote] ? "LONG" : "SHORT";
-            strongCur = direction==="LONG"?base:quote;
-            weakCur = direction==="LONG"?quote:base;
-            forceGap = Math.abs(sRank[base]-sRank[quote]);
-            f1 = forceGap>=4;
-          }
-          // retail
-          const r = retail[wpair] || retail[base+"/"+quote];
-          let f2=null, rLong=null, rShort=null, rDom=null;
-          if (r && r.longPercentage!=null && r.shortPercentage!=null){
-            rLong=Math.round(r.longPercentage); rShort=Math.round(r.shortPercentage);
-            rDom = rLong>=rShort?"LONG":"SHORT";
-            if (direction){ f2 = direction==="LONG" ? rShort>=70 : rLong>=70; }
-          }
-          // leveraged funds : toujours lire les chgNet (base + quote), meme sans direction
-          let f3=null, lfS=null, lfW=null, lfBase=null, lfQuote=null;
-          const cB=cot[CFTC_MAP[base]], cQ=cot[CFTC_MAP[quote]];
-          if (cB&&cB.chgNet!=null) lfBase=cB.chgNet;
-          if (cQ&&cQ.chgNet!=null) lfQuote=cQ.chgNet;
-          if (direction && strongCur && weakCur){
-            const cS=cot[CFTC_MAP[strongCur]], cW=cot[CFTC_MAP[weakCur]];
-            if (cS&&cW&&cS.chgNet!=null&&cW.chgNet!=null){ lfS=cS.chgNet; lfW=cW.chgNet; f3 = lfS>lfW; }
-          }
-          const known = [f1,f2,f3].filter(x=>x!==null);
-          const passed = [f1,f2,f3].filter(x=>x===true).length;
-          const total = known.length;
-          return {wpair, base, quote, direction, forceGap, f1, f2, f3, rLong, rShort, rDom, lfS, lfW, lfBase, lfQuote, strongCur, weakCur, passed, total};
+        if(cftcDate){ const days=Math.floor((new Date()-new Date(cftcDate))/(1000*60*60*24)); freshColor=days<=7?"#4ade80":days<=10?"#fbbf24":"#f87171"; freshLabel=`${cftcDate} (${days}j — ${days<=7?"frais ✓":days<=10?"à surveiller":"périmé ⚠"})`; }
+        // ---- TABLEAU 2 : Retail ----
+        const rRows=[];
+        PAIRS.forEach(p=>{
+          const r=retail[p]||retail[p.slice(0,3)+"/"+p.slice(3,6)];
+          if(!r||r.longPercentage==null||r.shortPercentage==null) return;
+          const lp=Math.round(r.longPercentage), sp=Math.round(r.shortPercentage);
+          rRows.push({pair:p, lp, sp, extreme:Math.max(lp,sp)>=70, dom:lp>=sp?"LONG":"SHORT"});
         });
-        // tri: 3/3 en haut, puis par nombre de filtres passes
-        rows.sort((a,b)=> (b.passed-a.passed) || ((b.forceGap||0)-(a.forceGap||0)));
-        const ck = v => v===true?"✓":v===false?"✗":"–";
-        const ckCol = v => v===true?"#4ade80":v===false?"#f87171":"#475569";
+        rRows.sort((a,b)=>Math.max(b.lp,b.sp)-Math.max(a.lp,a.sp));
+        // ---- CONVERGENCE : par paire ----
+        const conv = PAIRS.map(wpair=>{
+          const base=wpair.slice(0,3), quote=wpair.slice(3,6);
+          let direction=null,strongCur=null,weakCur=null,forceGap=null,f1=null;
+          if(sRank&&sRank[base]!=null&&sRank[quote]!=null){
+            direction=sRank[base]<sRank[quote]?"LONG":"SHORT";
+            strongCur=direction==="LONG"?base:quote; weakCur=direction==="LONG"?quote:base;
+            forceGap=Math.abs(sRank[base]-sRank[quote]); f1=forceGap>=4;
+          }
+          const r=retail[wpair]||retail[base+"/"+quote];
+          let f2=null,rLong=null,rShort=null,rDom=null;
+          if(r&&r.longPercentage!=null){ rLong=Math.round(r.longPercentage); rShort=Math.round(r.shortPercentage); rDom=rLong>=rShort?"LONG":"SHORT"; }
+          // pour la convergence 2/3 sans direction: on utilise le cote dominant retail comme direction presumee
+          const presumedDir = direction || (rDom==="LONG"?"SHORT":"LONG"); // si retail long -> on vendrait (contrarien)
+          const sCur = direction?strongCur:(presumedDir==="LONG"?base:quote);
+          const wCur = direction?weakCur:(presumedDir==="LONG"?quote:base);
+          if(r&&r.longPercentage!=null){ f2 = presumedDir==="LONG" ? rShort>=70 : rLong>=70; }
+          let f3=null,lfS=null,lfW=null;
+          const cS=cot[CFTC_MAP[sCur]],cW=cot[CFTC_MAP[wCur]];
+          if(cS&&cW&&cS.chgNet!=null&&cW.chgNet!=null){ lfS=cS.chgNet; lfW=cW.chgNet; f3=lfS>lfW; }
+          const passed=[f1,f2,f3].filter(x=>x===true).length;
+          const has3 = f1!==null;
+          return {wpair,base,quote,direction:presumedDir,realDir:direction,forceGap,f1,f2,f3,rLong,rShort,rDom,lfS,lfW,sCur,wCur,passed,has3};
+        });
+        // paires qui convergent: au moins retail+LF (2/3) sans MM, ou 3/3 avec MM
+        const converging = conv.filter(x=> x.f2===true && x.f3===true).sort((a,b)=>b.passed-a.passed);
         return (
-          <div style={{ marginBottom:14, padding:12, background:"#0a0f1e", border:"1px solid #38bdf855", borderRadius:8 }}>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:4, marginBottom:4 }}>
-              <span style={{ fontSize:11, color:"#38bdf8", fontWeight:700, letterSpacing:1 }}>🎯 CONVERGENCE — TES 7 PAIRES</span>
-              {freshLabel && <span style={{ fontSize:7.5, color:freshColor }}>📅 COT {freshLabel}</span>}
-            </div>
-            <div style={{ fontSize:8, color:TEXT_DIM, marginBottom:8 }}>① Divergence Currency Strength · ② Retail contrarien · ③ Leveraged Funds. {!sRank && <span style={{color:"#fbbf24"}}>Colle MarketMilk + Analyser pour activer ①.</span>}</div>
-            {(!hasCot || !hasRetail) && (
-              <div style={{ fontSize:8, color:"#fbbf24", marginBottom:8, padding:"5px 7px", background:"#1a1000", borderRadius:4 }}>
-                ⚠ {!hasRetail && "Retail Myfxbook non chargé"} {!hasCot && (!hasRetail?" · ":"")+"COT non chargé"} — recharge la page.
+          <div style={{marginBottom:14}}>
+            {/* TABLEAU LEVERAGED FUNDS */}
+            <div style={{ padding:12, background:"#0a0a1e", border:"1px solid #a78bfa44", borderRadius:8, marginBottom:10 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:4, marginBottom:8 }}>
+                <span style={{ fontSize:10, color:"#a78bfa", fontWeight:700, letterSpacing:1 }}>📊 BIAIS LEVERAGED FUNDS — FILTRE ③</span>
+                {freshLabel && <span style={{ fontSize:7.5, color:freshColor }}>📅 {freshLabel}</span>}
               </div>
-            )}
-            {/* en-tete colonnes */}
-            <div style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 1fr 1.1fr 0.7fr", gap:3, fontSize:7.5, color:TEXT_DIM, fontWeight:700, padding:"0 4px 4px", borderBottom:"1px solid #1e3a5f" }}>
-              <span>PAIRE</span><span style={{textAlign:"center"}}>① DIV</span><span style={{textAlign:"center"}}>② RETAIL</span><span style={{textAlign:"center"}}>③ LF</span><span style={{textAlign:"center"}}>VERDICT</span>
-            </div>
-            {rows.map(r => {
-              const is3 = r.passed===3 && r.total===3;
-              const verdictColor = is3?"#4ade80":r.passed===2?"#fbbf24":"#64748b";
-              const verdictBg = is3?"#052010":"transparent";
-              return (
-                <div key={r.wpair} style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 1fr 1.1fr 0.7fr", gap:3, fontSize:8.5, alignItems:"center", padding:"6px 4px", borderBottom:"1px solid #0f1a2e", background:verdictBg }}>
-                  <span style={{ fontWeight:700, color:TEXT }}>{r.base}/{r.quote}{r.direction&&<span style={{fontSize:7, color:r.direction==="LONG"?"#4ade80":"#f87171", marginLeft:3}}>{r.direction==="LONG"?"▲":"▼"}</span>}</span>
-                  <span style={{ textAlign:"center", color:ckCol(r.f1), fontWeight:700 }}>{ck(r.f1)}{r.forceGap!=null?<span style={{fontSize:6.5, color:TEXT_DIM}}> {r.forceGap}r</span>:""}</span>
-                  <span style={{ textAlign:"center", color:ckCol(r.f2), fontWeight:700 }}>{r.f2!==null?ck(r.f2):""}{r.rDom?<span style={{fontSize:7, color:r.f2===null?TEXT:TEXT_DIM}}>{r.f2!==null?" ":""}{r.rDom==="LONG"?"L":"S"}{Math.max(r.rLong,r.rShort)}%</span>:<span style={{color:"#475569"}}>–</span>}</span>
-                  <span style={{ textAlign:"center", color:ckCol(r.f3), fontWeight:700, lineHeight:1.2 }}>{r.f3!==null?ck(r.f3):""}{(r.lfBase!=null||r.lfQuote!=null)?<span style={{fontSize:6, color:TEXT_DIM, display:"block"}}>{r.base} {r.lfBase!=null?(r.lfBase>=0?"+":"")+(r.lfBase/1000).toFixed(1)+"k":"?"}<br/>{r.quote} {r.lfQuote!=null?(r.lfQuote>=0?"+":"")+(r.lfQuote/1000).toFixed(1)+"k":"?"}</span>:<span style={{color:"#475569"}}>–</span>}</span>
-                  <span style={{ textAlign:"center", fontWeight:700, color:verdictColor, fontSize:8 }}>{is3?"🟢 3/3":r.total>0?(r.passed+"/"+r.total):"–"}</span>
+              {!hasCot ? <div style={{fontSize:8.5,color:"#fbbf24",textAlign:"center",padding:"8px"}}>⚠ COT non chargé — recharge la page</div> :
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                <div>
+                  <div style={{ fontSize:9, color:"#4ade80", fontWeight:700, marginBottom:5 }}>🟢 ACHÈTENT</div>
+                  {buys.map(b=>(<div key={b.code} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 7px", marginBottom:3, background:"#001a0d", border:"1px solid #4ade8033", borderRadius:4 }}><span style={{ display:"flex", alignItems:"center", gap:5, fontSize:10, fontWeight:700, color:TEXT }}><FlagImg code={b.code} size={13}/> {b.code}</span><span style={{ fontSize:10, fontWeight:700, color:"#4ade80" }}>+{b.chgNet.toLocaleString()} {b.sw?"🔥":""}</span></div>))}
                 </div>
-              );
-            })}
-            <div style={{ fontSize:7.5, color:"#475569", marginTop:8, fontStyle:"italic", lineHeight:1.5 }}>
-              🟢 3/3 = les 3 filtres réunis = ALERTE (attends le Golden Pocket). ① divergence ≥4 rangs · ② retail ≥70% contrarien (on prend l'inverse de la foule) · ③ devise forte plus achetée/moins vendue que la faible (Lev. Funds COT). 🔗 <a href="https://marketmilk.babypips.com" target="_blank" rel="noreferrer" style={{color:"#38bdf8"}}>Ouvrir MarketMilk</a> pour le Currency Strength · COT mis à jour chaque vendredi.
+                <div>
+                  <div style={{ fontSize:9, color:"#f87171", fontWeight:700, marginBottom:5 }}>🔴 VENDENT</div>
+                  {sells.map(s=>(<div key={s.code} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 7px", marginBottom:3, background:"#1a0000", border:"1px solid #f8717133", borderRadius:4 }}><span style={{ display:"flex", alignItems:"center", gap:5, fontSize:10, fontWeight:700, color:TEXT }}><FlagImg code={s.code} size={13}/> {s.code}</span><span style={{ fontSize:10, fontWeight:700, color:"#f87171" }}>{s.chgNet.toLocaleString()} {s.sw?"🔥":""}</span></div>))}
+                </div>
+              </div>}
+              <div style={{ fontSize:7.5, color:"#475569", marginTop:8, fontStyle:"italic", lineHeight:1.5 }}>🔥 = switch cette semaine. Pour acheter une paire, la devise forte doit être plus achetée (ou moins vendue) que la faible. Mis à jour chaque vendredi (CFTC).</div>
+            </div>
+
+            {/* TABLEAU RETAIL */}
+            <div style={{ padding:12, background:"#0a0a1e", border:"1px solid #34d39944", borderRadius:8, marginBottom:10 }}>
+              <div style={{ fontSize:10, color:"#34d399", fontWeight:700, letterSpacing:1, marginBottom:8 }}>🎭 SENTIMENT RETAIL — FILTRE ② (Myfxbook)</div>
+              {!hasRetail ? (
+                <div style={{ textAlign:"center", padding:"6px" }}>
+                  <div style={{ fontSize:9, color:"#fbbf24", marginBottom:8 }}>⚠ Retail Myfxbook non chargé. Connecte-toi pour voir le sentiment.</div>
+                  <a href="https://www.myfxbook.com/community/outlook" target="_blank" rel="noreferrer" style={{ display:"inline-block", padding:"6px 12px", background:"#fbbf24", color:"#1a1500", fontSize:9, fontWeight:700, borderRadius:6, textDecoration:"none" }}>🔗 Ouvrir Myfxbook</a>
+                </div>
+              ) : rRows.map(r=>(
+                <div key={r.pair} style={{ marginBottom:7 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:2 }}>
+                    <span style={{ fontSize:9.5, fontWeight:700, color:TEXT }}>{r.pair.slice(0,3)}/{r.pair.slice(3,6)}</span>
+                    <span style={{ fontSize:8, fontWeight:700, color:r.extreme?"#fbbf24":"#475569" }}>{r.extreme?("🎯 "+r.dom+" "+Math.max(r.lp,r.sp)+"% — contrarien prêt"):(Math.max(r.lp,r.sp)+"% "+r.dom)}</span>
+                  </div>
+                  <div style={{ display:"flex", height:14, borderRadius:3, overflow:"hidden", border:"1px solid #1e3a5f" }}>
+                    <div style={{ width:r.lp+"%", background:"#16a34a", display:"flex", alignItems:"center", justifyContent:"center" }}>{r.lp>=18?<span style={{fontSize:7, color:"#fff", fontWeight:700}}>{r.lp}% L</span>:""}</div>
+                    <div style={{ width:r.sp+"%", background:"#dc2626", display:"flex", alignItems:"center", justifyContent:"center" }}>{r.sp>=18?<span style={{fontSize:7, color:"#fff", fontWeight:700}}>{r.sp}% S</span>:""}</div>
+                  </div>
+                </div>
+              ))}
+              <div style={{ fontSize:7.5, color:"#475569", marginTop:6, fontStyle:"italic", lineHeight:1.5 }}>🎯 = retail ≥70% (extrême) = contrarien prêt. On VEND ce que la foule achète. Live Myfxbook.</div>
+            </div>
+
+            {/* BLOC CONVERGENCE */}
+            <div style={{ padding:12, background:"#0a0f1e", border:"1px solid #38bdf855", borderRadius:8 }}>
+              <div style={{ fontSize:10, color:"#38bdf8", fontWeight:700, letterSpacing:1, marginBottom:6 }}>🎯 PAIRES QUI CONVERGENT</div>
+              {converging.length===0 ? (
+                <div style={{ fontSize:8.5, color:TEXT_DIM, lineHeight:1.5 }}>Aucune paire ne réunit Retail contrarien ≥70% + Leveraged Funds alignés pour l'instant. Reviens plus tard ou attends le prochain rapport COT.</div>
+              ) : converging.map(x=>{
+                const is3 = x.passed===3 && x.has3;
+                const isBuy = x.realDir ? x.realDir==="LONG" : x.direction==="LONG";
+                const bg = is3 ? (isBuy?"linear-gradient(135deg,#001a0d,#003319)":"linear-gradient(135deg,#1a0000,#330000)") : "#0a1424";
+                const bd = is3 ? (isBuy?"2px solid #00ff88":"2px solid #ff3b3b") : "1px solid #38bdf833";
+                return (
+                  <div key={x.wpair} style={{ padding:"8px 10px", marginBottom:6, background:bg, border:bd, borderRadius:6 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:3 }}>
+                      <span style={{ fontSize:11, fontWeight:700, color:is3?(isBuy?"#00ff88":"#ff3b3b"):TEXT }}>{x.base}/{x.quote} {is3?(isBuy?"▲ ACHAT":"▼ VENTE"):""}</span>
+                      <span style={{ fontSize:8, fontWeight:700, padding:"2px 6px", borderRadius:3, background:is3?(isBuy?"#00ff88":"#ff3b3b"):"#fbbf2433", color:is3?"#001a0d":"#fbbf24" }}>{is3?"🟢 3/3 ALERTE":"🟡 2/3"}</span>
+                    </div>
+                    <div style={{ fontSize:8, color:TEXT, lineHeight:1.6 }}>
+                      <span style={{color:x.f1===true?"#4ade80":x.f1===false?"#f87171":"#64748b"}}>① Divergence {x.forceGap!=null?x.forceGap+"r "+(x.f1?"✓":"✗"):"– (colle MarketMilk)"}</span> · <span style={{color:"#4ade80"}}>② Retail {x.direction==="LONG"?"SHORT":"LONG"} {x.direction==="LONG"?x.rShort:x.rLong}% ✓</span> · <span style={{color:"#a78bfa"}}>③ LF {x.sCur} moins vendu/plus acheté que {x.wCur} ✓</span>
+                    </div>
+                    {is3 && <div style={{ fontSize:8, color:isBuy?"#86efac":"#fca5a5", marginTop:4, fontWeight:600 }}>→ Les 3 filtres convergent. {isBuy?"ACHÈTE":"VENDS"} {x.base}/{x.quote} : attends le Golden Pocket (61.8-65%) sur H1, souvent pendant Tokyo le soir. Stop serré, swing 1-3 jours.</div>}
+                    {!is3 && <div style={{ fontSize:7.5, color:"#fbbf24", marginTop:3 }}>Retail + Leveraged Funds alignés. Colle MarketMilk + Analyse pour vérifier la divergence (①) et confirmer 3/3.</div>}
+                  </div>
+                );
+              })}
             </div>
           </div>
         );
