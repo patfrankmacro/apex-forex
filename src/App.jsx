@@ -2674,13 +2674,20 @@ function DayTradeAnalyzer() {
         if (cotStrong && cotWeak && cotStrong.chgNet!=null && cotWeak.chgNet!=null){
           lfStrongNet = cotStrong.chgNet; lfWeakNet = cotWeak.chgNet;
           // aligne: la forte est plus achetee (chgNet plus eleve) que la faible
-          fcotok = (lfStrongNet > lfWeakNet) && (lfStrongNet > lfWeakNet);
+          fcotok = (lfStrongNet > lfWeakNet);
         } else { lfMiss=true; fcotok=false; }
         dg.fcot = fcotok; dg.lfStrongNet=lfStrongNet; dg.lfWeakNet=lfWeakNet; dg.lfMiss=lfMiss; dg.strongCur=strongCur; dg.weakCur=weakCur;
         // raison de blocage
         if (!dg.f1) dg.reason = forceGap<GAP_MIN ? ("divergence "+forceGap+" rangs (<4)") : "force pas du bon cote";
-        else if (!dg.f5) dg.reason = rMiss ? "retail non disponible" : ("retail deja "+(direction==="LONG"?"Long":"Short")+" (besoin "+(direction==="LONG"?"Short":"Long")+" ≥70%)");
-        else if (!dg.fcot) dg.reason = lfMiss ? "Leveraged Funds non disponibles" : "Leveraged Funds pas alignes (la forte pas plus achetee que la faible)";
+        else if (!dg.f5) {
+          if (rMiss) dg.reason = "retail non disponible";
+          else {
+            const besoinCote = direction==="LONG"?"SHORT":"LONG";
+            const cotePct = direction==="LONG"?rShort:rLong; // le % du cote contrarien voulu
+            dg.reason = "retail "+besoinCote+" "+cotePct+"% (<70%)";
+          }
+        }
+        else if (!dg.fcot) dg.reason = lfMiss ? "Leveraged Funds non disponibles" : (strongCur+" pas plus favorisé que "+weakCur+" par les fonds");
         else dg.reason = "PASSE TOUT";
         dg.status = dg.f1&&dg.f5&&dg.fcot ? "passe" : "bloque";
         diagnostic.push(dg);
@@ -2778,7 +2785,7 @@ function DayTradeAnalyzer() {
               <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>
                 <b style={{color:o.direction==="LONG"?"#4ade80":"#f87171"}}>POURQUOI {o.direction==="LONG"?"ACHETER":"VENDRE"} :</b> {o.strongCur} est {o.strongRank===0?"la devise la plus FORTE":"forte ("+(o.strongRank+1)+"e)"} et {o.weakCur} {o.weakRank===o.strengthLen-1?"la plus FAIBLE":"faible ("+(o.weakRank+1)+"e)"}. La {o.direction==="LONG"?"forte monte contre la faible → on achète":"faible chute contre la forte → on vend"}.<br/>
                 <b style={{color:"#38bdf8"}}>POURQUOI CETTE PAIRE :</b> {o.isMaxDiv?"divergence MAXIMALE (les 2 extrêmes absolus du classement). ":`divergence de ${o.forceGap} rangs au Currency Strength. `}Oppose une devise de Londres (EUR/GBP/CHF) à une devise d'Asie-Pacifique (AUD/NZD/JPY) qui prend le relais le soir.<br/>
-                <b style={{color:"#fbbf24"}}>LEVERAGED FUNDS :</b> les hedge funds achètent {o.strongCur} ({o.lfStrongNet>=0?"+":""}{o.lfStrongNet?.toLocaleString()}) et vendent {o.weakCur} ({o.lfWeakNet>=0?"+":""}{o.lfWeakNet?.toLocaleString()}) — la vraie position institutionnelle confirme ta direction ✓<br/>
+                <b style={{color:"#a78bfa"}}>LEVERAGED FUNDS :</b> les hedge funds favorisent {o.strongCur} ({o.lfStrongNet>=0?"+":""}{o.lfStrongNet?.toLocaleString()}) face à {o.weakCur} ({o.lfWeakNet>=0?"+":""}{o.lfWeakNet?.toLocaleString()}) — {o.strongCur} {o.lfStrongNet>=0?"est acheté":"est moins vendu"} que {o.weakCur}, donc relativement plus fort. La vraie position institutionnelle confirme ta direction ✓<br/>
                 <b style={{color:"#34d399"}}>RETAIL CONTRARIEN :</b> {o.retailMissing?"⚠ Myfxbook non connecté — retail non vérifié":`${o.retailPct}% du retail est ${o.retailSide} = à contre-sens de toi. Ils se font piéger, leurs stops alimentent ton mouvement ✓`}<br/>
                 <b style={{color:"#c084fc"}}>EXÉCUTION :</b> attends un repli {o.direction==="LONG"?"baissier puis achète quand ça repart vers le haut":"haussier puis vends quand ça repart vers le bas"} (H1/M15). Stop serré {o.direction==="LONG"?"sous le dernier creux":"au-dessus du dernier sommet"} · target 1.5-2× le risque.
               </div>
@@ -2850,6 +2857,43 @@ function DayTradeView() {
               </div>
             </div>
             <div style={{ fontSize:7.5, color:"#475569", marginTop:8, fontStyle:"italic", lineHeight:1.5 }}>🔥 = switch cette semaine · Pour acheter une paire, la devise forte doit être plus haut (plus achetée) que la faible. Ex : JPY vendu -17 555 et CHF -5 126 → CHF/JPY haussier (JPY beaucoup plus vendu). Mis à jour chaque vendredi (rapport CFTC).</div>
+          </div>
+        );
+      })()}
+
+      {/* ===== TABLEAU MARKET SENTIMENT RETAIL (Myfxbook, live) ===== */}
+      {(() => {
+        const PAIRS = ["EURAUD","GBPAUD","EURNZD","GBPNZD","GBPJPY","EURJPY","CHFJPY"];
+        const retail = (typeof window!=="undefined" && window.__apexRetail) ? window.__apexRetail : {};
+        const rows = [];
+        PAIRS.forEach(p => {
+          const r = retail[p] || retail[p.slice(0,3)+"/"+p.slice(3,6)];
+          if (!r || r.longPercentage==null || r.shortPercentage==null) return;
+          const lp = Math.round(r.longPercentage), sp = Math.round(r.shortPercentage);
+          const extreme = Math.max(lp,sp) >= 70;
+          rows.push({ pair:p, lp, sp, extreme, dom: lp>=sp?"LONG":"SHORT" });
+        });
+        if (rows.length===0) return null;
+        // tri: les plus extremes en haut
+        rows.sort((a,b)=> Math.max(b.lp,b.sp) - Math.max(a.lp,a.sp));
+        return (
+          <div style={{ marginBottom:14, padding:12, background:"#0a0a1e", border:"1px solid #34d39944", borderRadius:8 }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:4, marginBottom:8 }}>
+              <span style={{ fontSize:10, color:"#34d399", fontWeight:700, letterSpacing:1 }}>🎭 SENTIMENT RETAIL — FILTRE ② (Myfxbook live)</span>
+            </div>
+            {rows.map(r => (
+              <div key={r.pair} style={{ marginBottom:7 }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:2 }}>
+                  <span style={{ fontSize:9.5, fontWeight:700, color:TEXT }}>{r.pair.slice(0,3)}/{r.pair.slice(3,6)}</span>
+                  <span style={{ fontSize:8, fontWeight:700, color:r.extreme?"#fbbf24":"#475569" }}>{r.extreme?("🎯 "+r.dom+" "+Math.max(r.lp,r.sp)+"% — contrarien prêt"):(Math.max(r.lp,r.sp)+"% "+r.dom+" (pas extrême)")}</span>
+                </div>
+                <div style={{ display:"flex", height:14, borderRadius:3, overflow:"hidden", border:"1px solid #1e3a5f" }}>
+                  <div style={{ width:r.lp+"%", background:"#16a34a", display:"flex", alignItems:"center", justifyContent:"center" }}>{r.lp>=18?<span style={{fontSize:7, color:"#fff", fontWeight:700}}>{r.lp}% L</span>:""}</div>
+                  <div style={{ width:r.sp+"%", background:"#dc2626", display:"flex", alignItems:"center", justifyContent:"center" }}>{r.sp>=18?<span style={{fontSize:7, color:"#fff", fontWeight:700}}>{r.sp}% S</span>:""}</div>
+                </div>
+              </div>
+            ))}
+            <div style={{ fontSize:7.5, color:"#475569", marginTop:6, fontStyle:"italic", lineHeight:1.5 }}>🎯 = retail ≥70% d\'un côté (extrême) = contrarien prêt. On VEND ce que le retail achète, on ACHÈTE ce que le retail vend. La foule piégée = ton carburant. Live Myfxbook.</div>
           </div>
         );
       })()}
