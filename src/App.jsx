@@ -2798,9 +2798,61 @@ function DayTradeView() {
   return (
     <div style={{padding:16, maxWidth:760, margin:"0 auto"}}>
       <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE FX — APEX INSTITUTIONNEL (3 FILTRES)</div>
-      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (intraday / 1-3 jours) basé sur la force et la volatilité du jour · Séparé de la méthode COT swing</div>
+      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (1-3 jours) — 3 filtres : divergence Currency Strength + retail contrarien + Leveraged Funds · Tu suis les big boys de Londres</div>
 
       <DayTradeAnalyzer />
+
+      {/* ===== TABLEAU LEVERAGED FUNDS (live, auto-update) ===== */}
+      {(() => {
+        const CFTC_MAP = {EUR:"099741",GBP:"096742",JPY:"097741",CAD:"090741",AUD:"232741",CHF:"092741",USD:"098662",NZD:"112741"};
+        const cot = (typeof window!=="undefined" && window.__apexCot) ? window.__apexCot : {};
+        const buys = [], sells = [];
+        Object.entries(CFTC_MAP).forEach(([code, id]) => {
+          const x = cot[id];
+          if (!x || x.chgNet === undefined) return;
+          if (x.chgNet > 0) buys.push({ code, chgNet:x.chgNet, sw:x.switchType });
+          else if (x.chgNet < 0) sells.push({ code, chgNet:x.chgNet, sw:x.switchType });
+        });
+        buys.sort((a,b)=>b.chgNet-a.chgNet);
+        sells.sort((a,b)=>a.chgNet-b.chgNet);
+        if (buys.length===0 && sells.length===0) return null;
+        const cftcDate = Object.values(cot).find(x=>x?.date)?.date;
+        let freshLabel=null, freshColor="#475569";
+        if (cftcDate){
+          const days = Math.floor((new Date() - new Date(cftcDate))/(1000*60*60*24));
+          freshColor = days<=7?"#4ade80":days<=10?"#fbbf24":"#f87171";
+          freshLabel = `${cftcDate} (${days}j — ${days<=7?"frais ✓":days<=10?"à surveiller":"périmé ⚠"})`;
+        }
+        return (
+          <div style={{ marginBottom:14, padding:12, background:"#0a0a1e", border:"1px solid #a78bfa44", borderRadius:8 }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:4, marginBottom:8 }}>
+              <span style={{ fontSize:10, color:"#a78bfa", fontWeight:700, letterSpacing:1 }}>📊 BIAIS LEVERAGED FUNDS — FILTRE ③ (live)</span>
+              {freshLabel && <span style={{ fontSize:7.5, color:freshColor }}>📅 {freshLabel}</span>}
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+              <div>
+                <div style={{ fontSize:9, color:"#4ade80", fontWeight:700, marginBottom:5 }}>🟢 ACHÈTENT</div>
+                {buys.map(b => (
+                  <div key={b.code} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 7px", marginBottom:3, background:"#001a0d", border:"1px solid #4ade8033", borderRadius:4 }}>
+                    <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:10, fontWeight:700, color:TEXT }}><FlagImg code={b.code} size={13} /> {b.code}</span>
+                    <span style={{ fontSize:10, fontWeight:700, color:"#4ade80" }}>+{b.chgNet.toLocaleString()} {b.sw?"🔥":""}</span>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div style={{ fontSize:9, color:"#f87171", fontWeight:700, marginBottom:5 }}>🔴 VENDENT</div>
+                {sells.map(s => (
+                  <div key={s.code} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 7px", marginBottom:3, background:"#1a0000", border:"1px solid #f8717133", borderRadius:4 }}>
+                    <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:10, fontWeight:700, color:TEXT }}><FlagImg code={s.code} size={13} /> {s.code}</span>
+                    <span style={{ fontSize:10, fontWeight:700, color:"#f87171" }}>{s.chgNet.toLocaleString()} {s.sw?"🔥":""}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ fontSize:7.5, color:"#475569", marginTop:8, fontStyle:"italic", lineHeight:1.5 }}>🔥 = switch cette semaine · Pour acheter une paire, la devise forte doit être plus haut (plus achetée) que la faible. Ex : JPY vendu -17 555 et CHF -5 126 → CHF/JPY haussier (JPY beaucoup plus vendu). Mis à jour chaque vendredi (rapport CFTC).</div>
+          </div>
+        );
+      })()}
 
 
       {/* LOGIQUE */}
