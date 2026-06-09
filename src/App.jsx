@@ -2581,7 +2581,7 @@ function DayTradeAnalyzer() {
 
   const analyze = () => {
     try {
-      // Blocage horaire : FX seulement de 7h00 a 11h30 ET (session Londres, tendance muere)
+      // Blocage horaire : FX seulement de 10h00 a 12h00 ET (Londres a tranche, NY a confirme)
       const nowET = new Date(new Date().toLocaleString("en-US", {timeZone:"America/New_York"}));
       const minsET = nowET.getHours()*60 + nowET.getMinutes();
       if (minsET < 600 || minsET > 720) {
@@ -2636,7 +2636,7 @@ function DayTradeAnalyzer() {
       const candidates = [];
       const SESSION_CURS = ["EUR","GBP","USD","CHF","CAD"]; // actives 6h-11h ET
       const nStr = strength.length;
-      const LONDON_CURS = ["EUR","GBP","CHF"];   // actives a ton entree 7h00
+      const LONDON_CURS = ["EUR","GBP","CHF"];   // devises de Londres
       const WHITELIST = ["EURAUD","GBPAUD","EURNZD","GBPNZD","GBPJPY","EURJPY","CHFJPY"]; // les 7 paires autorisees (Londres EUR/GBP/CHF contre Asie-Pacifique AUD/NZD/JPY) - format sans slash
       const NY_CURS = ["USD","CAD"];             // amplifient quand NY ouvre a 8h
       const GAP_MIN = 4;                          // divergence min (sur 8 devises)
@@ -2752,7 +2752,7 @@ function DayTradeAnalyzer() {
       {result && !result.error && (
         <div style={{marginTop:10}}>
           <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>FORCE DU JOUR : <b style={{color:"#4ade80"}}>{result.strongest} (la plus forte)</b> → <b style={{color:"#f87171"}}>{result.weakest} (la plus faible)</b></div>
-          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} SNIPER ELITE (les 6 filtres réunis)</div>
+          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} APEX (les 3 filtres réunis)</div>
           {result.top.map((o,i)=>{
             const isLong = o.direction==="LONG";
             const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
@@ -2797,7 +2797,7 @@ function DayTradeView() {
   const ACCENT="#38bdf8", TEXT="#c8d4f0", TEXT_DIM="#4a5070", BORDER="#1a1a2e";
   return (
     <div style={{padding:16, maxWidth:760, margin:"0 auto"}}>
-      <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE FX — SNIPER ELITE (6 FILTRES)</div>
+      <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE FX — APEX INSTITUTIONNEL (3 FILTRES)</div>
       <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (intraday / 1-3 jours) basé sur la force et la volatilité du jour · Séparé de la méthode COT swing</div>
 
       <DayTradeAnalyzer />
@@ -2808,56 +2808,54 @@ function DayTradeView() {
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 LA LOGIQUE</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
           Les <b style={{color:"#fbbf24"}}>gros joueurs</b> (banques, fonds) déplacent des milliards chaque jour. Quand ils achètent une devise elle devient <b style={{color:"#4ade80"}}>FORTE</b>, quand ils la vendent elle devient <b style={{color:"#f87171"}}>FAIBLE</b>. Ces positions ne se débouclent pas en une heure — les institutions sont puissantes mais lentes. Un mouvement qu'elles lancent peut durer <b>plusieurs jours</b>. On ne devine pas, <b>on SUIT ce flux</b>.<br/><br/>
-          Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence), quand le mouvement est déjà lancé (momentum) et qu'elle n'est pas dans les paires qui stagnent.<br/><br/>
-          <b style={{color:"#38bdf8"}}>⏰ 7h00 ET — ton moment d'analyse (midi à Londres) :</b> Londres roule depuis 4h, les news européennes sont tombées et digérées, les banques ont pris position. Entre 6h et 6h30 les classements oscillent encore ; à 7h00 la tendance est <b style={{color:"#fbbf24"}}>mûre et stable</b> — la direction ne danse plus. Tu lis leur trace sur MarketMilk, tu identifies l'impulsion de Londres et tu attends le pullback au Golden Pocket (61.8%-65%) pour entrer derrière eux au meilleur prix. Tu n'entres pas à 7h00 — tu observes et tu te prépares. À 7h00, MarketMilk te montre le résultat d'une <b style={{color:"#fbbf24"}}>double analyse</b> : les big boys de Londres ont lu la session asiatique (JPY/AUD/NZD pendant la nuit) ET les news européennes du matin. Tu arrives avec le consensus de deux sessions déjà intégré dans les prix.<br/><br/>
+          Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence Currency Strength), quand le retail est piégé à contre-sens ET que les Leveraged Funds confirment la même direction.<br/><br/>
+          <b style={{color:"#38bdf8"}}>⏰ 10h00-12h00 ET — ton moment d'analyse :</b> Pourquoi si tard ? Le mouvement du matin (3h-7h) est souvent un <b style={{color:"#fbbf24"}}>faux mouvement</b> : Londres chasse les stops (liquidity grab) avant de révéler sa VRAIE direction. Si tu analyses à 7h, tu vois le piège, pas la tendance. À 10h-11h, Londres a tranché et New York (ouvert depuis 8h) a confirmé. Londres ferme vers 11h30 — tu lis la <b style={{color:"#fbbf24"}}>direction finale</b>. Tu identifies l'impulsion et tu attends le pullback au Golden Pocket (61.8%-65%) — qui arrive souvent pendant Tokyo le soir — pour entrer derrière les big boys au meilleur prix.<br/><br/>
           <b style={{color:"#a78bfa"}}>🔁 Pourquoi tes positions durent 1 à 3 jours :</b> tes 7 paires opposent une devise de Londres (<b>EUR/GBP/CHF</b>) à une devise du bloc asiatique-Pacifique (<b>AUD/NZD/JPY</b>). Aucune n'est une paire du dollar. Le mouvement passe de main en main sans s'éteindre : <b>Londres</b> le lance le matin, tu gardes ta position pendant <b>New York</b> (8h), puis la <b>session asiatique</b> (Tokyo + Sydney) prend le relais le soir — les devises d'Asie (JPY à Tokyo, AUD/NZD à Sydney) continuent leur mouvement contre les devises de Londres. Le lendemain Londres reprend.<br/><br/><b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> dernière confirmation. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant.
         </div>
       </div>
 
       {/* POURQUOI CES 7 PAIRES */}
       <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:8}}>🎯 POURQUOI CES 7 PAIRES À 7h00</div>
+        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:8}}>🎯 POURQUOI CES 7 PAIRES</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.6, marginBottom:10}}>
           On trade UNIQUEMENT : <b style={{color:"#4ade80"}}>EUR/AUD · GBP/AUD · EUR/NZD · GBP/NZD · GBP/JPY · EUR/JPY · CHF/JPY</b>. Chacune oppose une devise de Londres (EUR, GBP, CHF) à une devise du bloc Asie-Pacifique (AUD, NZD, JPY). Pas de paires CAD : le CAD est une devise de session New York, pas de notre relais Londres↔Asie.
         </div>
         <div style={{display:"flex", flexDirection:"column", gap:7}}>
-          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>1.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Les news sont déjà sorties et digérées.</b> À 7h00 ET il est midi à Londres : les chiffres éco européens du matin (inflation, emploi, PIB UK/EU) sont tombés entre 2h et 5h, et le marché les a digérés depuis des heures. À 7h00 tu lis une tendance mûre et stable, pas une incertitude qui oscille — puis tu attends le Golden Pocket pour entrer.</span></div>
-          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>2.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>La conviction des big boys est à son max.</b> Londres est ouvert depuis 4h, le volume institutionnel est massif. Les gros joueurs ont bâti leurs positions sur EUR/GBP/CHF selon les news. À 7h00 (midi Londres) la direction est nette et posée, pas hésitante.</span></div>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>1.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Les news sont digérées et Londres a tranché.</b> À 10h-11h ET, les news EU du matin sont passées, Londres roule depuis 7h et a révélé sa vraie direction (pas le faux mouvement de 3h-7h). New York a confirmé. Tu lis une tendance mûre — puis tu attends le Golden Pocket pour entrer.</span></div>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>2.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>La conviction des big boys est confirmée.</b> À 10h-11h, Londres + New York sont tous deux actifs (chevauchement, volume max). Les gros joueurs ont bâti et confirmé leurs positions sur EUR/GBP/CHF. La direction est nette, validée par deux sessions.</span></div>
           <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>3.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Le mouvement va durer plusieurs sessions.</b> Une fois entré au Golden Pocket, tu gardes ta position pendant New York (8h), puis la session asiatique (Tokyo + Sydney) prend le relais le soir — jamais deux devises de la même session, toujours une devise de Londres contre une devise d'Asie. Tu te places dans un flux qui passe de main en main, pas dans un coup d'une heure.</span></div>
-          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>4.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Le sentiment retail est déjà formé.</b> Le retail a réagi aux news du matin, souvent à contre-sens. À 7h00 leur positionnement est mûr et lisible — ton filtre retail contrarien ≥70% capte ce déséquilibre exact.</span></div>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>4.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Le sentiment retail est mûr.</b> Le retail a réagi au mouvement, souvent à contre-sens. À 10h-11h leur positionnement est lisible — ton filtre retail contrarien ≥70% capte ce déséquilibre exact.</span></div>
         </div>
-        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>💡 7h00 ET = le point de convergence : news digérées + tendance de Londres mûre et stable + retail piégé. Tu ne devines rien, tu te places dans un flux déjà validé que les sessions suivantes vont relayer pendant 1 à 3 jours.</div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>💡 10h-12h ET = le point de convergence : Londres a tranché + NY a confirmé + retail piégé + Leveraged Funds alignés. Tu ne devines rien, tu te places dans un flux institutionnel validé que les sessions suivantes (Tokyo le soir, Londres J+1) vont relayer pendant 1 à 3 jours.</div>
       </div>
 
       {/* SEQUENCE */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LA SÉQUENCE — ÉTAPE PAR ÉTAPE</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie ces 6 filtres OBLIGATOIRES pour toi quand tu colles tes données. Une alerte Sniper Elite n'apparaît QUE si les 6 sont cochés — c'est le setup le plus rigoureux et le plus rare. Most Volatile est OBLIGATOIRE : le mouvement doit être explosif, pas juste directionnel.</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie ces 3 filtres OBLIGATOIRES sur tes 7 paires quand tu colles tes données. Une alerte n'apparaît QUE si les 3 sont cochés. Chaque filtre mesure une chose DIFFÉRENTE : où est le capital (Currency Strength), qui est piégé en face (retail), et ce que les vraies institutions font (Leveraged Funds). Quand les 3 convergent, tu suis les big boys avec le maximum de preuves.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE ≥ 4 rangs</b> au Currency Strength : la devise forte et la faible séparées d'au moins 4 places (vraie divergence, pas 2 voisines)</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>TOP 2 momentum</b> : la paire doit être #1 ou #2 des Top Gainers (→ achat) ou Top Losers (→ vente). Le cœur de la tempête — pas seulement dans la liste, mais en TÊTE. C'est là que le mouvement institutionnel est le plus fort.</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>UNE DE TES 7 PAIRES</b> : EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD, GBP/JPY, EUR/JPY ou CHF/JPY. Toute autre paire est écartée</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>PAS Least Volatile</b> : on écarte ce qui stagne (pas de pips à faire)</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#34d399", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>RETAIL CONTRARIEN ≥ 70%</b> : si tu achètes, le retail doit être short 70%+ ; si tu vends, long 70%+. Ils se font piéger, leurs stops alimentent ton mouvement</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DANS MOST VOLATILE (OBLIGATOIRE)</b> : la paire DOIT figurer dans les Most Volatile. C'est la preuve que le mouvement est explosif, pas juste directionnel. Si elle n'y est pas, pas de trade Sniper Elite — peu importe le reste.</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#c084fc", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>ENTRÉE</b> : attends le pullback au <b style={{color:"#c084fc"}}>Golden Pocket (61.8%–65%)</b> sur H1. Le pullback peut arriver pendant Londres, NY ou Tokyo — tu es patient. 2-3 rejets dans la zone puis tu entres. Stop serré, target 1.5-2×. Tu gardes en swing 1 à 3 jours — réévalue chaque matin à 7h00</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#34d399", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>RETAIL CONTRARIEN ≥ 70%</b> : si tu achètes, le retail doit être SHORT 70%+ ; si tu vends, LONG 70%+. La foule est piégée du mauvais côté — leurs stops qui sautent alimentent ton mouvement. C'est ton carburant.</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#a78bfa", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#a78bfa"}}>LEVERAGED FUNDS ALIGNÉS</b> : le rapport COT (CFTC, publié chaque vendredi) montre ce que les hedge funds font VRAIMENT. La devise forte doit être plus achetée que la faible. C'est la VRAIE position institutionnelle — pas une déduction, des chiffres réels. Si les fonds ne confirment pas, pas de trade.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1020", borderRadius:5}}><span style={{color:"#64748b", fontWeight:700, minWidth:16}}>📋</span><span style={{fontSize:8.5, color:TEXT_DIM, lineHeight:1.45}}><b>Condition de base :</b> seules tes 7 paires sont scannées (EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD, GBP/JPY, EUR/JPY, CHF/JPY) — une devise de Londres contre une devise d'Asie-Pacifique.</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#c084fc", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>ENTRÉE</b> : attends le pullback au <b style={{color:"#c084fc"}}>Golden Pocket (61.8%–65%)</b> sur H1. Le pullback peut arriver pendant Londres, NY ou Tokyo — tu es patient. 2-3 rejets dans la zone puis tu entres. Stop serré, target 1.5-2×. Tu gardes en swing 1 à 3 jours — réévalue chaque matin à 10h00</span></div>
         </div>
-        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ MEILLEURE (surbrillance) : parmi les paires qui passent les 6 filtres Sniper Elite, celle qui a la plus forte divergence (souvent les 2 extrêmes absolus du classement). C'est le signal le plus net du jour.</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ MEILLEURE (surbrillance) : parmi les paires qui passent les 3 filtres, celle qui combine la plus forte divergence ET les Leveraged Funds les plus engagés. C'est le signal le plus net du jour.</div>
       </div>
 
       {/* EXEMPLE REEL - GBP/NZD */}
       <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
         <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:4}}>📐 EXEMPLE RÉEL — CHF/JPY ACHAT (entrée au Golden Pocket)</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength à 7h00 : CHF #1 (le plus fort, refuge Europe), JPY #6 (faible). Pourquoi CHF/JPY ACHAT cochait les 6 filtres Sniper Elite (Most Volatile inclus) — et pourquoi la position a tenu plusieurs jours.</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength : CHF fort (refuge Europe) vs JPY faible. Pourquoi CHF/JPY ACHAT cochait les 3 filtres APEX — et pourquoi la position a tenu plusieurs jours.</div>
         <div style={{display:"flex", flexDirection:"column", gap:6}}>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Divergence ✓</b> — CHF #1 vs JPY #6 = écart de 5 rangs. Les banques de Londres ont acheté le CHF (refuge européen) depuis 3h.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Top 2 momentum ✓</b> — CHF/JPY était #1 ou #2 des Top Gainers. Le cœur de la tempête, pas juste dans la liste.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Retail contrarien ✓</b> — le retail était SHORT 70%+ pendant que CHF/JPY montait. La foule piégée du mauvais côté = le carburant de la hausse.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Une de tes 7 paires ✓</b> — CHF/JPY oppose une devise de Londres (CHF) à une devise d'Asie (JPY). Pile ton type de paire.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Pas Least Volatile ✓</b> — CHF/JPY bougeait activement, pas dans les stagnantes.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Retail contrarien ✓</b> — le retail était SHORT à 70%+ pendant que toi tu achetais. Ils se faisaient piéger.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:14}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Most Volatile ✓ (obligatoire)</b> — CHF/JPY était DANS Most Volatile = mouvement explosif confirmé. Sans ça, pas de trade Sniper Elite.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:14}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Leveraged Funds ✓</b> — les hedge funds vendaient le JPY beaucoup plus que le CHF (chgNet COT). La vraie position institutionnelle confirmait la hausse de CHF/JPY.</span></div>
         </div>
-        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 6 filtres réunis = ALERTE SNIPER ELITE à 7h00. Tu observes l'impulsion de Londres (CHF fort, JPY faible) et tu traces le Fibonacci. Le pullback arrive pendant Tokyo — tu attends les 2-3 rejets dans le Golden Pocket (61.8%-65%) puis tu entres. Londres reprend le lendemain et continue dans le même sens. La position a tenu plusieurs jours tant que CHF restait fort et JPY faible. C'est exactement le type de swing que le système cherche : impulsion Londres → Golden Pocket Tokyo → continuation J+1.</div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 3 filtres réunis = ALERTE APEX. Tu observes l'impulsion (CHF fort, JPY faible) et tu traces le Fibonacci. Le cycle réel : Londres lance le matin, le pullback arrive au Golden Pocket (61.8%-65%) souvent pendant Tokyo le soir — tu attends 2-3 rejets puis tu entres. Le lendemain à 3h, Londres rachète CHF/JPY (le CHF leur appartient) et continue. La position tient plusieurs jours tant que CHF reste fort et JPY faible : impulsion Londres → Golden Pocket Tokyo → continuation J+1.</div>
       </div>
 
       {/* TABLEAU RECAP - PLAN DE TRADE */}
@@ -2865,11 +2863,11 @@ function DayTradeView() {
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:10}}>📋 TON PLAN DE TRADE — RÉSUMÉ</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           {[
-            {t:"7h00 ET", a:"Colle MarketMilk + lance l'analyse", p:"Midi à Londres — tendance mûre et stable", col:"#4ade80"},
+            {t:"10h-12h ET", a:"Colle MarketMilk + lance l'analyse", p:"Londres a tranché + NY a confirmé", col:"#4ade80"},
             {t:"Si alerte", a:"Attends le Golden Pocket (61.8-65%) sur H1 — peut arriver à NY ou Tokyo", p:"Meilleur prix — jamais sur l'extension", col:"#4ade80"},
             {t:"8h ET", a:"Si en position : tu gardes. Si tu attends encore le Golden Pocket : NY peut te le donner", p:"Le fondamental de Londres n'a pas changé — tu ne prends aucune nouvelle position", col:"#38bdf8"},
             {t:"Le soir", a:"Tu gardes — Asie prend le relais", p:"Tokyo continue sur JPY · Sydney continue sur AUD et NZD — toujours contre une devise de Londres", col:"#a78bfa"},
-            {t:"Chaque matin 7h00", a:"Réévalue ta position", p:"Devise forte toujours forte ? Tu gardes. Sinon tu sors. Stop remonté.", col:"#fbbf24"}
+            {t:"Chaque matin 10h", a:"Réévalue ta position", p:"Devise forte toujours forte ? Tu gardes. Sinon tu sors. Stop remonté.", col:"#fbbf24"}
           ].map((r,i)=>(
             <div key={i} style={{display:"flex", gap:10, alignItems:"flex-start", padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:`3px solid ${r.col}`}}>
               <span style={{fontSize:9, fontWeight:700, color:r.col, minWidth:54, paddingTop:1}}>{r.t}</span>
@@ -2880,21 +2878,21 @@ function DayTradeView() {
             </div>
           ))}
         </div>
-        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8, lineHeight:1.5}}>Si aucune alerte ne sort à 7h00 = pas de trade ce jour. La discipline d'attendre le bon setup fait partie de la stratégie.</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8, lineHeight:1.5}}>Si aucune alerte ne sort à 10h-12h = pas de trade ce jour. La discipline d'attendre le bon setup fait partie de la stratégie.</div>
       </div>
 
       {/* ENTREE TECHNIQUE GOLDEN POCKET */}
       <div style={{padding:"12px 14px", background:"#001a2e", borderRadius:8, border:"1px solid #38bdf855", marginBottom:14}}>
         <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, letterSpacing:1, marginBottom:4}}>📐 TON ENTRÉE — LA MÉCANIQUE (Golden Pocket)</div>
-        <div style={{fontSize:8, color:"#475569", marginBottom:12}}>7h00 = tu analyses et tu observes · tu n'entres PAS immédiatement · tu attends l'impulsion puis le pullback</div>
+        <div style={{fontSize:8, color:"#475569", marginBottom:12}}>10h-12h = tu analyses et tu observes · tu n'entres PAS immédiatement · tu attends le pullback Golden Pocket</div>
 
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8, marginBottom:12, padding:"10px 12px", background:"#001a0d", borderRadius:4, borderLeft:"3px solid #4ade80"}}>
           <b style={{color:"#38bdf8"}}>🎯 LA NUANCE CLÉ</b><br/><br/>
-          À 7h00, MarketMilk te montre l'<b>impulsion que Londres a déjà créée</b> depuis 4h. Tu identifies la direction (devise forte vs faible) et tu attends que le prix <b>recule dans le Golden Pocket (61.8%–65%)</b> avant d'entrer. Ce pullback peut arriver pendant Londres, pendant New York, ou même pendant Tokyo le soir — tu es patient. <b style={{color:"#fbbf24"}}>Tu n'entres jamais sur l'extension, toujours sur l'escompte.</b>
+          À 10h-11h, MarketMilk te montre la <b>vraie direction de Londres</b> (après le faux mouvement du matin), confirmée par New York. Tu identifies la direction (devise forte vs faible) et tu attends que le prix <b>recule dans le Golden Pocket (61.8%–65%)</b> avant d'entrer. Ce pullback peut arriver pendant Londres, pendant New York, ou même pendant Tokyo le soir — tu es patient. <b style={{color:"#fbbf24"}}>Tu n'entres jamais sur l'extension, toujours sur l'escompte.</b>
         </div>
 
         <div style={{display:"flex", flexDirection:"column", gap:8, marginBottom:14}}>
-          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#38bdf8", fontWeight:700, fontSize:12, minWidth:20}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#38bdf8"}}>7h00 — Impulsion confirmée</b> : MarketMilk montre la direction. Devise forte vs faible = l'impulsion de Londres. Tu identifies, tu n'entres pas encore.</span></div>
+          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#38bdf8", fontWeight:700, fontSize:12, minWidth:20}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#38bdf8"}}>10h-11h — Direction confirmée</b> : MarketMilk montre la vraie direction (Londres a tranché, NY a confirmé). Devise forte vs faible. Tu identifies, tu n'entres pas encore.</span></div>
           <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#c084fc", fontWeight:700, fontSize:12, minWidth:20}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>Trace le Fibonacci</b> sur la dernière impulsion (H1). Tu attends que le prix recule dans le <b style={{color:"#c084fc"}}>Golden Pocket (61.8%–65%)</b> — la zone où les fonds rachètent à escompte. Ça peut prendre des heures.</span></div>
           <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#fbbf24", fontWeight:700, fontSize:12, minWidth:20}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>2-3 rejets dans le pocket</b> : mèches de rejet + volume qui monte = les fonds accumulent. C'est leur empreinte. Tu entres avec eux au même prix.</span></div>
         </div>
@@ -3008,12 +3006,12 @@ function DayTradeView() {
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#00ff88,#4ade80)", border:"3px solid #00ff88", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#001a0d", fontWeight:900, boxShadow:"0 0 12px rgba(0,255,136,0.6)"}}>7h00</div>
+              <div style={{width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#00ff88,#4ade80)", border:"3px solid #00ff88", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#001a0d", fontWeight:900, boxShadow:"0 0 12px rgba(0,255,136,0.6)"}}>10h</div>
               <div style={{width:2, height:40, background:"#00ff8866"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8, padding:"8px 10px", background:"#052010", borderRadius:6, border:"1px solid #00ff8866", marginBottom:4}}>
-              <div style={{fontSize:10, color:"#00ff88", fontWeight:900}}>⚡ 7h00 ET — TU ANALYSES ET OBSERVES</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres roule depuis 4h (midi à Londres). Tendance mûre et stable. Retail piégé à contre-sens. Tes 6 filtres Sniper Elite te disent si les gros joueurs sont dans le trade.</div>
+              <div style={{fontSize:10, color:"#00ff88", fontWeight:900}}>⚡ 10h-12h ET — TU ANALYSES ET OBSERVES</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres a tranché sa vraie direction (le faux mouvement du matin est passé), NY a confirmé. Retail piégé + Leveraged Funds alignés. Tes 3 filtres te disent si les gros joueurs sont dans le trade.</div>
               <div style={{fontSize:8.5, color:"#00ff88", fontWeight:700, marginTop:4}}>→ Analyse la direction · identifie l'impulsion · attends le pullback Golden Pocket</div>
             </div>
           </div>
@@ -3059,7 +3057,7 @@ function DayTradeView() {
               <div style={{width:28, height:28, borderRadius:"50%", background:"#052010", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#4ade80", fontWeight:700}}>J+1</div>
             </div>
             <div style={{flex:1}}>
-              <div style={{fontSize:9, color:"#4ade80", fontWeight:700}}>LENDEMAIN 7h00 — LONDRES REPREND</div>
+              <div style={{fontSize:9, color:"#4ade80", fontWeight:700}}>LENDEMAIN 10h — LONDRES REPREND</div>
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Londres rouvre et reprend le mouvement. Tu rouvres MarketMilk : ta devise forte toujours en haut, la faible toujours en bas ? Le swing continue. L'écart se referme ? Tu sors.</div>
               <div style={{fontSize:8, color:"#4ade80", marginTop:2}}>→ Réévalue chaque matin. Tu gardes 1 à 3 jours.</div>
             </div>
@@ -3073,11 +3071,11 @@ function DayTradeView() {
         <div style={{display:"flex", flexDirection:"column", gap:10}}>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #38bdf8"}}>
             <div style={{fontSize:9, color:"#38bdf8", fontWeight:700, marginBottom:3}}>3h ET — Londres entre en premier</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Deutsche Bank, HSBC, BNP, Barclays ouvrent leurs desks. Avant de prendre position, ils ont analysé <b style={{color:"#38bdf8"}}>deux choses</b> : (1) ce qui s'est passé pendant la session asiatique (comment JPY/AUD/NZD ont bougé la nuit, le sentiment risk-on/risk-off), et (2) les news économiques européennes du matin (inflation, emploi, PIB UK/EU). C'est la combinaison de ces deux analyses qui dicte leur direction sur EUR/GBP/CHF contre AUD/NZD/JPY. Tu ne les vois pas entrer — mais tu vois leur résultat à 7h00 : EUR #1, JPY #8 = ils ont acheté EUR après avoir lu la session asiatique ET les news EU.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Deutsche Bank, HSBC, BNP, Barclays ouvrent leurs desks. Avant de prendre position, ils ont analysé <b style={{color:"#38bdf8"}}>deux choses</b> : (1) ce qui s'est passé pendant la session asiatique (comment JPY/AUD/NZD ont bougé la nuit, le sentiment risk-on/risk-off), et (2) les news économiques européennes du matin (inflation, emploi, PIB UK/EU). C'est la combinaison de ces deux analyses qui dicte leur direction sur EUR/GBP/CHF contre AUD/NZD/JPY. Tu ne les vois pas entrer — mais tu vois leur résultat à 10h-11h : EUR fort, JPY faible = ils ont acheté EUR après avoir lu la session asiatique ET les news EU.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
-            <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>7h00 ET — Tu lis leur trace, tu identifies l'impulsion, tu attends le Golden Pocket</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 6 filtres Sniper Elite confirment que le mouvement est réel. Tu identifies l'impulsion et tu attends le Golden Pocket (61.8%-65%) pour entrer au meilleur prix — pendant Londres, NY, ou Tokyo. Tu ne devines pas — tu confirmes, tu attends l'escompte, et tu suis. Comme un sniper qui attend le bon moment.</div>
+            <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>10h-12h ET — Tu lis leur trace, tu identifies la direction, tu attends le Golden Pocket</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 3 filtres (divergence + retail + Leveraged Funds) confirment que le mouvement est réel. Tu attends le Golden Pocket (61.8%-65%) pour entrer au meilleur prix — souvent pendant Tokyo le soir. Tu ne devines pas — tu confirmes, tu attends l'escompte, et tu suis. Comme un sniper.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>8h ET — New York ouvre, tu gardes</div>
@@ -3094,7 +3092,7 @@ function DayTradeView() {
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #c084fc"}}>
             <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:3}}>🔗 Comment les banques se passent le relais — sans se parler</div>
             <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.7}}>Aucune banque n'appelle l'autre. Voici exactement comment ça marche sur tes 7 paires :<br/><br/>
-            <b style={{color:"#38bdf8"}}>Londres lance à 3h :</b> Deutsche Bank, HSBC, BNP achètent EUR/GBP/CHF (devises de Londres) et vendent AUD/NZD/JPY (devises d'Asie) selon les données économiques européennes. Chaque paire oppose toujours une devise de Londres à une devise d'Asie — jamais deux devises de la même session. La divergence est créée — tu la lis à 7h00 sur MarketMilk.<br/><br/>
+            <b style={{color:"#38bdf8"}}>Londres lance à 3h :</b> Deutsche Bank, HSBC, BNP achètent EUR/GBP/CHF (devises de Londres) et vendent AUD/NZD/JPY (devises d'Asie) selon les données économiques européennes. Chaque paire oppose toujours une devise de Londres à une devise d'Asie — jamais deux devises de la même session. La divergence est créée — tu la lis à 10h-11h sur MarketMilk, une fois confirmée.<br/><br/>
             <b style={{color:"#fbbf24"}}>New York garde à 8h :</b> NY ne trade pas tes paires directement (pas de dollar dans tes 7 paires). Le fondamental n'a pas changé — la tendance de Londres tient. Si tu es en position : tu gardes. Si tu attends encore le Golden Pocket : NY peut te le donner.<br/><br/>
             <b style={{color:"#a78bfa"}}>Tokyo/Sydney reprennent le soir :</b> Les desks de Tokyo voient CHF/JPY en hausse depuis Londres — CHF fort (refuge européen, données solides), JPY faible (BoJ accommodant). Ils continuent à vendre le JPY car rien n'a changé au Japon. Sydney voit EUR/AUD et GBP/AUD (ou EUR/NZD et GBP/NZD) avec une devise de Londres forte contre une devise d'Océanie faible — ils continuent à vendre l'AUD et le NZD selon les données chinoises et australiennes. Même fondamental, même direction, nouvelle session.<br/><br/>
             <b style={{color:"#4ade80"}}>Londres reprend J+1 :</b> La divergence est toujours là ? Les European open traders voient la même tendance et continuent. C'est pour ça qu'un bon trade tient 1 à 3 jours — automatique, prévisible, répétable.</div>
@@ -3109,7 +3107,7 @@ function DayTradeView() {
           </div>
           <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2444"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>💡 La règle d'or</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tu ne sais jamais exactement ce que les banques font. Mais MarketMilk te montre CE QU'ELLES ONT DÉJÀ FAIT. Tes 6 filtres Sniper Elite confirment que le mouvement est réel. Tu ne devines pas — tu confirmes et tu suis. Tu n'es pas la liquidité. Tu suis la liquidité.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tu ne sais jamais exactement ce que les banques font. Mais MarketMilk + le COT te montrent CE QU'ELLES ONT DÉJÀ FAIT. Tes 3 filtres confirment que le mouvement est réel. Tu ne devines pas — tu confirmes et tu suis. Tu n'es pas la liquidité. Tu suis la liquidité.</div>
           </div>
         </div>
       </div>
