@@ -2923,6 +2923,7 @@ function DayTradeView() {
                     <div style={{ fontSize:8, color:TEXT, lineHeight:1.6 }}>
                       <span style={{color:x.f1===true?"#4ade80":x.f1===false?"#f87171":"#64748b"}}>① Divergence {x.forceGap!=null?x.forceGap+"r "+(x.f1?"✓":"✗"):"– (colle MarketMilk)"}</span> · <span style={{color:"#4ade80"}}>② Retail {x.direction==="LONG"?"SHORT":"LONG"} {x.direction==="LONG"?x.rShort:x.rLong}% ✓</span> · <span style={{color:"#a78bfa"}}>③ LF: {x.sCur} {x.lfS>=0?"+":""}{x.lfS?.toLocaleString()} vs {x.wCur} {x.lfW>=0?"+":""}{x.lfW?.toLocaleString()} ✓</span>
                     </div>
+                    <div style={{ fontSize:7.5, color:"#8b9bbf", marginTop:3, fontStyle:"italic" }}>💡 {x.lfS>=0 && x.lfW<0 ? `Les fonds achètent ${x.sCur} et vendent ${x.wCur} → ${x.sCur} plus fort` : (x.lfS<0 && x.lfW<0 ? `Les fonds vendent les deux, mais ${x.wCur} beaucoup plus → ${x.sCur} relativement plus fort` : `Les fonds achètent les deux, mais ${x.sCur} plus → ${x.sCur} favorisé`)}</div>
                     {is3 && <div style={{ fontSize:8, color:isBuy?"#86efac":"#fca5a5", marginTop:4, fontWeight:600 }}>→ Les 3 filtres convergent. {isBuy?"ACHÈTE":"VENDS"} {x.base}/{x.quote} : attends le Golden Pocket (61.8-65%) sur H1, souvent pendant Tokyo le soir. Stop serré, swing 1-3 jours.</div>}
                     {!is3 && <div style={{ fontSize:7.5, color:"#fbbf24", marginTop:3 }}>Retail + Leveraged Funds alignés. Colle MarketMilk + Analyse pour vérifier la divergence (①) et confirmer 3/3.</div>}
                   </div>
