@@ -2840,16 +2840,19 @@ function DayTradeView() {
             rDom = rLong>=rShort?"LONG":"SHORT";
             if (direction){ f2 = direction==="LONG" ? rShort>=70 : rLong>=70; }
           }
-          // leveraged funds
-          let f3=null, lfS=null, lfW=null;
-          if (direction){
+          // leveraged funds : toujours lire les chgNet (base + quote), meme sans direction
+          let f3=null, lfS=null, lfW=null, lfBase=null, lfQuote=null;
+          const cB=cot[CFTC_MAP[base]], cQ=cot[CFTC_MAP[quote]];
+          if (cB&&cB.chgNet!=null) lfBase=cB.chgNet;
+          if (cQ&&cQ.chgNet!=null) lfQuote=cQ.chgNet;
+          if (direction && strongCur && weakCur){
             const cS=cot[CFTC_MAP[strongCur]], cW=cot[CFTC_MAP[weakCur]];
             if (cS&&cW&&cS.chgNet!=null&&cW.chgNet!=null){ lfS=cS.chgNet; lfW=cW.chgNet; f3 = lfS>lfW; }
           }
           const known = [f1,f2,f3].filter(x=>x!==null);
           const passed = [f1,f2,f3].filter(x=>x===true).length;
           const total = known.length;
-          return {wpair, base, quote, direction, forceGap, f1, f2, f3, rLong, rShort, rDom, lfS, lfW, strongCur, weakCur, passed, total};
+          return {wpair, base, quote, direction, forceGap, f1, f2, f3, rLong, rShort, rDom, lfS, lfW, lfBase, lfQuote, strongCur, weakCur, passed, total};
         });
         // tri: 3/3 en haut, puis par nombre de filtres passes
         rows.sort((a,b)=> (b.passed-a.passed) || ((b.forceGap||0)-(a.forceGap||0)));
@@ -2879,8 +2882,8 @@ function DayTradeView() {
                 <div key={r.wpair} style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 1fr 1.1fr 0.7fr", gap:3, fontSize:8.5, alignItems:"center", padding:"6px 4px", borderBottom:"1px solid #0f1a2e", background:verdictBg }}>
                   <span style={{ fontWeight:700, color:TEXT }}>{r.base}/{r.quote}{r.direction&&<span style={{fontSize:7, color:r.direction==="LONG"?"#4ade80":"#f87171", marginLeft:3}}>{r.direction==="LONG"?"▲":"▼"}</span>}</span>
                   <span style={{ textAlign:"center", color:ckCol(r.f1), fontWeight:700 }}>{ck(r.f1)}{r.forceGap!=null?<span style={{fontSize:6.5, color:TEXT_DIM}}> {r.forceGap}r</span>:""}</span>
-                  <span style={{ textAlign:"center", color:ckCol(r.f2), fontWeight:700 }}>{ck(r.f2)}{r.rDom?<span style={{fontSize:6.5, color:TEXT_DIM}}> {r.rDom==="LONG"?"L":"S"}{Math.max(r.rLong,r.rShort)}%</span>:""}</span>
-                  <span style={{ textAlign:"center", color:ckCol(r.f3), fontWeight:700 }}>{ck(r.f3)}{r.lfS!=null?<span style={{fontSize:6.5, color:TEXT_DIM}}> {r.strongCur}&gt;{r.weakCur}</span>:""}</span>
+                  <span style={{ textAlign:"center", color:ckCol(r.f2), fontWeight:700 }}>{r.f2!==null?ck(r.f2):""}{r.rDom?<span style={{fontSize:7, color:r.f2===null?TEXT:TEXT_DIM}}>{r.f2!==null?" ":""}{r.rDom==="LONG"?"L":"S"}{Math.max(r.rLong,r.rShort)}%</span>:<span style={{color:"#475569"}}>–</span>}</span>
+                  <span style={{ textAlign:"center", color:ckCol(r.f3), fontWeight:700, lineHeight:1.2 }}>{r.f3!==null?ck(r.f3):""}{(r.lfBase!=null||r.lfQuote!=null)?<span style={{fontSize:6, color:TEXT_DIM, display:"block"}}>{r.base} {r.lfBase!=null?(r.lfBase>=0?"+":"")+(r.lfBase/1000).toFixed(1)+"k":"?"}<br/>{r.quote} {r.lfQuote!=null?(r.lfQuote>=0?"+":"")+(r.lfQuote/1000).toFixed(1)+"k":"?"}</span>:<span style={{color:"#475569"}}>–</span>}</span>
                   <span style={{ textAlign:"center", fontWeight:700, color:verdictColor, fontSize:8 }}>{is3?"🟢 3/3":r.total>0?(r.passed+"/"+r.total):"–"}</span>
                 </div>
               );
