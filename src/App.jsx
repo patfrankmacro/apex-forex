@@ -2604,6 +2604,8 @@ function DayTradeAnalyzer() {
       const volMeter = grabCurrencies("Currency Volatility Meter"); // 0 = plus volatile
       const strongest = strength[0], weakest = strength[strength.length-1];
       const sRank = {}; strength.forEach((c,i)=>sRank[c]=i);
+      // expose le Currency Strength pour le gros tableau de convergence
+      if (typeof window!=="undefined") { window.__apexStrength = {rank: sRank, order: strength, ts: Date.now()}; }
       const vRank = {}; volMeter.forEach((c,i)=>vRank[c]=i);
 
       const grabPairs = (startName, stops) => {
@@ -2624,21 +2626,13 @@ function DayTradeAnalyzer() {
         }
         return out;
       };
-      const gainers  = grabPairs("Top Gainers", ["Top Losers","Volatility","Most Volatile"]);
-      const losers   = grabPairs("Top Losers", ["Volatility","Most Volatile","Currency Volatility"]);
-      const mostVol  = grabPairs("Most Volatile", ["Least Volatile","MarketMilk","Copyright"]);
-      const volRankPair = {}; mostVol.forEach((p)=>volRankPair[p.pair]={rank:p.rank, chg:p.chg});
+      // (Top Gainers/Losers et Most Volatile ne sont plus utilises — systeme APEX 3 filtres)
 
       if (!strongest || !weakest){ setResult({error:"Format non reconnu — colle le bloc MarketMilk complet (Currency Strength inclus)."}); return; }
 
-      const leastVol = grabPairs("Least Volatile", ["MarketMilk","Copyright","Manage"]).map(p=>p.pair);
-      const TOP_RANK = 2; // SNIPER ELITE: la paire doit etre #1 ou #2 des gainers/losers (le coeur de la tempete)
       const candidates = [];
-      const SESSION_CURS = ["EUR","GBP","USD","CHF","CAD"]; // actives 6h-11h ET
       const nStr = strength.length;
-      const LONDON_CURS = ["EUR","GBP","CHF"];   // devises de Londres
       const WHITELIST = ["EURAUD","GBPAUD","EURNZD","GBPNZD","GBPJPY","EURJPY","CHFJPY"]; // les 7 paires autorisees (Londres EUR/GBP/CHF contre Asie-Pacifique AUD/NZD/JPY) - format sans slash
-      const NY_CURS = ["USD","CAD"];             // amplifient quand NY ouvre a 8h
       const GAP_MIN = 4;                          // divergence min (sur 8 devises)
       const diagnostic = []; // trace chaque paire whitelist : ou elle passe, ou elle bloque
       const CFTC_MAP = {EUR:"099741",GBP:"096742",JPY:"097741",CAD:"090741",AUD:"232741",CHF:"092741",USD:"098662",NZD:"112741"};
@@ -2719,7 +2713,7 @@ function DayTradeAnalyzer() {
   return (
     <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2455", marginBottom:14}}>
       <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🤖 ANALYSE AUTO — COLLE TES DONNÉES MARKETMILK</div>
-      <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici tout le contenu copié depuis marketmilk.babypips.com (Currency Strength, Volatility Meter, Gainers, Losers, Most Volatile)..." style={{width:"100%", minHeight:90, background:"#001018", color:TEXT, border:"1px solid #1e3a5f", borderRadius:6, padding:8, fontSize:9, fontFamily:"monospace", resize:"vertical"}}/>
+      <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici le contenu copié depuis marketmilk.babypips.com (le Currency Strength Meter suffit pour la divergence)..." style={{width:"100%", minHeight:90, background:"#001018", color:TEXT, border:"1px solid #1e3a5f", borderRadius:6, padding:8, fontSize:9, fontFamily:"monospace", resize:"vertical"}}/>
       <button onClick={analyze} style={{marginTop:8, width:"100%", padding:"10px", background:"#fbbf24", color:"#1a1500", border:"none", borderRadius:6, fontSize:11, fontWeight:700, letterSpacing:1, cursor:"pointer"}}>⚡ ANALYSER</button>
 
       {result && result.error && (<div style={{marginTop:10, padding:"10px", background:"#1a0a00", borderRadius:6, fontSize:9, color:"#fbbf24", lineHeight:1.6}}>{result.error}{result.strongest?<div style={{color:TEXT_DIM, marginTop:6, fontSize:8}}>Force du jour : {result.strongest} fort → {result.weakest} faible</div>:""}</div>)}
@@ -2809,20 +2803,17 @@ function DayTradeView() {
 
       <DayTradeAnalyzer />
 
-      {/* ===== TABLEAU LEVERAGED FUNDS (live, auto-update) ===== */}
+      {/* ===== GROS TABLEAU CONVERGENCE — TES 7 PAIRES (3 filtres) ===== */}
       {(() => {
         const CFTC_MAP = {EUR:"099741",GBP:"096742",JPY:"097741",CAD:"090741",AUD:"232741",CHF:"092741",USD:"098662",NZD:"112741"};
+        const PAIRS = ["EURAUD","GBPAUD","EURNZD","GBPNZD","GBPJPY","EURJPY","CHFJPY"];
         const cot = (typeof window!=="undefined" && window.__apexCot) ? window.__apexCot : {};
-        const buys = [], sells = [];
-        Object.entries(CFTC_MAP).forEach(([code, id]) => {
-          const x = cot[id];
-          if (!x || x.chgNet === undefined) return;
-          if (x.chgNet > 0) buys.push({ code, chgNet:x.chgNet, sw:x.switchType });
-          else if (x.chgNet < 0) sells.push({ code, chgNet:x.chgNet, sw:x.switchType });
-        });
-        buys.sort((a,b)=>b.chgNet-a.chgNet);
-        sells.sort((a,b)=>a.chgNet-b.chgNet);
-        if (buys.length===0 && sells.length===0) return null;
+        const retail = (typeof window!=="undefined" && window.__apexRetail) ? window.__apexRetail : {};
+        const strength = (typeof window!=="undefined" && window.__apexStrength) ? window.__apexStrength : null;
+        const sRank = strength ? strength.rank : null;
+        const hasCot = Object.keys(cot).length>0;
+        const hasRetail = Object.keys(retail).length>0;
+        // date CFTC + fraicheur
         const cftcDate = Object.values(cot).find(x=>x?.date)?.date;
         let freshLabel=null, freshColor="#475569";
         if (cftcDate){
@@ -2830,74 +2821,76 @@ function DayTradeView() {
           freshColor = days<=7?"#4ade80":days<=10?"#fbbf24":"#f87171";
           freshLabel = `${cftcDate} (${days}j — ${days<=7?"frais ✓":days<=10?"à surveiller":"périmé ⚠"})`;
         }
-        return (
-          <div style={{ marginBottom:14, padding:12, background:"#0a0a1e", border:"1px solid #a78bfa44", borderRadius:8 }}>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:4, marginBottom:8 }}>
-              <span style={{ fontSize:10, color:"#a78bfa", fontWeight:700, letterSpacing:1 }}>📊 BIAIS LEVERAGED FUNDS — FILTRE ③ (live)</span>
-              {freshLabel && <span style={{ fontSize:7.5, color:freshColor }}>📅 {freshLabel}</span>}
-            </div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-              <div>
-                <div style={{ fontSize:9, color:"#4ade80", fontWeight:700, marginBottom:5 }}>🟢 ACHÈTENT</div>
-                {buys.map(b => (
-                  <div key={b.code} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 7px", marginBottom:3, background:"#001a0d", border:"1px solid #4ade8033", borderRadius:4 }}>
-                    <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:10, fontWeight:700, color:TEXT }}><FlagImg code={b.code} size={13} /> {b.code}</span>
-                    <span style={{ fontSize:10, fontWeight:700, color:"#4ade80" }}>+{b.chgNet.toLocaleString()} {b.sw?"🔥":""}</span>
-                  </div>
-                ))}
-              </div>
-              <div>
-                <div style={{ fontSize:9, color:"#f87171", fontWeight:700, marginBottom:5 }}>🔴 VENDENT</div>
-                {sells.map(s => (
-                  <div key={s.code} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 7px", marginBottom:3, background:"#1a0000", border:"1px solid #f8717133", borderRadius:4 }}>
-                    <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:10, fontWeight:700, color:TEXT }}><FlagImg code={s.code} size={13} /> {s.code}</span>
-                    <span style={{ fontSize:10, fontWeight:700, color:"#f87171" }}>{s.chgNet.toLocaleString()} {s.sw?"🔥":""}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div style={{ fontSize:7.5, color:"#475569", marginTop:8, fontStyle:"italic", lineHeight:1.5 }}>🔥 = switch cette semaine · Pour acheter une paire, la devise forte doit être plus haut (plus achetée) que la faible. Ex : JPY vendu -17 555 et CHF -5 126 → CHF/JPY haussier (JPY beaucoup plus vendu). Mis à jour chaque vendredi (rapport CFTC).</div>
-          </div>
-        );
-      })()}
-
-      {/* ===== TABLEAU MARKET SENTIMENT RETAIL (Myfxbook, live) ===== */}
-      {(() => {
-        const PAIRS = ["EURAUD","GBPAUD","EURNZD","GBPNZD","GBPJPY","EURJPY","CHFJPY"];
-        const retail = (typeof window!=="undefined" && window.__apexRetail) ? window.__apexRetail : {};
-        const rows = [];
-        PAIRS.forEach(p => {
-          const r = retail[p] || retail[p.slice(0,3)+"/"+p.slice(3,6)];
-          if (!r || r.longPercentage==null || r.shortPercentage==null) return;
-          const lp = Math.round(r.longPercentage), sp = Math.round(r.shortPercentage);
-          const extreme = Math.max(lp,sp) >= 70;
-          rows.push({ pair:p, lp, sp, extreme, dom: lp>=sp?"LONG":"SHORT" });
+        const rows = PAIRS.map(wpair => {
+          const base = wpair.slice(0,3), quote = wpair.slice(3,6);
+          // direction via strength si dispo
+          let direction=null, forceGap=null, f1=null, strongCur=null, weakCur=null;
+          if (sRank && sRank[base]!=null && sRank[quote]!=null){
+            direction = sRank[base] < sRank[quote] ? "LONG" : "SHORT";
+            strongCur = direction==="LONG"?base:quote;
+            weakCur = direction==="LONG"?quote:base;
+            forceGap = Math.abs(sRank[base]-sRank[quote]);
+            f1 = forceGap>=4;
+          }
+          // retail
+          const r = retail[wpair] || retail[base+"/"+quote];
+          let f2=null, rLong=null, rShort=null, rDom=null;
+          if (r && r.longPercentage!=null && r.shortPercentage!=null){
+            rLong=Math.round(r.longPercentage); rShort=Math.round(r.shortPercentage);
+            rDom = rLong>=rShort?"LONG":"SHORT";
+            if (direction){ f2 = direction==="LONG" ? rShort>=70 : rLong>=70; }
+          }
+          // leveraged funds
+          let f3=null, lfS=null, lfW=null;
+          if (direction){
+            const cS=cot[CFTC_MAP[strongCur]], cW=cot[CFTC_MAP[weakCur]];
+            if (cS&&cW&&cS.chgNet!=null&&cW.chgNet!=null){ lfS=cS.chgNet; lfW=cW.chgNet; f3 = lfS>lfW; }
+          }
+          const known = [f1,f2,f3].filter(x=>x!==null);
+          const passed = [f1,f2,f3].filter(x=>x===true).length;
+          const total = known.length;
+          return {wpair, base, quote, direction, forceGap, f1, f2, f3, rLong, rShort, rDom, lfS, lfW, strongCur, weakCur, passed, total};
         });
-        if (rows.length===0) return null;
-        // tri: les plus extremes en haut
-        rows.sort((a,b)=> Math.max(b.lp,b.sp) - Math.max(a.lp,a.sp));
+        // tri: 3/3 en haut, puis par nombre de filtres passes
+        rows.sort((a,b)=> (b.passed-a.passed) || ((b.forceGap||0)-(a.forceGap||0)));
+        const ck = v => v===true?"✓":v===false?"✗":"–";
+        const ckCol = v => v===true?"#4ade80":v===false?"#f87171":"#475569";
         return (
-          <div style={{ marginBottom:14, padding:12, background:"#0a0a1e", border:"1px solid #34d39944", borderRadius:8 }}>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:4, marginBottom:8 }}>
-              <span style={{ fontSize:10, color:"#34d399", fontWeight:700, letterSpacing:1 }}>🎭 SENTIMENT RETAIL — FILTRE ② (Myfxbook live)</span>
+          <div style={{ marginBottom:14, padding:12, background:"#0a0f1e", border:"1px solid #38bdf855", borderRadius:8 }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:4, marginBottom:4 }}>
+              <span style={{ fontSize:11, color:"#38bdf8", fontWeight:700, letterSpacing:1 }}>🎯 CONVERGENCE — TES 7 PAIRES</span>
+              {freshLabel && <span style={{ fontSize:7.5, color:freshColor }}>📅 COT {freshLabel}</span>}
             </div>
-            {rows.map(r => (
-              <div key={r.pair} style={{ marginBottom:7 }}>
-                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:2 }}>
-                  <span style={{ fontSize:9.5, fontWeight:700, color:TEXT }}>{r.pair.slice(0,3)}/{r.pair.slice(3,6)}</span>
-                  <span style={{ fontSize:8, fontWeight:700, color:r.extreme?"#fbbf24":"#475569" }}>{r.extreme?("🎯 "+r.dom+" "+Math.max(r.lp,r.sp)+"% — contrarien prêt"):(Math.max(r.lp,r.sp)+"% "+r.dom+" (pas extrême)")}</span>
-                </div>
-                <div style={{ display:"flex", height:14, borderRadius:3, overflow:"hidden", border:"1px solid #1e3a5f" }}>
-                  <div style={{ width:r.lp+"%", background:"#16a34a", display:"flex", alignItems:"center", justifyContent:"center" }}>{r.lp>=18?<span style={{fontSize:7, color:"#fff", fontWeight:700}}>{r.lp}% L</span>:""}</div>
-                  <div style={{ width:r.sp+"%", background:"#dc2626", display:"flex", alignItems:"center", justifyContent:"center" }}>{r.sp>=18?<span style={{fontSize:7, color:"#fff", fontWeight:700}}>{r.sp}% S</span>:""}</div>
-                </div>
+            <div style={{ fontSize:8, color:TEXT_DIM, marginBottom:8 }}>① Divergence Currency Strength · ② Retail contrarien · ③ Leveraged Funds. {!sRank && <span style={{color:"#fbbf24"}}>Colle MarketMilk + Analyser pour activer ①.</span>}</div>
+            {(!hasCot || !hasRetail) && (
+              <div style={{ fontSize:8, color:"#fbbf24", marginBottom:8, padding:"5px 7px", background:"#1a1000", borderRadius:4 }}>
+                ⚠ {!hasRetail && "Retail Myfxbook non chargé"} {!hasCot && (!hasRetail?" · ":"")+"COT non chargé"} — recharge la page.
               </div>
-            ))}
-            <div style={{ fontSize:7.5, color:"#475569", marginTop:6, fontStyle:"italic", lineHeight:1.5 }}>🎯 = retail ≥70% d\'un côté (extrême) = contrarien prêt. On VEND ce que le retail achète, on ACHÈTE ce que le retail vend. La foule piégée = ton carburant. Live Myfxbook.</div>
+            )}
+            {/* en-tete colonnes */}
+            <div style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 1fr 1.1fr 0.7fr", gap:3, fontSize:7.5, color:TEXT_DIM, fontWeight:700, padding:"0 4px 4px", borderBottom:"1px solid #1e3a5f" }}>
+              <span>PAIRE</span><span style={{textAlign:"center"}}>① DIV</span><span style={{textAlign:"center"}}>② RETAIL</span><span style={{textAlign:"center"}}>③ LF</span><span style={{textAlign:"center"}}>VERDICT</span>
+            </div>
+            {rows.map(r => {
+              const is3 = r.passed===3 && r.total===3;
+              const verdictColor = is3?"#4ade80":r.passed===2?"#fbbf24":"#64748b";
+              const verdictBg = is3?"#052010":"transparent";
+              return (
+                <div key={r.wpair} style={{ display:"grid", gridTemplateColumns:"1.4fr 0.7fr 1fr 1.1fr 0.7fr", gap:3, fontSize:8.5, alignItems:"center", padding:"6px 4px", borderBottom:"1px solid #0f1a2e", background:verdictBg }}>
+                  <span style={{ fontWeight:700, color:TEXT }}>{r.base}/{r.quote}{r.direction&&<span style={{fontSize:7, color:r.direction==="LONG"?"#4ade80":"#f87171", marginLeft:3}}>{r.direction==="LONG"?"▲":"▼"}</span>}</span>
+                  <span style={{ textAlign:"center", color:ckCol(r.f1), fontWeight:700 }}>{ck(r.f1)}{r.forceGap!=null?<span style={{fontSize:6.5, color:TEXT_DIM}}> {r.forceGap}r</span>:""}</span>
+                  <span style={{ textAlign:"center", color:ckCol(r.f2), fontWeight:700 }}>{ck(r.f2)}{r.rDom?<span style={{fontSize:6.5, color:TEXT_DIM}}> {r.rDom==="LONG"?"L":"S"}{Math.max(r.rLong,r.rShort)}%</span>:""}</span>
+                  <span style={{ textAlign:"center", color:ckCol(r.f3), fontWeight:700 }}>{ck(r.f3)}{r.lfS!=null?<span style={{fontSize:6.5, color:TEXT_DIM}}> {r.strongCur}&gt;{r.weakCur}</span>:""}</span>
+                  <span style={{ textAlign:"center", fontWeight:700, color:verdictColor, fontSize:8 }}>{is3?"🟢 3/3":r.total>0?(r.passed+"/"+r.total):"–"}</span>
+                </div>
+              );
+            })}
+            <div style={{ fontSize:7.5, color:"#475569", marginTop:8, fontStyle:"italic", lineHeight:1.5 }}>
+              🟢 3/3 = les 3 filtres réunis = ALERTE (attends le Golden Pocket). ① divergence ≥4 rangs · ② retail ≥70% contrarien (on prend l'inverse de la foule) · ③ devise forte plus achetée/moins vendue que la faible (Lev. Funds COT). 🔗 <a href="https://marketmilk.babypips.com" target="_blank" rel="noreferrer" style={{color:"#38bdf8"}}>Ouvrir MarketMilk</a> pour le Currency Strength · COT mis à jour chaque vendredi.
+            </div>
           </div>
         );
       })()}
-
 
       {/* LOGIQUE */}
       <div style={{padding:"12px 14px", background:"#1a1500", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
@@ -2944,12 +2937,10 @@ function DayTradeView() {
         <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:4}}>📐 EXEMPLE RÉEL — CHF/JPY ACHAT (entrée au Golden Pocket)</div>
         <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength : CHF fort (refuge Europe) vs JPY faible. Pourquoi CHF/JPY ACHAT cochait les 3 filtres APEX — et pourquoi la position a tenu plusieurs jours.</div>
         <div style={{display:"flex", flexDirection:"column", gap:6}}>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Divergence ✓</b> — CHF #1 vs JPY #6 = écart de 5 rangs. Les banques de Londres ont acheté le CHF (refuge européen) depuis 3h.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Retail contrarien ✓</b> — le retail était SHORT 70%+ pendant que CHF/JPY montait. La foule piégée du mauvais côté = le carburant de la hausse.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Une de tes 7 paires ✓</b> — CHF/JPY oppose une devise de Londres (CHF) à une devise d'Asie (JPY). Pile ton type de paire.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Pas Least Volatile ✓</b> — CHF/JPY bougeait activement, pas dans les stagnantes.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700, minWidth:14}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Retail contrarien ✓</b> — le retail était SHORT à 70%+ pendant que toi tu achetais. Ils se faisaient piéger.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:14}}>⑥</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Leveraged Funds ✓</b> — les hedge funds vendaient le JPY beaucoup plus que le CHF (chgNet COT). La vraie position institutionnelle confirmait la hausse de CHF/JPY.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:14}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Divergence ✓</b> — CHF fort vs JPY le plus faible = écart ≥4 rangs au Currency Strength. Vraie divergence, pas deux voisines.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#34d399", fontWeight:700, minWidth:14}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Retail contrarien ✓</b> — le retail était SHORT 70%+ pendant que CHF/JPY montait. La foule piégée du mauvais côté = le carburant de la hausse, leurs stops alimentent le mouvement.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#a78bfa", fontWeight:700, minWidth:14}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Leveraged Funds ✓</b> — les hedge funds vendaient le JPY beaucoup plus (-17 555) que le CHF (-5 126). Le CHF était moins vendu = relativement plus fort. La vraie position institutionnelle confirmait la hausse de CHF/JPY.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1020", borderRadius:5}}><span style={{color:"#64748b", fontWeight:700, minWidth:14}}>📋</span><span style={{fontSize:8.5, color:TEXT_DIM, lineHeight:1.45}}><b>Condition de base ✓</b> — CHF/JPY est une de tes 7 paires (devise de Londres CHF contre devise d'Asie JPY).</span></div>
         </div>
         <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 3 filtres réunis = ALERTE APEX. Tu observes l'impulsion (CHF fort, JPY faible) et tu traces le Fibonacci. Le cycle réel : Londres lance le matin, le pullback arrive au Golden Pocket (61.8%-65%) souvent pendant Tokyo le soir — tu attends 2-3 rejets puis tu entres. Le lendemain à 3h, Londres rachète CHF/JPY (le CHF leur appartient) et continue. La position tient plusieurs jours tant que CHF reste fort et JPY faible : impulsion Londres → Golden Pocket Tokyo → continuation J+1.</div>
       </div>
@@ -3214,7 +3205,7 @@ function DayTradeView() {
         <div style={{fontSize:8.5, color:"#a7f3d0", marginBottom:12, lineHeight:1.4}}>Ouvre MarketMilk pour l'analyse, puis vérifie les news avant de prendre position.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <a href="https://marketmilk.babypips.com/" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001a10", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #00ff88"}}>
-            🥛 1. MarketMilk <span style={{color:TEXT_DIM, fontWeight:400, fontSize:9}}>— force, volatilité, momentum (colle ici pour l'analyse)</span>
+            🥛 1. MarketMilk <span style={{color:TEXT_DIM, fontWeight:400, fontSize:9}}>— Currency Strength des devises (colle ici pour l'analyse)</span>
           </a>
           <a href="https://tradingeconomics.com/stream" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001a10", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #fb923c"}}>
             📡 2. Trading Economics Stream <span style={{color:TEXT_DIM, fontWeight:400, fontSize:9}}>— flux macro mondial en direct</span>
