@@ -2584,9 +2584,9 @@ function DayTradeAnalyzer() {
       // Blocage horaire : FX seulement de 7h00 a 11h30 ET (session Londres, tendance muere)
       const nowET = new Date(new Date().toLocaleString("en-US", {timeZone:"America/New_York"}));
       const minsET = nowET.getHours()*60 + nowET.getMinutes();
-      if (minsET < 420 || minsET > 690) {
+      if (minsET < 600 || minsET > 720) {
         const hh = String(nowET.getHours()).padStart(2,"0"), mm = String(nowET.getMinutes()).padStart(2,"0");
-        setResult({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade FX s'analyse entre 7h00 et 11h30 ET (session de Londres). Avant 7h00, Londres n'a pas encore tranché — les classements oscillent. À 7h00 (midi à Londres) la tendance est mûre et stable. Après 11h30, Londres ferme. Reviens dans la fenêtre — pas de trade hors session.`});
+        setResult({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade FX s'analyse entre 10h00 et 12h00 ET. Pourquoi si tard ? Le mouvement du matin (3h-7h) est souvent un faux mouvement : Londres chasse les stops avant de révéler sa VRAIE direction. À 10h-11h, Londres a tranché et New York (ouvert depuis 8h) a confirmé. Londres ferme vers 11h30 — tu lis la direction finale, pas le piège du matin. Reviens dans la fenêtre 10h-12h.`});
         return;
       }
       const lines = raw.split("\n").map(l=>l.trim()).filter(Boolean);
@@ -2641,128 +2641,71 @@ function DayTradeAnalyzer() {
       const NY_CURS = ["USD","CAD"];             // amplifient quand NY ouvre a 8h
       const GAP_MIN = 4;                          // divergence min (sur 8 devises)
       const diagnostic = []; // trace chaque paire whitelist : ou elle passe, ou elle bloque
-      const consider = (p, direction) => {
-        // CRITERE 1 - DIVERGENCE SUFFISANTE (ecart >= 4 rangs)
-        const rb=sRank[p.base], rq=sRank[p.quote];
+      const CFTC_MAP = {EUR:"099741",GBP:"096742",JPY:"097741",CAD:"090741",AUD:"232741",CHF:"092741",USD:"098662",NZD:"112741"};
+      const cot = window.__apexCot || {};
+      // On parcourt les 7 paires de la whitelist. La direction vient du Currency Strength (forte vs faible).
+      WHITELIST.forEach((wpair)=>{
+        const base = wpair.slice(0,3), quote = wpair.slice(3,6);
+        const rb=sRank[base], rq=sRank[quote];
         if (rb===undefined||rq===undefined) return;
-        const strongCur = direction==="LONG"?p.base:p.quote;
-        const weakCur   = direction==="LONG"?p.quote:p.base;
+        // direction: on achete la paire si base plus forte que quote, sinon on vend
+        const direction = (rb < rq) ? "LONG" : "SHORT"; // rang plus petit = plus fort
+        const strongCur = direction==="LONG"?base:quote;
+        const weakCur   = direction==="LONG"?quote:base;
         const forceGap = Math.abs(rb-rq);
-        const isWL = WHITELIST.includes(p.pair);
-        // on ne trace au diagnostic QUE les 7 paires de la whitelist
-        const dg = {pair:p.pair, direction, f1:false, f2:false, f3:isWL, f4:false, f5:false, bonus:false, reason:""};
+        const dg = {pair:wpair, base, quote, direction, f1:false, f3:true, f5:false, fcot:false, reason:""};
+        // FILTRE 1 - DIVERGENCE >= 4 rangs
         const f1ok = (forceGap >= GAP_MIN) && (sRank[strongCur] < sRank[weakCur]);
         dg.f1 = f1ok; dg.forceGap = forceGap;
-        const f2ok = (p.rank <= TOP_RANK) && (p.chg!==null);
-        dg.f2 = f2ok; dg.rank = p.rank;
-        const f4ok = !leastVol.includes(p.pair);
-        dg.f4 = f4ok;
-        // retail
-        const rt0 = (window.__apexRetail||{})[p.pair] || (window.__apexRetail||{})[p.base+p.quote];
-        let f5ok=false, dgPct=null, dgSide=null, dgMissing=false;
-        if (rt0 && rt0.longPercentage!=null && rt0.shortPercentage!=null){
-          const lp0=Math.round(rt0.longPercentage), sp0=Math.round(rt0.shortPercentage);
-          if (direction==="LONG"){ dgPct=sp0; dgSide="SHORT"; f5ok = sp0>=70; }
-          else { dgPct=lp0; dgSide="LONG"; f5ok = lp0>=70; }
-        } else { dgMissing=true; f5ok=true; }
-        dg.f5 = f5ok; dg.retailPct=dgPct; dg.retailSide=dgSide; dg.retailMissing=dgMissing;
-        dg.bonus = !!volRankPair[p.pair];
-        if (isWL){
-          if (!dg.f1) dg.reason = forceGap<GAP_MIN ? ("divergence "+forceGap+" rangs (<4)") : "force pas du bon cote";
-          else if (!dg.f2) dg.reason = "pas dans le top 2 "+(direction==="LONG"?"gainers":"losers");
-          else if (!dg.f4) dg.reason = "dans Least Volatile (stagne)";
-          else if (!dg.f5) dg.reason = "retail "+dgPct+"% "+dgSide+" (<70%)";
-          else dg.reason = "PASSE TOUT ✓";
-          diagnostic.push(dg);
-        }
-        // CRITERE 1 (rejet reel)
-        if (rb===undefined||rq===undefined) return;
-        if (forceGap < GAP_MIN) return;
-        if (!(sRank[strongCur] < sRank[weakCur])) return;
-        // CRITERE 2
-        if (p.rank > TOP_RANK) return;
-        if (p.chg===null) return;
-        // CRITERE 3
-        const hasLondon = LONDON_CURS.includes(p.base) || LONDON_CURS.includes(p.quote);
-        if (!WHITELIST.includes(p.pair)) return;
-        // CRITERE 4
-        if (leastVol.includes(p.pair)) return;
-        // CRITERE 5 - RETAIL
-        const rt = (window.__apexRetail||{})[p.pair] || (window.__apexRetail||{})[p.base+p.quote];
-        let retailOk=false, retailPct=null, retailSide=null, retailMissing=false;
-        if (rt && rt.longPercentage!=null && rt.shortPercentage!=null){
-          const lp=Math.round(rt.longPercentage), sp=Math.round(rt.shortPercentage);
-          if (direction==="LONG"){ retailPct=sp; retailSide="SHORT"; retailOk = sp>=70; }
-          else { retailPct=lp; retailSide="LONG"; retailOk = lp>=70; }
-          if (!retailOk) return;
-        } else {
-          retailMissing=true;
-        }
-        // CRITERE 6 - MOST VOLATILE OBLIGATOIRE (Sniper Elite)
-        if (!volRankPair[p.pair]) return;
-        const v = volRankPair[p.pair];
-        const isVolatile = !!v;
-        const volRank = v?v.rank:null, volChg = v?v.chg:null;
-        const inMostVol2 = isVolatile && volRank <= 1;
-        const hasNY = NY_CURS.includes(p.base) || NY_CURS.includes(p.quote); // continuation NY
-        const isMaxDiv = (p.base===strongest&&p.quote===weakest)||(p.base===weakest&&p.quote===strongest);
-        const score = forceGap*10 + (10-p.rank*3) + (inMostVol2?8:0) + (hasNY?4:0) + (isMaxDiv?5:0) + Math.abs(p.chg);
-        const driverVol = false;
-        candidates.push({...p, direction, forceGap, isMaxDiv, isVolatile, volRank, volChg, score, inMostVol2, hasNY, driverVol, retailOk, retailPct, retailSide, retailMissing, weakCur, strongCur,
-          strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: nStr});
-      };
-      gainers.forEach(p=>consider(p,"LONG"));
-      losers.forEach(p=>consider(p,"SHORT"));
-
-      candidates.sort((a,b)=>b.score-a.score);
-      const top = candidates.slice(0,3);
-      if (top.length>0) top[0].surbrillance = true; // la meilleure = surbrillance
-
-      // DIAGNOSTIC COMPLET DES 7 PAIRES (toujours affiche, meme celles sans momentum)
-      const diag7 = [];
-      WHITELIST.forEach(wpair => {
-        const base = wpair.slice(0,3), quote = wpair.slice(3,6);
-        const rb = sRank[base], rq = sRank[quote];
-        // chercher la paire dans gainers (ACHAT) ou losers (VENTE)
-        const inG = gainers.find(p=>p.pair===wpair);
-        const inL = losers.find(p=>p.pair===wpair);
-        let direction=null, rank=null, chg=null, hasMomentum=false;
-        if (inG){ direction="LONG"; rank=inG.rank; chg=inG.chg; hasMomentum = inG.rank<=TOP_RANK; }
-        else if (inL){ direction="SHORT"; rank=inL.rank; chg=inL.chg; hasMomentum = inL.rank<=TOP_RANK; }
-        // si pas de direction connue, on devine via la force (forte vs faible) pour info
-        if (!direction && rb!==undefined && rq!==undefined){ direction = rb<rq ? "LONG":"SHORT"; }
-        const strongCur = direction==="LONG"?base:quote;
-        const weakCur = direction==="LONG"?quote:base;
-        const forceGap = (rb!==undefined&&rq!==undefined)?Math.abs(rb-rq):null;
-        const f1 = forceGap!==null && forceGap>=GAP_MIN && (sRank[strongCur]<sRank[weakCur]);
-        const f2 = hasMomentum;
-        const f4 = !leastVol.includes(wpair);
-        const rt0 = (window.__apexRetail||{})[wpair];
-        let f5=false, rPct=null, rSide=null, rMiss=false, rLong=null, rShort=null;
+        // FILTRE RETAIL - contrarien >= 70%
+        const rt0 = (window.__apexRetail||{})[wpair] || (window.__apexRetail||{})[base+quote];
+        let f5ok=false, rLong=null, rShort=null, rMiss=false;
         if (rt0 && rt0.longPercentage!=null && rt0.shortPercentage!=null){
           const lp0=Math.round(rt0.longPercentage), sp0=Math.round(rt0.shortPercentage);
           rLong=lp0; rShort=sp0;
-          if (direction==="LONG"){ rPct=sp0; rSide="SHORT"; f5=sp0>=70; }
-          else { rPct=lp0; rSide="LONG"; f5=lp0>=70; }
-        } else { rMiss=true; f5=true; }
-        const f6 = !!volRankPair[wpair]; // SNIPER ELITE: Most Volatile obligatoire
-        const bonus = f6;
-        let reason="", status="";
-        if (!inG && !inL){ status="dort"; reason="pas de momentum (absente des Top Gainers/Losers)"; }
-        else if (!f1){ status="bloque"; reason = forceGap<GAP_MIN ? ("divergence "+forceGap+" rangs (<4)") : "force pas du bon cote"; }
-        else if (!f2){ status="bloque"; reason="rang #"+rank+" (hors top 2)"; }
-        else if (!f4){ status="bloque"; reason="dans Least Volatile (stagne)"; }
-        else if (!f5){ status="bloque"; reason="retail déjà "+(direction==="LONG"?"Long":"Short")+" (besoin "+(direction==="LONG"?"Short":"Long")+" ≥70%)"; }
-        else if (!f6){ status="bloque"; reason="hors Most Volatile (mouvement pas assez explosif)"; }
-        else { status="passe"; reason="PASSE TOUT"; }
-        diag7.push({pair:wpair, direction, rank, forceGap, f1,f2,f4,f5,f6, bonus, rPct, rSide, rMiss, rLong, rShort, reason, status, hasMomentum});
+          if (direction==="LONG"){ f5ok = sp0>=70; }   // achat -> retail short 70%+
+          else { f5ok = lp0>=70; }                       // vente -> retail long 70%+
+        } else { rMiss=true; f5ok=false; }
+        dg.f5 = f5ok; dg.rLong=rLong; dg.rShort=rShort; dg.rMiss=rMiss;
+        // FILTRE LEVERAGED FUNDS - la devise forte doit etre achetee, la faible vendue (chgNet)
+        const cotStrong = cot[CFTC_MAP[strongCur]];
+        const cotWeak   = cot[CFTC_MAP[weakCur]];
+        let fcotok=false, lfStrongNet=null, lfWeakNet=null, lfMiss=false;
+        if (cotStrong && cotWeak && cotStrong.chgNet!=null && cotWeak.chgNet!=null){
+          lfStrongNet = cotStrong.chgNet; lfWeakNet = cotWeak.chgNet;
+          // aligne: la forte est plus achetee (chgNet plus eleve) que la faible
+          fcotok = (lfStrongNet > lfWeakNet) && (lfStrongNet > lfWeakNet);
+        } else { lfMiss=true; fcotok=false; }
+        dg.fcot = fcotok; dg.lfStrongNet=lfStrongNet; dg.lfWeakNet=lfWeakNet; dg.lfMiss=lfMiss; dg.strongCur=strongCur; dg.weakCur=weakCur;
+        // raison de blocage
+        if (!dg.f1) dg.reason = forceGap<GAP_MIN ? ("divergence "+forceGap+" rangs (<4)") : "force pas du bon cote";
+        else if (!dg.f5) dg.reason = rMiss ? "retail non disponible" : ("retail deja "+(direction==="LONG"?"Long":"Short")+" (besoin "+(direction==="LONG"?"Short":"Long")+" ≥70%)");
+        else if (!dg.fcot) dg.reason = lfMiss ? "Leveraged Funds non disponibles" : "Leveraged Funds pas alignes (la forte pas plus achetee que la faible)";
+        else dg.reason = "PASSE TOUT";
+        dg.status = dg.f1&&dg.f5&&dg.fcot ? "passe" : "bloque";
+        diagnostic.push(dg);
+        // CANDIDAT REEL si les 4 filtres passent
+        if (!f1ok) return;
+        if (!f5ok) return;
+        if (!fcotok) return;
+        const isMaxDiv = (base===strongest&&quote===weakest)||(base===weakest&&quote===strongest);
+        const lfGap = (lfStrongNet!=null&&lfWeakNet!=null) ? (lfStrongNet - lfWeakNet) : 0;
+        const score = forceGap*10 + (isMaxDiv?5:0) + Math.abs(lfGap)/1000;
+        candidates.push({pair:wpair, base, quote, direction, forceGap, isMaxDiv, score, retailPct:(direction==="LONG"?rShort:rLong), retailSide:(direction==="LONG"?"SHORT":"LONG"), retailMissing:rMiss, weakCur, strongCur, lfStrongNet, lfWeakNet,
+          strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: nStr});
       });
-      // tri: passe d abord, puis bloque, puis dort
-      const ordre={passe:0,bloque:1,dort:2};
-      diag7.sort((a,b)=> (ordre[a.status]-ordre[b.status]) || ((b.forceGap||0)-(a.forceGap||0)));
 
-      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session (London-NY 6h-11h ET) — aucune paire active ne converge. Pas de trade = bonne décision.", strongest, weakest, diag7}); return; }
-      setResult({ strongest, weakest, top, diag7 });
+      // tri des candidats par score, la meilleure = surbrillance
+      candidates.sort((a,b)=>b.score-a.score);
+      const top = candidates.slice(0,3);
+      if (top.length>0) top[0].surbrillance = true;
+
+      // DIAGNOSTIC: on tri passe d'abord, puis bloque, par divergence
+      const ordre={passe:0,bloque:1};
+      diagnostic.sort((a,b)=> (ordre[a.status]-ordre[b.status]) || ((b.forceGap||0)-(a.forceGap||0)));
+
+      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session — aucune de tes 7 paires ne réunit les 3 filtres (divergence + retail contrarien + Leveraged Funds alignés). Pas de trade = bonne décision.", strongest, weakest, diag7: diagnostic}); return; }
+      setResult({ strongest, weakest, top, diag7: diagnostic });
     } catch(e){ setResult({error:"Erreur: "+e.message}); }
   };
 
@@ -2785,7 +2728,7 @@ function DayTradeAnalyzer() {
             <div key={i} style={{display:"flex", flexDirection:"column", gap:2, padding:"5px 7px", marginBottom:4, background:bg, borderRadius:4, borderLeft:"3px solid "+col, opacity:d.status==="dort"?0.6:1}}>
               <div style={{fontSize:9, color:TEXT, fontWeight:700}}>{pp} {d.direction&&d.status!=="dort"?<span style={{color:d.direction==="LONG"?"#4ade80":"#f87171"}}>{d.direction==="LONG"?"▲ ACHAT":"▼ VENTE"}</span>:""}</div>
               {d.status!=="dort" && (
-                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Strength {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f2?"✓":"✗"} {d.direction==="LONG"?"Top Gainers":"Top Losers"}{d.rank?" #"+d.rank:""} · ④ {d.f4?"✓":"✗"} hors Least Vol · ⑤ {d.f5?"✓":"✗"} retail · ⑥ {d.f6?"✓":"✗"} Most Vol</div>
+                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Divergence {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f5?"✓":"✗"} Retail ≥70% · ③ {d.fcot?"✓":"✗"} Leveraged Funds</div>
               )}
               {d.status!=="dort" && !d.rMiss && d.rLong!=null && (
                 <div style={{marginTop:2}}>
@@ -2795,11 +2738,14 @@ function DayTradeAnalyzer() {
                   </div>
                 </div>
               )}
-              <div style={{fontSize:8, color:col, fontWeight:600}}>{d.status==="passe"?"✓ PASSE TOUT — alerte !":d.status==="dort"?"💤 "+d.reason:"✗ bloque : "+d.reason}</div>
+              {d.lfStrongNet!=null && d.lfWeakNet!=null && (
+                <div style={{fontSize:7.5, color:TEXT_DIM, fontFamily:"monospace"}}>💼 LF: {d.strongCur} {d.lfStrongNet>=0?"+":""}{d.lfStrongNet?.toLocaleString()} vs {d.weakCur} {d.lfWeakNet>=0?"+":""}{d.lfWeakNet?.toLocaleString()}</div>
+              )}
+              <div style={{fontSize:8, color:col, fontWeight:600}}>{d.status==="passe"?"✓ PASSE TOUT — alerte !":"✗ bloque : "+d.reason}</div>
             </div>
             );
           })}
-          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Vert = passe · Rouge = bloque près du but · Gris = dort (pas de momentum). Tri : prêtes en haut.</div>
+          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Vert = passe les 3 filtres · Rouge = bloque. Tri : prêtes en haut. LF = Leveraged Funds (changement hebdo COT).</div>
         </div>
       )}
 
@@ -2831,15 +2777,15 @@ function DayTradeAnalyzer() {
               </div>
               <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>
                 <b style={{color:o.direction==="LONG"?"#4ade80":"#f87171"}}>POURQUOI {o.direction==="LONG"?"ACHETER":"VENDRE"} :</b> {o.strongCur} est {o.strongRank===0?"la devise la plus FORTE":"forte ("+(o.strongRank+1)+"e)"} et {o.weakCur} {o.weakRank===o.strengthLen-1?"la plus FAIBLE":"faible ("+(o.weakRank+1)+"e)"}. La {o.direction==="LONG"?"forte monte contre la faible → on achète":"faible chute contre la forte → on vend"}.<br/>
-                <b style={{color:"#38bdf8"}}>POURQUOI CETTE PAIRE :</b> {o.isMaxDiv?"divergence MAXIMALE (les 2 extrêmes absolus du classement). ":`divergence de ${o.forceGap} rangs au Currency Strength. `}Contient une devise de Londres = active à ton entrée 7h00, opposée à une devise d'Asie-Pacifique qui prend le relais le soir.<br/>
-                <b style={{color:"#fbbf24"}}>LE SIGNAL :</b> {o.direction==="LONG"?"top gainer":"top loser"} #{o.rank} ({o.chg>0?"+":""}{o.chg}%, mouvement de Londres lancé) · divergence {o.forceGap} rangs{o.isVolatile?` · Most Volatile #${o.volRank+1} (${o.volChg}%)`:""}<br/>
+                <b style={{color:"#38bdf8"}}>POURQUOI CETTE PAIRE :</b> {o.isMaxDiv?"divergence MAXIMALE (les 2 extrêmes absolus du classement). ":`divergence de ${o.forceGap} rangs au Currency Strength. `}Oppose une devise de Londres (EUR/GBP/CHF) à une devise d'Asie-Pacifique (AUD/NZD/JPY) qui prend le relais le soir.<br/>
+                <b style={{color:"#fbbf24"}}>LEVERAGED FUNDS :</b> les hedge funds achètent {o.strongCur} ({o.lfStrongNet>=0?"+":""}{o.lfStrongNet?.toLocaleString()}) et vendent {o.weakCur} ({o.lfWeakNet>=0?"+":""}{o.lfWeakNet?.toLocaleString()}) — la vraie position institutionnelle confirme ta direction ✓<br/>
                 <b style={{color:"#34d399"}}>RETAIL CONTRARIEN :</b> {o.retailMissing?"⚠ Myfxbook non connecté — retail non vérifié":`${o.retailPct}% du retail est ${o.retailSide} = à contre-sens de toi. Ils se font piéger, leurs stops alimentent ton mouvement ✓`}<br/>
                 <b style={{color:"#c084fc"}}>EXÉCUTION :</b> attends un repli {o.direction==="LONG"?"baissier puis achète quand ça repart vers le haut":"haussier puis vends quand ça repart vers le bas"} (H1/M15). Stop serré {o.direction==="LONG"?"sous le dernier creux":"au-dessus du dernier sommet"} · target 1.5-2× le risque.
               </div>
             </div>
           );})}
           <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
-            ⚠ SNIPER ELITE — chaque paire coche les 6 critères OBLIGATOIRES (divergence ≥4 rangs + top 2 momentum + une de tes paires + pas Least Volatile + DANS Most Volatile + retail contrarien ≥70%). Le setup le plus explosif et le plus rare. Classées par divergence et continuation NY. Attends le Golden Pocket (61.8-65%) pour entrer — Londres, NY ou Tokyo. Garde en swing 1 à 3 jours.
+            ⚠ APEX INSTITUTIONNEL — chaque paire réunit les 3 filtres OBLIGATOIRES : divergence ≥4 rangs au Currency Strength + retail contrarien ≥70% + Leveraged Funds alignés (la vraie position des hedge funds). Tu suis les big boys de Londres. Attends le Golden Pocket (61.8-65%) pour entrer — Londres, NY ou Tokyo le soir. Garde en swing 1 à 3 jours.
           </div>
         </div>
       )}
@@ -3349,6 +3295,7 @@ export default function App() {
       const map = {};
       res.forEach(([code, val]) => { if (val) map[code] = val; });
       setApexCot(map);
+      window.__apexCot = map; // expose pour le DayTradeAnalyzer (filtre Leveraged Funds)
     };
     loadCOT();
     // Refresh COT chaque vendredi 21h30 EST (publication CFTC) + vérif toutes les heures
