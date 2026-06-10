@@ -2811,7 +2811,7 @@ function DayTradeView() {
       <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (1-3 jours) — 3 filtres : divergence Currency Strength + retail contrarien + Leveraged Funds · Tu suis les big boys de Londres</div>
 
       {/* SEQUENCE VISUELLE DU JOUR */}
-      <div style={{padding:"14px 14px 6px", background:"linear-gradient(180deg,#0a0f1e,#0a1020)", borderRadius:10, border:"1px solid #38bdf855", marginBottom:16}}>
+      <div style={{padding:"11px 12px 4px", background:"linear-gradient(180deg,#0a0f1e,#0a1020)", borderRadius:10, border:"1px solid #38bdf855", marginBottom:14}}>
         <div style={{fontSize:12, color:"#38bdf8", fontWeight:800, letterSpacing:0.5, marginBottom:3, textAlign:"center"}}>📋 TA SÉQUENCE DU JOUR</div>
         <div style={{fontSize:8, color:TEXT_DIM, marginBottom:14, textAlign:"center", fontStyle:"italic"}}>Suis les étapes de haut en bas. Une action à la fois.</div>
         {(() => {
@@ -2824,15 +2824,15 @@ function DayTradeView() {
             {n:"6", icon:"🛡️", color:"#34d399", t:"TU GARDES 1 À 3 JOURS", sub:"Asie relaie le soir, Londres reprend à 3h. Tu sors quand ta devise forte faiblit."},
           ];
           return steps.map((s,i)=>(
-            <div key={s.n} style={{display:"flex", gap:11, alignItems:"flex-start", position:"relative", paddingBottom: i<steps.length-1?14:6}}>
+            <div key={s.n} style={{display:"flex", gap:11, alignItems:"flex-start", position:"relative", paddingBottom: i<steps.length-1?9:4}}>
               {/* ligne verticale reliant les etapes */}
-              {i<steps.length-1 && <div style={{position:"absolute", left:15, top:32, width:2, height:"calc(100% - 18px)", background:`linear-gradient(180deg,${s.color}66,${steps[i+1].color}66)`}}/>}
+              {i<steps.length-1 && <div style={{position:"absolute", left:13, top:26, width:2, height:"calc(100% - 14px)", background:`linear-gradient(180deg,${s.color}66,${steps[i+1].color}66)`}}/>}
               {/* cercle numero */}
-              <div style={{minWidth:32, width:32, height:32, borderRadius:"50%", background:s.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:900, color:"#08111f", zIndex:1, boxShadow:`0 0 10px ${s.color}55`}}>{s.n}</div>
+              <div style={{minWidth:26, width:26, height:26, borderRadius:"50%", background:s.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:900, color:"#08111f", zIndex:1, boxShadow:`0 0 8px ${s.color}55`}}>{s.n}</div>
               {/* contenu */}
               <div style={{flex:1, paddingTop:1}}>
-                <div style={{fontSize:11, fontWeight:800, color:s.color, letterSpacing:0.3, marginBottom:2, display:"flex", alignItems:"center", gap:5}}><span style={{fontSize:14}}>{s.icon}</span> {s.t}</div>
-                <div style={{fontSize:9, color:TEXT, lineHeight:1.5}}>{s.sub}</div>
+                <div style={{fontSize:10, fontWeight:800, color:s.color, letterSpacing:0.3, marginBottom:1, display:"flex", alignItems:"center", gap:5}}><span style={{fontSize:12}}>{s.icon}</span> {s.t}</div>
+                <div style={{fontSize:8, color:TEXT, lineHeight:1.45}}>{s.sub}</div>
               </div>
             </div>
           ));
