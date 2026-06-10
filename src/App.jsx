@@ -2584,7 +2584,7 @@ function DayTradeAnalyzer() {
       // Blocage horaire : FX seulement de 10h00 a 12h00 ET (Londres a tranche, NY a confirme)
       const nowET = new Date(new Date().toLocaleString("en-US", {timeZone:"America/New_York"}));
       const minsET = nowET.getHours()*60 + nowET.getMinutes();
-      if (minsET < 630 || minsET > 645) {
+      if (minsET < 630 || minsET > 655) {
         const hh = String(nowET.getHours()).padStart(2,"0"), mm = String(nowET.getMinutes()).padStart(2,"0");
         const avant = minsET < 630;
         setResult({error:`⏰ Il est ${hh}h${mm} à New York. Le Swing Trade FX s'analyse UNIQUEMENT entre 10h30 et 10h45 ET. ${avant ? "Pourquoi pas avant ? Les desks de Londres construisent leurs positions jusqu'à ~10h, et les données US de 10h00 ont besoin de 30 minutes de digestion. À 10h30, leur conviction est complète et le classement est stable." : "Pourquoi pas après ? Le London Fix de 11h crée un spike artificiel, puis les desks clôturent (11h-11h30), puis Londres ferme — le classement flotte sur le bruit de NY. La lecture n'est plus propre."} Reviens demain à 10h30 — une analyse par jour, 15 minutes de clarté.`});
