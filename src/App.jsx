@@ -3095,6 +3095,42 @@ function DayTradeView() {
         </div>
       </div>
 
+      {/* OU SONT LES BIG BOYS - PSYCHO HEURE PAR HEURE */}
+      <div style={{padding:"12px 14px", background:"#160a2e", borderRadius:8, border:"1px solid #c084fc44", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#c084fc", fontWeight:700, marginBottom:4}}>🧠 OÙ SONT LES BIG BOYS — ET COMMENT PENSER À CHAQUE HEURE</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginBottom:10, fontStyle:"italic"}}>Le marché bouge selon QUI est assis à son desk, et OÙ. Voici où sont les gros joueurs à chaque heure — et la mentalité à avoir pour les suivre sans te faire piéger.</div>
+        <div style={{display:"flex", flexDirection:"column", gap:8}}>
+          <div style={{padding:"8px 10px", background:"#0a1020", borderRadius:6, borderLeft:"3px solid #64748b"}}>
+            <div style={{fontSize:9, color:"#94a3b8", fontWeight:700, marginBottom:2}}>🌙 NUIT (19h-3h ET) — L'ASIE ACCUMULE EN SILENCE</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Les desks de Tokyo, Singapour et Hong Kong construisent doucement leurs positions dans un range serré. Pas de gros mouvement — ils accumulent tranquillement avant la tempête. Le volume est faible.</div>
+            <div style={{fontSize:8, color:"#c084fc", marginTop:3, fontWeight:600}}>🧠 Ta mentalité : tu dors. Le décor se met en place sans toi. Rien à faire.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#0a1020", borderRadius:6, borderLeft:"3px solid #38bdf8"}}>
+            <div style={{fontSize:9, color:"#38bdf8", fontWeight:700, marginBottom:2}}>⚠️ 3h ET — LONDRES ENTRE… ET TEND LE PIÈGE</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Les banques (Deutsche, HSBC, BNP, Barclays) ouvrent. Leur PREMIER geste n'est pas de révéler leur direction : elles poussent le prix sous un support ou au-dessus d'une résistance pour <b style={{color:"#f87171"}}>déclencher les stops du retail</b> (liquidity grab). Ces stops qui sautent = la liquidité dont elles ont besoin pour remplir leurs vraies positions à bon prix.</div>
+            <div style={{fontSize:8, color:"#c084fc", marginTop:3, fontWeight:600}}>🧠 Ta mentalité : ne crois JAMAIS le premier mouvement. C'est une fausse cassure conçue pour piéger les impatients. Tu observes, tu ne touches à rien.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#0a1020", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
+            <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:2}}>👀 8h ET — NEW YORK ARRIVE, LA VÉRITÉ SE RÉVÈLE</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Le vrai flux institutionnel est en place. New York confirme la direction de Londres — c'est le chevauchement Londres-NY, le moment de plus haute liquidité (70% du volume mondial passe ici entre 8h et 12h). Les banques ne cachent plus leur jeu.</div>
+            <div style={{fontSize:8, color:"#c084fc", marginTop:3, fontWeight:600}}>🧠 Ta mentalité : la direction se confirme, mais tu n'agis pas encore. Tu attends que la session soit mûre. Patience.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
+            <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:2}}>🎯 10h-12h ET — TU LIS LA TRACE, TU MONTES DANS LEUR TRAIN</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Londres a tranché, NY a confirmé, le piège du matin est loin derrière. MarketMilk te montre OÙ le capital est allé : quelle devise est forte, laquelle est faible. Tes 3 filtres confirment que le mouvement est réel.</div>
+            <div style={{fontSize:8, color:"#c084fc", marginTop:3, fontWeight:600}}>🧠 Ta mentalité : tu n'es pas le marché, tu es le passager. Tu montes dans leur train une fois qu'il roule — jamais avant. Tu suis, tu ne devines pas.</div>
+          </div>
+          <div style={{padding:"8px 10px", background:"#0a1020", borderRadius:6, borderLeft:"3px solid #a78bfa"}}>
+            <div style={{fontSize:9, color:"#a78bfa", fontWeight:700, marginBottom:2}}>🌏 LE SOIR — L'ASIE REPREND LE FLAMBEAU</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tokyo rouvre et voit la tendance que Londres a posée. Les desks asiatiques — disciplinés, suiveurs de tendance — la continuent car les fondamentaux n'ont pas changé. Le JPY continue de bouger à Tokyo, l'AUD/NZD à Sydney. Le flux change de mains, pas de direction.</div>
+            <div style={{fontSize:8, color:"#c084fc", marginTop:3, fontWeight:600}}>🧠 Ta mentalité : tu gardes. Tu fais confiance au relais. Tant que ta devise forte reste forte, tu restes dans le train.</div>
+          </div>
+        </div>
+        <div style={{fontSize:8, color:"#c084fc", marginTop:10, padding:"8px 10px", background:"#1a0a2e", borderRadius:6, lineHeight:1.6, fontWeight:600, textAlign:"center"}}>
+          La règle d'or : les institutions piègent le matin, révèlent à midi, et relaient le soir. Toi, tu ne joues jamais le piège — tu lis la trace et tu suis le train une fois qu'il roule.
+        </div>
+      </div>
+
       {/* TIMELINE GPS FX */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #4ade8044", marginBottom:14}}>
         <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:4}}>🗺️ GPS — L'AGENDA DES GROS JOUEURS FX</div>
