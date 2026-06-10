@@ -2586,7 +2586,7 @@ function DayTradeAnalyzer() {
       const minsET = nowET.getHours()*60 + nowET.getMinutes();
       if (minsET < 600 || minsET > 720) {
         const hh = String(nowET.getHours()).padStart(2,"0"), mm = String(nowET.getMinutes()).padStart(2,"0");
-        setResult({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade FX s'analyse entre 10h00 et 12h00 ET. Pourquoi si tard ? Le mouvement du matin (3h-7h) est souvent un faux mouvement : Londres chasse les stops avant de révéler sa VRAIE direction. À 10h-11h, Londres a tranché et New York (ouvert depuis 8h) a confirmé. Londres ferme vers 11h30 — tu lis la direction finale, pas le piège du matin. Reviens dans la fenêtre 10h-12h.`});
+        setResult({error:`⏰ Il est ${hh}h${mm} à New York. Le Swing Trade FX s'analyse entre 10h00 et 12h00 ET. Pourquoi si tard ? Le mouvement du matin (3h-7h) est souvent un faux mouvement : Londres chasse les stops avant de révéler sa VRAIE direction. À 10h-11h, Londres a tranché et New York (ouvert depuis 8h) a confirmé. Londres ferme vers 11h30 — tu lis la direction finale, pas le piège du matin. Reviens dans la fenêtre 10h-12h.`});
         return;
       }
       const lines = raw.split("\n").map(l=>l.trim()).filter(Boolean);
@@ -2798,7 +2798,7 @@ function DayTradeView() {
   const ACCENT="#38bdf8", TEXT="#c8d4f0", TEXT_DIM="#4a5070", BORDER="#1a1a2e";
   return (
     <div style={{padding:16, maxWidth:760, margin:"0 auto"}}>
-      <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ DAY TRADE FX — APEX INSTITUTIONNEL (3 FILTRES)</div>
+      <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ SWING TRADE FX — APEX INSTITUTIONNEL (3 FILTRES)</div>
       <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (1-3 jours) — 3 filtres : divergence Currency Strength + retail contrarien + Leveraged Funds · Tu suis les big boys de Londres</div>
 
       <DayTradeAnalyzer />
@@ -2938,7 +2938,7 @@ function DayTradeView() {
       <div style={{padding:"12px 14px", background:"#1a1500", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 LA LOGIQUE</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
-          Les <b style={{color:"#fbbf24"}}>gros joueurs</b> (banques, fonds) déplacent des milliards chaque jour. Quand ils achètent une devise elle devient <b style={{color:"#4ade80"}}>FORTE</b>, quand ils la vendent elle devient <b style={{color:"#f87171"}}>FAIBLE</b>. Ces positions ne se débouclent pas en une heure — les institutions sont puissantes mais lentes. Un mouvement qu'elles lancent peut durer <b>plusieurs jours</b>. On ne devine pas, <b>on SUIT ce flux</b>.<br/><br/>
+          Les <b style={{color:"#fbbf24"}}>gros joueurs de Londres</b> (banques, fonds) prennent position pendant leur session. Quand ils achètent une devise elle devient <b style={{color:"#4ade80"}}>FORTE</b>, quand ils la vendent elle devient <b style={{color:"#f87171"}}>FAIBLE</b>. Tu ne devines pas leur direction : tu attends que Londres ait fait <b>toute sa session</b> (3h→11h30 ET), puis à 10h-12h tu lis le résultat sur MarketMilk. Le mouvement qu'ils lancent ne meurt pas à la fermeture de Londres — New York le tient, l'Asie le relaie le soir, Londres le reprend le lendemain. C'est pour ça que ta position dure <b>1 à 3 jours</b> : pas parce que les institutions sont lentes, mais parce que le flux passe de session en session. <b>On ne devine pas, on SUIT ce flux.</b><br/><br/>
           Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence Currency Strength), quand le retail est piégé à contre-sens ET que les Leveraged Funds confirment la même direction.<br/><br/>
           <b style={{color:"#38bdf8"}}>⏰ 10h00-12h00 ET — ton moment d'analyse :</b> Pourquoi si tard ? Le mouvement du matin (3h-7h) est souvent un <b style={{color:"#fbbf24"}}>faux mouvement</b> : Londres chasse les stops (liquidity grab) avant de révéler sa VRAIE direction. Si tu analyses à 7h, tu vois le piège, pas la tendance. À 10h-11h, Londres a tranché et New York (ouvert depuis 8h) a confirmé. Londres ferme vers 11h30 — tu lis la <b style={{color:"#fbbf24"}}>direction finale</b>. Tu identifies l'impulsion et tu attends le pullback au Golden Pocket (61.8%-65%) — qui arrive souvent pendant Tokyo le soir — pour entrer derrière les big boys au meilleur prix.<br/><br/>
           <b style={{color:"#a78bfa"}}>🔁 Pourquoi tes positions durent 1 à 3 jours :</b> tes 7 paires opposent une devise de Londres (<b>EUR/GBP/CHF</b>) à une devise du bloc asiatique-Pacifique (<b>AUD/NZD/JPY</b>). Aucune n'est une paire du dollar. Le mouvement passe de main en main sans s'éteindre : <b>Londres</b> le lance le matin, tu gardes ta position pendant <b>New York</b> (8h), puis la <b>session asiatique</b> (Tokyo + Sydney) prend le relais le soir — les devises d'Asie (JPY à Tokyo, AUD/NZD à Sydney) continuent leur mouvement contre les devises de Londres. Le lendemain Londres reprend.<br/><br/><b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> dernière confirmation. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant.
@@ -3084,10 +3084,11 @@ function DayTradeView() {
       <div style={{padding:"12px 14px", background:"#1a0a2e", borderRadius:8, border:"1px solid #a855f744", marginBottom:14}}>
         <div style={{fontSize:11, color:"#c084fc", fontWeight:700, marginBottom:8}}>🧠 LA PSYCHOLOGIE</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
-          <b style={{color:"#c084fc"}}>Reste du côté du flux.</b> Tu ne prédis pas — tu suis ce qui bouge déjà. La devise forte attire les acheteurs, la faible attire les vendeurs : tu te places dans ce courant et tu y restes tant qu'il tient.<br/><br/>
-          <b style={{color:"#c084fc"}}>Ne chasse pas un mouvement trop avancé.</b> Si une paire a déjà fait +1.5% aujourd'hui, le gros du mouvement est peut-être passé. Entre sur un <b>repli</b>, pas sur l'extension. Le bon moment = quand le momentum reprend après une petite pause.<br/><br/>
-          <b style={{color:"#c084fc"}}>La volatilité est ton amie ET ton ennemie.</b> Elle crée les pips, mais aussi les faux mouvements. Stop serré et discipline absolue.<br/><br/>
-          <b style={{color:"#fbbf24"}}>Une décision, une exécution.</b> Pas de sur-analyse, pas de revenge trade. Une fois dans le swing, laisse le flux travailler — ne touche pas à ta position par impatience.
+          <b style={{color:"#c084fc"}}>Tu n'es pas le marché — tu suis ceux qui le font.</b> Les banques de Londres déplacent des milliards. Toi, tu déplaces un petit compte. Tu ne peux pas pousser le prix, mais tu peux <b>monter dans leur train</b>. Ton seul travail : lire où ils sont allés, et te placer derrière eux. Pas devant, pas contre. Derrière.<br/><br/>
+          <b style={{color:"#c084fc"}}>La patience d'attendre la session complète.</b> Londres ouvre à 3h et travaille jusqu'à 11h30. Tu ne juges pas à 4h ni à 7h — c'est là qu'ils piègent (faux mouvements, chasse aux stops). Tu attends que <b>toute leur session soit jouée</b> et tu lis le résultat à 10h-12h. Laisser Londres finir son travail avant de lire = la base de tout. L'impatience te fait lire le piège au lieu de la vérité.<br/><br/>
+          <b style={{color:"#c084fc"}}>Trois preuves valent mieux que ton intuition.</b> Tu n'entres que si la divergence (où est le capital), le retail piégé (qui est du mauvais côté) et les Leveraged Funds (la vraie position des fonds) disent la même chose. Si une seule manque, tu n'as pas assez de preuves — tu attends. Ton opinion ne compte pas : seules les 3 preuves comptent.<br/><br/>
+          <b style={{color:"#c084fc"}}>Observer sans ego.</b> Tu ne cherches pas à avoir raison, tu cherches à suivre. Si les big boys changent de direction (la devise forte faiblit, les LF se retournent), tu sors sans débattre. Tu n'es pas marié à ta position — tu es marié au flux institutionnel. Quand il tourne, tu tournes.<br/><br/>
+          <b style={{color:"#fbbf24"}}>Pas d'alerte = pas de trade.</b> Certains matins, aucune paire ne réunit les 3 preuves. C'est normal et c'est voulu. Ne force jamais un trade pour "faire quelque chose". La discipline d'attendre le bon setup EST la stratégie. Un jour sans trade est un bon jour si le setup n'était pas là.
         </div>
       </div>
 
@@ -3121,15 +3122,29 @@ function DayTradeView() {
             </div>
           </div>
 
+
+
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#052010", border:"2px solid #00ff88", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#00ff88", fontWeight:700}}>6h</div>
-              <div style={{width:2, height:32, background:"#00ff8844"}}/>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a2a00", border:"2px solid #fbbf24", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#fbbf24", fontWeight:700}}>8h</div>
+              <div style={{width:2, height:32, background:"#fbbf2444"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#00ff88", fontWeight:700}}>6h00 ET — PRÉPARE-TOI</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Ouvre ton rituel. MarketMilk + calendrier éco + news. Lis la tendance de Londres.</div>
-              <div style={{fontSize:8, color:"#00ff88", marginTop:2}}>→ Rituel du matin. Check tes ressources.</div>
+              <div style={{fontSize:9, color:"#fbbf24", fontWeight:700}}>8h00 ET — NEW YORK OUVRE</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>New York entre et confirme (ou non) la direction de Londres. Tes paires n'ont pas de dollar, donc NY ne les trade pas directement — mais son volume valide la tendance. Tu n'analyses pas encore : tu attends 10h que Londres ait fait toute sa session. Tu observes seulement.</div>
+              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Observe seulement. Pas d'analyse, pas de position avant 10h.</div>
+            </div>
+          </div>
+
+          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a1500", border:"2px solid #fbbf24", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fbbf24", fontWeight:700}}>8h30</div>
+              <div style={{width:2, height:32, background:"#fbbf2422"}}/>
+            </div>
+            <div style={{flex:1, paddingBottom:8}}>
+              <div style={{fontSize:9, color:"#fbbf24", fontWeight:700}}>8h30 ET — NEWS US ⚠️</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>NFP, CPI, FOMC. Peut accélérer OU renverser brutalement. Ne pas entrer après une news.</div>
+              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Tu n'as pas encore de position (analyse à 10h). Laisse la news passer — elle fait partie de ce que Londres et NY digèrent avant que tu lises la direction finale à 10h.</div>
             </div>
           </div>
 
@@ -3144,31 +3159,6 @@ function DayTradeView() {
               <div style={{fontSize:8.5, color:"#00ff88", fontWeight:700, marginTop:4}}>→ Analyse la direction · identifie l'impulsion · attends le pullback Golden Pocket</div>
             </div>
           </div>
-
-          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
-            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a2a00", border:"2px solid #fbbf24", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#fbbf24", fontWeight:700}}>8h</div>
-              <div style={{width:2, height:32, background:"#fbbf2444"}}/>
-            </div>
-            <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#fbbf24", fontWeight:700}}>8h00 ET — NEW YORK OUVRE</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>New York entre. Tes paires n'ont pas de dollar, donc NY ne les trade pas directement. Le fondamental de Londres n'a pas changé — tu ne prends aucune nouvelle position à 8h. Si tu as déjà un trade ouvert (Golden Pocket atteint pendant Londres) : tu gardes. Si tu attends encore le pullback : NY peut te le donner.</div>
-              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Si en position : tu gardes, remonte ton stop. Si tu attends le pocket : observe, NY peut le donner.</div>
-            </div>
-          </div>
-
-          <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
-            <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a1500", border:"2px solid #fbbf24", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fbbf24", fontWeight:700}}>8h30</div>
-              <div style={{width:2, height:32, background:"#fbbf2422"}}/>
-            </div>
-            <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#fbbf24", fontWeight:700}}>8h30 ET — NEWS US ⚠️</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>NFP, CPI, FOMC. Peut accélérer OU renverser brutalement. Ne pas entrer après une news.</div>
-              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Si en position : ne panique pas sur un pic, ton fondamental Londres↔Asie n'a pas changé, ton stop protège déjà ta position. Si pas encore entré : n'entre PAS pendant une news — attends que la poussière retombe.</div>
-            </div>
-          </div>
-
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
               <div style={{width:28, height:28, borderRadius:"50%", background:"#160a2e", border:"2px solid #a78bfa", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#a78bfa", fontWeight:700}}>Soir</div>
@@ -3618,7 +3608,7 @@ export default function App() {
           </div>
         </div>
         <div style={{ display:"flex", gap:6, flexWrap:"wrap", alignItems:"center" }}>
-          <button onClick={()=>setView("daytrade")} style={{ padding:"6px 12px", borderRadius:6, fontSize:10, fontWeight:800, letterSpacing:1, cursor:"pointer", border: view==="daytrade"?"2px solid #fbbf24":"2px solid #fbbf2466", background: view==="daytrade"?"#fbbf24":"#1a1500", color: view==="daytrade"?"#1a1500":"#fbbf24", fontFamily:"'IBM Plex Mono'", boxShadow:"0 0 8px rgba(251,191,36,0.3)" }}>⚡ DAY TRADE FX</button>
+          <button onClick={()=>setView("daytrade")} style={{ padding:"6px 12px", borderRadius:6, fontSize:10, fontWeight:800, letterSpacing:1, cursor:"pointer", border: view==="daytrade"?"2px solid #fbbf24":"2px solid #fbbf2466", background: view==="daytrade"?"#fbbf24":"#1a1500", color: view==="daytrade"?"#1a1500":"#fbbf24", fontFamily:"'IBM Plex Mono'", boxShadow:"0 0 8px rgba(251,191,36,0.3)" }}>⚡ SWING TRADE FX</button>
           <button onClick={()=>setView("daytradeor")} style={{ padding:"6px 12px", borderRadius:6, fontSize:10, fontWeight:800, letterSpacing:1, cursor:"pointer", border: view==="daytradeor"?"2px solid #fbbf24":"2px solid #fbbf2466", background: view==="daytradeor"?"#fbbf24":"#1a1500", color: view==="daytradeor"?"#1a1500":"#fbbf24", fontFamily:"'IBM Plex Mono'", boxShadow:"0 0 8px rgba(251,191,36,0.3)" }}>⚡ DAY TRADE OR</button>
           <div style={{ width:1, height:20, background:BORDER, margin:"0 2px" }} />
           {TABS.map(t=><button key={t.id} style={tabStyle(view===t.id)} onClick={()=>setView(t.id)}>{t.label}</button>)}
