@@ -2798,7 +2798,7 @@ function DayTradeView() {
   const ACCENT="#38bdf8", TEXT="#c8d4f0", TEXT_DIM="#4a5070", BORDER="#1a1a2e";
   return (
     <div style={{padding:16, maxWidth:760, margin:"0 auto"}}>
-      <div style={{fontSize:13, color:"#fbbf24", fontWeight:700, letterSpacing:2, marginBottom:4}}>⚡ SWING TRADE FX — APEX INSTITUTIONNEL (3 FILTRES)</div>
+      <div style={{fontSize:15, color:"#fbbf24", fontWeight:900, letterSpacing:1.5, marginBottom:5}}>⚡ SWING TRADE FX</div><div style={{fontSize:9, color:"#fbbf24aa", fontWeight:700, letterSpacing:2, marginBottom:4}}>APEX INSTITUTIONNEL · 3 FILTRES</div>
       <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (1-3 jours) — 3 filtres : divergence Currency Strength + retail contrarien + Leveraged Funds · Tu suis les big boys de Londres</div>
 
       <DayTradeAnalyzer />
@@ -2935,8 +2935,8 @@ function DayTradeView() {
       })()}
 
       {/* LOGIQUE */}
-      <div style={{padding:"12px 14px", background:"#1a1500", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 LA LOGIQUE</div>
+      <div style={{padding:"12px 14px", background:"#1a1500", borderRadius:8, border:"1px solid #fbbf2455", marginBottom:14}}>
+        <div style={{fontSize:12, color:"#fbbf24", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #fbbf2433"}}>🎯 LA LOGIQUE</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
           <b style={{color:"#fbbf24"}}>Londres est le centre du forex mondial.</b> À elle seule, la City traite environ <b>40% de tout le volume de change de la planète</b> — près de 4 700 milliards de dollars par jour, devant New York (2 300 G$) et Singapour (1 500 G$). Quand Londres prend une direction, ce n'est pas une opinion : c'est la plus grosse force du marché qui se met en mouvement.<br/><br/>
           Ces flux viennent des <b>banques (Deutsche Bank, HSBC, BNP, Barclays) et des hedge funds</b>. Quand ils achètent massivement une devise, elle devient <b style={{color:"#4ade80"}}>FORTE</b> ; quand ils la vendent, elle devient <b style={{color:"#f87171"}}>FAIBLE</b>. Tu ne peux pas faire bouger le prix avec ton compte — eux le font. Ton edge, c'est de <b>lire leur trace et te placer derrière eux</b>.<br/><br/>
@@ -2951,7 +2951,7 @@ function DayTradeView() {
 
       {/* POURQUOI CES 7 PAIRES */}
       <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:8}}>🎯 POURQUOI CES 7 PAIRES</div>
+        <div style={{fontSize:12, color:"#4ade80", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #4ade8033"}}>🎯 POURQUOI CES 7 PAIRES</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.6, marginBottom:10}}>
           On trade UNIQUEMENT : <b style={{color:"#4ade80"}}>EUR/AUD · GBP/AUD · EUR/NZD · GBP/NZD · GBP/JPY · EUR/JPY · CHF/JPY</b>. Chacune oppose une devise de Londres (EUR, GBP, CHF) à une devise du bloc Asie-Pacifique (AUD, NZD, JPY). Pas de paires CAD : le CAD est une devise de session New York, pas de notre relais Londres↔Asie.
         </div>
@@ -2966,7 +2966,7 @@ function DayTradeView() {
 
       {/* SEQUENCE */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:10}}>📋 LA SÉQUENCE — ÉTAPE PAR ÉTAPE</div>
+        <div style={{fontSize:12, color:"#38bdf8", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #38bdf833"}}>📋 LA SÉQUENCE — ÉTAPE PAR ÉTAPE</div>
         <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie ces 3 filtres OBLIGATOIRES sur tes 7 paires quand tu colles tes données. Une alerte n'apparaît QUE si les 3 sont cochés. Chaque filtre mesure une chose DIFFÉRENTE : où est le capital (Currency Strength), qui est piégé en face (retail), et ce que les vraies institutions font (Leveraged Funds). Quand les 3 convergent, tu suis les big boys avec le maximum de preuves.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE ≥ 4 rangs</b> au Currency Strength : la devise forte et la faible séparées d'au moins 4 places (vraie divergence, pas 2 voisines)</span></div>
@@ -2980,7 +2980,7 @@ function DayTradeView() {
 
       {/* EXEMPLE REEL - GBP/NZD */}
       <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:4}}>📐 EXEMPLE RÉEL — CHF/JPY ACHAT (entrée au Golden Pocket)</div>
+        <div style={{fontSize:12, color:"#4ade80", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #4ade8033"}}>📐 EXEMPLE RÉEL — CHF/JPY ACHAT</div>
         <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength : CHF fort (refuge Europe) vs JPY faible. Pourquoi CHF/JPY ACHAT cochait les 3 filtres APEX — et pourquoi la position a tenu plusieurs jours.</div>
         <div style={{display:"flex", flexDirection:"column", gap:6}}>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:14}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Divergence ✓</b> — CHF fort vs JPY le plus faible = écart ≥4 rangs au Currency Strength. Vraie divergence, pas deux voisines.</span></div>
@@ -2993,7 +2993,7 @@ function DayTradeView() {
 
       {/* TABLEAU RECAP - PLAN DE TRADE */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:10}}>📋 TON PLAN DE TRADE — RÉSUMÉ</div>
+        <div style={{fontSize:12, color:"#fbbf24", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #fbbf2433"}}>📋 TON PLAN DE TRADE — RÉSUMÉ</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           {[
             {t:"10h-12h ET", a:"Colle MarketMilk + lance l'analyse", p:"Londres a tranché + NY a confirmé", col:"#4ade80"},
@@ -3015,7 +3015,7 @@ function DayTradeView() {
 
       {/* ENTREE TECHNIQUE GOLDEN POCKET */}
       <div style={{padding:"12px 14px", background:"#001a2e", borderRadius:8, border:"1px solid #38bdf855", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, letterSpacing:1, marginBottom:4}}>📐 TON ENTRÉE — LA MÉCANIQUE (Golden Pocket)</div>
+        <div style={{fontSize:12, color:"#38bdf8", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #38bdf833"}}>📐 TON ENTRÉE — LA MÉCANIQUE (Golden Pocket)</div>
         <div style={{fontSize:8, color:"#475569", marginBottom:12}}>10h-12h = tu analyses et tu observes · tu n'entres PAS immédiatement · tu attends le pullback Golden Pocket</div>
 
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8, marginBottom:12, padding:"10px 12px", background:"#001a0d", borderRadius:4, borderLeft:"3px solid #4ade80"}}>
@@ -3085,7 +3085,7 @@ function DayTradeView() {
 
       {/* PSYCHOLOGIE */}
       <div style={{padding:"12px 14px", background:"#1a0a2e", borderRadius:8, border:"1px solid #a855f744", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#c084fc", fontWeight:700, marginBottom:8}}>🧠 LA PSYCHOLOGIE</div>
+        <div style={{fontSize:12, color:"#c084fc", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #c084fc33"}}>🧠 LA PSYCHOLOGIE</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
           <b style={{color:"#c084fc"}}>Tu n'es pas le marché — tu suis ceux qui le font.</b> Les banques de Londres déplacent des milliards. Toi, tu déplaces un petit compte. Tu ne peux pas pousser le prix, mais tu peux <b>monter dans leur train</b>. Ton seul travail : lire où ils sont allés, et te placer derrière eux. Pas devant, pas contre. Derrière.<br/><br/>
           <b style={{color:"#c084fc"}}>La patience d'attendre la session complète.</b> Londres ouvre à 3h et travaille jusqu'à 11h30. Tu ne juges pas à 4h ni à 7h — c'est là qu'ils piègent (faux mouvements, chasse aux stops). Tu attends que <b>toute leur session soit jouée</b> et tu lis le résultat à 10h-12h. Laisser Londres finir son travail avant de lire = la base de tout. L'impatience te fait lire le piège au lieu de la vérité.<br/><br/>
@@ -3097,7 +3097,7 @@ function DayTradeView() {
 
       {/* OU SONT LES BIG BOYS - PSYCHO HEURE PAR HEURE */}
       <div style={{padding:"12px 14px", background:"#160a2e", borderRadius:8, border:"1px solid #c084fc44", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#c084fc", fontWeight:700, marginBottom:4}}>🧠 OÙ SONT LES BIG BOYS — ET COMMENT PENSER À CHAQUE HEURE</div>
+        <div style={{fontSize:12, color:"#c084fc", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #c084fc33"}}>🧠 OÙ SONT LES BIG BOYS — HEURE PAR HEURE</div>
         <div style={{fontSize:8, color:TEXT_DIM, marginBottom:10, fontStyle:"italic"}}>Le marché bouge selon QUI est assis à son desk, et OÙ. Voici où sont les gros joueurs à chaque heure — et la mentalité à avoir pour les suivre sans te faire piéger.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <div style={{padding:"8px 10px", background:"#0a1020", borderRadius:6, borderLeft:"3px solid #64748b"}}>
@@ -3133,7 +3133,7 @@ function DayTradeView() {
 
       {/* TIMELINE GPS FX */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #4ade8044", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#4ade80", fontWeight:700, marginBottom:4}}>🗺️ GPS — L'AGENDA DES GROS JOUEURS FX</div>
+        <div style={{fontSize:12, color:"#4ade80", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #4ade8033"}}>🗺️ GPS — L'AGENDA DES GROS JOUEURS FX</div>
         <div style={{fontSize:8, color:TEXT_DIM, marginBottom:12}}>Suis leur agenda. Entre derrière eux. Comme un sniper.</div>
         <div style={{display:"flex", flexDirection:"column", gap:0}}>
 
@@ -3225,7 +3225,7 @@ function DayTradeView() {
       </div>
 
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🏦 COMPRENDRE L'AGENDA INSTITUTIONNEL — COMMENT LES SUIVRE</div>
+        <div style={{fontSize:12, color:"#fbbf24", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #fbbf2433"}}>🏦 COMPRENDRE L'AGENDA INSTITUTIONNEL</div>
         <div style={{display:"flex", flexDirection:"column", gap:10}}>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #38bdf8"}}>
             <div style={{fontSize:9, color:"#38bdf8", fontWeight:700, marginBottom:3}}>3h ET — Londres entre en premier</div>
@@ -3272,7 +3272,7 @@ function DayTradeView() {
 
       {/* RITUEL DU MATIN - 4 LIENS */}
       <div style={{padding:"14px", background:"linear-gradient(135deg, #001a0d 0%, #003319 100%)", borderRadius:8, border:"2px solid #00ff88", borderLeft:"5px solid #00ff88", boxShadow:"0 0 16px rgba(0,255,136,0.4)"}}>
-        <div style={{fontSize:11, color:"#00ff88", fontWeight:700, marginBottom:4}}>☀️ TON RITUEL DU MATIN — 6h ET</div>
+        <div style={{fontSize:12, color:"#00ff88", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #00ff8833"}}>☀️ TON RITUEL DU MATIN</div>
         <div style={{fontSize:8.5, color:"#a7f3d0", marginBottom:12, lineHeight:1.4}}>Ouvre MarketMilk pour l'analyse, puis vérifie les news avant de prendre position.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <a href="https://marketmilk.babypips.com/" target="_blank" rel="noopener noreferrer" style={{display:"block", padding:"10px 12px", background:"#001a10", color:TEXT, borderRadius:6, fontSize:10, fontWeight:600, textDecoration:"none", borderLeft:"3px solid #00ff88"}}>
