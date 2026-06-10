@@ -2836,12 +2836,12 @@ function DayTradeView() {
         <div style={{fontSize:8, color:TEXT_DIM, marginBottom:14, textAlign:"center", fontStyle:"italic"}}>Suis les étapes de haut en bas. Une action à la fois.</div>
         {(() => {
           const steps = [
-            {n:"1", icon:"👁️", color:"#38bdf8", t:"REGARDE LE GRAPHIQUE", sub:"3h → 11h ET — Qu'a fait Londres ? Repère le faux mouvement du matin (le piège), puis la vraie direction."},
+            {n:"1", icon:"👁️", color:"#38bdf8", t:"VÉRIFIE LE PÔLE (H1)", sub:"Londres (3h-11h) et NY (8h-11h) poussent dans le MÊME sens ? = PÔLE de convergence valide. Sens opposés = pas de pôle, pas de trade."},
             {n:"2", icon:"🥛", color:"#fbbf24", t:"OUVRE MARKETMILK", sub:"🎯 10h30-10h45 ET — Colle tes données. Quelle devise est FORTE ? Laquelle est FAIBLE ? (avant le Fix de 11h)"},
             {n:"3", icon:"🔍", color:"#a78bfa", t:"VÉRIFIE LES 4 FILTRES", sub:"① Divergence ≥4 rangs · ② Retail ≥70% contre la foule · ③ Leveraged Funds alignés · ④ Paire dans le Top 5 Gainers/Losers"},
             {n:"4", icon:"🎯", color:"#4ade80", t:"4/4 ? DIRECTION CONFIRMÉE", sub:"Les 4 cochés = vrai flux institutionnel. Carte VERTE = achat ▲ · Carte ROUGE = vente ▼"},
-            {n:"5", icon:"⏳", color:"#f59e0b", t:"ATTENDS LE GOLDEN POCKET", sub:"Le prix recule à 61.8-65% (H1). 2-3 rejets, puis tu entres. Jamais sur l'extension."},
-            {n:"6", icon:"🛡️", color:"#34d399", t:"TU GARDES 1 À 3 JOURS", sub:"Asie relaie le soir, Londres reprend à 3h. Tu sors quand ta devise forte faiblit."},
+            {n:"5", icon:"⏳", color:"#f59e0b", t:"ATTENDS LE DRAPEAU", sub:"Après-midi NY (11h30-17h) : le prix consolide en drift léger contre-tendance, SANS s'effondrer. C'est le drapeau qui se dessine."},
+            {n:"6", icon:"🛡️", color:"#34d399", t:"ENTRE À LA CASSURE", sub:"Cassure du drapeau dans le sens du pôle (fin NY ou Tokyo 19h). Stop sous le drapeau. Target = hauteur du pôle. Garde 1-3 jours."},
           ];
           return steps.map((s,i)=>(
             <div key={s.n} style={{display:"flex", gap:11, alignItems:"flex-start", position:"relative", paddingBottom: i<steps.length-1?9:4}}>
@@ -3141,66 +3141,74 @@ function DayTradeView() {
 
       {/* ENTREE TECHNIQUE GOLDEN POCKET */}
       <div style={{padding:"12px 14px", background:"#001a2e", borderRadius:8, border:"1px solid #38bdf855", marginBottom:14}}>
-        <div style={{fontSize:12, color:"#38bdf8", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #38bdf833"}}>📐 TON ENTRÉE — LA MÉCANIQUE (Golden Pocket)</div>
-        <div style={{fontSize:8, color:"#475569", marginBottom:12}}>10h-12h = tu analyses et tu observes · tu n'entres PAS immédiatement · tu attends le pullback Golden Pocket</div>
+        <div style={{fontSize:12, color:"#38bdf8", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #38bdf833"}}>📐 TON ENTRÉE — LA MÉCANIQUE (Flag de convergence)</div>
+        <div style={{fontSize:8, color:"#475569", marginBottom:12}}>10h30 = tu détectes · après-midi NY = le drapeau se dessine · fin NY ou Tokyo = tu entres à la cassure</div>
 
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8, marginBottom:12, padding:"10px 12px", background:"#001a0d", borderRadius:4, borderLeft:"3px solid #4ade80"}}>
           <b style={{color:"#38bdf8"}}>🎯 LA NUANCE CLÉ</b><br/><br/>
-          Tu identifies la direction à 10h-11h, mais tu n'entres pas tout de suite : tu attends que le prix recule dans le Golden Pocket. <b style={{color:"#fbbf24"}}>Tu n'entres jamais sur l'extension, toujours sur l'escompte.</b> Voici comment :
+          Tu identifies la direction à 10h30, mais tu n'entres pas tout de suite : le pôle (Londres+NY ensemble) est déjà construit — tu attends que le marché dessine son drapeau l'après-midi, puis tu entres à la cassure. <b style={{color:"#fbbf24"}}>Tu n'achètes pas le pôle, tu achètes la cassure du drapeau.</b> Voici comment :
         </div>
 
         <div style={{display:"flex", flexDirection:"column", gap:8, marginBottom:14}}>
-          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#38bdf8", fontWeight:700, fontSize:12, minWidth:20}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#38bdf8"}}>10h-11h — Direction confirmée</b> : MarketMilk montre la vraie direction (Londres a tranché, NY a confirmé). Devise forte vs faible. Tu identifies, tu n'entres pas encore.</span></div>
-          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#c084fc", fontWeight:700, fontSize:12, minWidth:20}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>Trace le Fibonacci</b> sur la dernière impulsion (H1). Tu attends que le prix recule dans le <b style={{color:"#c084fc"}}>Golden Pocket (61.8%–65%)</b> — la zone où les fonds rachètent à escompte. Ça peut prendre des heures.</span></div>
-          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#fbbf24", fontWeight:700, fontSize:12, minWidth:20}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>2-3 rejets dans le pocket</b> : mèches de rejet + volume qui monte = les fonds accumulent. C'est leur empreinte. Tu entres avec eux au même prix.</span></div>
+          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#38bdf8", fontWeight:700, fontSize:12, minWidth:20}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#38bdf8"}}>10h30 — Le PÔLE est confirmé</b> : tes 4 filtres passent ET ton H1 montre Londres (3h-11h) et NY (8h-11h) dans le même sens. Le pôle de convergence existe — les deux centres mondiaux sont d'accord. Tu identifies, tu n'entres pas encore.</span></div>
+          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#c084fc", fontWeight:700, fontSize:12, minWidth:20}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>L'après-midi NY (11h30-17h) — le DRAPEAU</b> : Londres fermée, le marché se calme. Le prix consolide en drift léger contre la tendance, SANS s'effondrer — il reste haut (achat) ou bas (vente). Les fonds gardent leurs positions : c'est leur pause, pas leur sortie.</span></div>
+          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#fbbf24", fontWeight:700, fontSize:12, minWidth:20}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>La CASSURE — ton entrée</b> : fin NY ou ouverture Tokyo (19h ET), le prix casse le drapeau dans le sens du pôle. Tu entres à la cassure confirmée (bougie qui clôture hors du drapeau). Stop sous/sur le drapeau · Target = hauteur du pôle projetée.</span></div>
         </div>
 
         <div style={{marginBottom:12, padding:"12px", background:"#001a0d", borderRadius:6, border:"1px solid #4ade8044"}}>
-          <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8}}>▲ ACHAT — IMPULSION HAUSSIÈRE LONDRES + PULLBACK</div>
+          <div style={{fontSize:10, color:"#4ade80", fontWeight:700, marginBottom:8}}>▲ BULL FLAG — LONDRES + NY ACHÈTENT ENSEMBLE = PÔLE</div>
           <svg viewBox="0 0 320 180" style={{width:"100%", maxWidth:340, display:"block", margin:"0 auto 10px"}}>
-            <line x1="40" y1="20" x2="300" y2="20" stroke="#555" strokeWidth="0.8" strokeDasharray="3,3"/>
-            <text x="2" y="23" fill="#888" fontSize="7" fontFamily="monospace">100%</text>
-            <line x1="40" y1="65" x2="300" y2="65" stroke="#888" strokeWidth="0.8" strokeDasharray="3,3"/>
-            <text x="6" y="68" fill="#aaa" fontSize="7" fontFamily="monospace">50%</text>
-            <rect x="40" y="88" width="260" height="18" fill="#a855f733" stroke="#a855f7" strokeWidth="1.2"/>
-            <text x="44" y="84" fill="#c084fc" fontSize="7" fontFamily="monospace" fontWeight="700">GOLDEN POCKET 61.8-65%</text>
-            <line x1="40" y1="130" x2="300" y2="130" stroke="#ff6666" strokeWidth="0.8" strokeDasharray="3,3"/>
-            <text x="2" y="133" fill="#ff6666" fontSize="7" fontFamily="monospace">78.6%</text>
-            <polyline points="45,135 80,90 110,45 135,25 155,50 165,95 175,88 185,97 195,89 215,50 250,25 280,15" fill="none" stroke="#4ade80" strokeWidth="2"/>
-            <text x="148" y="115" fill="#4ade80" fontSize="9">↑</text>
-            <text x="178" y="115" fill="#4ade80" fontSize="9">↑</text>
-            <circle cx="195" cy="89" r="4" fill="#00ff88"/>
-            <text x="200" y="87" fill="#00ff88" fontSize="7" fontFamily="monospace" fontWeight="700">ENTRÉE</text>
-            <text x="44" y="170" fill="#38bdf8" fontSize="7" fontFamily="monospace">◀ Londres</text>
-            <text x="140" y="170" fill="#fbbf24" fontSize="7" fontFamily="monospace">◀ NY ou Tokyo</text>
-            <text x="220" y="170" fill="#4ade80" fontSize="7" fontFamily="monospace">◀ J+1</text>
+            <rect x="40" y="155" width="95" height="6" fill="#38bdf855"/>
+            <text x="42" y="152" fill="#38bdf8" fontSize="6" fontFamily="monospace">LONDRES 3h-11h</text>
+            <rect x="95" y="163" width="80" height="6" fill="#4ade8055"/>
+            <text x="97" y="176" fill="#4ade80" fontSize="6" fontFamily="monospace">NY 8h... (chevauchement 8h-11h)</text>
+            <polyline points="45,140 65,118 85,95 105,70 125,48 140,38" fill="none" stroke="#4ade80" strokeWidth="2.5"/>
+            <text x="55" y="85" fill="#4ade80" fontSize="8" fontFamily="monospace" fontWeight="700">LE PÔLE</text>
+            <text x="55" y="95" fill="#86efac" fontSize="6" fontFamily="monospace">2 sessions, 1 direction</text>
+            <polyline points="140,38 152,46 164,42 176,52 188,48 200,56 212,53" fill="none" stroke="#fbbf24" strokeWidth="2"/>
+            <line x1="138" y1="34" x2="214" y2="48" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
+            <line x1="142" y1="52" x2="216" y2="64" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
+            <text x="150" y="28" fill="#fbbf24" fontSize="8" fontFamily="monospace" fontWeight="700">LE DRAPEAU</text>
+            <text x="150" y="78" fill="#fde68a" fontSize="6" fontFamily="monospace">après-midi NY : drift léger, le prix RESTE HAUT</text>
+            <polyline points="212,53 228,35 248,22 270,12" fill="none" stroke="#00ff88" strokeWidth="2.5"/>
+            <circle cx="218" cy="46" r="4" fill="#00ff88"/>
+            <text x="226" y="50" fill="#00ff88" fontSize="7" fontFamily="monospace" fontWeight="700">CASSURE = ENTRÉE</text>
+            <line x1="212" y1="68" x2="232" y2="68" stroke="#f87171" strokeWidth="1.5"/>
+            <text x="236" y="71" fill="#f87171" fontSize="6" fontFamily="monospace">STOP sous le drapeau</text>
+            <text x="250" y="8" fill="#86efac" fontSize="6" fontFamily="monospace">TARGET = hauteur du pôle</text>
+            <text x="44" y="120" fill="#38bdf8" fontSize="7" fontFamily="monospace">◀ 3h</text>
+            <text x="130" y="120" fill="#fbbf24" fontSize="7" fontFamily="monospace">◀ 11h30</text>
+            <text x="226" y="120" fill="#4ade80" fontSize="7" fontFamily="monospace">◀ Tokyo 19h</text>
           </svg>
-          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>① Impulsion haussière de Londres → ② pullback dans le Golden Pocket (NY ou Tokyo) → ③ rejets + entrée → ④ continuation J+1 Londres reprend</div>
-          <div style={{fontSize:8, color:"#4ade80", marginTop:4}}><b>Entrée LONG</b> au rejet dans le pocket · Stop sous 78.6% · Target extension 1.618</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>① Pôle : Londres achète 3h-11h ET NY achète avec elle 8h-11h (convergence) → ② Drapeau : après-midi NY, drift léger, le prix tient → ③ Cassure vers le haut (fin NY/Tokyo) = ENTRÉE → stop sous le drapeau, target = hauteur du pôle projetée</div>
         </div>
 
-        <div style={{marginBottom:12, padding:"12px", background:"#1a0000", borderRadius:6, border:"1px solid #f8717144"}}>
-          <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:8}}>▼ VENTE — IMPULSION BAISSIÈRE LONDRES + PULLBACK</div>
+        <div style={{marginBottom:12, padding:"12px", background:"#1a0505", borderRadius:6, border:"1px solid #f8717144"}}>
+          <div style={{fontSize:10, color:"#f87171", fontWeight:700, marginBottom:8}}>▼ BEAR FLAG — LONDRES + NY VENDENT ENSEMBLE = PÔLE</div>
           <svg viewBox="0 0 320 180" style={{width:"100%", maxWidth:340, display:"block", margin:"0 auto 10px"}}>
-            <line x1="40" y1="45" x2="300" y2="45" stroke="#ff6666" strokeWidth="0.8" strokeDasharray="3,3"/>
-            <text x="2" y="48" fill="#ff6666" fontSize="7" fontFamily="monospace">78.6%</text>
-            <rect x="40" y="62" width="260" height="18" fill="#a855f733" stroke="#a855f7" strokeWidth="1.2"/>
-            <text x="44" y="58" fill="#c084fc" fontSize="7" fontFamily="monospace" fontWeight="700">GOLDEN POCKET 61.8-65%</text>
-            <line x1="40" y1="105" x2="300" y2="105" stroke="#888" strokeWidth="0.8" strokeDasharray="3,3"/>
-            <text x="6" y="108" fill="#aaa" fontSize="7" fontFamily="monospace">50%</text>
-            <line x1="40" y1="155" x2="300" y2="155" stroke="#555" strokeWidth="0.8" strokeDasharray="3,3"/>
-            <text x="2" y="158" fill="#888" fontSize="7" fontFamily="monospace">100%</text>
-            <polyline points="45,40 80,80 110,120 135,150 155,110 165,72 175,64 185,73 195,65 215,105 250,140 280,160" fill="none" stroke="#f87171" strokeWidth="2"/>
-            <text x="148" y="52" fill="#f87171" fontSize="9">↓</text>
-            <text x="178" y="52" fill="#f87171" fontSize="9">↓</text>
-            <circle cx="195" cy="65" r="4" fill="#ff3b3b"/>
-            <text x="200" y="63" fill="#ff3b3b" fontSize="7" fontFamily="monospace" fontWeight="700">ENTRÉE</text>
-            <text x="44" y="175" fill="#38bdf8" fontSize="7" fontFamily="monospace">◀ Londres</text>
-            <text x="140" y="175" fill="#fbbf24" fontSize="7" fontFamily="monospace">◀ NY ou Tokyo</text>
-            <text x="220" y="175" fill="#f87171" fontSize="7" fontFamily="monospace">◀ J+1</text>
+            <rect x="40" y="155" width="95" height="6" fill="#38bdf855"/>
+            <text x="42" y="152" fill="#38bdf8" fontSize="6" fontFamily="monospace">LONDRES 3h-11h</text>
+            <rect x="95" y="163" width="80" height="6" fill="#f8717155"/>
+            <text x="97" y="176" fill="#f87171" fontSize="6" fontFamily="monospace">NY 8h... (chevauchement 8h-11h)</text>
+            <polyline points="45,20 65,42 85,65 105,90 125,112 140,122" fill="none" stroke="#f87171" strokeWidth="2.5"/>
+            <text x="55" y="100" fill="#f87171" fontSize="8" fontFamily="monospace" fontWeight="700">LE PÔLE</text>
+            <text x="55" y="110" fill="#fca5a5" fontSize="6" fontFamily="monospace">2 sessions, 1 direction</text>
+            <polyline points="140,122 152,114 164,118 176,108 188,112 200,104 212,107" fill="none" stroke="#fbbf24" strokeWidth="2"/>
+            <line x1="138" y1="126" x2="214" y2="112" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
+            <line x1="142" y1="108" x2="216" y2="96" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
+            <text x="150" y="140" fill="#fbbf24" fontSize="8" fontFamily="monospace" fontWeight="700">LE DRAPEAU</text>
+            <text x="150" y="90" fill="#fde68a" fontSize="6" fontFamily="monospace">après-midi NY : drift léger, le prix RESTE BAS</text>
+            <polyline points="212,107 228,125 248,138 270,148" fill="none" stroke="#ff4444" strokeWidth="2.5"/>
+            <circle cx="218" cy="114" r="4" fill="#ff4444"/>
+            <text x="226" y="110" fill="#ff4444" fontSize="7" fontFamily="monospace" fontWeight="700">CASSURE = ENTRÉE</text>
+            <line x1="212" y1="92" x2="232" y2="92" stroke="#4ade80" strokeWidth="1.5"/>
+            <text x="236" y="95" fill="#4ade80" fontSize="6" fontFamily="monospace">STOP au-dessus du drapeau</text>
+            <text x="240" y="160" fill="#fca5a5" fontSize="6" fontFamily="monospace">TARGET = hauteur du pôle</text>
+            <text x="44" y="12" fill="#38bdf8" fontSize="7" fontFamily="monospace">◀ 3h</text>
+            <text x="130" y="12" fill="#fbbf24" fontSize="7" fontFamily="monospace">◀ 11h30</text>
+            <text x="226" y="12" fill="#f87171" fontSize="7" fontFamily="monospace">◀ Tokyo 19h</text>
           </svg>
-          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>① Impulsion baissière de Londres → ② pullback dans le Golden Pocket (NY ou Tokyo) → ③ rejets + entrée → ④ continuation J+1 Londres reprend</div>
-          <div style={{fontSize:8, color:"#f87171", marginTop:4}}><b>Entrée SHORT</b> au rejet dans le pocket · Stop au-dessus du 78.6% · Target extension 1.618</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>① Pôle : Londres vend 3h-11h ET NY vend avec elle 8h-11h (convergence) → ② Drapeau : après-midi NY, drift léger, le prix reste bas → ③ Cassure vers le bas (fin NY/Tokyo) = ENTRÉE → stop au-dessus du drapeau, target = hauteur du pôle projetée</div>
         </div>
 
         <div style={{padding:"10px 12px", background:"#1a1500", borderRadius:4, border:"1px solid #fbbf2444", fontSize:9, color:TEXT, lineHeight:1.7}}>
@@ -3214,10 +3222,10 @@ function DayTradeView() {
         <div style={{fontSize:12, color:"#c084fc", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #c084fc33"}}>🧠 LA PSYCHOLOGIE</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
           <b style={{color:"#c084fc"}}>Tout commence par Londres.</b> Chaque jour, les banques de Londres (Deutsche, HSBC, BNP, Barclays) déplacent près de 40% du volume mondial — des milliers de milliards. Quand elles tranchent une direction, c'est la plus grosse force du marché qui se met en marche. Toi, avec ton compte, tu ne peux rien pousser. <b>Mais tu peux les suivre.</b><br/><br/>C'est ça, ta seule mission : lire ce que Londres a fait pendant sa session, et te placer <b>derrière eux</b>. Pas avant (tu tomberais dans le piège du matin), pas contre (tu te ferais écraser). Derrière. Tu es leur passager, pas le conducteur. Le jour où tu acceptes que ton opinion ne vaut rien face à leurs milliards, tu arrêtes de te battre contre le marché — tu commences à le suivre.<br/><br/>
-          <b style={{color:"#c084fc"}}>La patience d'attendre la session complète.</b> Londres ouvre à 3h et travaille jusqu'à 11h30. Tu ne juges pas à 4h ni à 7h — c'est là qu'ils piègent (faux mouvements, chasse aux stops). Tu attends que <b>toute leur session soit jouée</b> et tu lis le résultat à 10h-12h. Laisser Londres finir son travail avant de lire = la base de tout. L'impatience te fait lire le piège au lieu de la vérité.<br/><br/>
-          <b style={{color:"#c084fc"}}>Trois preuves valent mieux que ton intuition.</b> Tu n'entres que si la divergence (où est le capital), le retail piégé (qui est du mauvais côté) et les Leveraged Funds (la vraie position des fonds) disent la même chose. Si une seule manque, tu n'as pas assez de preuves — tu attends. Ton opinion ne compte pas : seules les 3 preuves comptent.<br/><br/>
+          <b style={{color:"#c084fc"}}>La patience d'attendre la session complète.</b> Londres ouvre à 3h et travaille jusqu'à 11h30. Tu ne juges pas à 4h ni à 7h — c'est là qu'ils piègent (faux mouvements, chasse aux stops). Tu attends que <b>toute leur session soit jouée</b> et tu lis le résultat à 10h30. Laisser Londres finir son travail avant de lire = la base de tout. L'impatience te fait lire le piège au lieu de la vérité.<br/><br/>
+          <b style={{color:"#c084fc"}}>Quatre preuves valent mieux que ton intuition.</b> Tu n'entres que si la divergence (où est le capital), le retail piégé (qui est du mauvais côté), les Leveraged Funds (la vraie position des fonds) et le mouvement réel (Top 5) disent la même chose. Si une seule manque, tu n'as pas assez de preuves — tu attends. Ton opinion ne compte pas : seules les 4 preuves comptent.<br/><br/>
           <b style={{color:"#c084fc"}}>Observer sans ego.</b> Tu ne cherches pas à avoir raison, tu cherches à suivre. Si les big boys changent de direction (la devise forte faiblit, les LF se retournent), tu sors sans débattre. Tu n'es pas marié à ta position — tu es marié au flux institutionnel. Quand il tourne, tu tournes.<br/><br/>
-          <b style={{color:"#fbbf24"}}>Pas d'alerte = pas de trade.</b> Certains matins, aucune paire ne réunit les 3 preuves. C'est normal et c'est voulu. Ne force jamais un trade pour "faire quelque chose". La discipline d'attendre le bon setup EST la stratégie. Un jour sans trade est un bon jour si le setup n'était pas là.
+          <b style={{color:"#fbbf24"}}>Pas d'alerte = pas de trade.</b> Certains matins, aucune paire ne réunit les 4 preuves. C'est normal et c'est voulu. Ne force jamais un trade pour "faire quelque chose". La discipline d'attendre le bon setup EST la stratégie. Un jour sans trade est un bon jour si le setup n'était pas là.
         </div>
       </div>
 
