@@ -2801,6 +2801,38 @@ function DayTradeView() {
       <div style={{fontSize:15, color:"#fbbf24", fontWeight:900, letterSpacing:1.5, marginBottom:5}}>⚡ SWING TRADE FX</div><div style={{fontSize:9, color:"#fbbf24aa", fontWeight:700, letterSpacing:2, marginBottom:4}}>APEX INSTITUTIONNEL · 3 FILTRES</div>
       <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (1-3 jours) — 3 filtres : divergence Currency Strength + retail contrarien + Leveraged Funds · Tu suis les big boys de Londres</div>
 
+      {/* SEQUENCE VISUELLE DU JOUR */}
+      <div style={{padding:"14px 14px 6px", background:"linear-gradient(180deg,#0a0f1e,#0a1020)", borderRadius:10, border:"1px solid #38bdf855", marginBottom:16}}>
+        <div style={{fontSize:12, color:"#38bdf8", fontWeight:800, letterSpacing:0.5, marginBottom:3, textAlign:"center"}}>📋 TA SÉQUENCE DU JOUR</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginBottom:14, textAlign:"center", fontStyle:"italic"}}>Suis les étapes de haut en bas. Une action à la fois.</div>
+        {(() => {
+          const steps = [
+            {n:"1", icon:"👁️", color:"#38bdf8", t:"REGARDE LE GRAPHIQUE", sub:"3h → 11h ET — Qu'a fait Londres ? Repère le faux mouvement du matin (le piège), puis la vraie direction."},
+            {n:"2", icon:"🥛", color:"#fbbf24", t:"OUVRE MARKETMILK", sub:"10h-12h ET — Colle tes données. Quelle devise est FORTE ? Laquelle est FAIBLE ?"},
+            {n:"3", icon:"🔍", color:"#a78bfa", t:"VÉRIFIE LES 3 FILTRES", sub:"① Divergence ≥4 rangs · ② Retail ≥70% contre la foule · ③ Leveraged Funds alignés"},
+            {n:"4", icon:"🎯", color:"#4ade80", t:"3/3 ? DIRECTION CONFIRMÉE", sub:"Les 3 cochés = vrai flux institutionnel. Carte VERTE = achat ▲ · Carte ROUGE = vente ▼"},
+            {n:"5", icon:"⏳", color:"#f59e0b", t:"ATTENDS LE GOLDEN POCKET", sub:"Le prix recule à 61.8-65% (H1). 2-3 rejets, puis tu entres. Jamais sur l'extension."},
+            {n:"6", icon:"🛡️", color:"#34d399", t:"TU GARDES 1 À 3 JOURS", sub:"Asie relaie le soir, Londres reprend à 3h. Tu sors quand ta devise forte faiblit."},
+          ];
+          return steps.map((s,i)=>(
+            <div key={s.n} style={{display:"flex", gap:11, alignItems:"flex-start", position:"relative", paddingBottom: i<steps.length-1?14:6}}>
+              {/* ligne verticale reliant les etapes */}
+              {i<steps.length-1 && <div style={{position:"absolute", left:15, top:32, width:2, height:"calc(100% - 18px)", background:`linear-gradient(180deg,${s.color}66,${steps[i+1].color}66)`}}/>}
+              {/* cercle numero */}
+              <div style={{minWidth:32, width:32, height:32, borderRadius:"50%", background:s.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:900, color:"#08111f", zIndex:1, boxShadow:`0 0 10px ${s.color}55`}}>{s.n}</div>
+              {/* contenu */}
+              <div style={{flex:1, paddingTop:1}}>
+                <div style={{fontSize:11, fontWeight:800, color:s.color, letterSpacing:0.3, marginBottom:2, display:"flex", alignItems:"center", gap:5}}><span style={{fontSize:14}}>{s.icon}</span> {s.t}</div>
+                <div style={{fontSize:9, color:TEXT, lineHeight:1.5}}>{s.sub}</div>
+              </div>
+            </div>
+          ));
+        })()}
+        <div style={{fontSize:8, color:"#38bdf8", textAlign:"center", padding:"8px", marginTop:4, background:"#001018", borderRadius:6, fontWeight:600, lineHeight:1.5}}>
+          Pas de 3/3 aujourd'hui ? = Pas de trade. C'est normal. La discipline d'attendre fait partie de la stratégie.
+        </div>
+      </div>
+
       <DayTradeAnalyzer />
 
       {/* ===== TABLEAU LEVERAGED FUNDS + RETAIL + CONVERGENCE ===== */}
@@ -2944,8 +2976,7 @@ function DayTradeView() {
           <b style={{color:"#fbbf24"}}>Pourquoi ta position dure 1 à 3 jours ?</b> Parce que ces positions institutionnelles ne se débouclent pas en quelques heures — elles sont énormes. Et le flux <b>passe de session en session</b> : Londres lance le matin, New York le tient (8h-17h), l'Asie le relaie le soir (Tokyo sur le JPY, Sydney sur l'AUD/NZD), puis Londres rouvre à 3h et reprend. Tant que les mêmes fondamentaux tiennent, chaque session continue dans le même sens. Tu surfes une vague qui se transmet de banque en banque.<br/><br/>
           <b style={{color:"#fbbf24"}}>On ne devine pas. On SUIT les plus gros joueurs du marché.</b><br/><br/>
           Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence Currency Strength), quand le retail est piégé à contre-sens ET que les Leveraged Funds confirment la même direction.<br/><br/>
-          <b style={{color:"#38bdf8"}}>⏰ 10h00-12h00 ET — ton moment d'analyse :</b> Pourquoi si tard ? Le mouvement du matin (3h-7h) est souvent un <b style={{color:"#fbbf24"}}>faux mouvement</b> : Londres chasse les stops (liquidity grab) avant de révéler sa VRAIE direction. Si tu analyses à 7h, tu vois le piège, pas la tendance. À 10h-11h, Londres a tranché et New York (ouvert depuis 8h) a confirmé. Londres ferme vers 11h30 — tu lis la <b style={{color:"#fbbf24"}}>direction finale</b>. Tu identifies l'impulsion et tu attends le pullback au Golden Pocket (61.8%-65%) — qui arrive souvent pendant Tokyo le soir — pour entrer derrière les big boys au meilleur prix.<br/><br/>
-          <b style={{color:"#a78bfa"}}>🔁 Pourquoi tes positions durent 1 à 3 jours :</b> tes 7 paires opposent une devise de Londres (<b>EUR/GBP/CHF</b>) à une devise du bloc asiatique-Pacifique (<b>AUD/NZD/JPY</b>). Aucune n'est une paire du dollar. Le mouvement passe de main en main sans s'éteindre : <b>Londres</b> le lance le matin, tu gardes ta position pendant <b>New York</b> (8h), puis la <b>session asiatique</b> (Tokyo + Sydney) prend le relais le soir — les devises d'Asie (JPY à Tokyo, AUD/NZD à Sydney) continuent leur mouvement contre les devises de Londres. Le lendemain Londres reprend.<br/><br/><b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> dernière confirmation. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant.
+          <b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> dernière confirmation. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant.
         </div>
       </div>
 
@@ -2988,9 +3019,9 @@ function DayTradeView() {
           On trade UNIQUEMENT : <b style={{color:"#4ade80"}}>EUR/AUD · GBP/AUD · EUR/NZD · GBP/NZD · GBP/JPY · EUR/JPY · CHF/JPY</b>. Chacune oppose une devise de Londres (EUR, GBP, CHF) à une devise du bloc Asie-Pacifique (AUD, NZD, JPY). Pas de paires CAD : le CAD est une devise de session New York, pas de notre relais Londres↔Asie.
         </div>
         <div style={{display:"flex", flexDirection:"column", gap:7}}>
-          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>1.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Les news sont digérées et Londres a tranché.</b> À 10h-11h ET, les news EU du matin sont passées, Londres roule depuis 7h et a révélé sa vraie direction (pas le faux mouvement de 3h-7h). New York a confirmé. Tu lis une tendance mûre — puis tu attends le Golden Pocket pour entrer.</span></div>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>1.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Les news sont digérées et Londres a tranché.</b> À 10h-11h ET, les news EU du matin sont passées, Londres roule depuis 3h et a révélé sa vraie direction (pas le faux mouvement du matin). New York a confirmé. Tu lis une tendance mûre — puis tu attends le Golden Pocket pour entrer.</span></div>
           <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>2.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>La conviction des big boys est confirmée.</b> À 10h-11h, Londres + New York sont tous deux actifs (chevauchement, volume max). Les gros joueurs ont bâti et confirmé leurs positions sur EUR/GBP/CHF. La direction est nette, validée par deux sessions.</span></div>
-          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>3.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Le mouvement va durer plusieurs sessions.</b> Une fois entré au Golden Pocket, tu gardes ta position pendant New York (8h), puis la session asiatique (Tokyo + Sydney) prend le relais le soir — jamais deux devises de la même session, toujours une devise de Londres contre une devise d'Asie. Tu te places dans un flux qui passe de main en main, pas dans un coup d'une heure.</span></div>
+          <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>3.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Le mouvement va durer plusieurs sessions.</b> Une fois entré au Golden Pocket, ta position est portée par New York, puis par la session asiatique (Tokyo + Sydney) le soir — jamais deux devises de la même session, toujours une devise de Londres contre une devise d'Asie. Tu te places dans un flux qui passe de main en main, pas dans un coup d'une heure.</span></div>
           <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>4.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Le sentiment retail est mûr.</b> Le retail a réagi au mouvement, souvent à contre-sens. À 10h-11h leur positionnement est lisible — ton filtre retail contrarien ≥70% capte ce déséquilibre exact.</span></div>
         </div>
         <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>💡 10h-12h ET = le point de convergence : Londres a tranché + NY a confirmé + retail piégé + Leveraged Funds alignés. Tu ne devines rien, tu te places dans un flux institutionnel validé que les sessions suivantes (Tokyo le soir, Londres J+1) vont relayer pendant 1 à 3 jours.</div>
@@ -3052,7 +3083,7 @@ function DayTradeView() {
 
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8, marginBottom:12, padding:"10px 12px", background:"#001a0d", borderRadius:4, borderLeft:"3px solid #4ade80"}}>
           <b style={{color:"#38bdf8"}}>🎯 LA NUANCE CLÉ</b><br/><br/>
-          À 10h-11h, MarketMilk te montre la <b>vraie direction de Londres</b> (après le faux mouvement du matin), confirmée par New York. Tu identifies la direction (devise forte vs faible) et tu attends que le prix <b>recule dans le Golden Pocket (61.8%–65%)</b> avant d'entrer. Ce pullback peut arriver pendant Londres, pendant New York, ou même pendant Tokyo le soir — tu es patient. <b style={{color:"#fbbf24"}}>Tu n'entres jamais sur l'extension, toujours sur l'escompte.</b>
+          Tu identifies la direction à 10h-11h, mais tu n'entres pas tout de suite : tu attends que le prix recule dans le Golden Pocket. <b style={{color:"#fbbf24"}}>Tu n'entres jamais sur l'extension, toujours sur l'escompte.</b> Voici comment :
         </div>
 
         <div style={{display:"flex", flexDirection:"column", gap:8, marginBottom:14}}>
