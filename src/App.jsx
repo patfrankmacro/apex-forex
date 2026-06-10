@@ -2586,7 +2586,7 @@ function DayTradeAnalyzer() {
       const minsET = nowET.getHours()*60 + nowET.getMinutes();
       if (minsET < 600 || minsET > 720) {
         const hh = String(nowET.getHours()).padStart(2,"0"), mm = String(nowET.getMinutes()).padStart(2,"0");
-        setResult({error:`⏰ Il est ${hh}h${mm} à New York. Le Swing Trade FX s'analyse entre 10h00 et 12h00 ET. Pourquoi si tard ? Le mouvement du matin (3h-7h) est souvent un faux mouvement : Londres chasse les stops avant de révéler sa VRAIE direction. À 10h-11h, Londres a tranché et New York (ouvert depuis 8h) a confirmé. Londres ferme vers 11h30 — tu lis la direction finale, pas le piège du matin. Reviens dans la fenêtre 10h-12h.`});
+        setResult({error:`⏰ Il est ${hh}h${mm} à New York. Le Swing Trade FX s'analyse entre 10h00 et 12h00 ET — fenêtre idéale : 10h30-10h45. Pourquoi là ? Londres roule depuis 7h30 (direction complète), NY confirme depuis 2h30, toutes les news sont digérées, et tu es AVANT le London Fix de 11h (spike institutionnel artificiel) et les clôtures de Londres. Reviens à 10h30.`});
         return;
       }
       const lines = raw.split("\n").map(l=>l.trim()).filter(Boolean);
@@ -2836,7 +2836,7 @@ function DayTradeView() {
         {(() => {
           const steps = [
             {n:"1", icon:"👁️", color:"#38bdf8", t:"REGARDE LE GRAPHIQUE", sub:"3h → 11h ET — Qu'a fait Londres ? Repère le faux mouvement du matin (le piège), puis la vraie direction."},
-            {n:"2", icon:"🥛", color:"#fbbf24", t:"OUVRE MARKETMILK", sub:"10h-12h ET — Colle tes données. Quelle devise est FORTE ? Laquelle est FAIBLE ?"},
+            {n:"2", icon:"🥛", color:"#fbbf24", t:"OUVRE MARKETMILK", sub:"🎯 10h30-10h45 ET — Colle tes données. Quelle devise est FORTE ? Laquelle est FAIBLE ? (avant le Fix de 11h)"},
             {n:"3", icon:"🔍", color:"#a78bfa", t:"VÉRIFIE LES 4 FILTRES", sub:"① Divergence ≥4 rangs · ② Retail ≥70% contre la foule · ③ Leveraged Funds alignés · ④ Paire dans le Top 5 Gainers/Losers"},
             {n:"4", icon:"🎯", color:"#4ade80", t:"4/4 ? DIRECTION CONFIRMÉE", sub:"Les 4 cochés = vrai flux institutionnel. Carte VERTE = achat ▲ · Carte ROUGE = vente ▼"},
             {n:"5", icon:"⏳", color:"#f59e0b", t:"ATTENDS LE GOLDEN POCKET", sub:"Le prix recule à 61.8-65% (H1). 2-3 rejets, puis tu entres. Jamais sur l'extension."},
@@ -3006,6 +3006,25 @@ function DayTradeView() {
           Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence Currency Strength), quand le retail est piégé à contre-sens ET que les Leveraged Funds confirment la même direction.<br/><br/>
           <b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> dernière confirmation. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant.
         </div>
+      </div>
+
+      {/* TA FENETRE 10H30 */}
+      <div style={{padding:"12px 14px", background:"#0a1020", borderRadius:8, border:"1px solid #f59e0b55", marginBottom:14}}>
+        <div style={{fontSize:12, color:"#f59e0b", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #f59e0b33"}}>⏰ TA FENÊTRE : 10H30-10H45 — POURQUOI EXACTEMENT LÀ</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:10}}>La journée a des moments de bruit et un seul moment de lecture propre. Voici la carte :</div>
+        <div style={{display:"flex", flexDirection:"column", gap:6, marginBottom:10}}>
+          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a1500", borderRadius:5}}><span style={{color:APX.wait, fontWeight:700, fontSize:9, minWidth:62}}>8h30</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>News US : le marché digère, ça secoue.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a1500", borderRadius:5}}><span style={{color:APX.wait, fontWeight:700, fontSize:9, minWidth:62}}>9h30</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Ouverture du NYSE : poussée de volume.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a1500", borderRadius:5}}><span style={{color:APX.wait, fontWeight:700, fontSize:9, minWidth:62}}>10h00</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Données économiques US fréquentes : dernier bruit du matin.</span></div>
+          <div style={{display:"flex", gap:8, padding:"8px 9px", background:"#052010", borderRadius:5, border:"1px solid "+APX.buy+"66"}}><span style={{color:APX.buy, fontWeight:900, fontSize:9, minWidth:62}}>🎯 10h30-10h45</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}><b style={{color:APX.buy}}>TA FENÊTRE.</b> Londres roule depuis 7h30, sa direction est complète. NY confirme depuis 2h30. Toutes les news sont digérées. Rien devant toi. C'est la photo la plus propre du travail de Londres — et elle est stable : que tu analyses à 10h32 ou 10h44, tu lis la même chose.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a0a00", borderRadius:5}}><span style={{color:APX.sell, fontWeight:700, fontSize:9, minWidth:62}}>⚠️ 11h00</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}><b style={{color:APX.sell}}>London Fix</b> : les banques exécutent d'énormes ordres groupés pour fixer les taux de référence officiels. Spike artificiel possible — ne lis pas ici.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a0a00", borderRadius:5}}><span style={{color:APX.sell, fontWeight:700, fontSize:9, minWidth:62}}>11h-11h30</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Les desks de Londres clôturent leurs ajustements : volume de sortie, pas de direction fraîche.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1020", borderRadius:5}}><span style={{color:APX.rest, fontWeight:700, fontSize:9, minWidth:62}}>Après 11h30</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Londres fermée. Le classement flotte sur le bruit de NY seul. Trop tard pour une lecture propre.</span></div>
+        </div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, padding:"8px 10px", background:"#160a2e", borderRadius:5, border:"1px solid "+APX.inst+"44", marginBottom:8}}>
+          <b style={{color:APX.inst}}>🏦 Le Fix de 11h, c'est les desks aussi — mais PAS leur direction.</b> Le matin (3h-10h), les desks construisent leurs positions par conviction : « on vend le JPY parce que la BoJ est accommodante ». Ça, c'est la trace que tu suis. Le Fix de 11h, c'est de l'exécution administrative : les clients des banques (fonds de pension, multinationales) convertissent des milliards au taux officiel du jour — dividendes, rééquilibrages, factures. Des flux mécaniques et obligatoires, peu importe la direction. Le prix fait souvent un pic puis revient où il était. <b style={{color:APX.inst}}>Conviction du matin = signal. Tuyauterie du Fix = bruit.</b>
+        </div>
+        <div style={{fontSize:9, color:APX.buy, fontWeight:700, textAlign:"center", padding:"6px"}}>Une analyse à 10h30-10h45, une seule, et c'est tout. Avant = pas mûr. Après = pollué. Le marché te donne 15 minutes de clarté par jour — c'est là que tu lis.</div>
       </div>
 
       {/* CE QUE CHAQUE FILTRE REVELE */}
