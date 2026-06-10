@@ -3088,7 +3088,7 @@ function DayTradeView() {
 
         <div style={{padding:"10px 11px", background:"#160a2e", borderRadius:6, border:"1px solid #818cf844"}}>
           <div style={{fontSize:10, color:"#a5b4fc", fontWeight:700, marginBottom:4}}>🎯 POURQUOI LES 5 ENSEMBLE — la convergence</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Chacun seul peut mentir. Le Currency Strength peut montrer un piège du matin. Le retail peut être extrême sans suite. Le COT a quelques jours de décalage. Le mouvement du jour peut être une sortie. <b style={{color:"#a5b4fc"}}>Mais les quatre mentent rarement en même temps, dans le même sens.</b><br/><br/>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Chacun seul peut mentir. Le Currency Strength peut montrer un piège du matin. Le retail peut être extrême sans suite. Le COT a quelques jours de décalage. Le mouvement du jour peut être une sortie. La volatilité peut être du yo-yo sans direction. <b style={{color:"#a5b4fc"}}>Mais les cinq mentent rarement en même temps, dans le même sens.</b><br/><br/>
           Quand le flux temps réel (①), le carburant de la foule (②), le flux frais des fonds (③), le mouvement réel du jour (④) et l'énergie du mouvement (⑤) pointent tous vers la même paire → tu n'es pas sur une illusion. Tu es sur un vrai courant institutionnel, confirmé sous cinq angles indépendants qui se compensent.</div>
         </div>
       </div>
