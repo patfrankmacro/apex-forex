@@ -2949,6 +2949,38 @@ function DayTradeView() {
         </div>
       </div>
 
+      {/* CE QUE CHAQUE FILTRE REVELE */}
+      <div style={{padding:"12px 14px", background:"#0d0a1a", borderRadius:8, border:"1px solid #818cf855", marginBottom:14}}>
+        <div style={{fontSize:12, color:"#a5b4fc", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #818cf833"}}>🔬 CE QUE CHAQUE FILTRE RÉVÈLE VRAIMENT SUR LES INSTITUTIONS</div>
+
+        <div style={{marginBottom:10, padding:"10px 11px", background:"#0a1420", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
+          <div style={{fontSize:10, color:"#fbbf24", fontWeight:700, marginBottom:4}}>① CURRENCY STRENGTH — où le capital coule MAINTENANT</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Le Currency Strength ne regarde pas une paire isolée : il agrège le comportement d'une devise contre TOUTES les autres en même temps, et la classe de la plus forte à la plus faible. Il répond à la vraie question : <i>l'EUR est-il fort partout, ou c'est juste le NZD qui est faible ?</i><br/><br/>
+          La force d'une devise n'est pas magique : elle reflète <b style={{color:"#fbbf24"}}>où les institutions allouent leur capital</b> (taux d'intérêt, données économiques, flux de fonds). Une devise qui grimpe = le capital institutionnel y coule. Une devise qui descend = ils en sortent.<br/><br/>
+          <b style={{color:"#fbbf24"}}>La divergence (≥4 rangs) = la signature d'un vrai déséquilibre.</b> EUR #1 vs JPY #8 n'est pas du bruit : les desks achètent l'EUR ET vendent le JPY en même temps. Deux devises voisines (rang 3 et 4) = pas de conviction. Une divergence large = les gros ont tranché des deux côtés. C'est l'image temps réel de leur allocation.</div>
+        </div>
+
+        <div style={{marginBottom:10, padding:"10px 11px", background:"#0a1420", borderRadius:6, borderLeft:"3px solid #34d399"}}>
+          <div style={{fontSize:10, color:"#34d399", fontWeight:700, marginBottom:4}}>② RETAIL CONTRARIEN — pourquoi faire l'INVERSE de la foule</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Tu ne fais pas l'inverse du retail par mépris — tu le fais parce que <b style={{color:"#34d399"}}>les banques ont besoin du retail pour exécuter leurs trades</b>.<br/><br/>
+          Une banque qui veut acheter EUR/JPY pour des milliards a besoin de vendeurs en face — elle ne peut pas juste « cliquer acheter ». Quand 80% du retail est SHORT, leurs stops d'achat sont juste au-dessus du prix. La banque pousse le prix → les stops sautent → pour fermer un short il faut acheter → ces achats forcés sont <b style={{color:"#34d399"}}>exactement la liquidité que la banque absorbe</b>. Le retail piégé devient le carburant du mouvement.<br/><br/>
+          Donc le retail ≥70% te dit : <i>il y a une réserve de carburant d'un côté précis</i>. Faire l'inverse de la foule = te placer du côté de ceux qui seront alimentés, pas de ceux qui alimentent.</div>
+        </div>
+
+        <div style={{marginBottom:10, padding:"10px 11px", background:"#0a1420", borderRadius:6, borderLeft:"3px solid #a78bfa"}}>
+          <div style={{fontSize:10, color:"#a78bfa", fontWeight:700, marginBottom:4}}>③ LEVERAGED FUNDS (COT) — le flux frais des vrais gros</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Le Currency Strength et le retail montrent l'instant. Le COT montre ce que les hedge funds font <b style={{color:"#a78bfa"}}>vraiment</b>, en chiffres réels déclarés à la CFTC — pas une déduction.<br/><br/>
+          On regarde le <b style={{color:"#a78bfa"}}>changement de la semaine</b> (pas la position accumulée du passé). Pourquoi ? Parce qu'une grosse position héritée du passé ne garantit pas la suite — elle peut être en train d'être débouclée. Le changement hebdo capte le <b>flux frais</b> : dans quel sens les fonds bougent EN CE MOMENT. Un fonds qui vend agressivement le JPY cette semaine te dit « ils chargent maintenant » — info active, pas figée.<br/><br/>
+          C'est cohérent avec toute ta stratégie : tu suis le mouvement frais, pas les vieilles positions. Le COT te donne le flux institutionnel récent en chiffres durs.</div>
+        </div>
+
+        <div style={{padding:"10px 11px", background:"#160a2e", borderRadius:6, border:"1px solid #818cf844"}}>
+          <div style={{fontSize:10, color:"#a5b4fc", fontWeight:700, marginBottom:4}}>🎯 POURQUOI LES 3 ENSEMBLE — la convergence</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Chacun seul peut mentir. Le Currency Strength peut montrer un piège du matin. Le retail peut être extrême sans suite. Le COT a quelques jours de décalage. <b style={{color:"#a5b4fc"}}>Mais les trois mentent rarement en même temps, dans le même sens.</b><br/><br/>
+          Quand le flux temps réel (①), le carburant de la foule (②) et le flux frais des fonds (③) pointent tous vers la même paire → tu n'es pas sur une illusion. Tu es sur un vrai courant institutionnel, confirmé sous trois angles indépendants qui se compensent : le temps réel corrige le décalage du COT, et le COT ancre ce que le temps réel montre.</div>
+        </div>
+      </div>
+
       {/* POURQUOI CES 7 PAIRES */}
       <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
         <div style={{fontSize:12, color:"#4ade80", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #4ade8033"}}>🎯 POURQUOI CES 7 PAIRES</div>
