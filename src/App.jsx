@@ -2626,7 +2626,14 @@ function DayTradeAnalyzer() {
         }
         return out;
       };
-      // (Top Gainers/Losers et Most Volatile ne sont plus utilises — systeme APEX 3 filtres)
+      // FILTRE 4 : Top Gainers / Top Losers (confirme que le mouvement est reel et institutionnel)
+      const topGainers = grabPairs("Top Gainers", ["Top Losers","Currency Volatility","Most Volatile","Least Volatile"]);
+      const topLosers  = grabPairs("Top Losers",  ["Currency Volatility","Most Volatile","Least Volatile","Top Gainers"]);
+      const gainersSet = new Set(topGainers.slice(0,5).map(p=>p.pair));
+      const losersSet  = new Set(topLosers.slice(0,5).map(p=>p.pair));
+      // compte combien de fois une devise apparait du cote perdant / gagnant (signal renforce)
+      const loserCurCount = {}; topLosers.slice(0,5).forEach(p=>{ loserCurCount[p.base]=(loserCurCount[p.base]||0)+1; loserCurCount[p.quote]=(loserCurCount[p.quote]||0)+1; });
+      const gainerCurCount = {}; topGainers.slice(0,5).forEach(p=>{ gainerCurCount[p.base]=(gainerCurCount[p.base]||0)+1; gainerCurCount[p.quote]=(gainerCurCount[p.quote]||0)+1; });
 
       if (!strongest || !weakest){ setResult({error:"Format non reconnu — colle le bloc MarketMilk complet (Currency Strength inclus)."}); return; }
 
@@ -2671,6 +2678,15 @@ function DayTradeAnalyzer() {
           fcotok = (lfStrongNet > lfWeakNet);
         } else { lfMiss=true; fcotok=false; }
         dg.fcot = fcotok; dg.lfStrongNet=lfStrongNet; dg.lfWeakNet=lfWeakNet; dg.lfMiss=lfMiss; dg.strongCur=strongCur; dg.weakCur=weakCur;
+        // FILTRE 4 - mouvement reel : la paire doit etre dans le Top 5 du bon cote
+        // LONG -> dans Top Gainers ; SHORT -> dans Top Losers
+        const f4ok = (direction==="LONG") ? gainersSet.has(wpair) : losersSet.has(wpair);
+        // signal renforce : la devise faible perd sur plusieurs paires (ou forte gagne sur plusieurs)
+        const weakRepeat = loserCurCount[weakCur]||0;
+        const strongRepeat = gainerCurCount[strongCur]||0;
+        dg.f4 = f4ok; dg.weakRepeat = weakRepeat; dg.strongRepeat = strongRepeat;
+        const topEmpty = (gainersSet.size===0 && losersSet.size===0);
+        dg.topEmpty = topEmpty;
         // raison de blocage
         if (!dg.f1) dg.reason = forceGap<GAP_MIN ? ("divergence "+forceGap+" rangs (<4)") : "force pas du bon cote";
         else if (!dg.f5) {
@@ -2682,18 +2698,21 @@ function DayTradeAnalyzer() {
           }
         }
         else if (!dg.fcot) dg.reason = lfMiss ? "Leveraged Funds non disponibles" : (strongCur+" pas plus favorisé que "+weakCur+" par les fonds");
+        else if (!dg.f4) dg.reason = topEmpty ? "Top Gainers/Losers absent (colle le snapshot complet)" : (wpair+" pas dans le Top 5 "+(direction==="LONG"?"Gainers":"Losers")+" — mouvement pas confirmé");
         else dg.reason = "PASSE TOUT";
-        dg.status = dg.f1&&dg.f5&&dg.fcot ? "passe" : "bloque";
+        dg.status = dg.f1&&dg.f5&&dg.fcot&&dg.f4 ? "passe" : "bloque";
         diagnostic.push(dg);
         // CANDIDAT REEL si les 4 filtres passent
         if (!f1ok) return;
         if (!f5ok) return;
         if (!fcotok) return;
+        if (!f4ok) return;
         const isMaxDiv = (base===strongest&&quote===weakest)||(base===weakest&&quote===strongest);
         const lfGap = (lfStrongNet!=null&&lfWeakNet!=null) ? (lfStrongNet - lfWeakNet) : 0;
         const score = forceGap*10 + (isMaxDiv?5:0) + Math.abs(lfGap)/1000;
         candidates.push({pair:wpair, base, quote, direction, forceGap, isMaxDiv, score, retailPct:(direction==="LONG"?rShort:rLong), retailSide:(direction==="LONG"?"SHORT":"LONG"), retailMissing:rMiss, weakCur, strongCur, lfStrongNet, lfWeakNet,
-          strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: nStr});
+          strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: nStr,
+          inTop: f4ok, weakRepeat, strongRepeat});
       });
 
       // tri des candidats par score, la meilleure = surbrillance
@@ -2807,8 +2826,8 @@ function DayTradeView() {
   };
   return (
     <div style={{padding:16, maxWidth:760, margin:"0 auto"}}>
-      <div style={{fontSize:15, color:"#fbbf24", fontWeight:900, letterSpacing:1.5, marginBottom:5}}>⚡ SWING TRADE FX</div><div style={{fontSize:9, color:"#fbbf24aa", fontWeight:700, letterSpacing:2, marginBottom:4}}>APEX INSTITUTIONNEL · 3 FILTRES</div>
-      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (1-3 jours) — 3 filtres : divergence Currency Strength + retail contrarien + Leveraged Funds · Tu suis les big boys de Londres</div>
+      <div style={{fontSize:15, color:"#fbbf24", fontWeight:900, letterSpacing:1.5, marginBottom:5}}>⚡ SWING TRADE FX</div><div style={{fontSize:9, color:"#fbbf24aa", fontWeight:700, letterSpacing:2, marginBottom:4}}>APEX INSTITUTIONNEL · 4 FILTRES</div>
+      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (1-3 jours) — 4 filtres : divergence Currency Strength + retail contrarien + Leveraged Funds + mouvement réel (Top Gainers/Losers) · Tu suis les big boys de Londres</div>
 
       {/* SEQUENCE VISUELLE DU JOUR */}
       <div style={{padding:"11px 12px 4px", background:"linear-gradient(180deg,#0a0f1e,#0a1020)", borderRadius:10, border:"1px solid #38bdf855", marginBottom:14}}>
@@ -2818,7 +2837,7 @@ function DayTradeView() {
           const steps = [
             {n:"1", icon:"👁️", color:"#38bdf8", t:"REGARDE LE GRAPHIQUE", sub:"3h → 11h ET — Qu'a fait Londres ? Repère le faux mouvement du matin (le piège), puis la vraie direction."},
             {n:"2", icon:"🥛", color:"#fbbf24", t:"OUVRE MARKETMILK", sub:"10h-12h ET — Colle tes données. Quelle devise est FORTE ? Laquelle est FAIBLE ?"},
-            {n:"3", icon:"🔍", color:"#a78bfa", t:"VÉRIFIE LES 3 FILTRES", sub:"① Divergence ≥4 rangs · ② Retail ≥70% contre la foule · ③ Leveraged Funds alignés"},
+            {n:"3", icon:"🔍", color:"#a78bfa", t:"VÉRIFIE LES 4 FILTRES", sub:"① Divergence ≥4 rangs · ② Retail ≥70% contre la foule · ③ Leveraged Funds alignés · ④ Paire dans le Top 5 Gainers/Losers"},
             {n:"4", icon:"🎯", color:"#4ade80", t:"3/3 ? DIRECTION CONFIRMÉE", sub:"Les 3 cochés = vrai flux institutionnel. Carte VERTE = achat ▲ · Carte ROUGE = vente ▼"},
             {n:"5", icon:"⏳", color:"#f59e0b", t:"ATTENDS LE GOLDEN POCKET", sub:"Le prix recule à 61.8-65% (H1). 2-3 rejets, puis tu entres. Jamais sur l'extension."},
             {n:"6", icon:"🛡️", color:"#34d399", t:"TU GARDES 1 À 3 JOURS", sub:"Asie relaie le soir, Londres reprend à 3h. Tu sors quand ta devise forte faiblit."},
@@ -3015,7 +3034,7 @@ function DayTradeView() {
         </div>
 
         <div style={{padding:"10px 11px", background:"#160a2e", borderRadius:6, border:"1px solid #818cf844"}}>
-          <div style={{fontSize:10, color:"#a5b4fc", fontWeight:700, marginBottom:4}}>🎯 POURQUOI LES 3 ENSEMBLE — la convergence</div>
+          <div style={{fontSize:10, color:"#a5b4fc", fontWeight:700, marginBottom:4}}>🎯 POURQUOI LES 4 ENSEMBLE — la convergence</div>
           <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Chacun seul peut mentir. Le Currency Strength peut montrer un piège du matin. Le retail peut être extrême sans suite. Le COT a quelques jours de décalage. <b style={{color:"#a5b4fc"}}>Mais les trois mentent rarement en même temps, dans le même sens.</b><br/><br/>
           Quand le flux temps réel (①), le carburant de la foule (②) et le flux frais des fonds (③) pointent tous vers la même paire → tu n'es pas sur une illusion. Tu es sur un vrai courant institutionnel, confirmé sous trois angles indépendants qui se compensent : le temps réel corrige le décalage du COT, et le COT ancre ce que le temps réel montre.</div>
         </div>
