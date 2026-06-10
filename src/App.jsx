@@ -3211,11 +3211,11 @@ function DayTradeView() {
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#1e3a5f", border:"2px solid #38bdf8", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#38bdf8", fontWeight:700}}>3h</div>
-              <div style={{width:2, height:32, background:"#1e3a5f"}}/>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#2a1e00", border:"2px solid "+APX.wait, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:APX.wait, fontWeight:700}}>3h</div>
+              <div style={{width:2, height:32, background:APX.wait+"55"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#38bdf8", fontWeight:700}}>3h00 ET — OUVERTURE LONDRES</div>
+              <div style={{fontSize:9, color:APX.wait, fontWeight:700}}>3h00 ET — OUVERTURE LONDRES</div>
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Banques européennes entrent sur EUR/GBP/CHF. La tendance du jour se forme en silence.</div>
               <div style={{fontSize:8, color:"#4a5070", marginTop:2}}>→ Dors. Laisse-les travailler.</div>
             </div>
@@ -3223,11 +3223,11 @@ function DayTradeView() {
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#1e3a5f", border:"2px solid #38bdf8", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#38bdf8", fontWeight:700}}>5h</div>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#2a1e00", border:"2px solid "+APX.wait, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:APX.wait, fontWeight:700}}>5h</div>
               <div style={{width:2, height:32, background:"#1e3a5f"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#38bdf8", fontWeight:700}}>3h-6h ET — NEWS EUROPÉENNES</div>
+              <div style={{fontSize:9, color:APX.wait, fontWeight:700}}>3h-6h ET — NEWS EUROPÉENNES</div>
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Inflation, emploi, PIB de la zone euro tombent. Les institutionnels digèrent et confirment leur direction.</div>
               <div style={{fontSize:8, color:"#4a5070", marginTop:2}}>→ Dors. La tendance s'établit.</div>
             </div>
@@ -3237,11 +3237,11 @@ function DayTradeView() {
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a2a00", border:"2px solid #fbbf24", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#fbbf24", fontWeight:700}}>8h</div>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#0a1a2e", border:"2px solid "+APX.obs, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:APX.obs, fontWeight:700}}>8h</div>
               <div style={{width:2, height:32, background:"#fbbf2444"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#fbbf24", fontWeight:700}}>8h00 ET — NEW YORK OUVRE</div>
+              <div style={{fontSize:9, color:APX.obs, fontWeight:700}}>8h00 ET — NEW YORK OUVRE</div>
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>New York entre et confirme (ou non) la direction de Londres. Tes paires n'ont pas de dollar, donc NY ne les trade pas directement — mais son volume valide la tendance. Tu n'analyses pas encore : tu attends 10h que Londres ait fait toute sa session. Tu observes seulement.</div>
               <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Observe seulement. Pas d'analyse, pas de position avant 10h.</div>
             </div>
@@ -3249,11 +3249,11 @@ function DayTradeView() {
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#1a1500", border:"2px solid #fbbf24", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fbbf24", fontWeight:700}}>8h30</div>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#2a1e00", border:"2px solid "+APX.wait, display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:APX.wait, fontWeight:700}}>8h30</div>
               <div style={{width:2, height:32, background:"#fbbf2422"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#fbbf24", fontWeight:700}}>8h30 ET — NEWS US ⚠️</div>
+              <div style={{fontSize:9, color:APX.wait, fontWeight:700}}>8h30 ET — NEWS US ⚠️</div>
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>NFP, CPI, FOMC. Peut accélérer OU renverser brutalement. Ne pas entrer après une news.</div>
               <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Tu n'as pas encore de position (analyse à 10h). Laisse la news passer — elle fait partie de ce que Londres et NY digèrent avant que tu lises la direction finale à 10h.</div>
             </div>
@@ -3261,22 +3261,22 @@ function DayTradeView() {
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#00ff88,#4ade80)", border:"3px solid #00ff88", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#001a0d", fontWeight:900, boxShadow:"0 0 12px rgba(0,255,136,0.6)"}}>10h</div>
+              <div style={{width:32, height:32, borderRadius:"50%", background:APX.buy, border:"3px solid "+APX.buy, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#04140a", fontWeight:900, boxShadow:"0 0 12px "+APX.buy+"99"}}>10h</div>
               <div style={{width:2, height:40, background:"#00ff8866"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8, padding:"8px 10px", background:"#052010", borderRadius:6, border:"1px solid #00ff8866", marginBottom:4}}>
-              <div style={{fontSize:10, color:"#00ff88", fontWeight:900}}>⚡ 10h-12h ET — TU ANALYSES ET OBSERVES</div>
+              <div style={{fontSize:10, color:APX.buy, fontWeight:900}}>⚡ 10h-12h ET — TU ANALYSES ET OBSERVES</div>
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres a tranché sa vraie direction (le faux mouvement du matin est passé), NY a confirmé. Retail piégé + Leveraged Funds alignés. Tes 3 filtres te disent si les gros joueurs sont dans le trade.</div>
               <div style={{fontSize:8.5, color:"#00ff88", fontWeight:700, marginTop:4}}>→ Analyse la direction · identifie l'impulsion · attends le pullback Golden Pocket</div>
             </div>
           </div>
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#160a2e", border:"2px solid #a78bfa", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#a78bfa", fontWeight:700}}>Soir</div>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#160a2e", border:"2px solid "+APX.inst, display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:APX.inst, fontWeight:700}}>Soir</div>
               <div style={{width:2, height:32, background:"#f8717133"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:"#a78bfa", fontWeight:700}}>LE SOIR — SESSION ASIATIQUE PREND LE RELAIS</div>
+              <div style={{fontSize:9, color:APX.inst, fontWeight:700}}>LE SOIR — SESSION ASIATIQUE PREND LE RELAIS</div>
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Tokyo ouvre sur le JPY, Sydney sur l'AUD et le NZD. Quand la tendance de Londres est forte et que les fondamentaux tiennent, l'Asie la prolonge souvent. Mais pas toujours — parfois elle consolide. Tu gardes ta position tant que ta devise forte reste forte, sans présumer que le mouvement va forcément continuer.</div>
               <div style={{fontSize:8, color:"#a78bfa", marginTop:2}}>→ Tu gardes. Le relais est passé.</div>
             </div>
@@ -3284,10 +3284,10 @@ function DayTradeView() {
 
           <div style={{display:"flex", gap:10, alignItems:"flex-start"}}>
             <div style={{display:"flex", flexDirection:"column", alignItems:"center", minWidth:32}}>
-              <div style={{width:28, height:28, borderRadius:"50%", background:"#052010", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#4ade80", fontWeight:700}}>J+1</div>
+              <div style={{width:28, height:28, borderRadius:"50%", background:"#160a2e", border:"2px solid "+APX.inst, display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:APX.inst, fontWeight:700}}>J+1</div>
             </div>
             <div style={{flex:1}}>
-              <div style={{fontSize:9, color:"#4ade80", fontWeight:700}}>LENDEMAIN 3h — LONDRES REPREND</div>
+              <div style={{fontSize:9, color:APX.inst, fontWeight:700}}>LENDEMAIN 3h — LONDRES REPREND</div>
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Londres rouvre à 3h et reprend le mouvement de la veille. Toi, tu réévalues à 10h (quand la session est de nouveau lisible) : ta devise forte toujours en haut, la faible toujours en bas ? Le swing continue. L'écart se referme ? Tu sors.</div>
               <div style={{fontSize:8, color:"#4ade80", marginTop:2}}>→ Réévalue chaque matin. Tu gardes 1 à 3 jours.</div>
             </div>
