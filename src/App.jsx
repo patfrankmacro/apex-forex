@@ -2938,7 +2938,10 @@ function DayTradeView() {
       <div style={{padding:"12px 14px", background:"#1a1500", borderRadius:8, border:"1px solid #fbbf2444", marginBottom:14}}>
         <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 LA LOGIQUE</div>
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
-          Les <b style={{color:"#fbbf24"}}>gros joueurs de Londres</b> (banques, fonds) prennent position pendant leur session. Quand ils achètent une devise elle devient <b style={{color:"#4ade80"}}>FORTE</b>, quand ils la vendent elle devient <b style={{color:"#f87171"}}>FAIBLE</b>. Tu ne devines pas leur direction : tu attends que Londres ait fait <b>toute sa session</b> (3h→11h30 ET), puis à 10h-12h tu lis le résultat sur MarketMilk. Le mouvement qu'ils lancent ne meurt pas à la fermeture de Londres — New York le tient, l'Asie le relaie le soir, Londres le reprend le lendemain. C'est pour ça que ta position dure <b>1 à 3 jours</b> : pas parce que les institutions sont lentes, mais parce que le flux passe de session en session. <b>On ne devine pas, on SUIT ce flux.</b><br/><br/>
+          Les <b style={{color:"#fbbf24"}}>banques de Londres</b> déplacent des milliards. Quand elles achètent une devise, elle devient <b style={{color:"#4ade80"}}>FORTE</b> ; quand elles la vendent, elle devient <b style={{color:"#f87171"}}>FAIBLE</b>.<br/><br/>
+          Tu ne devines pas leur direction. Tu attends qu'elles aient fait <b>toute leur session</b> (3h→11h30 ET), puis à 10h-12h tu lis simplement le résultat sur MarketMilk : quelle devise est forte, laquelle est faible.<br/><br/>
+          Leur mouvement ne s'arrête pas quand Londres ferme : <b>New York le tient, l'Asie le relaie le soir, Londres le reprend le lendemain</b>. Le flux passe de session en session — c'est pour ça que ta position dure <b>1 à 3 jours</b>.<br/><br/>
+          <b style={{color:"#fbbf24"}}>On ne devine pas. On SUIT.</b><br/><br/>
           Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence Currency Strength), quand le retail est piégé à contre-sens ET que les Leveraged Funds confirment la même direction.<br/><br/>
           <b style={{color:"#38bdf8"}}>⏰ 10h00-12h00 ET — ton moment d'analyse :</b> Pourquoi si tard ? Le mouvement du matin (3h-7h) est souvent un <b style={{color:"#fbbf24"}}>faux mouvement</b> : Londres chasse les stops (liquidity grab) avant de révéler sa VRAIE direction. Si tu analyses à 7h, tu vois le piège, pas la tendance. À 10h-11h, Londres a tranché et New York (ouvert depuis 8h) a confirmé. Londres ferme vers 11h30 — tu lis la <b style={{color:"#fbbf24"}}>direction finale</b>. Tu identifies l'impulsion et tu attends le pullback au Golden Pocket (61.8%-65%) — qui arrive souvent pendant Tokyo le soir — pour entrer derrière les big boys au meilleur prix.<br/><br/>
           <b style={{color:"#a78bfa"}}>🔁 Pourquoi tes positions durent 1 à 3 jours :</b> tes 7 paires opposent une devise de Londres (<b>EUR/GBP/CHF</b>) à une devise du bloc asiatique-Pacifique (<b>AUD/NZD/JPY</b>). Aucune n'est une paire du dollar. Le mouvement passe de main en main sans s'éteindre : <b>Londres</b> le lance le matin, tu gardes ta position pendant <b>New York</b> (8h), puis la <b>session asiatique</b> (Tokyo + Sydney) prend le relais le soir — les devises d'Asie (JPY à Tokyo, AUD/NZD à Sydney) continuent leur mouvement contre les devises de Londres. Le lendemain Londres reprend.<br/><br/><b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> dernière confirmation. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant.
@@ -2994,7 +2997,6 @@ function DayTradeView() {
           {[
             {t:"10h-12h ET", a:"Colle MarketMilk + lance l'analyse", p:"Londres a tranché + NY a confirmé", col:"#4ade80"},
             {t:"Si alerte", a:"Attends le Golden Pocket (61.8-65%) sur H1 — peut arriver à NY ou Tokyo", p:"Meilleur prix — jamais sur l'extension", col:"#4ade80"},
-            {t:"8h ET", a:"Si en position : tu gardes. Si tu attends encore le Golden Pocket : NY peut te le donner", p:"Le fondamental de Londres n'a pas changé — tu ne prends aucune nouvelle position", col:"#38bdf8"},
             {t:"Le soir", a:"Tu gardes — Asie prend le relais", p:"Tokyo continue sur JPY · Sydney continue sur AUD et NZD — toujours contre une devise de Londres", col:"#a78bfa"},
             {t:"Chaque matin 10h", a:"Réévalue ta position", p:"Devise forte toujours forte ? Tu gardes. Sinon tu sors. Stop remonté.", col:"#fbbf24"}
           ].map((r,i)=>(
@@ -3176,8 +3178,8 @@ function DayTradeView() {
               <div style={{width:28, height:28, borderRadius:"50%", background:"#052010", border:"2px solid #4ade80", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#4ade80", fontWeight:700}}>J+1</div>
             </div>
             <div style={{flex:1}}>
-              <div style={{fontSize:9, color:"#4ade80", fontWeight:700}}>LENDEMAIN 10h — LONDRES REPREND</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Londres rouvre et reprend le mouvement. Tu rouvres MarketMilk : ta devise forte toujours en haut, la faible toujours en bas ? Le swing continue. L'écart se referme ? Tu sors.</div>
+              <div style={{fontSize:9, color:"#4ade80", fontWeight:700}}>LENDEMAIN 3h — LONDRES REPREND</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Londres rouvre à 3h et reprend le mouvement de la veille. Toi, tu réévalues à 10h (quand la session est de nouveau lisible) : ta devise forte toujours en haut, la faible toujours en bas ? Le swing continue. L'écart se referme ? Tu sors.</div>
               <div style={{fontSize:8, color:"#4ade80", marginTop:2}}>→ Réévalue chaque matin. Tu gardes 1 à 3 jours.</div>
             </div>
           </div>
@@ -3197,8 +3199,8 @@ function DayTradeView() {
             <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 3 filtres (divergence + retail + Leveraged Funds) confirment que le mouvement est réel. Tu attends le Golden Pocket (61.8%-65%) pour entrer au meilleur prix — souvent pendant Tokyo le soir. Tu ne devines pas — tu confirmes, tu attends l'escompte, et tu suis. Comme un sniper.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
-            <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>8h ET — New York ouvre, tu gardes</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tes paires n'ont pas de dollar, donc NY ne les trade pas directement. Rien n'a changé au fondamental de Londres. Tu ne prends aucune nouvelle position à 8h. Si le Golden Pocket est arrivé pendant Londres et que tu es en position : tu gardes. Si tu attends encore le pullback : NY peut te le donner — observe. Dans les deux cas, le fondamental de Londres tient.</div>
+            <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>8h ET — New York ouvre, tu observes</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tes paires n'ont pas de dollar, donc NY ne les trade pas directement — mais le volume de New York confirme (ou non) la direction lancée par Londres. Tu n'analyses pas encore : ton analyse se fait à 10h-12h, quand Londres a fini sa session. À 8h, tu observes seulement. Tu ne prends aucune position avant d'avoir lu le résultat complet.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #4ade80"}}>
             <div style={{fontSize:9, color:"#a78bfa", fontWeight:700, marginBottom:3}}>Le soir — La session asiatique reprend le flambeau</div>
