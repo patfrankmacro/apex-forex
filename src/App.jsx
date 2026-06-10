@@ -2632,6 +2632,8 @@ function DayTradeAnalyzer() {
       const topLosers  = grabPairs("Top Losers",  ["Currency Volatility","Most Volatile","Least Volatile","Top Gainers"]);
       const mostVol    = grabPairs("Most Volatile", ["Least Volatile","Top Gainers","Top Losers"]);
       const volSet     = new Set(mostVol.slice(0,5).map(p=>p.replace("/","")));
+      const leastVol   = grabPairs("Least Volatile", ["Top Gainers","Top Losers","Most Volatile"]);
+      const leastSet   = new Set(leastVol.slice(0,5).map(p=>p.replace("/","")));
       const gainersSet = new Set(topGainers.slice(0,5).map(p=>p.pair));
       const losersSet  = new Set(topLosers.slice(0,5).map(p=>p.pair));
       // compte combien de fois une devise apparait du cote perdant / gagnant (signal renforce)
@@ -2657,7 +2659,7 @@ function DayTradeAnalyzer() {
         const strongCur = direction==="LONG"?base:quote;
         const weakCur   = direction==="LONG"?quote:base;
         const forceGap = Math.abs(rb-rq);
-        const dg = {pair:wpair, base, quote, direction, f1:false, f3:true, f5:false, fcot:false, reason:""};
+        const dg = {pair:wpair, base, quote, direction, f1:false, f3:true, f5:false, fcot:false, fvol:false, reason:""};
         // FILTRE 1 - DIVERGENCE >= 4 rangs
         const f1ok = (forceGap >= GAP_MIN) && (sRank[strongCur] < sRank[weakCur]);
         dg.f1 = f1ok; dg.forceGap = forceGap;
@@ -2688,6 +2690,13 @@ function DayTradeAnalyzer() {
         const weakRepeat = loserCurCount[weakCur]||0;
         const strongRepeat = gainerCurCount[strongCur]||0;
         dg.f4 = f4ok; dg.weakRepeat = weakRepeat; dg.strongRepeat = strongRepeat;
+        // FILTRE 5 - energie reelle : dans le Top 5 Most Volatile ET pas dans le Least Volatile
+        const inMost = volSet.has(wpair);
+        const inLeast = leastSet.has(wpair);
+        const fvolok = inMost && !inLeast;
+        dg.fvol = fvolok; dg.inMost = inMost; dg.inLeast = inLeast;
+        const volEmpty = (volSet.size===0);
+        dg.volEmpty = volEmpty;
         const topEmpty = (gainersSet.size===0 && losersSet.size===0);
         dg.topEmpty = topEmpty;
         // raison de blocage
@@ -2702,14 +2711,16 @@ function DayTradeAnalyzer() {
         }
         else if (!dg.fcot) dg.reason = lfMiss ? "Leveraged Funds non disponibles" : (strongCur+" pas plus favorisé que "+weakCur+" par les fonds");
         else if (!dg.f4) dg.reason = topEmpty ? "Top Gainers/Losers absent (colle le snapshot complet)" : (wpair+" pas dans le Top 5 "+(direction==="LONG"?"Gainers":"Losers")+" — mouvement pas confirmé");
+        else if (!dg.fvol) dg.reason = volEmpty ? "Most Volatile absent (colle le snapshot complet)" : (inLeast ? wpair+" dans le Least Volatile — paire endormie, pas de pôle possible" : wpair+" pas dans le Top 5 Most Volatile — pas assez d\u0027énergie pour un pôle");
         else dg.reason = "PASSE TOUT";
-        dg.status = dg.f1&&dg.f5&&dg.fcot&&dg.f4 ? "passe" : "bloque";
+        dg.status = dg.f1&&dg.f5&&dg.fcot&&dg.f4&&dg.fvol ? "passe" : "bloque";
         diagnostic.push(dg);
-        // CANDIDAT REEL si les 4 filtres passent
+        // CANDIDAT REEL si les 5 filtres passent
         if (!f1ok) return;
         if (!f5ok) return;
         if (!fcotok) return;
         if (!f4ok) return;
+        if (!fvolok) return;
         const isMaxDiv = (base===strongest&&quote===weakest)||(base===weakest&&quote===strongest);
         const lfGap = (lfStrongNet!=null&&lfWeakNet!=null) ? (lfStrongNet - lfWeakNet) : 0;
         const score = forceGap*10 + (isMaxDiv?5:0) + Math.abs(lfGap)/1000;
@@ -2727,7 +2738,7 @@ function DayTradeAnalyzer() {
       const ordre={passe:0,bloque:1};
       diagnostic.sort((a,b)=> (ordre[a.status]-ordre[b.status]) || ((b.forceGap||0)-(a.forceGap||0)));
 
-      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session — aucune de tes 7 paires ne réunit les 4 filtres (divergence + retail contrarien + Leveraged Funds + Top 5 Gainers/Losers). Pas de trade = bonne décision.", strongest, weakest, diag7: diagnostic}); return; }
+      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session — aucune de tes 7 paires ne réunit les 5 filtres (divergence + retail + Leveraged Funds + Top 5 Gainers/Losers + Most Volatile). Pas de trade = bonne décision.", strongest, weakest, diag7: diagnostic}); return; }
       setResult({ strongest, weakest, top, diag7: diagnostic });
     } catch(e){ setResult({error:"Erreur: "+e.message}); }
   };
@@ -2751,7 +2762,7 @@ function DayTradeAnalyzer() {
             <div key={i} style={{display:"flex", flexDirection:"column", gap:2, padding:"5px 7px", marginBottom:4, background:bg, borderRadius:4, borderLeft:"3px solid "+col, opacity:d.status==="dort"?0.6:1}}>
               <div style={{fontSize:9, color:TEXT, fontWeight:700}}>{pp} {d.direction&&d.status!=="dort"?<span style={{color:d.direction==="LONG"?"#4ade80":"#f87171"}}>{d.direction==="LONG"?"▲ ACHAT":"▼ VENTE"}</span>:""}</div>
               {d.status!=="dort" && (
-                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Divergence {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f5?"✓":"✗"} Retail ≥70% · ③ {d.fcot?"✓":"✗"} LF · ④ {d.f4?"✓":"✗"} Top5</div>
+                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Divergence {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f5?"✓":"✗"} Retail ≥70% · ③ {d.fcot?"✓":"✗"} LF · ④ {d.f4?"✓":"✗"} Top5 · ⑤ {d.fvol?"✓":"✗"} Vol</div>
               )}
               {d.status!=="dort" && !d.rMiss && d.rLong!=null && (
                 <div style={{marginTop:2}}>
@@ -2768,14 +2779,14 @@ function DayTradeAnalyzer() {
             </div>
             );
           })}
-          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Vert = passe les 4 filtres · Rouge = bloque. Tri : prêtes en haut. LF = Leveraged Funds · Top5 = paire dans le Top 5 Gainers/Losers.</div>
+          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Vert = passe les 5 filtres · Rouge = bloque. Tri : prêtes en haut. LF = Leveraged Funds · Top5 = paire dans le Top 5 Gainers/Losers.</div>
         </div>
       )}
 
       {result && !result.error && (
         <div style={{marginTop:10}}>
           <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>FORCE DU JOUR : <b style={{color:"#4ade80"}}>{result.strongest} (la plus forte)</b> → <b style={{color:"#f87171"}}>{result.weakest} (la plus faible)</b></div>
-          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} APEX (les 4 filtres réunis)</div>
+          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} APEX (les 5 filtres réunis)</div>
           {result.top.map((o,i)=>{
             const isLong = o.direction==="LONG";
             const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
@@ -2808,7 +2819,7 @@ function DayTradeAnalyzer() {
             </div>
           );})}
           <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
-            ⚠ APEX INSTITUTIONNEL — chaque paire réunit les 4 filtres OBLIGATOIRES : divergence ≥4 rangs + retail contrarien ≥70% + Leveraged Funds alignés + paire dans le Top 5 Gainers/Losers (mouvement réel). Tu suis les big boys de Londres. Vérifie le pôle sur H1 (Londres+NY même sens), attends le drapeau de l'après-midi, entre à la cassure (fin NY ou Tokyo). Garde en swing 1 à 3 jours.
+            ⚠ APEX INSTITUTIONNEL — chaque paire réunit les 5 filtres OBLIGATOIRES : divergence ≥4 rangs + retail ≥70% + Leveraged Funds + Top 5 Gainers/Losers (mouvement) + Top 5 Most Volatile (énergie). Tu suis les big boys de Londres. Vérifie le pôle sur H1 (Londres+NY même sens), attends le drapeau de l'après-midi, entre à la cassure (fin NY ou Tokyo). Garde en swing 1 à 3 jours.
           </div>
         </div>
       )}
@@ -2829,8 +2840,8 @@ function DayTradeView() {
   };
   return (
     <div style={{padding:16, maxWidth:760, margin:"0 auto"}}>
-      <div style={{fontSize:15, color:"#fbbf24", fontWeight:900, letterSpacing:1.5, marginBottom:5}}>⚡ SWING TRADE FX</div><div style={{fontSize:9, color:"#fbbf24aa", fontWeight:700, letterSpacing:2, marginBottom:4}}>APEX INSTITUTIONNEL · 4 FILTRES</div>
-      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (1-3 jours) — 4 filtres : divergence Currency Strength + retail contrarien + Leveraged Funds + mouvement réel (Top Gainers/Losers) · Tu suis les big boys de Londres</div>
+      <div style={{fontSize:15, color:"#fbbf24", fontWeight:900, letterSpacing:1.5, marginBottom:5}}>⚡ SWING TRADE FX</div><div style={{fontSize:9, color:"#fbbf24aa", fontWeight:700, letterSpacing:2, marginBottom:4}}>APEX INSTITUTIONNEL · 5 FILTRES</div>
+      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (1-3 jours) — 5 filtres : divergence + retail contrarien + Leveraged Funds + mouvement réel (Top 5) + énergie réelle (Most Volatile) · Tu suis les big boys de Londres</div>
 
       {/* SEQUENCE VISUELLE DU JOUR */}
       <div style={{padding:"11px 12px 4px", background:"linear-gradient(180deg,#0a0f1e,#0a1020)", borderRadius:10, border:"1px solid #38bdf855", marginBottom:14}}>
@@ -2840,8 +2851,8 @@ function DayTradeView() {
           const steps = [
             {n:"1", icon:"👁️", color:"#38bdf8", t:"VÉRIFIE LE PÔLE (H1)", sub:"Londres (3h-11h) et NY (8h-11h) poussent dans le MÊME sens ? = PÔLE de convergence valide. Sens opposés = pas de pôle, pas de trade."},
             {n:"2", icon:"🥛", color:"#fbbf24", t:"OUVRE MARKETMILK", sub:"🎯 10h30-10h45 ET (tolérance 10h55) — Colle tes données. Quelle devise est FORTE ? Laquelle est FAIBLE ? (avant le Fix de 11h)"},
-            {n:"3", icon:"🔍", color:"#a78bfa", t:"VÉRIFIE LES 4 FILTRES", sub:"① Divergence ≥4 rangs · ② Retail ≥70% contre la foule · ③ Leveraged Funds alignés · ④ Paire dans le Top 5 Gainers/Losers"},
-            {n:"4", icon:"🎯", color:"#4ade80", t:"4/4 ? DIRECTION CONFIRMÉE", sub:"Les 4 cochés = vrai flux institutionnel. Carte VERTE = achat ▲ · Carte ROUGE = vente ▼"},
+            {n:"3", icon:"🔍", color:"#a78bfa", t:"VÉRIFIE LES 5 FILTRES", sub:"① Divergence ≥4r · ② Retail ≥70% · ③ Leveraged Funds · ④ Top 5 Gainers/Losers · ⑤ Top 5 Most Volatile (jamais Least)"},
+            {n:"4", icon:"🎯", color:"#4ade80", t:"5/5 ? DIRECTION CONFIRMÉE", sub:"Les 5 cochés = vrai flux institutionnel. Carte VERTE = achat ▲ · Carte ROUGE = vente ▼"},
             {n:"5", icon:"⏳", color:"#f59e0b", t:"ATTENDS LE DRAPEAU", sub:"Après-midi NY (11h30-17h) : le prix consolide en drift léger contre-tendance, SANS s'effondrer. C'est le drapeau qui se dessine."},
             {n:"6", icon:"🛡️", color:"#34d399", t:"ENTRE À LA CASSURE", sub:"Cassure du drapeau dans le sens du pôle (fin NY ou Tokyo 19h). Stop sous le drapeau. Target = hauteur du pôle. Garde 1-3 jours."},
           ];
@@ -2860,7 +2871,7 @@ function DayTradeView() {
           ));
         })()}
         <div style={{fontSize:8, color:"#38bdf8", textAlign:"center", padding:"8px", marginTop:4, background:"#001018", borderRadius:6, fontWeight:600, lineHeight:1.5}}>
-          Pas de 4/4 aujourd'hui ? = Pas de trade. C'est normal. La discipline d'attendre fait partie de la stratégie.
+          Pas de 5/5 aujourd'hui ? = Pas de trade. C'est normal. La discipline d'attendre fait partie de la stratégie.
         </div>
       </div>
 
@@ -2981,15 +2992,15 @@ function DayTradeView() {
                   <div key={x.wpair} style={{ padding:"8px 10px", marginBottom:6, background:bg, border:bd, borderRadius:6 }}>
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:3 }}>
                       <span style={{ fontSize:11, fontWeight:700, color:is3?(isBuy?"#00ff88":"#ff3b3b"):TEXT }}>{x.base}/{x.quote} {is3?(isBuy?"▲ ACHAT":"▼ VENTE"):""}</span>
-                      <span style={{ fontSize:8, fontWeight:700, padding:"2px 6px", borderRadius:3, background:is3?(isBuy?"#00ff88":"#ff3b3b"):"#fbbf2433", color:is3?"#001a0d":"#fbbf24" }}>{is3?"🟢 3/4 — vérifie ④":"🟡 2/4"}</span>
+                      <span style={{ fontSize:8, fontWeight:700, padding:"2px 6px", borderRadius:3, background:is3?(isBuy?"#00ff88":"#ff3b3b"):"#fbbf2433", color:is3?"#001a0d":"#fbbf24" }}>{is3?"🟢 3/5 — vérifie ④⑤":"🟡 2/5"}</span>
                     </div>
                     <div style={{ fontSize:8, color:TEXT, lineHeight:1.6 }}>
-                      <span style={{color:x.f1===true?"#4ade80":x.f1===false?"#f87171":"#64748b"}}>① Divergence {x.forceGap!=null?x.forceGap+"r "+(x.f1?"✓":"✗"):"– (colle MarketMilk)"}</span> · <span style={{color:"#4ade80"}}>② Retail {x.direction==="LONG"?"SHORT":"LONG"} {x.direction==="LONG"?x.rShort:x.rLong}% ✓</span> · <span style={{color:"#a78bfa"}}>③ LF: {x.sCur} {x.lfS>=0?"+":""}{x.lfS?.toLocaleString()} vs {x.wCur} {x.lfW>=0?"+":""}{x.lfW?.toLocaleString()} ✓</span> · <span style={{color:"#64748b"}}>④ Top5 – (colle MarketMilk)</span>
+                      <span style={{color:x.f1===true?"#4ade80":x.f1===false?"#f87171":"#64748b"}}>① Divergence {x.forceGap!=null?x.forceGap+"r "+(x.f1?"✓":"✗"):"– (colle MarketMilk)"}</span> · <span style={{color:"#4ade80"}}>② Retail {x.direction==="LONG"?"SHORT":"LONG"} {x.direction==="LONG"?x.rShort:x.rLong}% ✓</span> · <span style={{color:"#a78bfa"}}>③ LF: {x.sCur} {x.lfS>=0?"+":""}{x.lfS?.toLocaleString()} vs {x.wCur} {x.lfW>=0?"+":""}{x.lfW?.toLocaleString()} ✓</span> · <span style={{color:"#64748b"}}>④ Top5 – (colle MarketMilk)</span> · <span style={{color:"#64748b"}}>⑤ Vol – (colle MarketMilk)</span>
                     </div>
                     <div style={{ fontSize:7.5, color:"#8b9bbf", marginTop:3, fontStyle:"italic" }}>💡 {x.lfS>=0 && x.lfW<0 ? `Les fonds achètent ${x.sCur} et vendent ${x.wCur} → ${x.sCur} plus fort` : (x.lfS<0 && x.lfW<0 ? `Les fonds vendent les deux, mais ${x.wCur} beaucoup plus → ${x.sCur} relativement plus fort` : `Les fonds achètent les deux, mais ${x.sCur} plus → ${x.sCur} favorisé`)}</div>
-                    {is3 && <div style={{ fontSize:8, color:isBuy?"#86efac":"#fca5a5", marginTop:4, fontWeight:600 }}>→ Les 4 filtres convergent. {isBuy?"ACHÈTE":"VENDS"} {x.base}/{x.quote} : vérifie le pôle sur H1, laisse le drapeau se dessiner l'après-midi, entre à la cassure (fin NY/Tokyo). Stop sous le drapeau, swing 1-3 jours.</div>}
-                    {x.impulsif && <div style={{fontSize:8.5, color:"#fbbf24", marginTop:4, fontWeight:700}}>💪 PÔLE IMPULSIF — aussi dans le Top 5 Most Volatile : le mouvement a direction ET énergie. Cassure du drapeau probablement nette. Setup A+ du jour.</div>}
-                    {!is3 && <div style={{ fontSize:7.5, color:"#fbbf24", marginTop:3 }}>Retail + Leveraged Funds alignés. Colle MarketMilk + Analyse pour vérifier la divergence (①) ET que la paire est dans le Top 5 Gainers/Losers (④).</div>}
+                    {is3 && <div style={{ fontSize:8, color:isBuy?"#86efac":"#fca5a5", marginTop:4, fontWeight:600 }}>→ Les 5 filtres convergent. {isBuy?"ACHÈTE":"VENDS"} {x.base}/{x.quote} : vérifie le pôle sur H1, laisse le drapeau se dessiner l'après-midi, entre à la cassure (fin NY/Tokyo). Stop sous le drapeau, swing 1-3 jours.</div>}
+                    
+                    {!is3 && <div style={{ fontSize:7.5, color:"#fbbf24", marginTop:3 }}>Retail + Leveraged Funds alignés. Colle MarketMilk + Analyse pour vérifier la divergence (①), le Top 5 Gainers/Losers (④) et le Most Volatile (⑤).</div>}
                   </div>
                 );
               })}
@@ -3070,11 +3081,15 @@ function DayTradeView() {
           On exige que ta paire soit dans le <b style={{color:"#f59e0b"}}>Top 5</b> du bon côté (Top Gainers si tu achètes, Top Losers si tu vends). Signal encore plus fort : ta devise faible perd sur <b>plusieurs paires</b> à la fois (ex : l'AUD sur 4 paires) = faiblesse généralisée, pas un coup isolé.<br/><br/>
           <b style={{color:"#f59e0b"}}>Attention :</b> ce filtre confirme le PÔLE à l'analyse (10h30-10h45), il ne dit pas d'entrer maintenant. Tu attends le drapeau de l'après-midi, puis la cassure dans le sens du pôle — tu n'achètes jamais le pôle en route.</div>
         </div>
+        <div style={{marginBottom:12, padding:"10px 12px", background:"#1a1500", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
+          <div style={{fontSize:10, color:"#fbbf24", fontWeight:700, marginBottom:4}}>⑤ ÉNERGIE RÉELLE (Most Volatile) — la force derrière le mouvement</div>
+          <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>Le ④ prouve que ta paire a une DIRECTION aujourd'hui. Le ⑤ prouve qu'elle a de l'ÉNERGIE : elle doit être dans le Top 5 Most Volatile — les paires où le prix se bat vraiment, avec du volume. Et elle ne doit JAMAIS être dans le Least Volatile : une paire endormie (range de 0,2%) ne peut pas construire un pôle digne d'un flag.<br/><br/>Direction (④) + énergie (⑤) = un pôle impulsif. C'est la différence entre une paire qui dérive mollement vers le haut et une paire que les institutions poussent avec conviction. Le flag a besoin de la deuxième : sans énergie dans le pôle, la cassure du drapeau n'a pas de carburant.</div>
+        </div>
 
         <div style={{padding:"10px 11px", background:"#160a2e", borderRadius:6, border:"1px solid #818cf844"}}>
           <div style={{fontSize:10, color:"#a5b4fc", fontWeight:700, marginBottom:4}}>🎯 POURQUOI LES 4 ENSEMBLE — la convergence</div>
           <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Chacun seul peut mentir. Le Currency Strength peut montrer un piège du matin. Le retail peut être extrême sans suite. Le COT a quelques jours de décalage. Le mouvement du jour peut être une sortie. <b style={{color:"#a5b4fc"}}>Mais les quatre mentent rarement en même temps, dans le même sens.</b><br/><br/>
-          Quand le flux temps réel (①), le carburant de la foule (②), le flux frais des fonds (③) et le mouvement réel du jour (④) pointent tous vers la même paire → tu n'es pas sur une illusion. Tu es sur un vrai courant institutionnel, confirmé sous quatre angles indépendants qui se compensent.</div>
+          Quand le flux temps réel (①), le carburant de la foule (②), le flux frais des fonds (③), le mouvement réel du jour (④) et l'énergie du mouvement (⑤) pointent tous vers la même paire → tu n'es pas sur une illusion. Tu es sur un vrai courant institutionnel, confirmé sous cinq angles indépendants qui se compensent.</div>
         </div>
       </div>
 
@@ -3096,30 +3111,32 @@ function DayTradeView() {
       {/* SEQUENCE */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:12, color:"#38bdf8", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #38bdf833"}}>📋 LA SÉQUENCE — ÉTAPE PAR ÉTAPE</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie ces 4 filtres OBLIGATOIRES sur tes 7 paires quand tu colles tes données. Une alerte n'apparaît QUE si les 4 sont cochés. Chaque filtre mesure une chose DIFFÉRENTE : où est le capital (Currency Strength), qui est piégé en face (retail), ce que les vraies institutions font (Leveraged Funds), et si le mouvement est réel aujourd'hui (Top Gainers/Losers). Quand les 4 convergent, tu suis les big boys avec le maximum de preuves.</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie ces 5 filtres OBLIGATOIRES sur tes 7 paires quand tu colles tes données. Une alerte n'apparaît QUE si les 5 sont cochés. Chaque filtre mesure une chose DIFFÉRENTE : où est le capital (Currency Strength), qui est piégé en face (retail), ce que les vraies institutions font (Leveraged Funds), et si le mouvement est réel aujourd'hui (Top Gainers/Losers). Quand les 5 convergent, tu suis les big boys avec le maximum de preuves.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE ≥ 4 rangs</b> au Currency Strength : la devise forte et la faible séparées d'au moins 4 places (vraie divergence, pas 2 voisines)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#34d399", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>RETAIL CONTRARIEN ≥ 70%</b> : si tu achètes, le retail doit être SHORT 70%+ ; si tu vends, LONG 70%+. La foule est piégée du mauvais côté — leurs stops qui sautent alimentent ton mouvement. C'est ton carburant.</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#a78bfa", fontWeight:700, minWidth:16}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#a78bfa"}}>LEVERAGED FUNDS ALIGNÉS</b> : le rapport COT (CFTC, publié chaque vendredi) montre ce que les hedge funds font VRAIMENT. La devise forte doit être plus achetée que la faible. C'est la VRAIE position institutionnelle — pas une déduction, des chiffres réels. Si les fonds ne confirment pas, pas de trade.</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#f59e0b", fontWeight:700, minWidth:16}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#f59e0b"}}>MOUVEMENT RÉEL</b> : ta paire doit être dans le Top 5 Gainers (achat) ou Top 5 Losers (vente) de MarketMilk. Un vrai mouvement de prix = volume institutionnel aujourd'hui. Confirme le pôle à l'analyse — puis tu attends le drapeau et sa cassure pour entrer.</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>ÉNERGIE RÉELLE</b> : ta paire doit être dans le Top 5 Most Volatile de MarketMilk (et jamais dans le Least Volatile). La direction sans énergie = un drift mou. Direction + énergie = un pôle impulsif dont la cassure a du carburant.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1020", borderRadius:5}}><span style={{color:"#64748b", fontWeight:700, minWidth:16}}>📋</span><span style={{fontSize:8.5, color:TEXT_DIM, lineHeight:1.45}}><b>Condition de base :</b> seules tes 7 paires sont scannées (EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD, GBP/JPY, EUR/JPY, CHF/JPY) — une devise de Londres contre une devise d'Asie-Pacifique.</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#c084fc", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>ENTRÉE</b> : vérifie le pôle sur H1 (Londres 3h-11h + NY 8h-11h même sens), laisse le <b style={{color:"#c084fc"}}>drapeau</b> se dessiner l'après-midi, entre à la <b style={{color:"#c084fc"}}>cassure</b> dans le sens du pôle (fin NY ou Tokyo). Stop sous/sur le drapeau, target = hauteur du pôle. Swing 1 à 3 jours — réévalue chaque matin à 10h30</span></div>
         </div>
-        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ MEILLEURE (surbrillance) : parmi les paires qui passent les 4 filtres, celle qui combine la plus forte divergence ET les Leveraged Funds les plus engagés. C'est le signal le plus net du jour.</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ MEILLEURE (surbrillance) : parmi les paires qui passent les 5 filtres, celle qui combine la plus forte divergence ET les Leveraged Funds les plus engagés. C'est le signal le plus net du jour.</div>
       </div>
 
       {/* EXEMPLE REEL - GBP/NZD */}
       <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
         <div style={{fontSize:12, color:"#4ade80", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #4ade8033"}}>📐 EXEMPLE RÉEL — CHF/JPY ACHAT</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength : CHF fort (refuge Europe) vs JPY faible. Pourquoi CHF/JPY ACHAT cochait les 4 filtres APEX — et comment le flag de convergence donnait l'entrée.</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Currency Strength : CHF fort (refuge Europe) vs JPY faible. Pourquoi CHF/JPY ACHAT cochait les 5 filtres APEX — et comment le flag de convergence donnait l'entrée.</div>
         <div style={{display:"flex", flexDirection:"column", gap:6}}>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:14}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Divergence ✓</b> — CHF fort vs JPY le plus faible = écart ≥4 rangs au Currency Strength. Vraie divergence, pas deux voisines.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#34d399", fontWeight:700, minWidth:14}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Retail contrarien ✓</b> — le retail était SHORT 70%+ pendant que CHF/JPY montait. La foule piégée du mauvais côté = le carburant de la hausse, leurs stops alimentent le mouvement.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#a78bfa", fontWeight:700, minWidth:14}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Leveraged Funds ✓</b> — les hedge funds vendaient le JPY beaucoup plus (-17 555) que le CHF (-5 126). Le CHF était moins vendu = relativement plus fort. La vraie position institutionnelle confirmait la hausse de CHF/JPY.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#f59e0b", fontWeight:700, minWidth:14}}>④</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Mouvement réel ✓</b> — CHF/JPY était dans le Top Gainers ce jour-là : le mouvement haussier était actif et institutionnel, pas théorique.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:14}}>⑤</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Énergie réelle ✓</b> — CHF/JPY était aussi dans le Top 5 Most Volatile : le mouvement avait de la force, pas un simple drift. Direction + énergie = un pôle impulsif, le carburant de la cassure.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1020", borderRadius:5}}><span style={{color:"#64748b", fontWeight:700, minWidth:14}}>📋</span><span style={{fontSize:8.5, color:TEXT_DIM, lineHeight:1.45}}><b>Condition de base ✓</b> — CHF/JPY est une de tes 7 paires (devise de Londres CHF contre devise d'Asie JPY).</span></div>
         </div>
-        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 4 filtres réunis = ALERTE APEX. Sur ton H1 : Londres a acheté CHF/JPY de 3h à 11h, NY a acheté avec elle de 8h à 11h — le PÔLE de convergence est là. L'après-midi, le prix a dérivé légèrement vers le bas SANS s'effondrer : le DRAPEAU. En soirée (Tokyo), cassure du drapeau vers le haut = ENTRÉE, stop sous le drapeau, target = hauteur du pôle projetée. Si la divergence persiste, Londres reprend CHF/JPY le lendemain et prolonge. La position tient plusieurs jours tant que CHF reste fort et JPY faible — tu vérifies chaque matin : si l'écart se referme, tu sors.</div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 5 filtres réunis = ALERTE APEX. Sur ton H1 : Londres a acheté CHF/JPY de 3h à 11h, NY a acheté avec elle de 8h à 11h — le PÔLE de convergence est là. L'après-midi, le prix a dérivé légèrement vers le bas SANS s'effondrer : le DRAPEAU. En soirée (Tokyo), cassure du drapeau vers le haut = ENTRÉE, stop sous le drapeau, target = hauteur du pôle projetée. Si la divergence persiste, Londres reprend CHF/JPY le lendemain et prolonge. La position tient plusieurs jours tant que CHF reste fort et JPY faible — tu vérifies chaque matin : si l'écart se referme, tu sors.</div>
       </div>
 
       {/* TABLEAU RECAP - PLAN DE TRADE */}
@@ -3155,7 +3172,7 @@ function DayTradeView() {
         </div>
 
         <div style={{display:"flex", flexDirection:"column", gap:8, marginBottom:14}}>
-          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#38bdf8", fontWeight:700, fontSize:12, minWidth:20}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#38bdf8"}}>10h30 — Le PÔLE est confirmé</b> : tes 4 filtres passent ET ton H1 montre Londres (3h-11h) et NY (8h-11h) dans le même sens. Le pôle de convergence existe — les deux centres mondiaux sont d'accord. Tu identifies, tu n'entres pas encore.</span></div>
+          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#38bdf8", fontWeight:700, fontSize:12, minWidth:20}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#38bdf8"}}>10h30 — Le PÔLE est confirmé</b> : tes 5 filtres passent ET ton H1 montre Londres (3h-11h) et NY (8h-11h) dans le même sens. Le pôle de convergence existe — les deux centres mondiaux sont d'accord. Tu identifies, tu n'entres pas encore.</span></div>
           <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#c084fc", fontWeight:700, fontSize:12, minWidth:20}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>L'après-midi NY (11h30-17h) — le DRAPEAU</b> : Londres fermée, le marché se calme. Le prix consolide en drift léger contre la tendance, SANS s'effondrer — il reste haut (achat) ou bas (vente). Les fonds gardent leurs positions : c'est leur pause, pas leur sortie.</span></div>
           <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#fbbf24", fontWeight:700, fontSize:12, minWidth:20}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>La CASSURE — ton entrée</b> : fin NY ou ouverture Tokyo (19h ET), le prix casse le drapeau dans le sens du pôle. Tu entres à la cassure confirmée (bougie qui clôture hors du drapeau). Stop sous/sur le drapeau · Target = hauteur du pôle projetée.</span></div>
         </div>
@@ -3228,9 +3245,9 @@ function DayTradeView() {
         <div style={{fontSize:9, color:TEXT, lineHeight:1.8}}>
           <b style={{color:"#c084fc"}}>Tout commence par Londres.</b> Chaque jour, les banques de Londres (Deutsche, HSBC, BNP, Barclays) déplacent près de 40% du volume mondial — des milliers de milliards. Quand elles tranchent une direction, c'est la plus grosse force du marché qui se met en marche. Toi, avec ton compte, tu ne peux rien pousser. <b>Mais tu peux les suivre.</b><br/><br/>C'est ça, ta seule mission : lire ce que Londres a fait pendant sa session, et te placer <b>derrière eux</b>. Pas avant (tu tomberais dans le piège du matin), pas contre (tu te ferais écraser). Derrière. Tu es leur passager, pas le conducteur. Le jour où tu acceptes que ton opinion ne vaut rien face à leurs milliards, tu arrêtes de te battre contre le marché — tu commences à le suivre.<br/><br/>
           <b style={{color:"#c084fc"}}>La patience d'attendre la session complète.</b> Londres ouvre à 3h et travaille jusqu'à 11h30. Tu ne juges pas à 4h ni à 7h — c'est là qu'ils piègent (faux mouvements, chasse aux stops). Tu attends que <b>toute leur session soit jouée</b> et tu lis le résultat à 10h30. Laisser Londres finir son travail avant de lire = la base de tout. Et après la lecture, même patience : le drapeau de l'après-midi doit se dessiner avant ta cassure. Tu n'achètes jamais le pôle en route — tu attends que le marché respire, puis tu entres quand il repart. L'impatience te fait lire le piège au lieu de la vérité, et acheter le sommet au lieu de la cassure.<br/><br/>
-          <b style={{color:"#c084fc"}}>Quatre preuves valent mieux que ton intuition.</b> Tu n'entres que si la divergence (où est le capital), le retail piégé (qui est du mauvais côté), les Leveraged Funds (la vraie position des fonds) et le mouvement réel (Top 5) disent la même chose. Si une seule manque, tu n'as pas assez de preuves — tu attends. Ton opinion ne compte pas : seules les 4 preuves comptent.<br/><br/>
+          <b style={{color:"#c084fc"}}>Cinq preuves valent mieux que ton intuition.</b> Tu n'entres que si la divergence (où est le capital), le retail piégé (qui est du mauvais côté), les Leveraged Funds (la vraie position des fonds), le mouvement réel (Top 5) et l'énergie réelle (Most Volatile) disent la même chose. Si une seule manque, tu n'as pas assez de preuves — tu attends. Ton opinion ne compte pas : seules les 5 preuves comptent.<br/><br/>
           <b style={{color:"#c084fc"}}>Observer sans ego.</b> Tu ne cherches pas à avoir raison, tu cherches à suivre. Si les big boys changent de direction (la devise forte faiblit, les LF se retournent), tu sors sans débattre. Tu n'es pas marié à ta position — tu es marié au flux institutionnel. Quand il tourne, tu tournes.<br/><br/>
-          <b style={{color:"#fbbf24"}}>Pas d'alerte = pas de trade.</b> Certains matins, aucune paire ne réunit les 4 preuves. C'est normal et c'est voulu. Ne force jamais un trade pour "faire quelque chose". La discipline d'attendre le bon setup EST la stratégie. Un jour sans trade est un bon jour si le setup n'était pas là.
+          <b style={{color:"#fbbf24"}}>Pas d'alerte = pas de trade.</b> Certains matins, aucune paire ne réunit les 5 preuves. C'est normal et c'est voulu. Ne force jamais un trade pour "faire quelque chose". La discipline d'attendre le bon setup EST la stratégie. Un jour sans trade est un bon jour si le setup n'était pas là.
         </div>
       </div>
 
@@ -3256,7 +3273,7 @@ function DayTradeView() {
           </div>
           <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid "+APX.buy}}>
             <div style={{fontSize:9, color:APX.buy, fontWeight:700, marginBottom:2}}>🎯 10h30 ET — TU MESURES LE PÔLE</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Londres a tranché, NY a confirmé, le piège du matin est loin derrière. MarketMilk te montre OÙ le capital est allé : quelle devise est forte, laquelle est faible. Tes 4 filtres confirment que le pôle est réel — Londres et NY l'ont construit ensemble.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Londres a tranché, NY a confirmé, le piège du matin est loin derrière. MarketMilk te montre OÙ le capital est allé : quelle devise est forte, laquelle est faible. Tes 5 filtres confirment que le pôle est réel — direction ET énergie, construit par Londres et NY ensemble.</div>
             <div style={{fontSize:8, color:"#c084fc", marginTop:3, fontWeight:600}}>🧠 Ta mentalité : tu n'es pas le marché, tu es le passager. Tu montes dans leur train une fois qu'il roule — jamais avant. Tu suis, tu ne devines pas.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:6, borderLeft:"3px solid "+APX.wait}}>
@@ -3338,7 +3355,7 @@ function DayTradeView() {
             </div>
             <div style={{flex:1, paddingBottom:8, padding:"8px 10px", background:"#052010", borderRadius:6, border:"1px solid #00ff8866", marginBottom:4}}>
               <div style={{fontSize:10, color:APX.buy, fontWeight:900}}>⚡ 10h30 ET — TU ANALYSES ET OBSERVES</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres a tranché sa vraie direction (le faux mouvement du matin est passé), NY a confirmé. Retail piégé + Leveraged Funds alignés. Tes 4 filtres te disent si les gros joueurs sont dans le trade.</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres a tranché sa vraie direction (le faux mouvement du matin est passé), NY a confirmé. Retail piégé + Leveraged Funds alignés. Tes 5 filtres te disent si les gros joueurs sont dans le trade.</div>
               <div style={{fontSize:8.5, color:"#00ff88", fontWeight:700, marginTop:4}}>→ Analyse la direction · vérifie le pôle sur H1 · surveille le drapeau l'après-midi · entre à la cassure</div>
             </div>
           </div>
@@ -3381,7 +3398,7 @@ function DayTradeView() {
           </div>
           <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid #00ff88"}}>
             <div style={{fontSize:9, color:"#00ff88", fontWeight:700, marginBottom:3}}>10h30 ET — Tu lis leur trace, tu mesures le pôle, tu prépares le drapeau</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 4 filtres (divergence + retail + Leveraged Funds + Top 5) confirment que le pôle est réel. L'après-midi, le drapeau se dessine ; fin NY ou Tokyo, tu entres à la cassure dans le sens du pôle. Tu ne devines pas — tu confirmes, tu attends la cassure, et tu suis. Comme un sniper.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>MarketMilk te montre ce que les gros joueurs ont DÉJÀ fait. Tes 5 filtres (divergence + retail + Leveraged Funds + Top 5 + Most Volatile) confirment que le pôle est réel. L'après-midi, le drapeau se dessine ; fin NY ou Tokyo, tu entres à la cassure dans le sens du pôle. Tu ne devines pas — tu confirmes, tu attends la cassure, et tu suis. Comme un sniper.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:"3px solid #4ade80"}}>
             <div style={{fontSize:9, color:"#a78bfa", fontWeight:700, marginBottom:3}}>Le soir — La session asiatique reprend le flambeau</div>
@@ -3409,7 +3426,7 @@ function DayTradeView() {
           </div>
           <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:6, border:"1px solid #fbbf2444"}}>
             <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:3}}>💡 La règle d'or</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tu ne sais jamais exactement ce que les banques font. Mais MarketMilk + le COT te montrent CE QU'ELLES ONT DÉJÀ FAIT. Tes 4 filtres confirment que le mouvement est réel. Tu ne devines pas — tu confirmes et tu suis. Tu n'es pas la liquidité. Tu suis la liquidité.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tu ne sais jamais exactement ce que les banques font. Mais MarketMilk + le COT te montrent CE QU'ELLES ONT DÉJÀ FAIT. Tes 5 filtres confirment que le mouvement est réel. Tu ne devines pas — tu confirmes et tu suis. Tu n'es pas la liquidité. Tu suis la liquidité.</div>
           </div>
         </div>
       </div>
