@@ -2748,7 +2748,7 @@ function DayTradeAnalyzer() {
             <div key={i} style={{display:"flex", flexDirection:"column", gap:2, padding:"5px 7px", marginBottom:4, background:bg, borderRadius:4, borderLeft:"3px solid "+col, opacity:d.status==="dort"?0.6:1}}>
               <div style={{fontSize:9, color:TEXT, fontWeight:700}}>{pp} {d.direction&&d.status!=="dort"?<span style={{color:d.direction==="LONG"?"#4ade80":"#f87171"}}>{d.direction==="LONG"?"▲ ACHAT":"▼ VENTE"}</span>:""}</div>
               {d.status!=="dort" && (
-                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Divergence {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f5?"✓":"✗"} Retail ≥70% · ③ {d.fcot?"✓":"✗"} Leveraged Funds</div>
+                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Divergence {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f5?"✓":"✗"} Retail ≥70% · ③ {d.fcot?"✓":"✗"} LF · ④ {d.f4?"✓":"✗"} Top5</div>
               )}
               {d.status!=="dort" && !d.rMiss && d.rLong!=null && (
                 <div style={{marginTop:2}}>
@@ -2765,14 +2765,14 @@ function DayTradeAnalyzer() {
             </div>
             );
           })}
-          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Vert = passe les 3 filtres · Rouge = bloque. Tri : prêtes en haut. LF = Leveraged Funds (changement hebdo COT).</div>
+          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Vert = passe les 4 filtres · Rouge = bloque. Tri : prêtes en haut. LF = Leveraged Funds · Top5 = paire dans le Top 5 Gainers/Losers.</div>
         </div>
       )}
 
       {result && !result.error && (
         <div style={{marginTop:10}}>
           <div style={{fontSize:8, color:TEXT_DIM, marginBottom:8}}>FORCE DU JOUR : <b style={{color:"#4ade80"}}>{result.strongest} (la plus forte)</b> → <b style={{color:"#f87171"}}>{result.weakest} (la plus faible)</b></div>
-          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} APEX (les 3 filtres réunis)</div>
+          <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🎯 {result.top.length} OPPORTUNITÉ{result.top.length>1?"S":""} APEX (les 4 filtres réunis)</div>
           {result.top.map((o,i)=>{
             const isLong = o.direction==="LONG";
             const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`;
@@ -2805,7 +2805,7 @@ function DayTradeAnalyzer() {
             </div>
           );})}
           <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
-            ⚠ APEX INSTITUTIONNEL — chaque paire réunit les 3 filtres OBLIGATOIRES : divergence ≥4 rangs au Currency Strength + retail contrarien ≥70% + Leveraged Funds alignés (la vraie position des hedge funds). Tu suis les big boys de Londres. Attends le Golden Pocket (61.8-65%) pour entrer — Londres, NY ou Tokyo le soir. Garde en swing 1 à 3 jours.
+            ⚠ APEX INSTITUTIONNEL — chaque paire réunit les 4 filtres OBLIGATOIRES : divergence ≥4 rangs + retail contrarien ≥70% + Leveraged Funds alignés + paire dans le Top 5 Gainers/Losers (mouvement réel). Tu suis les big boys de Londres. Attends le Golden Pocket (61.8-65%) pour entrer — Londres, NY ou Tokyo le soir. Garde en swing 1 à 3 jours.
           </div>
         </div>
       )}
