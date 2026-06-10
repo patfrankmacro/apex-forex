@@ -2587,7 +2587,7 @@ function DayTradeAnalyzer() {
       if (minsET < 630 || minsET > 655) {
         const hh = String(nowET.getHours()).padStart(2,"0"), mm = String(nowET.getMinutes()).padStart(2,"0");
         const avant = minsET < 630;
-        setResult({error:`⏰ Il est ${hh}h${mm} à New York. Le Swing Trade FX s'analyse UNIQUEMENT entre 10h30 et 10h45 ET. ${avant ? "Pourquoi pas avant ? Les desks de Londres construisent leurs positions jusqu'à ~10h, et les données US de 10h00 ont besoin de 30 minutes de digestion. À 10h30, leur conviction est complète et le classement est stable." : "Pourquoi pas après ? Le London Fix de 11h crée un spike artificiel, puis les desks clôturent (11h-11h30), puis Londres ferme — le classement flotte sur le bruit de NY. La lecture n'est plus propre."} Reviens demain à 10h30 — une analyse par jour, 15 minutes de clarté.`});
+        setResult({error:`⏰ Il est ${hh}h${mm} à New York. Le Swing Trade FX s'analyse UNIQUEMENT entre 10h30 et 10h55 ET (cible : 10h30-10h45). ${avant ? "Pourquoi pas avant ? Les desks de Londres construisent leurs positions jusqu'à ~10h, et les données US de 10h00 ont besoin de 30 minutes de digestion. À 10h30, leur conviction est complète et le classement est stable." : "Pourquoi pas après ? Le London Fix de 11h crée un spike artificiel, puis les desks clôturent (11h-11h30), puis Londres ferme — le classement flotte sur le bruit de NY. La lecture n'est plus propre."} Reviens demain à 10h30 — une analyse par jour, 15 minutes de clarté.`});
         return;
       }
       const lines = raw.split("\n").map(l=>l.trim()).filter(Boolean);
@@ -2630,6 +2630,8 @@ function DayTradeAnalyzer() {
       // FILTRE 4 : Top Gainers / Top Losers (confirme que le mouvement est reel et institutionnel)
       const topGainers = grabPairs("Top Gainers", ["Top Losers","Currency Volatility","Most Volatile","Least Volatile"]);
       const topLosers  = grabPairs("Top Losers",  ["Currency Volatility","Most Volatile","Least Volatile","Top Gainers"]);
+      const mostVol    = grabPairs("Most Volatile", ["Least Volatile","Top Gainers","Top Losers"]);
+      const volSet     = new Set(mostVol.slice(0,5).map(p=>p.replace("/","")));
       const gainersSet = new Set(topGainers.slice(0,5).map(p=>p.pair));
       const losersSet  = new Set(topLosers.slice(0,5).map(p=>p.pair));
       // compte combien de fois une devise apparait du cote perdant / gagnant (signal renforce)
@@ -2713,7 +2715,7 @@ function DayTradeAnalyzer() {
         const score = forceGap*10 + (isMaxDiv?5:0) + Math.abs(lfGap)/1000;
         candidates.push({pair:wpair, base, quote, direction, forceGap, isMaxDiv, score, retailPct:(direction==="LONG"?rShort:rLong), retailSide:(direction==="LONG"?"SHORT":"LONG"), retailMissing:rMiss, weakCur, strongCur, lfStrongNet, lfWeakNet,
           strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: nStr,
-          inTop: f4ok, weakRepeat, strongRepeat});
+          inTop: f4ok, weakRepeat, strongRepeat, impulsif: volSet.has(wpair)});
       });
 
       // tri des candidats par score, la meilleure = surbrillance
@@ -2986,6 +2988,7 @@ function DayTradeView() {
                     </div>
                     <div style={{ fontSize:7.5, color:"#8b9bbf", marginTop:3, fontStyle:"italic" }}>💡 {x.lfS>=0 && x.lfW<0 ? `Les fonds achètent ${x.sCur} et vendent ${x.wCur} → ${x.sCur} plus fort` : (x.lfS<0 && x.lfW<0 ? `Les fonds vendent les deux, mais ${x.wCur} beaucoup plus → ${x.sCur} relativement plus fort` : `Les fonds achètent les deux, mais ${x.sCur} plus → ${x.sCur} favorisé`)}</div>
                     {is3 && <div style={{ fontSize:8, color:isBuy?"#86efac":"#fca5a5", marginTop:4, fontWeight:600 }}>→ Les 4 filtres convergent. {isBuy?"ACHÈTE":"VENDS"} {x.base}/{x.quote} : vérifie le pôle sur H1, laisse le drapeau se dessiner l'après-midi, entre à la cassure (fin NY/Tokyo). Stop sous le drapeau, swing 1-3 jours.</div>}
+                    {x.impulsif && <div style={{fontSize:8.5, color:"#fbbf24", marginTop:4, fontWeight:700}}>💪 PÔLE IMPULSIF — aussi dans le Top 5 Most Volatile : le mouvement a direction ET énergie. Cassure du drapeau probablement nette. Setup A+ du jour.</div>}
                     {!is3 && <div style={{ fontSize:7.5, color:"#fbbf24", marginTop:3 }}>Retail + Leveraged Funds alignés. Colle MarketMilk + Analyse pour vérifier la divergence (①) ET que la paire est dans le Top 5 Gainers/Losers (④).</div>}
                   </div>
                 );
@@ -3254,14 +3257,19 @@ function DayTradeView() {
             <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Londres a tranché, NY a confirmé, le piège du matin est loin derrière. MarketMilk te montre OÙ le capital est allé : quelle devise est forte, laquelle est faible. Tes 4 filtres confirment que le pôle est réel — Londres et NY l'ont construit ensemble.</div>
             <div style={{fontSize:8, color:"#c084fc", marginTop:3, fontWeight:600}}>🧠 Ta mentalité : tu n'es pas le marché, tu es le passager. Tu montes dans leur train une fois qu'il roule — jamais avant. Tu suis, tu ne devines pas.</div>
           </div>
+          <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:6, borderLeft:"3px solid "+APX.wait}}>
+            <div style={{fontSize:9, color:APX.wait, fontWeight:700, marginBottom:2}}>🚩 APRÈS-MIDI (11h30-17h ET) — LE DRAPEAU SE DESSINE</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Londres est partie, NY tourne seule : le marché se calme. Le prix consolide en drift léger contre la tendance — il respire, il ne s'effondre pas. C'est le drapeau qui se forme sous ton pôle. Ton outil ici n'est PAS MarketMilk (le classement flotte sans Londres) : c'est ton graphique H1 — tu traces le canal du drapeau et tu poses une alerte sur sa borne.</div>
+            <div style={{fontSize:8, color:"#c084fc", marginTop:3, fontWeight:600}}>🧠 Ta mentalité : le calme de l'après-midi n'est pas un signal d'entrée — c'est la pause des fonds. Tu n'achètes pas le drapeau, tu attends sa cassure.</div>
+          </div>
           <div style={{padding:"8px 10px", background:"#0a1020", borderRadius:6, borderLeft:"3px solid "+APX.inst}}>
-            <div style={{fontSize:9, color:APX.inst, fontWeight:700, marginBottom:2}}>🌏 LE SOIR — L'ASIE PEUT PRENDRE LE RELAIS</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Tokyo rouvre et voit la tendance que Londres a posée. Souvent, les desks asiatiques la prolongent quand les fondamentaux tiennent (ex : JPY faible sur BoJ accommodante). Mais ce n'est pas garanti : l'Asie peut aussi consolider ou faire du range après les gros mouvements. Tu surveilles — tu ne supposes pas que ça continue automatiquement.</div>
-            <div style={{fontSize:8, color:"#c084fc", marginTop:3, fontWeight:600}}>🧠 Ta mentalité : tu gardes. Tu fais confiance au relais. Tant que ta devise forte reste forte, tu restes dans le train.</div>
+            <div style={{fontSize:9, color:APX.inst, fontWeight:700, marginBottom:2}}>🌏 LE SOIR (17h-19h+) — LA CASSURE, PUIS L'ASIE RELAIE</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>C'est ici que ta cassure arrive le plus souvent : fin de NY ou ouverture de Tokyo (19h). Tokyo voit la tendance que Londres a posée et le drapeau bien dessiné — quand les fondamentaux tiennent (ex : JPY faible sur BoJ accommodante), les desks asiatiques cassent le drapeau dans le sens du pôle et prolongent. Ce n'est pas garanti : si la cassure part du MAUVAIS côté, le setup est mort, tu laisses passer.</div>
+            <div style={{fontSize:8, color:"#c084fc", marginTop:3, fontWeight:600}}>🧠 Ta mentalité : entrée à la cassure confirmée seulement (bougie qui clôture hors du drapeau). Une fois dedans : tant que ta devise forte reste forte, tu restes dans le train.</div>
           </div>
         </div>
         <div style={{fontSize:8, color:"#c084fc", marginTop:10, padding:"8px 10px", background:"#1a0a2e", borderRadius:6, lineHeight:1.6, fontWeight:600, textAlign:"center"}}>
-          La règle d'or : les institutions piègent le matin, révèlent à midi, et relaient le soir. Toi, tu ne joues jamais le piège — tu lis la trace et tu suis le train une fois qu'il roule.
+          La règle d'or : les institutions piègent le matin, construisent le pôle jusqu'à 11h, dessinent le drapeau l'après-midi, et cassent le soir. Toi, tu ne joues jamais le piège — tu mesures le pôle à 10h30 et tu entres à la cassure.
         </div>
       </div>
 
@@ -3338,9 +3346,9 @@ function DayTradeView() {
               <div style={{width:2, height:32, background:"#f8717133"}}/>
             </div>
             <div style={{flex:1, paddingBottom:8}}>
-              <div style={{fontSize:9, color:APX.inst, fontWeight:700}}>LE SOIR — SESSION ASIATIQUE PREND LE RELAIS</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Tokyo ouvre sur le JPY, Sydney sur l'AUD et le NZD. Quand la tendance de Londres est forte et que les fondamentaux tiennent, l'Asie la prolonge souvent. Mais pas toujours — parfois elle consolide. Tu gardes ta position tant que ta devise forte reste forte, sans présumer que le mouvement va forcément continuer.</div>
-              <div style={{fontSize:8, color:"#a78bfa", marginTop:2}}>→ Tu gardes. Le relais est passé.</div>
+              <div style={{fontSize:9, color:APX.inst, fontWeight:700}}>LE SOIR — LA CASSURE, PUIS L'ASIE RELAIE</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Fin de NY ou ouverture de Tokyo (19h) : c'est ici que le drapeau casse le plus souvent — ton entrée, à la cassure confirmée dans le sens du pôle. Tokyo ouvre sur le JPY, Sydney sur l'AUD et le NZD : quand les fondamentaux tiennent, l'Asie pousse la cassure et prolonge. Une fois entré, tu gardes tant que ta devise forte reste forte.</div>
+              <div style={{fontSize:8, color:"#a78bfa", marginTop:2}}>→ Entre à la cassure. Puis tu gardes — le relais est passé.</div>
             </div>
           </div>
 
@@ -3350,7 +3358,7 @@ function DayTradeView() {
             </div>
             <div style={{flex:1}}>
               <div style={{fontSize:9, color:APX.inst, fontWeight:700}}>LENDEMAIN 3h — LONDRES REPREND</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Londres rouvre à 3h et reprend le mouvement de la veille. Toi, tu réévalues à 10h (quand la session est de nouveau lisible) : ta devise forte toujours en haut, la faible toujours en bas ? Le swing continue. L'écart se referme ? Tu sors.</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>Londres rouvre à 3h et reprend le mouvement de la veille. Toi, tu réévalues à 10h30 (quand le nouveau pôle est lisible) : ta devise forte toujours en haut, la faible toujours en bas ? Le swing continue. L'écart se referme ? Tu sors.</div>
               <div style={{fontSize:8, color:"#4ade80", marginTop:2}}>→ Réévalue chaque matin. Tu gardes 1 à 3 jours.</div>
             </div>
           </div>
