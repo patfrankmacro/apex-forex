@@ -2724,7 +2724,7 @@ function DayTradeAnalyzer() {
       const ordre={passe:0,bloque:1};
       diagnostic.sort((a,b)=> (ordre[a.status]-ordre[b.status]) || ((b.forceGap||0)-(a.forceGap||0)));
 
-      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session — aucune de tes 7 paires ne réunit les 3 filtres (divergence + retail contrarien + Leveraged Funds alignés). Pas de trade = bonne décision.", strongest, weakest, diag7: diagnostic}); return; }
+      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session — aucune de tes 7 paires ne réunit les 4 filtres (divergence + retail contrarien + Leveraged Funds + Top 5 Gainers/Losers). Pas de trade = bonne décision.", strongest, weakest, diag7: diagnostic}); return; }
       setResult({ strongest, weakest, top, diag7: diagnostic });
     } catch(e){ setResult({error:"Erreur: "+e.message}); }
   };
@@ -2857,7 +2857,7 @@ function DayTradeView() {
           ));
         })()}
         <div style={{fontSize:8, color:"#38bdf8", textAlign:"center", padding:"8px", marginTop:4, background:"#001018", borderRadius:6, fontWeight:600, lineHeight:1.5}}>
-          Pas de 3/3 aujourd'hui ? = Pas de trade. C'est normal. La discipline d'attendre fait partie de la stratégie.
+          Pas de 4/4 aujourd'hui ? = Pas de trade. C'est normal. La discipline d'attendre fait partie de la stratégie.
         </div>
       </div>
 
