@@ -2839,7 +2839,7 @@ function DayTradeView() {
         {(() => {
           const steps = [
             {n:"1", icon:"👁️", color:"#38bdf8", t:"VÉRIFIE LE PÔLE (H1)", sub:"Londres (3h-11h) et NY (8h-11h) poussent dans le MÊME sens ? = PÔLE de convergence valide. Sens opposés = pas de pôle, pas de trade."},
-            {n:"2", icon:"🥛", color:"#fbbf24", t:"OUVRE MARKETMILK", sub:"🎯 10h30-10h45 ET — Colle tes données. Quelle devise est FORTE ? Laquelle est FAIBLE ? (avant le Fix de 11h)"},
+            {n:"2", icon:"🥛", color:"#fbbf24", t:"OUVRE MARKETMILK", sub:"🎯 10h30-10h45 ET (tolérance 10h55) — Colle tes données. Quelle devise est FORTE ? Laquelle est FAIBLE ? (avant le Fix de 11h)"},
             {n:"3", icon:"🔍", color:"#a78bfa", t:"VÉRIFIE LES 4 FILTRES", sub:"① Divergence ≥4 rangs · ② Retail ≥70% contre la foule · ③ Leveraged Funds alignés · ④ Paire dans le Top 5 Gainers/Losers"},
             {n:"4", icon:"🎯", color:"#4ade80", t:"4/4 ? DIRECTION CONFIRMÉE", sub:"Les 4 cochés = vrai flux institutionnel. Carte VERTE = achat ▲ · Carte ROUGE = vente ▼"},
             {n:"5", icon:"⏳", color:"#f59e0b", t:"ATTENDS LE DRAPEAU", sub:"Après-midi NY (11h30-17h) : le prix consolide en drift léger contre-tendance, SANS s'effondrer. C'est le drapeau qui se dessine."},
@@ -3017,6 +3017,8 @@ function DayTradeView() {
         <div style={{fontSize:12, color:"#f59e0b", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #f59e0b33"}}>⏰ TA FENÊTRE : 10H30-10H45 — POURQUOI EXACTEMENT LÀ</div>
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:10}}>La journée a des moments de bruit et un seul moment de lecture propre. Voici la carte :</div>
         <div style={{display:"flex", flexDirection:"column", gap:6, marginBottom:10}}>
+          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1a2e", borderRadius:5}}><span style={{color:APX.obs, fontWeight:700, fontSize:9, minWidth:62}}>3h00</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Londres ouvre : piège du matin (fausse cassure, chasse aux stops), puis le pôle commence à se construire.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1a2e", borderRadius:5}}><span style={{color:APX.obs, fontWeight:700, fontSize:9, minWidth:62}}>8h00</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>NY ouvre : le chevauchement Londres-NY commence — si NY pousse dans le même sens, le pôle de convergence se forme.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a1500", borderRadius:5}}><span style={{color:APX.wait, fontWeight:700, fontSize:9, minWidth:62}}>8h30</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>News US : le marché digère, ça secoue.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a1500", borderRadius:5}}><span style={{color:APX.wait, fontWeight:700, fontSize:9, minWidth:62}}>9h30</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Ouverture du NYSE : poussée de volume.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a1500", borderRadius:5}}><span style={{color:APX.wait, fontWeight:700, fontSize:9, minWidth:62}}>10h00</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Données économiques US fréquentes : dernier bruit du matin.</span></div>
@@ -3088,7 +3090,7 @@ function DayTradeView() {
           <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>3.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Le mouvement peut durer plusieurs sessions.</b> Une fois entré à la cassure du drapeau, ta position peut être portée par New York, puis par la session asiatique le soir — chaque paire oppose une devise de Londres à une devise d'Asie, jamais deux de la même session. Tu te places dans un flux qui peut passer de main en main, pas dans un coup d'une heure — mais tu réévalues chaque jour, rien n'est acquis.</span></div>
           <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>4.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Le sentiment retail est mûr.</b> Le retail a réagi au mouvement, souvent à contre-sens. À 10h30 leur positionnement est lisible — ton filtre retail contrarien ≥70% capte ce déséquilibre exact.</span></div>
         </div>
-        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>💡 10h30-10h45 ET = le point de convergence : Londres a tranché + NY a confirmé + retail piégé + Leveraged Funds alignés. Tu ne devines rien, tu te places dans un flux institutionnel validé que les sessions suivantes peuvent prolonger — souvent sur 1 à 3 jours quand la divergence persiste, sans que ce soit jamais garanti.</div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>💡 10h30 ET = le point de convergence : Londres a tranché + NY a confirmé + retail piégé + Leveraged Funds alignés. Tu ne devines rien, tu te places dans un flux institutionnel validé que les sessions suivantes peuvent prolonger — souvent sur 1 à 3 jours quand la divergence persiste, sans que ce soit jamais garanti.</div>
       </div>
 
       {/* SEQUENCE */}
@@ -3125,7 +3127,7 @@ function DayTradeView() {
         <div style={{fontSize:12, color:"#fbbf24", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #fbbf2433"}}>📋 TON PLAN DE TRADE — RÉSUMÉ</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           {[
-            {t:"10h30-10h45 ET", a:"Colle MarketMilk + lance l'analyse", p:"Londres a tranché + NY a confirmé", col:"#4ade80"},
+            {t:"10h30-10h45 ET (max 10h55)", a:"Colle MarketMilk + lance l'analyse", p:"Londres a tranché + NY a confirmé = le pôle est mesurable", col:"#4ade80"},
             {t:"Si alerte", a:"Vérifie le pôle sur H1 (Londres+NY même sens), puis surveille le drapeau l'après-midi", p:"Drift léger contre-tendance = drapeau qui se dessine", col:"#4ade80"},
             {t:"Le soir", a:"Tu gardes si la tendance tient", p:"Tokyo et Sydney prolongent souvent le mouvement de Londres — mais peuvent aussi consolider. Tu surveilles.", col:"#a78bfa"},
             {t:"Chaque matin 10h30", a:"Réévalue ta position", p:"Devise forte toujours forte ? Tu gardes. Sinon tu sors. Stop remonté.", col:"#fbbf24"}
