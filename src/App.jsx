@@ -2819,7 +2819,7 @@ function DayTradeAnalyzer() {
             </div>
           );})}
           <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
-            ⚠ APEX INSTITUTIONNEL — chaque paire réunit les 5 filtres OBLIGATOIRES : divergence ≥4 rangs + retail ≥70% + Leveraged Funds + Top 5 Gainers/Losers (mouvement) + Top 5 Most Volatile (énergie). Tu suis les big boys de Londres. Vérifie le pôle sur H1 (mouvement continu 3h→11h, pas d'inversion à 8h), attends le drapeau de l'après-midi, entre à la cassure (fin NY ou Tokyo). Garde en swing 1 à 3 jours.
+            ⚠ APEX INSTITUTIONNEL — chaque paire réunit les 5 filtres OBLIGATOIRES : divergence ≥4 rangs + retail ≥70% + Leveraged Funds + Top 5 Gainers/Losers (mouvement) + Top 5 Most Volatile (énergie). Tu suis les big boys de Londres. Vérifie le pôle sur H1 (mouvement continu de 3h à ton analyse, pas d'inversion à 8h), attends le drapeau de l'après-midi, entre à la cassure (fin NY ou Tokyo). Garde en swing 1 à 3 jours.
           </div>
         </div>
       )}
@@ -2849,12 +2849,12 @@ function DayTradeView() {
         <div style={{fontSize:8, color:TEXT_DIM, marginBottom:14, textAlign:"center", fontStyle:"italic"}}>Suis les étapes de haut en bas. Une action à la fois.</div>
         {(() => {
           const steps = [
-            {n:"1", icon:"👁️", color:"#38bdf8", t:"VÉRIFIE LE PÔLE (H1)", sub:"Le mouvement de Londres (3h→8h) CONTINUE après l'ouverture de NY (8h→11h) ? Un seul flux continu = PÔLE valide. Le prix s'inverse à 8h = pas de pôle, pas de trade."},
+            {n:"1", icon:"👁️", color:"#38bdf8", t:"VÉRIFIE LE PÔLE (H1)", sub:"De 3h jusqu'à MAINTENANT (10h30) : un seul flux continu, sans inversion à l'ouverture de NY (8h) ? = PÔLE valide. Le prix s'est inversé à 8h = pas de pôle, pas de trade."},
             {n:"2", icon:"🥛", color:"#fbbf24", t:"OUVRE MARKETMILK", sub:"🎯 10h30-10h45 ET (tolérance 10h55) — Colle tes données. Quelle devise est FORTE ? Laquelle est FAIBLE ? (avant le Fix de 11h)"},
             {n:"3", icon:"🔍", color:"#a78bfa", t:"VÉRIFIE LES 5 FILTRES", sub:"① Divergence ≥4r · ② Retail ≥70% · ③ Leveraged Funds · ④ Top 5 Gainers/Losers · ⑤ Top 5 Most Volatile (jamais Least)"},
             {n:"4", icon:"🎯", color:"#4ade80", t:"5/5 ? DIRECTION CONFIRMÉE", sub:"Les 5 cochés = vrai flux institutionnel. Carte VERTE = achat ▲ · Carte ROUGE = vente ▼"},
             {n:"5", icon:"⏳", color:"#f59e0b", t:"ATTENDS LE DRAPEAU", sub:"Après-midi NY (11h30-17h) : le prix consolide en drift léger contre-tendance, SANS s'effondrer. C'est le drapeau qui se dessine."},
-            {n:"6", icon:"🛡️", color:"#34d399", t:"ENTRE À LA CASSURE", sub:"Cassure du drapeau dans le sens du pôle (fin NY ou Tokyo 19h). Stop sous le drapeau. Target = hauteur du pôle. Garde 1-3 jours."},
+            {n:"6", icon:"🚀", color:"#34d399", t:"ENTRE À LA CASSURE", sub:"Cassure du drapeau dans le sens du pôle (fin NY ou Tokyo 19h). Stop sous le drapeau. Target = hauteur du pôle. Garde 1-3 jours."},
           ];
           return steps.map((s,i)=>(
             <div key={s.n} style={{display:"flex", gap:11, alignItems:"flex-start", position:"relative", paddingBottom: i<steps.length-1?9:4}}>
@@ -3145,7 +3145,7 @@ function DayTradeView() {
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           {[
             {t:"10h30-10h45 ET (max 10h55)", a:"Colle MarketMilk + lance l'analyse", p:"Londres a tranché + NY a confirmé = le pôle est mesurable", col:"#4ade80"},
-            {t:"Si alerte", a:"Vérifie le pôle sur H1 (mouvement continu 3h→11h, pas d'inversion à 8h), puis surveille le drapeau l'après-midi", p:"Drift léger contre-tendance = drapeau qui se dessine", col:"#4ade80"},
+            {t:"Si alerte", a:"Vérifie le pôle sur H1 (mouvement continu de 3h à maintenant, pas d'inversion à 8h), puis surveille le drapeau l'après-midi", p:"Drift léger contre-tendance = drapeau qui se dessine", col:"#4ade80"},
             {t:"Le soir", a:"Tu gardes si la tendance tient", p:"Tokyo et Sydney prolongent souvent le mouvement de Londres — mais peuvent aussi consolider. Tu surveilles.", col:"#a78bfa"},
             {t:"Chaque matin 10h30", a:"Réévalue ta position", p:"Devise forte toujours forte ? Tu gardes. Sinon tu sors. Stop remonté.", col:"#fbbf24"}
           ].map((r,i)=>(
@@ -3172,7 +3172,7 @@ function DayTradeView() {
         </div>
 
         <div style={{display:"flex", flexDirection:"column", gap:8, marginBottom:14}}>
-          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#38bdf8", fontWeight:700, fontSize:12, minWidth:20}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#38bdf8"}}>10h30 — Le PÔLE est confirmé</b> : tes 5 filtres passent ET ton H1 montre UN SEUL mouvement continu de 3h à 11h — Londres lance avant 8h, et le mouvement CONTINUE après l'ouverture de NY. Nuance clé : NY ne trade pas tes paires (pas de dollar dedans) — mais son ouverture double la liquidité mondiale. Si le mouvement de Londres survit à ce test sans s'inverser, c'est que personne de gros ne s'y oppose. Tu identifies, tu n'entres pas encore.</span></div>
+          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#38bdf8", fontWeight:700, fontSize:12, minWidth:20}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#38bdf8"}}>10h30 — Le PÔLE est confirmé</b> : tes 5 filtres passent ET ton H1 montre UN SEUL mouvement continu de 3h jusqu'à maintenant (10h30) — Londres lance avant 8h, et le mouvement CONTINUE après l'ouverture de NY. Nuance clé : NY ne trade pas tes paires (pas de dollar dedans) — mais son ouverture double la liquidité mondiale. Si le mouvement de Londres survit à ce test sans s'inverser, c'est que personne de gros ne s'y oppose. Tu identifies, tu n'entres pas encore.</span></div>
           <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#c084fc", fontWeight:700, fontSize:12, minWidth:20}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>L'après-midi NY (11h30-17h) — le DRAPEAU</b> : Londres fermée, le marché se calme. Le prix consolide en drift léger contre la tendance, SANS s'effondrer — il reste haut (achat) ou bas (vente). Les fonds gardent leurs positions : c'est leur pause, pas leur sortie.</span></div>
           <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#fbbf24", fontWeight:700, fontSize:12, minWidth:20}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>La CASSURE — ton entrée</b> : fin NY ou ouverture Tokyo (19h ET), le prix casse le drapeau dans le sens du pôle. Tu entres à la cassure confirmée (bougie qui clôture hors du drapeau). Stop sous/sur le drapeau · Target = hauteur du pôle projetée.</span></div>
         </div>
@@ -3235,7 +3235,7 @@ function DayTradeView() {
 
         <div style={{padding:"10px 12px", background:"#1a1500", borderRadius:4, border:"1px solid #fbbf2444", fontSize:9, color:TEXT, lineHeight:1.7}}>
           <b style={{color:"#fbbf24"}}>⏱️ LA PATIENCE EST L'EDGE</b><br/>
-          Le drapeau met des heures à se dessiner : le pôle finit à 11h, la consolidation occupe tout l'après-midi NY, et la cassure arrive souvent en fin de NY ou à l'ouverture de Tokyo (19h). <b style={{color:"#fbbf24"}}>Tu n'es pas pressé — tu attends la cassure confirmée.</b> Si le drapeau casse du MAUVAIS côté (contre le pôle), le setup est mort : tu laisses passer sans regret. Et si le prix s'effondre au lieu de dériver légèrement, ce n'était pas un drapeau — c'était une sortie. Un trade raté est meilleur qu'une cassure devinée.
+          Le drapeau met des heures à se dessiner : le pôle s'achève à la fermeture de Londres (vers 11h-11h30), la consolidation occupe tout l'après-midi NY, et la cassure arrive souvent en fin de NY ou à l'ouverture de Tokyo (19h). <b style={{color:"#fbbf24"}}>Tu n'es pas pressé — tu attends la cassure confirmée.</b> Si le drapeau casse du MAUVAIS côté (contre le pôle), le setup est mort : tu laisses passer sans regret. Et si le prix s'effondre au lieu de dériver légèrement, ce n'était pas un drapeau — c'était une sortie. Un trade raté est meilleur qu'une cassure devinée.
         </div>
       </div>
 
