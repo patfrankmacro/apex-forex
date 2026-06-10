@@ -3024,7 +3024,7 @@ function DayTradeView() {
           <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>3.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Le mouvement va durer plusieurs sessions.</b> Une fois entré au Golden Pocket, ta position est portée par New York, puis par la session asiatique (Tokyo + Sydney) le soir — jamais deux devises de la même session, toujours une devise de Londres contre une devise d'Asie. Tu te places dans un flux qui passe de main en main, pas dans un coup d'une heure.</span></div>
           <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>4.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Le sentiment retail est mûr.</b> Le retail a réagi au mouvement, souvent à contre-sens. À 10h-11h leur positionnement est lisible — ton filtre retail contrarien ≥70% capte ce déséquilibre exact.</span></div>
         </div>
-        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>💡 10h-12h ET = le point de convergence : Londres a tranché + NY a confirmé + retail piégé + Leveraged Funds alignés. Tu ne devines rien, tu te places dans un flux institutionnel validé que les sessions suivantes (Tokyo le soir, Londres J+1) vont relayer pendant 1 à 3 jours.</div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>💡 10h-12h ET = le point de convergence : Londres a tranché + NY a confirmé + retail piégé + Leveraged Funds alignés. Tu ne devines rien, tu te places dans un flux institutionnel validé que les sessions suivantes peuvent prolonger — souvent sur 1 à 3 jours quand la divergence persiste, sans que ce soit jamais garanti.</div>
       </div>
 
       {/* SEQUENCE */}
@@ -3061,7 +3061,7 @@ function DayTradeView() {
           {[
             {t:"10h-12h ET", a:"Colle MarketMilk + lance l'analyse", p:"Londres a tranché + NY a confirmé", col:"#4ade80"},
             {t:"Si alerte", a:"Attends le Golden Pocket (61.8-65%) sur H1 — peut arriver à NY ou Tokyo", p:"Meilleur prix — jamais sur l'extension", col:"#4ade80"},
-            {t:"Le soir", a:"Tu gardes — Asie prend le relais", p:"Tokyo continue sur JPY · Sydney continue sur AUD et NZD — toujours contre une devise de Londres", col:"#a78bfa"},
+            {t:"Le soir", a:"Tu gardes si la tendance tient", p:"Tokyo et Sydney prolongent souvent le mouvement de Londres — mais peuvent aussi consolider. Tu surveilles.", col:"#a78bfa"},
             {t:"Chaque matin 10h", a:"Réévalue ta position", p:"Devise forte toujours forte ? Tu gardes. Sinon tu sors. Stop remonté.", col:"#fbbf24"}
           ].map((r,i)=>(
             <div key={i} style={{display:"flex", gap:10, alignItems:"flex-start", padding:"8px 10px", background:"#001018", borderRadius:6, borderLeft:`3px solid ${r.col}`}}>
@@ -3165,7 +3165,7 @@ function DayTradeView() {
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <div style={{padding:"8px 10px", background:"#0a1020", borderRadius:6, borderLeft:"3px solid #64748b"}}>
             <div style={{fontSize:9, color:"#94a3b8", fontWeight:700, marginBottom:2}}>🌙 NUIT (19h-3h ET) — L'ASIE ACCUMULE EN SILENCE</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Les desks de Tokyo, Singapour et Hong Kong construisent doucement leurs positions dans un range serré. Pas de gros mouvement — ils accumulent tranquillement avant la tempête. Le volume est faible.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>La session asiatique est calme : le prix consolide souvent dans un range serré, peu de volume. L'Asie ne lance pas la tendance du jour — elle attend. C'est Londres qui tranchera la direction à l'ouverture. Rien d'actionnable ici pour toi.</div>
             <div style={{fontSize:8, color:"#c084fc", marginTop:3, fontWeight:600}}>🧠 Ta mentalité : tu dors. Le décor se met en place sans toi. Rien à faire.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#0a1020", borderRadius:6, borderLeft:"3px solid #38bdf8"}}>
