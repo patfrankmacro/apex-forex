@@ -2577,6 +2577,15 @@ function JournalView() {
 function DayTradeAnalyzer() {
   const [raw, setRaw] = useState("");
   const [result, setResult] = useState(null);
+  useEffect(() => {
+    try {
+      const unsub = onValue(ref(db, "apexHistory"), (snap) => {
+        const v = snap.val();
+        if (v && Array.isArray(v)) localStorage.setItem("apexHistory", JSON.stringify(v));
+      });
+      return () => unsub();
+    } catch(e){}
+  }, []);
   const TEXT="#c8d4f0", TEXT_DIM="#4a5070";
 
   const analyze = () => {
@@ -2773,6 +2782,7 @@ function DayTradeAnalyzer() {
         const sameDay = hist.findIndex(h=>h.date===entry.date);
         if (sameDay>=0) hist[sameDay]=entry; else hist.unshift(entry);
         localStorage.setItem("apexHistory", JSON.stringify(hist.slice(0,30)));
+        try { set(ref(db, "apexHistory"), hist.slice(0,30)); } catch(fe){}
       } catch(e){}
       if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session — aucune de tes 7 paires ne réunit les 5 filtres (divergence + retail + Leveraged Funds + Top 5 Gainers/Losers + Most Volatile). Pas de trade = bonne décision.", strongest, weakest, diag7: diagnostic, degrade}); return; }
       setResult({ strongest, weakest, top, diag7: diagnostic, degrade });
