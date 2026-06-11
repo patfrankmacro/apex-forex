@@ -3106,7 +3106,7 @@ function DayTradeView() {
 
       {/* TA FENETRE 10H30 */}
       <div style={{padding:"12px 14px", background:"#0a1020", borderRadius:8, border:"1px solid #f59e0b55", marginBottom:14}}>
-        <div style={{fontSize:12, color:"#f59e0b", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #f59e0b33"}}>⏰ TA FENÊTRE : 10H30-10H45 — POURQUOI EXACTEMENT LÀ</div>
+        <div style={{fontSize:12, color:"#f59e0b", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #f59e0b33"}}>⏰ TA FENÊTRE : 10H30-10H55 — POURQUOI EXACTEMENT LÀ</div>
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:10}}>La journée a des moments de bruit et un seul moment de lecture propre. Voici la carte :</div>
         <div style={{display:"flex", flexDirection:"column", gap:6, marginBottom:10}}>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1a2e", borderRadius:5}}><span style={{color:APX.obs, fontWeight:700, fontSize:9, minWidth:62}}>3h00</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Londres ouvre : piège du matin (fausse cassure, chasse aux stops), puis le pôle commence à se construire.</span></div>
@@ -3129,7 +3129,7 @@ function DayTradeView() {
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, padding:"8px 10px", background:"#160a2e", borderRadius:5, border:"1px solid "+APX.inst+"44", marginBottom:8}}>
           <b style={{color:APX.inst}}>🏦 Le Fix de 11h, c'est les desks aussi — mais PAS leur direction.</b> Le matin (3h-10h), les desks construisent leurs positions par conviction : « on vend le JPY parce que la BoJ est accommodante ». Ça, c'est la trace que tu suis. Le Fix de 11h, c'est de l'exécution administrative : les clients des banques (fonds de pension, multinationales) convertissent des milliards au taux officiel du jour — dividendes, rééquilibrages, factures. Des flux mécaniques et obligatoires, peu importe la direction. Le prix fait souvent un pic puis revient où il était. <b style={{color:APX.inst}}>Conviction du matin = signal. Tuyauterie du Fix = bruit.</b>
         </div>
-        <div style={{fontSize:9, color:APX.buy, fontWeight:700, textAlign:"center", padding:"6px"}}>Une analyse à 10h30-10h45, une seule, et c'est tout. Avant = pas mûr. Après = pollué. Le marché te donne 15 minutes de clarté par jour — c'est là que tu lis.</div>
+        <div style={{fontSize:9, color:APX.buy, fontWeight:700, textAlign:"center", padding:"6px"}}>Une analyse entre 10h30 et 10h55 (cible : 10h30-10h45), une seule, et c'est tout. Avant = pas mûr. Après = pollué. Le marché te donne une fenêtre de clarté par jour — c'est là que tu lis.</div>
       </div>
 
       {/* CE QUE CHAQUE FILTRE REVELE */}
