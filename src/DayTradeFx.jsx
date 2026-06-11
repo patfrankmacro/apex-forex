@@ -48,12 +48,10 @@ function DtAnalyzer(){
       out.sort((a,b)=>b.gap-a.gap);
       // XAU/USD : cas special — l'or se trade contre la position du dollar seul
       const ru = rank["USD"];
-      const usdActif = vrankUSD>0 && vrankUSD<=4; // moitie active du Volatility Meter
       let xau = null;
-      if (ru <= 2 && usdActif) xau = {dir:"SHORT", why:"USD #"+ru+" au Strength + #"+vrankUSD+" en volatilité : le dollar est tranché ET il travaille → l'or sous pression"};
-      else if (ru >= 7 && usdActif) xau = {dir:"LONG", why:"USD #"+ru+" au Strength + #"+vrankUSD+" en volatilité : le dollar coule avec du volume → l'or respire"};
+      if (ru <= 2) xau = {dir:"SHORT", why:"USD #"+ru+" (Top 2 = le dollar est LE moteur du jour) → l'or sous pression"};
+      else if (ru >= 7) xau = {dir:"LONG", why:"USD #"+ru+" (Bottom 2 = le dollar coule) → l'or respire"};
       let xauNote = null;
-      if ((ru<=2||ru>=7) && !usdActif) xauNote = "USD #"+ru+" au Strength mais #"+(vrankUSD||"?")+" en volatilité — tranché mais FIGÉ : l'or va ranger, pas de trade.";
       setRes({order, out, xau, xauNote, ru, heure:String(nowET.getHours()).padStart(2,"0")+"h"+String(nowET.getMinutes()).padStart(2,"0")});
     } catch(e){ setRes({error:"Erreur: "+e.message}); }
   };
