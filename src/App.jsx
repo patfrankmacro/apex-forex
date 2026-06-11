@@ -2726,7 +2726,18 @@ function DayTradeAnalyzer() {
         const score = forceGap*10 + (isMaxDiv?5:0) + Math.abs(lfGap)/1000;
         candidates.push({pair:wpair, base, quote, direction, forceGap, isMaxDiv, score, retailPct:(direction==="LONG"?rShort:rLong), retailSide:(direction==="LONG"?"SHORT":"LONG"), retailMissing:rMiss, weakCur, strongCur, lfStrongNet, lfWeakNet,
           strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: nStr,
-          inTop: f4ok, weakRepeat, strongRepeat, impulsif: volSet.has(wpair)});
+          inTop: f4ok, weakRepeat, strongRepeat, impulsif: volSet.has(wpair),
+          qualite: (function(){
+            let pts = 0;
+            if (forceGap >= 6) pts += 2; else if (forceGap >= 5) pts += 1;
+            const rp = (direction==="LONG"?rShort:rLong) || 0;
+            if (rp >= 80) pts += 2; else if (rp >= 74) pts += 1;
+            const gl = (direction==="LONG") ? [...gainersSet] : [...losersSet];
+            const rang = gl.indexOf(wpair);
+            if (rang >= 0 && rang <= 1) pts += 1;
+            if (lfStrongNet!=null && lfWeakNet!=null && (lfStrongNet - lfWeakNet) >= 10000) pts += 1;
+            return pts;
+          })()});
       });
 
       // tri des candidats par score, la meilleure = surbrillance
@@ -3039,7 +3050,8 @@ function DayTradeView() {
                       <span style={{color:x.f1===true?"#4ade80":x.f1===false?"#f87171":"#64748b"}}>① Divergence {x.forceGap!=null?x.forceGap+"r "+(x.f1?"✓":"✗"):"– (colle MarketMilk)"}</span> · <span style={{color:"#4ade80"}}>② Retail {x.direction==="LONG"?"SHORT":"LONG"} {x.direction==="LONG"?x.rShort:x.rLong}% ✓</span> · <span style={{color:"#a78bfa"}}>③ LF: {x.sCur} {x.lfS>=0?"+":""}{x.lfS?.toLocaleString()} vs {x.wCur} {x.lfW>=0?"+":""}{x.lfW?.toLocaleString()} ✓</span> · <span style={{color:"#64748b"}}>④ Top5 – (colle MarketMilk)</span> · <span style={{color:"#64748b"}}>⑤ Vol – (colle MarketMilk)</span>
                     </div>
                     <div style={{ fontSize:7.5, color:"#8b9bbf", marginTop:3, fontStyle:"italic" }}>💡 {x.lfS>=0 && x.lfW<0 ? `Les fonds achètent ${x.sCur} et vendent ${x.wCur} → ${x.sCur} plus fort` : (x.lfS<0 && x.lfW<0 ? `Les fonds vendent les deux, mais ${x.wCur} beaucoup plus → ${x.sCur} relativement plus fort` : `Les fonds achètent les deux, mais ${x.sCur} plus → ${x.sCur} favorisé`)}</div>
-                    {is3 && <div style={{ fontSize:8, color:isBuy?"#86efac":"#fca5a5", marginTop:4, fontWeight:600 }}>→ Les 5 filtres convergent. {isBuy?"ACHÈTE":"VENDS"} {x.base}/{x.quote} : vérifie le pôle sur H1, laisse le drapeau se dessiner l'après-midi, entre à la cassure (fin NY/Tokyo). Stop sous le drapeau, swing 1-3 jours.</div>}
+                    {is3 && <div style={{ fontSize:8, color:isBuy?"#86efac":"#fca5a5", marginTop:4, fontWeight:600 }}>→ Les 5 filtres convergent. {isBuy?"ACHÈTE":"VENDS"} {x.base}/{x.quote} : vérifie le pôle sur H1, laisse le drapeau se dessiner l\'après-midi, entre à la cassure (fin NY/Tokyo). Stop sous le drapeau, swing 1-3 jours.</div>}
+                    {x.qualite!=null && <div style={{fontSize:8.5, marginTop:4, fontWeight:700, color: x.qualite>=4?"#00ff88":x.qualite>=2?"#fbbf24":"#94a3b8"}}>{x.qualite>=4?"💎 DOMINANT":x.qualite>=2?"🔶 SOLIDE":"⚡ SERRÉ"} {x.qualite}/6 — {x.qualite>=4?"toutes les marges sont larges : le signal le plus net possible.":x.qualite>=2?"bonnes marges sur plusieurs filtres.":"passe les 5 filtres mais sans marge — la cassure devra prouver, taille réduite."}</div>}
                     
                     {!is3 && <div style={{ fontSize:7.5, color:"#fbbf24", marginTop:3 }}>Retail + Leveraged Funds alignés. Colle MarketMilk + Analyse pour vérifier la divergence (①), le Top 5 Gainers/Losers (④) et le Most Volatile (⑤).</div>}
                   </div>
