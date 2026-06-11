@@ -3052,7 +3052,7 @@ function DayTradeView() {
             {/* TABLEAU LEVERAGED FUNDS */}
             <div style={{ padding:12, background:"#0a0a1e", border:"1px solid #a78bfa44", borderRadius:8, marginBottom:10 }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:4, marginBottom:8 }}>
-                <span style={{ fontSize:10, color:"#a78bfa", fontWeight:700, letterSpacing:1 }}>📊 BIAIS LEVERAGED FUNDS — FILTRE ③</span>
+                <span style={{ fontSize:10, color:"#a78bfa", fontWeight:700, letterSpacing:1 }}>📊 BIAIS LEVERAGED FUNDS — BONUS</span>
                 {freshLabel && <span style={{ fontSize:7.5, color:freshColor }}>📅 {freshLabel}</span>}
               </div>
               {!hasCot ? <div style={{fontSize:8.5,color:"#fbbf24",textAlign:"center",padding:"8px"}}>⚠ COT non chargé — recharge la page</div> :
@@ -3071,7 +3071,7 @@ function DayTradeView() {
 
             {/* TABLEAU RETAIL */}
             <div style={{ padding:12, background:"#0a0a1e", border:"1px solid #34d39944", borderRadius:8, marginBottom:10 }}>
-              <div style={{ fontSize:10, color:"#34d399", fontWeight:700, letterSpacing:1, marginBottom:8 }}>🎭 SENTIMENT RETAIL — FILTRE ② (Myfxbook)</div>
+              <div style={{ fontSize:10, color:"#34d399", fontWeight:700, letterSpacing:1, marginBottom:8 }}>🎭 SENTIMENT RETAIL — BONUS (Myfxbook)</div>
               {!hasRetail ? (
                 <div style={{ textAlign:"center", padding:"6px" }}>
                   <div style={{ fontSize:9, color:"#fbbf24", marginBottom:8 }}>⚠ Retail Myfxbook non chargé. Connecte-toi pour voir le sentiment.</div>
@@ -3151,7 +3151,7 @@ function DayTradeView() {
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a1500", borderRadius:5}}><span style={{color:APX.wait, fontWeight:700, fontSize:9, minWidth:62}}>9h30</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Ouverture du NYSE : poussée de volume.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a1500", borderRadius:5}}><span style={{color:APX.wait, fontWeight:700, fontSize:9, minWidth:62}}>10h00</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Données économiques US fréquentes : dernier bruit du matin.</span></div>
           <div style={{display:"flex", gap:8, padding:"8px 9px", background:"#052010", borderRadius:5, border:"1px solid "+APX.buy+"66"}}><span style={{color:APX.buy, fontWeight:900, fontSize:9, minWidth:62}}>🎯 10h30-10h45</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}><b style={{color:APX.buy}}>TA FENÊTRE.</b> Londres roule depuis 7h30, sa direction est complète. NY confirme depuis 2h30. Toutes les news sont digérées. Rien devant toi. C'est la photo la plus propre du travail de Londres — et elle est stable : que tu analyses à 10h32 ou 10h44, tu lis la même chose.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a0a00", borderRadius:5}}><span style={{color:APX.sell, fontWeight:700, fontSize:9, minWidth:62}}>⚠️ 11h00</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}><b style={{color:APX.sell}}>London Fix</b> : les banques exécutent d'énormes ordres groupés pour fixer les taux de référence officiels. Spike artificiel possible — ne lis pas ici.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a0a00", borderRadius:5}}><span style={{color:APX.sell, fontWeight:700, fontSize:9, minWidth:62}}>⚠️ 11h00</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}><b style={{color:APX.sell}}>London Fix</b> : les banques exécutent d'énormes ordres groupés pour fixer les taux de référence officiels. 11h00 = la dernière limite de ta fenêtre : analyse AVANT le spike du Fix.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a0a00", borderRadius:5}}><span style={{color:APX.sell, fontWeight:700, fontSize:9, minWidth:62}}>11h-11h30</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Les desks de Londres clôturent leurs ajustements : volume de sortie, pas de direction fraîche.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1020", borderRadius:5}}><span style={{color:APX.rest, fontWeight:700, fontSize:9, minWidth:62}}>Après 11h30</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Londres fermée. Le classement flotte sur le bruit de NY seul. Trop tard pour une lecture propre.</span></div>
         </div>
