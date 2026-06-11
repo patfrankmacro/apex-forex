@@ -2795,6 +2795,35 @@ function DayTradeAnalyzer() {
       <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici le contenu copié depuis marketmilk.babypips.com (le Currency Strength Meter suffit pour la divergence)..." style={{width:"100%", minHeight:90, background:"#001018", color:TEXT, border:"1px solid #1e3a5f", borderRadius:6, padding:8, fontSize:9, fontFamily:"monospace", resize:"vertical"}}/>
       <button onClick={analyze} style={{marginTop:8, width:"100%", padding:"10px", background:"#fbbf24", color:"#1a1500", border:"none", borderRadius:6, fontSize:11, fontWeight:700, letterSpacing:1, cursor:"pointer"}}>⚡ ANALYSER</button>
 
+      {!result && (()=>{
+        let hist=[];
+        try { hist = JSON.parse(localStorage.getItem("apexHistory")||"[]"); } catch(e){}
+        const today = new Date().toLocaleDateString("fr-CA");
+        const h = hist.find(x=>x.date===today);
+        if (!h) return null;
+        // Affiche jusqu'a 19h ET (ouverture Tokyo = derniere fenetre d'entree), puis bascule dans l'historique seul
+        const nowET2 = new Date(new Date().toLocaleString("en-US", {timeZone:"America/New_York"}));
+        if (nowET2.getHours() >= 19) return null;
+        const has = h.signaux && h.signaux.length>0;
+        return (
+          <div style={{marginTop:10, padding:"10px", background: has?"#052010":"#0f1622", borderRadius:6, border:"1px solid "+(has?"#4ade8055":"#1e3a5f")}}>
+            <div style={{fontSize:9, color: has?"#4ade80":"#94a3b8", fontWeight:700, marginBottom:6}}>📌 TON ANALYSE DU JOUR — faite à {h.heure} · {h.strongest} fort → {h.weakest} faible</div>
+            {has ? h.signaux.map((s,i)=>(
+              <div key={i} style={{padding:"6px 8px", background:"#0a2818", borderRadius:4, marginBottom:4, fontSize:9, color:"#86efac", fontWeight:700}}>
+                🎯 {s.pair.slice(0,3)}/{s.pair.slice(3,6)} {s.dir==="LONG"?"▲ ACHAT":"▼ VENTE"} · divergence {s.gap}r · 5/5 — surveille le drapeau, entre à la cassure (fin NY/Tokyo)
+              </div>
+            )) : <div style={{fontSize:8.5, color:"#94a3b8", marginBottom:4}}>Aucun signal 5/5 aujourd'hui — pas de trade, c'est la discipline.</div>}
+            <div style={{fontSize:8, color:"#7dd3fc", fontWeight:700, margin:"6px 0 4px"}}>Le diagnostic de tes 7 paires :</div>
+            {(h.diag||[]).map((d,i)=>(
+              <div key={i} style={{fontSize:7.5, color: d.status==="passe"?"#4ade80":"#94a3b8", lineHeight:1.5, padding:"2px 0"}}>
+                {d.status==="passe"?"✅":"·"} {d.pair.slice(0,3)}/{d.pair.slice(3,6)} {d.dir==="LONG"?"▲":"▼"} — {d.status==="passe"?"5/5 PASSE":d.reason}
+              </div>
+            ))}
+            <div style={{fontSize:7, color:"#4a5070", marginTop:5, fontStyle:"italic"}}>Cette lecture reste affichée toute la journée — ta référence pendant le drapeau et jusqu'à la cassure.</div>
+          </div>
+        );
+      })()}
+
       {result && result.degrade && result.degrade.length>0 && (
         <div style={{marginTop:10, padding:"10px", background:"#1a0a00", borderRadius:6, border:"1px solid #f87171aa"}}>
           <div style={{fontSize:9, color:"#f87171", fontWeight:700, marginBottom:4}}>⚠️ LECTURE DÉGRADÉE — vérifie tes données avant de trader</div>
