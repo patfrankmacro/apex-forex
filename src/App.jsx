@@ -2749,6 +2749,17 @@ function DayTradeAnalyzer() {
       const ordre={passe:0,bloque:1};
       diagnostic.sort((a,b)=> (ordre[a.status]-ordre[b.status]) || ((b.forceGap||0)-(a.forceGap||0)));
 
+      // DETECTEUR DE DONNEES DEGRADEES
+      const degrade = [];
+      try {
+        const cd = Object.values(cot).find(x=>x?.date)?.date;
+        if (cd){ const age=Math.floor((new Date()-new Date(cd))/(1000*60*60*24)); if (age>10) degrade.push("COT de "+age+" jours (périmé) — un nouveau rapport CFTC existe probablement, va le chercher dans DONNÉES"); }
+        else degrade.push("COT absent — le filtre ③ ne peut pas être évalué");
+      } catch(e){}
+      if (gainersSet.size===0 && losersSet.size===0) degrade.push("Top Gainers/Losers absent du snapshot — le ④ bloque tout, recolle la page MarketMilk complète");
+      if (volSet.size===0) degrade.push("Most Volatile absent du snapshot — le ⑤ bloque tout, recolle la page MarketMilk complète");
+      const nbRMiss = diagnostic.filter(d=>d.rMiss).length;
+      if (nbRMiss>0) degrade.push("Retail Myfxbook indisponible sur "+nbRMiss+" paire"+(nbRMiss>1?"s":"")+" — le ② ne peut pas être évalué dessus");
       // SAUVEGARDE HISTORIQUE (chaque analyse, meme 0 signal)
       try {
         const hist = JSON.parse(localStorage.getItem("apexHistory")||"[]");
@@ -2763,8 +2774,8 @@ function DayTradeAnalyzer() {
         if (sameDay>=0) hist[sameDay]=entry; else hist.unshift(entry);
         localStorage.setItem("apexHistory", JSON.stringify(hist.slice(0,30)));
       } catch(e){}
-      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session — aucune de tes 7 paires ne réunit les 5 filtres (divergence + retail + Leveraged Funds + Top 5 Gainers/Losers + Most Volatile). Pas de trade = bonne décision.", strongest, weakest, diag7: diagnostic}); return; }
-      setResult({ strongest, weakest, top, diag7: diagnostic });
+      if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session — aucune de tes 7 paires ne réunit les 5 filtres (divergence + retail + Leveraged Funds + Top 5 Gainers/Losers + Most Volatile). Pas de trade = bonne décision.", strongest, weakest, diag7: diagnostic, degrade}); return; }
+      setResult({ strongest, weakest, top, diag7: diagnostic, degrade });
     } catch(e){ setResult({error:"Erreur: "+e.message}); }
   };
 
@@ -2774,6 +2785,12 @@ function DayTradeAnalyzer() {
       <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici le contenu copié depuis marketmilk.babypips.com (le Currency Strength Meter suffit pour la divergence)..." style={{width:"100%", minHeight:90, background:"#001018", color:TEXT, border:"1px solid #1e3a5f", borderRadius:6, padding:8, fontSize:9, fontFamily:"monospace", resize:"vertical"}}/>
       <button onClick={analyze} style={{marginTop:8, width:"100%", padding:"10px", background:"#fbbf24", color:"#1a1500", border:"none", borderRadius:6, fontSize:11, fontWeight:700, letterSpacing:1, cursor:"pointer"}}>⚡ ANALYSER</button>
 
+      {result && result.degrade && result.degrade.length>0 && (
+        <div style={{marginTop:10, padding:"10px", background:"#1a0a00", borderRadius:6, border:"1px solid #f87171aa"}}>
+          <div style={{fontSize:9, color:"#f87171", fontWeight:700, marginBottom:4}}>⚠️ LECTURE DÉGRADÉE — vérifie tes données avant de trader</div>
+          {result.degrade.map((d,i)=><div key={i} style={{fontSize:8.5, color:"#fca5a5", lineHeight:1.5}}>· {d}</div>)}
+        </div>
+      )}
       {result && result.error && (<div style={{marginTop:10, padding:"10px", background:"#1a0a00", borderRadius:6, fontSize:9, color:"#fbbf24", lineHeight:1.6}}>{result.error}{result.strongest?<div style={{color:TEXT_DIM, marginTop:6, fontSize:8}}>Force du jour : {result.strongest} fort → {result.weakest} faible</div>:""}</div>)}
 
       {result && result.diag7 && result.diag7.length>0 && (
