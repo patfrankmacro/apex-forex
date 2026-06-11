@@ -56,15 +56,27 @@ function DtAnalyzer(){
         const gap=Math.abs(rank[b]-rank[q]);
         const dir = rank[b]<rank[q] ? "LONG" : "SHORT";
         const aligned = riskAligned(q, dir);
-        out.push({pair:b+"/"+q, base:b, quote:q, rb:rank[b], rq:rank[q], gap, dir, ok:(gap>=3 && aligned), gapOk:gap>=3, aligned});
+        const quoteRefuge = (q === "JPY");
+        let pourquoi = "";
+        if (gap>=3 && aligned) {
+          const sens = dir==="LONG" ? "ACHAT" : "VENTE";
+          const cs = b+" #"+rank[b]+" vs "+q+" #"+rank[q]+" = "+gap+" rangs";
+          const courant = quoteRefuge
+            ? (dir==="LONG" ? "RISK-ON : le "+q+" refuge est vendu, ta paire monte avec le courant" : "RISK-OFF : la fuite vers le "+q+" refuge porte ta vente")
+            : (dir==="LONG" ? "RISK-OFF : le "+q+" risqué est lâché, ta paire monte avec le courant" : "RISK-ON : le "+q+" risqué est acheté, ta paire descend avec le courant");
+          pourquoi = sens+" car CONVERGENCE — ② "+cs+" (le capital a tranché) + ③ "+courant+". Currency Strength et sentiment poussent dans le MÊME sens.";
+        } else if (gap>=3 && !aligned) {
+          pourquoi = riskMode ? (riskMode==="NEUTRE" ? "3+ rangs mais sentiment NEUTRE : pas de courant de fond pour porter le mouvement" : gap+" rangs au Strength mais le "+riskMode+" pousse cette paire dans l'AUTRE sens — divergence sans courant = piège possible") : "choisis le sentiment (③) pour valider";
+        }
+        out.push({pair:b+"/"+q, base:b, quote:q, rb:rank[b], rq:rank[q], gap, dir, ok:(gap>=3 && aligned), gapOk:gap>=3, aligned, pourquoi});
       });
       out.sort((a,b)=>b.gap-a.gap);
       // XAU/USD : cas special — l'or se trade contre la position du dollar seul
       const ru = rank["USD"];
       let xau = null;
       let xauConflit = null;
-      if (ru <= 2 && riskMode === "RISK-ON") xau = {dir:"SHORT", why:"USD #"+ru+" + RISK-ON : les deux moteurs poussent l'or vers le bas — convergence"};
-      else if (ru >= 7 && riskMode === "RISK-OFF") xau = {dir:"LONG", why:"USD #"+ru+" + RISK-OFF : dollar faible + fuite vers le refuge — convergence"};
+      if (ru <= 2 && riskMode === "RISK-ON") xau = {dir:"SHORT", why:"VENTE car DOUBLE CONVERGENCE — moteur dollar : USD #"+ru+" (Top 2, l'or coté en USD subit sa force) + moteur peur : RISK-ON (le refuge or est délaissé). Les deux moteurs de l'or poussent vers le BAS ensemble."};
+      else if (ru >= 7 && riskMode === "RISK-OFF") xau = {dir:"LONG", why:"ACHAT car DOUBLE CONVERGENCE — moteur dollar : USD #"+ru+" (Bottom 2, le dollar coule = l'or mécaniquement porté) + moteur peur : RISK-OFF (fuite vers le refuge). Les deux moteurs poussent vers le HAUT ensemble."};
       else if (ru <= 2 && riskMode === "RISK-OFF") xauConflit = "USD #"+ru+" pousse l'or en BAS mais RISK-OFF le pousse en HAUT — les deux moteurs se battent, jour de mèches, pas de trade or";
       else if (ru >= 7 && riskMode === "RISK-ON") xauConflit = "USD #"+ru+" pousse l'or en HAUT mais RISK-ON le pousse en BAS — conflit, pas de trade or";
       if (false && ru <= 2) xau = {dir:"SHORT", why:"USD #"+ru+" (Top 2 = le dollar est LE moteur du jour) → l'or sous pression"};
@@ -99,6 +111,7 @@ function DtAnalyzer(){
               <div style={{fontSize:9.5, fontWeight:700, color:p.ok?(p.dir==="LONG"?"#4ade80":"#f87171"):"#64748b"}}>
                 {p.ok?"✅":"·"} {p.pair} {p.ok?(p.dir==="LONG"?"▲ ACHAT possible":"▼ VENTE possible"):(p.gapOk && !p.aligned ? "⛔ "+p.gap+"r mais sentiment contraire" : "")} — {p.base} #{p.rb} vs {p.quote} #{p.rq} = {p.gap} rang{p.gap>1?"s":""} {p.ok?"(≥3 ✓)":"(<3)"}
               </div>
+              {p.pourquoi && <div style={{fontSize:8, color:p.ok?"#86efac":"#fbbf24", marginTop:3, lineHeight:1.5, fontStyle:"italic"}}>{p.pourquoi}</div>}
               {p.ok && <div style={{fontSize:8, color:TEXT_DIM, marginTop:3, lineHeight:1.5}}>Maintenant ton graphique M15 : pôle de Londres continu depuis 3h dans ce sens ? Flag dessiné depuis ~7h30 ? Pas de news US à 8h30 ? Alors attends la cassure du flag — c'est ton entrée.</div>}
             </div>
           ))}
@@ -218,6 +231,40 @@ export default function DayTradeFxView(){
           <div style={{padding:"6px 8px", background:"#1a2030", borderRadius:5}}><b style={{color:"#94a3b8"}}>{"⚪ NEUTRE"}</b>{" — pas de courant de fond : les divergences sont moins fiables, le ③ n'est pas rempli → pas de trade. Les jours neutres sont les jours de range."}</div>
         </div>
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, padding:"8px 10px", background:"#1a1500", borderRadius:5}}>{"🥇 L'or et ses DEUX moteurs : le dollar (mécanique — l'or est coté en USD) et la peur (refuge). Quand ils convergent (USD fort + Risk-On = vente · USD faible + Risk-Off = achat), le mouvement est propre. Quand ils se BATTENT (USD fort + Risk-Off, typique des paniques où le cash dollar et l'or refuge montent ensemble), l'or fait des mèches dans les deux sens — le scanner te le dira : CONFLIT, pas de trade. C'est la convergence qui fait le trade, jamais un moteur seul."}</div>
+        <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginTop:10, marginBottom:5}}>{"📋 PAIRE PAR PAIRE — CE QUE CHAQUE SENTIMENT VALIDE"}</div>
+        <div style={{fontSize:7.5, fontFamily:"monospace", lineHeight:1.9}}>
+          <div style={{display:"flex", borderBottom:"1px solid #334155", paddingBottom:3, marginBottom:3, fontWeight:700, color:"#94a3b8"}}><span style={{flex:1.2}}>PAIRE</span><span style={{flex:1, color:"#4ade80"}}>🟢 RISK-ON</span><span style={{flex:1, color:"#f87171"}}>🔴 RISK-OFF</span></div>
+          {[
+            ["GBP/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)"],
+            ["EUR/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)"],
+            ["CHF/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)"],
+            ["EUR/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)"],
+            ["GBP/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)"],
+            ["EUR/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)"],
+            ["GBP/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)"],
+          ].map((r,i)=>(
+            <div key={i} style={{display:"flex", borderBottom:"1px solid #1e293b"}}><span style={{flex:1.2, color:"#e2e8f0", fontWeight:700}}>{r[0]}</span><span style={{flex:1, color:"#4ade80"}}>{r[1]}</span><span style={{flex:1, color:"#f87171"}}>{r[2]}</span></div>
+          ))}
+          <div style={{display:"flex", borderBottom:"1px solid #1e293b", background:"#1a150033"}}><span style={{flex:1.2, color:"#fbbf24", fontWeight:700}}>XAU/USD 🥇</span><span style={{flex:1, color:"#4ade80"}}>{"▼ VENTE si USD #1-2"}</span><span style={{flex:1, color:"#f87171"}}>{"▲ ACHAT si USD #7-8"}</span></div>
+        </div>
+        <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:5, lineHeight:1.5}}>{"Lecture : la direction affichée est la SEULE validable sous ce sentiment. L'autre direction = ⛔ bloquée même à 3+ rangs. L'or exige en plus sa condition dollar — sentiment seul ne suffit jamais pour XAU. NEUTRE = rien n'est validable, paires comme or."}</div>
+        <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginTop:10, marginBottom:5}}>{"📋 PAIRE PAR PAIRE — CE QUE CHAQUE SENTIMENT VALIDE"}</div>
+        <div style={{fontSize:7.5, fontFamily:"monospace", lineHeight:1.9}}>
+          <div style={{display:"flex", borderBottom:"1px solid #334155", paddingBottom:3, marginBottom:3, fontWeight:700, color:"#94a3b8"}}><span style={{flex:1.2}}>PAIRE</span><span style={{flex:1, color:"#4ade80"}}>🟢 RISK-ON</span><span style={{flex:1, color:"#f87171"}}>🔴 RISK-OFF</span></div>
+          {[
+            ["GBP/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)"],
+            ["EUR/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)"],
+            ["CHF/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)"],
+            ["EUR/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)"],
+            ["GBP/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)"],
+            ["EUR/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)"],
+            ["GBP/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)"],
+          ].map((r,i)=>(
+            <div key={i} style={{display:"flex", borderBottom:"1px solid #1e293b"}}><span style={{flex:1.2, color:"#e2e8f0", fontWeight:700}}>{r[0]}</span><span style={{flex:1, color:"#4ade80"}}>{r[1]}</span><span style={{flex:1, color:"#f87171"}}>{r[2]}</span></div>
+          ))}
+          <div style={{display:"flex", borderBottom:"1px solid #1e293b", background:"#1a150033"}}><span style={{flex:1.2, color:"#fbbf24", fontWeight:700}}>XAU/USD 🥇</span><span style={{flex:1, color:"#4ade80"}}>{"▼ VENTE si USD #1-2"}</span><span style={{flex:1, color:"#f87171"}}>{"▲ ACHAT si USD #7-8"}</span></div>
+        </div>
+        <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:5, lineHeight:1.5}}>{"Lecture : la direction affichée est la SEULE validable sous ce sentiment. L'autre direction = ⛔ bloquée même à 3+ rangs. L'or exige en plus sa condition dollar — sentiment seul ne suffit jamais pour XAU. NEUTRE = rien n'est validable, paires comme or."}</div>
         <a href="https://www.babypips.com/tools/risk-on-risk-off-meter" target="_blank" rel="noopener noreferrer" style={{display:"block", marginTop:8, fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700}}>{"🌡️ Ouvrir le Risk-On/Risk-Off Meter ↗"}</a>
       </div>
 
