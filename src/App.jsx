@@ -2928,12 +2928,13 @@ function DayTradeView() {
         <div style={{fontSize:8, color:TEXT_DIM, marginBottom:14, textAlign:"center", fontStyle:"italic"}}>Suis les étapes de haut en bas. Une action à la fois.</div>
         {(() => {
           const steps = [
-            {n:"1", icon:"👁️", color:"#38bdf8", t:"VÉRIFIE LE PÔLE (H1)", sub:"De 3h jusqu'à MAINTENANT (10h30) : un seul flux continu, sans inversion à l'ouverture de NY (8h) ? = PÔLE valide. Le prix s'est inversé à 8h = pas de pôle, pas de trade."},
-            {n:"2", icon:"🥛", color:"#fbbf24", t:"OUVRE MARKETMILK", sub:"🎯 10h30-10h45 ET (tolérance 10h55) — Colle tes données. Quelle devise est FORTE ? Laquelle est FAIBLE ? (avant le Fix de 11h)"},
-            {n:"3", icon:"🔍", color:"#a78bfa", t:"VÉRIFIE LES 5 FILTRES", sub:"① Divergence ≥4r · ② Retail ≥70% · ③ Leveraged Funds · ④ Top 5 Gainers/Losers · ⑤ Top 5 Most Volatile (jamais Least)"},
-            {n:"4", icon:"🎯", color:"#4ade80", t:"5/5 ? DIRECTION CONFIRMÉE", sub:"Les 5 cochés = vrai flux institutionnel. Carte VERTE = achat ▲ · Carte ROUGE = vente ▼"},
-            {n:"5", icon:"⏳", color:"#f59e0b", t:"ATTENDS LE DRAPEAU", sub:"Après-midi NY (11h30-17h) : le prix consolide en drift léger contre-tendance, SANS s'effondrer. C'est le drapeau qui se dessine."},
-            {n:"6", icon:"🚀", color:"#34d399", t:"ENTRE À LA CASSURE", sub:"Cassure du drapeau dans le sens du pôle (fin NY ou Tokyo 19h). Stop sous le drapeau. Target = hauteur du pôle. Garde 1-3 jours."},
+            {n:"1", icon:"📰", color:"#38bdf8", t:"6H-8H — PRÉPARATION : NEWS + SESSION WRAPS", sub:"Calendrier économique (Investing) : quelles news majeures aujourd\'hui et cette nuit sur TES devises (BoJ, RBA, RBNZ, BoE, BCE, SNB) ? Note les heures. Puis lis les session wraps : qu\'a fait l\'Asie cette nuit, que fait Londres depuis 3h ? Tu connais le terrain avant de lire la carte."},
+            {n:"2", icon:"👁️", color:"#38bdf8", t:"VÉRIFIE LE PÔLE (H1)", sub:"De 3h jusqu\'à MAINTENANT (10h30) : un seul flux continu, sans inversion à l\'ouverture de NY (8h) ? = PÔLE valide. Le prix s\'est inversé à 8h = pas de pôle, pas de trade."},
+            {n:"3", icon:"🥛", color:"#fbbf24", t:"OUVRE MARKETMILK", sub:"🎯 10h30-10h45 ET (tolérance 10h55) — Colle tes données. Quelle devise est FORTE ? Laquelle est FAIBLE ? (avant le Fix de 11h)"},
+            {n:"4", icon:"🔍", color:"#a78bfa", t:"VÉRIFIE LES 5 FILTRES", sub:"① Divergence ≥4r · ② Retail ≥70% · ③ Leveraged Funds · ④ Top 5 Gainers/Losers · ⑤ Top 5 Most Volatile (jamais Least)"},
+            {n:"5", icon:"🎯", color:"#4ade80", t:"5/5 ? DIRECTION CONFIRMÉE", sub:"Les 5 cochés = vrai flux institutionnel. Carte VERTE = achat ▲ · Carte ROUGE = vente ▼"},
+            {n:"6", icon:"⏳", color:"#f59e0b", t:"ATTENDS LE DRAPEAU", sub:"Après-midi NY (11h30-17h) : le prix consolide en drift léger contre-tendance, SANS s'effondrer. C'est le drapeau qui se dessine."},
+            {n:"7", icon:"🚀", color:"#34d399", t:"ENTRE À LA CASSURE", sub:"Cassure du drapeau dans le sens du pôle (fin NY ou Tokyo 19h). ⚠️ News majeure à moins de 2h (vue le matin à l'étape 1) ? Laisse-la passer d'abord. Stop sous le drapeau. Target = hauteur du pôle. Garde 1-3 jours."},
           ];
           return steps.map((s,i)=>(
             <div key={s.n} style={{display:"flex", gap:11, alignItems:"flex-start", position:"relative", paddingBottom: i<steps.length-1?9:4}}>
@@ -3109,6 +3110,7 @@ function DayTradeView() {
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:10}}>La journée a des moments de bruit et un seul moment de lecture propre. Voici la carte :</div>
         <div style={{display:"flex", flexDirection:"column", gap:6, marginBottom:10}}>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1a2e", borderRadius:5}}><span style={{color:APX.obs, fontWeight:700, fontSize:9, minWidth:62}}>3h00</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Londres ouvre : piège du matin (fausse cassure, chasse aux stops), puis le pôle commence à se construire.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1a2e", borderRadius:5}}><span style={{color:APX.obs, fontWeight:700, fontSize:9, minWidth:62}}>6h-8h</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>TA PRÉPARATION : calendrier économique du jour + session wraps (Asie cette nuit, Londres depuis 3h). Le briefing avant la lecture.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1a2e", borderRadius:5}}><span style={{color:APX.obs, fontWeight:700, fontSize:9, minWidth:62}}>8h00</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>NY ouvre : la liquidité mondiale double — le TEST du mouvement de Londres. S'il continue sans s'inverser, le pôle se confirme. (NY ne trade pas tes paires — pas de dollar — mais sa liquidité teste la conviction de Londres.)</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a1500", borderRadius:5}}><span style={{color:APX.wait, fontWeight:700, fontSize:9, minWidth:62}}>8h30</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>News US : le marché digère, ça secoue.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#1a1500", borderRadius:5}}><span style={{color:APX.wait, fontWeight:700, fontSize:9, minWidth:62}}>9h30</span><span style={{fontSize:8.5, color:TEXT, lineHeight:1.5}}>Ouverture du NYSE : poussée de volume.</span></div>
