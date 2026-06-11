@@ -2640,9 +2640,9 @@ function DayTradeAnalyzer() {
       const topGainers = grabPairs("Top Gainers", ["Top Losers","Currency Volatility","Most Volatile","Least Volatile"]);
       const topLosers  = grabPairs("Top Losers",  ["Currency Volatility","Most Volatile","Least Volatile","Top Gainers"]);
       const mostVol    = grabPairs("Most Volatile", ["Least Volatile","Top Gainers","Top Losers"]);
-      const volSet     = new Set(mostVol.slice(0,5).map(p=>p.replace("/","")));
+      const volSet     = new Set(mostVol.slice(0,5).map(p=>p.pair));
       const leastVol   = grabPairs("Least Volatile", ["Top Gainers","Top Losers","Most Volatile"]);
-      const leastSet   = new Set(leastVol.slice(0,5).map(p=>p.replace("/","")));
+      const leastSet   = new Set(leastVol.slice(0,5).map(p=>p.pair));
       const gainersSet = new Set(topGainers.slice(0,5).map(p=>p.pair));
       const losersSet  = new Set(topLosers.slice(0,5).map(p=>p.pair));
       // compte combien de fois une devise apparait du cote perdant / gagnant (signal renforce)
