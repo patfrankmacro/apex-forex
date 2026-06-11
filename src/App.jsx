@@ -3399,7 +3399,7 @@ function DayTradeView() {
           </div>
           <div style={{padding:"8px 10px", background:"#052010", borderRadius:6, borderLeft:"3px solid "+APX.buy}}>
             <div style={{fontSize:9, color:APX.buy, fontWeight:700, marginBottom:2}}>🎯 10h30 ET — TU MESURES LE PÔLE</div>
-            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Londres a tranché, NY a confirmé, le piège du matin est loin derrière. MarketMilk te montre OÙ le capital est allé : quelle devise est forte, laquelle est faible. Tes 5 filtres confirment que le pôle est réel — direction ET énergie, construit par Londres et NY ensemble.</div>
+            <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Londres a tranché, son mouvement a survécu au test de NY, le piège du matin est loin derrière. MarketMilk te montre OÙ le capital est allé. Tes 5 filtres confirment que le pôle est réel — direction ET énergie.</div>
             <div style={{fontSize:8, color:"#c084fc", marginTop:3, fontWeight:600}}>🧠 Ta mentalité : tu n'es pas le marché, tu es le passager. Tu montes dans leur train une fois qu'il roule — jamais avant. Tu suis, tu ne devines pas.</div>
           </div>
           <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:6, borderLeft:"3px solid "+APX.wait}}>
@@ -3457,8 +3457,8 @@ function DayTradeView() {
             </div>
             <div style={{flex:1, paddingBottom:8}}>
               <div style={{fontSize:9, color:APX.obs, fontWeight:700}}>8h00 ET — NEW YORK OUVRE</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>New York entre et confirme (ou non) la direction de Londres. Tes paires n'ont pas de dollar, donc NY ne les trade pas directement — mais son volume valide la tendance. Tu n'analyses pas encore : tu attends 10h que Londres ait fait toute sa session. Tu observes seulement.</div>
-              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Observe seulement. Pas d'analyse, pas de position avant 10h.</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>NY ouvre, la liquidité double : le TEST du mouvement de Londres. Tes paires n'ont pas de dollar — NY ne les trade pas, mais son volume peut inverser un mouvement fragile. S'il continue : le pôle se confirme.</div>
+              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Observe seulement. Pas d'analyse avant 10h30.</div>
             </div>
           </div>
 
@@ -3470,7 +3470,7 @@ function DayTradeView() {
             <div style={{flex:1, paddingBottom:8}}>
               <div style={{fontSize:9, color:APX.wait, fontWeight:700}}>8h30 ET — NEWS US ⚠️</div>
               <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>NFP, CPI, FOMC. Peut accélérer OU renverser brutalement. Ne pas entrer après une news.</div>
-              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Tu n'as pas encore de position (analyse à 10h). Laisse la news passer — elle fait partie de ce que Londres et NY digèrent avant que tu lises la direction finale à 10h.</div>
+              <div style={{fontSize:8, color:"#fbbf24", marginTop:2}}>→ Laisse passer : la news fait partie de ce que le marché digère avant ta lecture de 10h30.</div>
             </div>
           </div>
 
@@ -3481,7 +3481,7 @@ function DayTradeView() {
             </div>
             <div style={{flex:1, paddingBottom:8, padding:"8px 10px", background:"#052010", borderRadius:6, border:"1px solid #00ff8866", marginBottom:4}}>
               <div style={{fontSize:10, color:APX.buy, fontWeight:900}}>⚡ 10h30 ET — TU ANALYSES ET OBSERVES</div>
-              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres a tranché sa vraie direction (le faux mouvement du matin est passé), NY a confirmé. Retail piégé + Leveraged Funds alignés. Tes 5 filtres te disent si les gros joueurs sont dans le trade.</div>
+              <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>Londres a tranché (le faux mouvement du matin est passé), le test de NY est survécu. Tes 5 filtres te disent si les gros joueurs sont dans le trade.</div>
               <div style={{fontSize:8.5, color:"#00ff88", fontWeight:700, marginTop:4}}>→ Analyse la direction · vérifie le pôle sur H1 · surveille le drapeau l'après-midi · entre à la cassure</div>
             </div>
           </div>
