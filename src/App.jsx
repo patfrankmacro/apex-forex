@@ -3187,13 +3187,6 @@ function DayTradeView() {
             <polyline points="45,140 65,118 85,95 105,70 125,48 140,38" fill="none" stroke="#4ade80" strokeWidth="2.5"/>
             <text x="55" y="85" fill="#4ade80" fontSize="8" fontFamily="monospace" fontWeight="700">LE PÔLE</text>
             <text x="55" y="95" fill="#86efac" fontSize="6" fontFamily="monospace">2 sessions, 1 direction</text>
-            <line x1="140" y1="77" x2="300" y2="77" stroke="#4ade80" strokeWidth="0.7" strokeDasharray="2,3"/>
-            <text x="272" y="75" fill="#4ade80" fontSize="5.5" fontFamily="monospace">38.2%</text>
-            <line x1="140" y1="89" x2="300" y2="89" stroke="#fbbf24" strokeWidth="0.7" strokeDasharray="2,3"/>
-            <text x="272" y="87" fill="#fbbf24" fontSize="5.5" fontFamily="monospace">50%</text>
-            <rect x="140" y="99" width="160" height="7" fill="#a855f722"/>
-            <line x1="140" y1="101" x2="300" y2="101" stroke="#c084fc" strokeWidth="0.7" strokeDasharray="2,3"/>
-            <text x="248" y="112" fill="#c084fc" fontSize="5.5" fontFamily="monospace">61.8-65% G.POCKET</text>
             <polyline points="140,38 152,46 164,42 176,52 188,48 200,56 212,53" fill="none" stroke="#fbbf24" strokeWidth="2"/>
             <line x1="138" y1="34" x2="214" y2="48" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
             <line x1="142" y1="52" x2="216" y2="64" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
@@ -3222,13 +3215,6 @@ function DayTradeView() {
             <polyline points="45,20 65,42 85,65 105,90 125,112 140,122" fill="none" stroke="#f87171" strokeWidth="2.5"/>
             <text x="55" y="100" fill="#f87171" fontSize="8" fontFamily="monospace" fontWeight="700">LE PÔLE</text>
             <text x="55" y="110" fill="#fca5a5" fontSize="6" fontFamily="monospace">2 sessions, 1 direction</text>
-            <line x1="140" y1="83" x2="300" y2="83" stroke="#4ade80" strokeWidth="0.7" strokeDasharray="2,3"/>
-            <text x="272" y="81" fill="#4ade80" fontSize="5.5" fontFamily="monospace">38.2%</text>
-            <line x1="140" y1="71" x2="300" y2="71" stroke="#fbbf24" strokeWidth="0.7" strokeDasharray="2,3"/>
-            <text x="272" y="69" fill="#fbbf24" fontSize="5.5" fontFamily="monospace">50%</text>
-            <rect x="140" y="55" width="160" height="7" fill="#a855f722"/>
-            <line x1="140" y1="59" x2="300" y2="59" stroke="#c084fc" strokeWidth="0.7" strokeDasharray="2,3"/>
-            <text x="248" y="53" fill="#c084fc" fontSize="5.5" fontFamily="monospace">61.8-65% G.POCKET</text>
             <polyline points="140,122 152,114 164,118 176,108 188,112 200,104 212,107" fill="none" stroke="#fbbf24" strokeWidth="2"/>
             <line x1="138" y1="126" x2="214" y2="112" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
             <line x1="142" y1="108" x2="216" y2="96" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
@@ -3245,6 +3231,38 @@ function DayTradeView() {
             <text x="226" y="12" fill="#f87171" fontSize="7" fontFamily="monospace">◀ Tokyo 19h</text>
           </svg>
           <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>① Pôle : Londres vend de 3h à 11h — le mouvement CONTINUE après l'ouverture de NY à 8h (le test de liquidité est passé) → ② Drapeau : après-midi NY, drift léger, le prix reste bas → ③ Cassure vers le bas (fin NY/Tokyo) = ENTRÉE → stop au-dessus du drapeau, target = hauteur du pôle projetée</div>
+        </div>
+
+        <div style={{marginBottom:12, padding:"12px", background:"#0a0a1a", borderRadius:6, border:"1px solid #c084fc44"}}>
+          <div style={{fontSize:10, color:"#c084fc", fontWeight:700, marginBottom:8}}>📏 OÙ S'ARRÊTE LE DRAPEAU ? — la profondeur au Fibonacci (tracé sur le pôle)</div>
+          <svg viewBox="0 0 320 200" style={{width:"100%", maxWidth:340, display:"block", margin:"0 auto 10px"}}>
+            <polyline points="30,170 50,140 70,105 90,70 105,42" fill="none" stroke="#4ade80" strokeWidth="2.5"/>
+            <text x="32" y="120" fill="#4ade80" fontSize="7" fontFamily="monospace" fontWeight="700">PÔLE</text>
+            <line x1="105" y1="42" x2="310" y2="42" stroke="#64748b" strokeWidth="0.7" strokeDasharray="2,3"/>
+            <text x="2" y="45" fill="#64748b" fontSize="6" fontFamily="monospace">0%</text>
+            <line x1="105" y1="91" x2="310" y2="91" stroke="#4ade80" strokeWidth="0.9" strokeDasharray="3,2"/>
+            <text x="2" y="94" fill="#4ade80" fontSize="6" fontFamily="monospace">38.2%</text>
+            <line x1="105" y1="106" x2="310" y2="106" stroke="#fbbf24" strokeWidth="0.9" strokeDasharray="3,2"/>
+            <text x="2" y="109" fill="#fbbf24" fontSize="6" fontFamily="monospace">50%</text>
+            <rect x="105" y="119" width="205" height="9" fill="#a855f726"/>
+            <line x1="105" y1="123" x2="310" y2="123" stroke="#c084fc" strokeWidth="0.9" strokeDasharray="3,2"/>
+            <text x="2" y="126" fill="#c084fc" fontSize="6" fontFamily="monospace">61.8-65</text>
+            <line x1="105" y1="170" x2="310" y2="170" stroke="#64748b" strokeWidth="0.7" strokeDasharray="2,3"/>
+            <text x="2" y="173" fill="#64748b" fontSize="6" fontFamily="monospace">100%</text>
+            <polyline points="105,42 120,52 135,48 150,58 165,54" fill="none" stroke="#4ade80" strokeWidth="2"/>
+            <text x="170" y="52" fill="#4ade80" fontSize="6.5" fontFamily="monospace" fontWeight="700">A · 38.2% = TRÈS FORT</text>
+            <text x="170" y="61" fill="#86efac" fontSize="5.5" fontFamily="monospace">les fonds ne lâchent rien</text>
+            <polyline points="105,42 122,62 139,57 156,77 173,71 190,99 207,93" fill="none" stroke="#fbbf24" strokeWidth="2"/>
+            <text x="212" y="97" fill="#fbbf24" fontSize="6.5" fontFamily="monospace" fontWeight="700">B · 50% = CLASSIQUE</text>
+            <text x="212" y="106" fill="#fde68a" fontSize="5.5" fontFamily="monospace">respiration saine</text>
+            <polyline points="105,42 125,70 145,64 165,95 185,89 205,121 225,116" fill="none" stroke="#c084fc" strokeWidth="2"/>
+            <text x="230" y="120" fill="#c084fc" fontSize="6.5" fontFamily="monospace" fontWeight="700">C · POCKET =</text>
+            <text x="230" y="129" fill="#c084fc" fontSize="6.5" fontFamily="monospace" fontWeight="700">RECHARGEMENT</text>
+            <text x="230" y="138" fill="#d8b4fe" fontSize="5.5" fontFamily="monospace">attends les rejets</text>
+            <rect x="105" y="146" width="205" height="22" fill="#f8717115"/>
+            <text x="130" y="160" fill="#f87171" fontSize="6.5" fontFamily="monospace" fontWeight="700">✗ SOUS 65% = SORTIE, PAS UN DRAPEAU — setup mort</text>
+          </svg>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Un même pôle, trois drapeaux possibles : A s'arrête au 38.2% (pôle dominant, cassure violente probable) · B respire jusqu'au 50% (classique) · C plonge au Golden Pocket (les fonds rechargent à escompte — valide si les rejets tiennent). Plus bas que 65% : les desks sortent, tu laisses passer.</div>
         </div>
 
         <div style={{marginBottom:12, padding:"10px 12px", background:"#160a2e", borderRadius:6, border:"1px solid #c084fc44"}}>
