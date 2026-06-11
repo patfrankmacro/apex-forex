@@ -30,6 +30,15 @@ function DtAnalyzer(){
       }
       if (order.length<8){ setRes({error:"Classement incomplet ("+order.length+"/8 devises lues) — recolle la section Currency Strength en entier."}); return; }
       const rank={}; order.forEach((c,i)=>rank[c]=i+1);
+      // Volatility Meter par devise (pour le gold uniquement)
+      let vstart=-1, vend=lines.length;
+      for (let i=0;i<lines.length;i++){
+        if (lines[i].includes("Currency Volatility Meter")) vstart=i;
+        else if (vstart>=0 && (lines[i].includes("Most Volatile")||lines[i].includes("As of"))){ vend=i; break; }
+      }
+      const vorder=[];
+      if (vstart>=0) for (let i=vstart;i<vend;i++){ const t=lines[i]; if (CURS.includes(t) && !vorder.includes(t)) vorder.push(t); }
+      const vrankUSD = vorder.indexOf("USD")+1; // 0 si absent
       const out=[];
       DT_PAIRS.forEach(([b,q])=>{
         const gap=Math.abs(rank[b]-rank[q]);
@@ -39,10 +48,13 @@ function DtAnalyzer(){
       out.sort((a,b)=>b.gap-a.gap);
       // XAU/USD : cas special — l'or se trade contre la position du dollar seul
       const ru = rank["USD"];
+      const usdActif = vrankUSD>0 && vrankUSD<=4; // moitie active du Volatility Meter
       let xau = null;
-      if (ru <= 2) xau = {dir:"SHORT", why:"USD #"+ru+" (Top 2 = le dollar est LE moteur du jour) → l'or sous pression"};
-      else if (ru >= 7) xau = {dir:"LONG", why:"USD #"+ru+" (Bottom 2 = le dollar coule) → l'or respire"};
-      setRes({order, out, xau, ru, heure:String(nowET.getHours()).padStart(2,"0")+"h"+String(nowET.getMinutes()).padStart(2,"0")});
+      if (ru <= 2 && usdActif) xau = {dir:"SHORT", why:"USD #"+ru+" au Strength + #"+vrankUSD+" en volatilité : le dollar est tranché ET il travaille → l'or sous pression"};
+      else if (ru >= 7 && usdActif) xau = {dir:"LONG", why:"USD #"+ru+" au Strength + #"+vrankUSD+" en volatilité : le dollar coule avec du volume → l'or respire"};
+      let xauNote = null;
+      if ((ru<=2||ru>=7) && !usdActif) xauNote = "USD #"+ru+" au Strength mais #"+(vrankUSD||"?")+" en volatilité — tranché mais FIGÉ : l'or va ranger, pas de trade.";
+      setRes({order, out, xau, xauNote, ru, heure:String(nowET.getHours()).padStart(2,"0")+"h"+String(nowET.getMinutes()).padStart(2,"0")});
     } catch(e){ setRes({error:"Erreur: "+e.message}); }
   };
   return (
@@ -65,7 +77,7 @@ function DtAnalyzer(){
           ))}
           <div style={{padding:"7px 9px", marginBottom:4, background:res.xau?(res.xau.dir==="LONG"?"#1a1500":"#200505"):"#0f1622", borderRadius:5, borderLeft:"3px solid "+(res.xau?"#fbbf24":"#334155")}}>
             <div style={{fontSize:9.5, fontWeight:700, color:res.xau?"#fbbf24":"#64748b"}}>
-              {res.xau?"✅":"·"} XAU/USD (OR) {res.xau?(res.xau.dir==="LONG"?"▲ ACHAT possible":"▼ VENTE possible"):"— USD #"+res.ru+" au milieu (3-6), pas de conviction"}
+              {res.xau?"✅":"·"} XAU/USD (OR) {res.xau?(res.xau.dir==="LONG"?"▲ ACHAT possible":"▼ VENTE possible"):(res.xauNote || "— USD #"+res.ru+" au milieu (3-6), pas de conviction")}
             </div>
             {res.xau && <div style={{fontSize:8, color:TEXT_DIM, marginTop:3, lineHeight:1.5}}>{res.xau.why}. Même structure : pôle de Londres sur M15, flag 7h30-8h, cassure 8h-8h45 — et le COMEX ouvre à 8h20, le carburant de l'or. Stop sur le flag, sortie avant 17h.</div>}
           </div>
