@@ -2963,7 +2963,7 @@ function DayTradeView() {
         {(() => {
           const steps = [
             {n:"1", icon:"📰", color:"#38bdf8", t:"6H-8H — QU'ONT FAIT L'ASIE ET LONDRES ?", sub:"News à fort impact de la nuit et du matin + commentaires des banques centrales (session wraps Investing). Tu comprends le POURQUOI derrière ce que les desks font."},
-            {n:"2", icon:"👁️", color:"#38bdf8", t:"10H30 — VÉRIFIE LE PÔLE (H1)", sub:"Un seul flux continu de 3h à maintenant, sans inversion à 8h ? = PÔLE valide, qui confirme la narrative de l'étape 1. Inversé à 8h = pas de trade."},
+            {n:"2", icon:"👁️", color:"#38bdf8", t:"10H30 — VÉRIFIE LE PÔLE (H1)", sub:"Ouvre le graphique H1. Le prix doit bouger dans UNE seule direction depuis 3h du matin jusqu'à maintenant, sans avoir changé de sens à l'ouverture de New York (8h). Si oui : le pôle est valide, il confirme les news de l'étape 1. Si le prix s'est inversé à 8h : pas de trade aujourd'hui."},
             {n:"3", icon:"🥛", color:"#fbbf24", t:"10H30-11H00 — OUVRE MARKETMILK", sub:"Colle tes données, lance l'analyse. Quelle devise est FORTE ? Laquelle est FAIBLE ? (avant le Fix de 11h)"},
             {n:"4", icon:"🔍", color:"#a78bfa", t:"LE SIGNAL : ① + ②", sub:"① Divergence ≥4 rangs · ② Top 5 Gainers (achat) ou Losers (vente). 2/2 = SIGNAL."},
             {n:"5", icon:"🎯", color:"#34d399", t:"SIGNAL ? LIS SES BONUS", sub:"VERTE = achat ▲ · ROUGE = vente ▼. Retail/Fonds/Énergie = la qualité : 0 bonus BRUT · 1-2 CONFIRMÉ · 3 PARFAIT. Tu identifies — tu n'entres pas encore."},
