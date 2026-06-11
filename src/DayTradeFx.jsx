@@ -156,6 +156,20 @@ export default function DayTradeFxView(){
         <div style={{fontSize:8, color:"#fbbf24", marginTop:8, padding:"7px 9px", background:"#1a1500", borderRadius:5, lineHeight:1.5}}>Pas de pôle propre, pas de ≥3 rangs, ou news à 8h30 ? = Pas de trade aujourd'hui. Une entrée par jour MAXIMUM — la deuxième tentative est toujours la mauvaise.</div>
       </div>
 
+      <div style={{padding:"12px 14px", background:"#0a1220", borderRadius:8, border:"1px solid #7dd3fc55", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#7dd3fc", fontWeight:700, marginBottom:8}}>{"🎬 TON MATIN, MINUTE PAR MINUTE — COMMENT TOUT S'EMBOÎTE"}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.7, marginBottom:8}}>{"Pendant que tu dors, les desks de Londres ouvrent à 3h et tendent leur piège : fausse cassure du range asiatique pour déclencher les stops du retail. Puis de 4h à 7h30, ils chargent leur vraie position par tranches — c'est le PÔLE que tu verras sur ton M15. Ils ne devinent pas : ils exécutent des milliards d'ordres clients et une conviction macro. Ta mission n'est pas de les battre — c'est de monter dans leur train au bon moment."}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.7, marginBottom:8}}><b style={{color:"#7dd3fc"}}>{"6h-7h30 — Tu lis le POURQUOI."}</b>{" Session wraps, news de la nuit, commentaires des banques centrales. Tu cherches l'histoire qui anime les desks : pourquoi vendent-ils le JPY ? Pourquoi le GBP coule ? Sans le pourquoi, le pôle n'est qu'une ligne."}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.7, marginBottom:8}}><b style={{color:"#fbbf24"}}>{"7h30-7h45 — Tu vérifies le terrain : ① pôle + flag."}</b>{" Ton M15 montre-t-il un flux continu depuis 3h-4h (leur conviction) qui ralentit en drift léger depuis 7h30 (leur pause avant NY) ? C'est la structure. Pas de pôle propre = ils hésitent = tu t'abstiens."}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.7, marginBottom:8}}><b style={{color:"#fbbf24"}}>{"7h45 — Tu choisis le sentiment : ③."}</b>{" Un regard sur le Risk Meter : l'argent mondial cherche-t-il du rendement (RISK-ON) ou la sécurité (RISK-OFF) ? Un clic sur le bouton, c'est mémorisé pour la journée. C'est le courant de fond — les desks de Londres nagent DEDANS, jamais contre."}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.7, marginBottom:8}}><b style={{color:"#fbbf24"}}>{"7h45-8h45 — Tu colles MarketMilk et tu scannes : ②."}</b>{" Le Currency Strength agrège ce que les desks ont FAIT depuis 3h : quelle devise reçoit le capital, laquelle le perd. Le scanner croise tout : une paire à ≥3 rangs DONT la direction va avec le sentiment = ✅ avec l'explication complète de la convergence. Une paire à 3 rangs CONTRE le courant = ⛔ avec la raison. L'or se juge sur ses deux moteurs : le dollar (USD #1-2 ou #7-8) ET la peur — convergents ou pas de trade."}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.7, marginBottom:8}}><b style={{color:"#4ade80"}}>{"8h-8h45 — NY juge, tu entres."}</b>{" La liquidité mondiale double à 8h. Si NY pousse dans le sens de Londres, ton flag casse avec du volume — entrée à la clôture M15 hors du flag. Stop sur le flag, target = hauteur du pôle. Tu n'as rien deviné : tu as lu leur narrative (news), vérifié leur travail (pôle), confirmé leur allocation (Strength), vérifié le courant (sentiment), et attendu que NY valide. Cinq lectures, une entrée."}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.7, padding:"8px 10px", background:"#0d1828", borderRadius:5}}>{"⚡ En une phrase : les desks construisent (3h-7h30), tu lis leur trace sous trois angles (narrative + pôle + Strength), le sentiment te dit si le courant mondial les porte, et NY appuie sur le bouton à ta place. Si UN seul maillon manque — pas de pôle, pas de 3 rangs, sentiment contraire, news à 8h30 — la chaîne est cassée et tu passes ton tour. La discipline du non-trade EST le système."}</div>
+      </div>
+
+      <div style={{display:"none"}}><div></div>
+      </div>
+
       <DtAnalyzer />
 
       <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
@@ -235,36 +249,20 @@ export default function DayTradeFxView(){
         <div style={{fontSize:7.5, fontFamily:"monospace", lineHeight:1.9}}>
           <div style={{display:"flex", borderBottom:"1px solid #334155", paddingBottom:3, marginBottom:3, fontWeight:700, color:"#94a3b8"}}><span style={{flex:1.2}}>PAIRE</span><span style={{flex:1, color:"#4ade80"}}>🟢 RISK-ON</span><span style={{flex:1, color:"#f87171"}}>🔴 RISK-OFF</span></div>
           {[
-            ["GBP/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)"],
-            ["EUR/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)"],
-            ["CHF/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)"],
-            ["EUR/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)"],
-            ["GBP/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)"],
-            ["EUR/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)"],
-            ["GBP/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)"],
+            ["GBP/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)","achat","vente"],
+            ["EUR/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)","achat","vente"],
+            ["CHF/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)","achat","vente"],
+            ["EUR/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)","vente","achat"],
+            ["GBP/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)","vente","achat"],
+            ["EUR/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)","vente","achat"],
+            ["GBP/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)","vente","achat"],
           ].map((r,i)=>(
-            <div key={i} style={{display:"flex", borderBottom:"1px solid #1e293b"}}><span style={{flex:1.2, color:"#e2e8f0", fontWeight:700}}>{r[0]}</span><span style={{flex:1, color:"#4ade80"}}>{r[1]}</span><span style={{flex:1, color:"#f87171"}}>{r[2]}</span></div>
+            <div key={i} style={{display:"flex", borderBottom:"1px solid #1e293b"}}><span style={{flex:1.2, color:"#e2e8f0", fontWeight:700}}>{r[0]}</span><span style={{flex:1, color:r[3]==="achat"?"#4ade80":"#f87171"}}>{r[1]}</span><span style={{flex:1, color:r[4]==="achat"?"#4ade80":"#f87171"}}>{r[2]}</span></div>
           ))}
-          <div style={{display:"flex", borderBottom:"1px solid #1e293b", background:"#1a150033"}}><span style={{flex:1.2, color:"#fbbf24", fontWeight:700}}>XAU/USD 🥇</span><span style={{flex:1, color:"#4ade80"}}>{"▼ VENTE si USD #1-2"}</span><span style={{flex:1, color:"#f87171"}}>{"▲ ACHAT si USD #7-8"}</span></div>
+          <div style={{display:"flex", borderBottom:"1px solid #1e293b", background:"#1a150033"}}><span style={{flex:1.2, color:"#fbbf24", fontWeight:700}}>XAU/USD 🥇</span><span style={{flex:1, color:"#f87171"}}>{"▼ VENTE si USD #1-2"}</span><span style={{flex:1, color:"#4ade80"}}>{"▲ ACHAT si USD #7-8"}</span></div>
         </div>
         <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:5, lineHeight:1.5}}>{"Lecture : la direction affichée est la SEULE validable sous ce sentiment. L'autre direction = ⛔ bloquée même à 3+ rangs. L'or exige en plus sa condition dollar — sentiment seul ne suffit jamais pour XAU. NEUTRE = rien n'est validable, paires comme or."}</div>
-        <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginTop:10, marginBottom:5}}>{"📋 PAIRE PAR PAIRE — CE QUE CHAQUE SENTIMENT VALIDE"}</div>
-        <div style={{fontSize:7.5, fontFamily:"monospace", lineHeight:1.9}}>
-          <div style={{display:"flex", borderBottom:"1px solid #334155", paddingBottom:3, marginBottom:3, fontWeight:700, color:"#94a3b8"}}><span style={{flex:1.2}}>PAIRE</span><span style={{flex:1, color:"#4ade80"}}>🟢 RISK-ON</span><span style={{flex:1, color:"#f87171"}}>🔴 RISK-OFF</span></div>
-          {[
-            ["GBP/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)"],
-            ["EUR/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)"],
-            ["CHF/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)"],
-            ["EUR/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)"],
-            ["GBP/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)"],
-            ["EUR/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)"],
-            ["GBP/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)"],
-          ].map((r,i)=>(
-            <div key={i} style={{display:"flex", borderBottom:"1px solid #1e293b"}}><span style={{flex:1.2, color:"#e2e8f0", fontWeight:700}}>{r[0]}</span><span style={{flex:1, color:"#4ade80"}}>{r[1]}</span><span style={{flex:1, color:"#f87171"}}>{r[2]}</span></div>
-          ))}
-          <div style={{display:"flex", borderBottom:"1px solid #1e293b", background:"#1a150033"}}><span style={{flex:1.2, color:"#fbbf24", fontWeight:700}}>XAU/USD 🥇</span><span style={{flex:1, color:"#4ade80"}}>{"▼ VENTE si USD #1-2"}</span><span style={{flex:1, color:"#f87171"}}>{"▲ ACHAT si USD #7-8"}</span></div>
-        </div>
-        <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:5, lineHeight:1.5}}>{"Lecture : la direction affichée est la SEULE validable sous ce sentiment. L'autre direction = ⛔ bloquée même à 3+ rangs. L'or exige en plus sa condition dollar — sentiment seul ne suffit jamais pour XAU. NEUTRE = rien n'est validable, paires comme or."}</div>
+        
         <a href="https://www.babypips.com/tools/risk-on-risk-off-meter" target="_blank" rel="noopener noreferrer" style={{display:"block", marginTop:8, fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700}}>{"🌡️ Ouvrir le Risk-On/Risk-Off Meter ↗"}</a>
       </div>
 
