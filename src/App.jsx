@@ -2929,12 +2929,12 @@ function DayTradeView() {
         {(() => {
           const steps = [
             {n:"1", icon:"📰", color:"#38bdf8", t:"6H-8H — PRÉPARATION : QU'ONT FAIT L'ASIE ET LONDRES ?", sub:"Tu regardes en ARRIÈRE : ① les news à fort impact qui ONT EU LIEU cette nuit (Asie) et ce matin (Londres) — qu'est-ce qui a bougé, et pourquoi ? ② les commentaires des banques centrales déjà prononcés (BoJ, RBA, RBNZ, BoE, BCE, SNB) dans les session wraps Investing. Objectif : comprendre le POURQUOI derrière ce que les desks font depuis 3h — le pôle de 10h30 aura une explication."},
-            {n:"2", icon:"👁️", color:"#38bdf8", t:"VÉRIFIE LE PÔLE (H1)", sub:"De 3h jusqu\'à MAINTENANT (10h30) : un seul flux continu, sans inversion à l\'ouverture de NY (8h) ? = PÔLE valide. Le prix s\'est inversé à 8h = pas de pôle, pas de trade."},
-            {n:"3", icon:"🥛", color:"#fbbf24", t:"OUVRE MARKETMILK", sub:"🎯 10h30-10h45 ET (tolérance 10h55) — Colle tes données. Quelle devise est FORTE ? Laquelle est FAIBLE ? (avant le Fix de 11h)"},
-            {n:"4", icon:"🔍", color:"#a78bfa", t:"VÉRIFIE LES 5 FILTRES", sub:"① Divergence ≥4r · ② Retail ≥70% · ③ Leveraged Funds · ④ Top 5 Gainers/Losers · ⑤ Top 5 Most Volatile (jamais Least)"},
-            {n:"5", icon:"🎯", color:"#4ade80", t:"5/5 ? DIRECTION CONFIRMÉE", sub:"Les 5 cochés = vrai flux institutionnel. Carte VERTE = achat ▲ · Carte ROUGE = vente ▼"},
-            {n:"6", icon:"⏳", color:"#f59e0b", t:"ATTENDS LE DRAPEAU", sub:"Après-midi NY (11h30-17h) : le prix consolide en drift léger contre-tendance, SANS s'effondrer. C'est le drapeau qui se dessine."},
-            {n:"7", icon:"🚀", color:"#34d399", t:"ENTRE À LA CASSURE", sub:"Cassure du drapeau dans le sens du pôle (fin NY ou Tokyo 19h). ⚠️ News majeure à moins de 2h (vue le matin à l'étape 1) ? Laisse-la passer d'abord. Stop sous le drapeau. Target = hauteur du pôle. Garde 1-3 jours."},
+            {n:"2", icon:"👁️", color:"#38bdf8", t:"10H30 — VÉRIFIE LE PÔLE (H1)", sub:"De 3h jusqu\'à MAINTENANT (10h30) : un seul flux continu, sans inversion à l\'ouverture de NY (8h) ? = PÔLE valide. Le prix s\'est inversé à 8h = pas de pôle, pas de trade."},
+            {n:"3", icon:"🥛", color:"#fbbf24", t:"10H30-10H45 — OUVRE MARKETMILK", sub:"🎯 10h30-10h45 ET (tolérance 10h55) — Colle tes données. Quelle devise est FORTE ? Laquelle est FAIBLE ? (avant le Fix de 11h)"},
+            {n:"4", icon:"🔍", color:"#a78bfa", t:"10H30-10H45 — VÉRIFIE LES 5 FILTRES", sub:"① Divergence ≥4r · ② Retail ≥70% · ③ Leveraged Funds · ④ Top 5 Gainers/Losers · ⑤ Top 5 Most Volatile (jamais Least)"},
+            {n:"5", icon:"🎯", color:"#4ade80", t:"10H45 — 5/5 ? DIRECTION CONFIRMÉE", sub:"Les 5 cochés = vrai flux institutionnel. Carte VERTE = achat ▲ · Carte ROUGE = vente ▼"},
+            {n:"6", icon:"⏳", color:"#f59e0b", t:"11H30-17H — ATTENDS LE DRAPEAU", sub:"Après-midi NY (11h30-17h) : le prix consolide en drift léger contre-tendance, SANS s'effondrer. C'est le drapeau qui se dessine."},
+            {n:"7", icon:"🚀", color:"#34d399", t:"FIN NY-TOKYO 19H — ENTRE À LA CASSURE", sub:"Cassure du drapeau dans le sens du pôle (fin NY ou Tokyo 19h). ⚠️ AVANT d'entrer : ouvre le calendrier (Investing) — news majeure sur tes devises à moins de 2h (BoJ, RBA, RBNZ = heures de Tokyo) ? Laisse-la passer d'abord. Stop sous le drapeau. Target = hauteur du pôle. Garde 1-3 jours."},
           ];
           return steps.map((s,i)=>(
             <div key={s.n} style={{display:"flex", gap:11, alignItems:"flex-start", position:"relative", paddingBottom: i<steps.length-1?9:4}}>
