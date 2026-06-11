@@ -3173,7 +3173,7 @@ function DayTradeView() {
 
         <div style={{display:"flex", flexDirection:"column", gap:8, marginBottom:14}}>
           <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#38bdf8", fontWeight:700, fontSize:12, minWidth:20}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#38bdf8"}}>10h30 — Le PÔLE est confirmé</b> : tes 5 filtres passent ET ton H1 montre UN SEUL mouvement continu de 3h jusqu'à maintenant (10h30) — Londres lance avant 8h, et le mouvement CONTINUE après l'ouverture de NY. Nuance clé : NY ne trade pas tes paires (pas de dollar dedans) — mais son ouverture double la liquidité mondiale. Si le mouvement de Londres survit à ce test sans s'inverser, c'est que personne de gros ne s'y oppose. Tu identifies, tu n'entres pas encore.</span></div>
-          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#c084fc", fontWeight:700, fontSize:12, minWidth:20}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>L'après-midi NY (11h30-17h) — le DRAPEAU</b> : Londres fermée, le marché se calme. Le prix consolide en drift léger contre la tendance, SANS s'effondrer — il reste haut (achat) ou bas (vente). Les fonds gardent leurs positions : c'est leur pause, pas leur sortie.</span></div>
+          <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#c084fc", fontWeight:700, fontSize:12, minWidth:20}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>L'après-midi NY (11h30-17h) — le DRAPEAU, mesuré au Fibonacci</b> : Londres fermée, le marché se calme. Trace le Fibonacci sur le pôle (du creux au sommet). La profondeur du drift te dit qui contrôle : <b style={{color:"#4ade80"}}>38.2%</b> = les fonds ne lâchent presque rien, pôle très fort · <b style={{color:"#fbbf24"}}>50%</b> = respiration normale, drapeau classique · <b style={{color:"#c084fc"}}>61.8-65% (Golden Pocket)</b> = pullback profond, la zone d'escompte où les fonds RECHARGENT — encore valide, attends les rejets. <b style={{color:"#f87171"}}>Sous le 65%</b> = ce n'était pas un drapeau, c'était une sortie : setup mort.</span></div>
           <div style={{display:"flex", gap:8, alignItems:"flex-start"}}><span style={{color:"#fbbf24", fontWeight:700, fontSize:12, minWidth:20}}>③</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>La CASSURE — ton entrée</b> : fin NY ou ouverture Tokyo (19h ET), le prix casse le drapeau dans le sens du pôle. Tu entres à la cassure confirmée (bougie qui clôture hors du drapeau). Stop sous/sur le drapeau · Target = hauteur du pôle projetée.</span></div>
         </div>
 
@@ -3187,6 +3187,13 @@ function DayTradeView() {
             <polyline points="45,140 65,118 85,95 105,70 125,48 140,38" fill="none" stroke="#4ade80" strokeWidth="2.5"/>
             <text x="55" y="85" fill="#4ade80" fontSize="8" fontFamily="monospace" fontWeight="700">LE PÔLE</text>
             <text x="55" y="95" fill="#86efac" fontSize="6" fontFamily="monospace">2 sessions, 1 direction</text>
+            <line x1="140" y1="77" x2="300" y2="77" stroke="#4ade80" strokeWidth="0.7" strokeDasharray="2,3"/>
+            <text x="272" y="75" fill="#4ade80" fontSize="5.5" fontFamily="monospace">38.2%</text>
+            <line x1="140" y1="89" x2="300" y2="89" stroke="#fbbf24" strokeWidth="0.7" strokeDasharray="2,3"/>
+            <text x="272" y="87" fill="#fbbf24" fontSize="5.5" fontFamily="monospace">50%</text>
+            <rect x="140" y="99" width="160" height="7" fill="#a855f722"/>
+            <line x1="140" y1="101" x2="300" y2="101" stroke="#c084fc" strokeWidth="0.7" strokeDasharray="2,3"/>
+            <text x="248" y="112" fill="#c084fc" fontSize="5.5" fontFamily="monospace">61.8-65% G.POCKET</text>
             <polyline points="140,38 152,46 164,42 176,52 188,48 200,56 212,53" fill="none" stroke="#fbbf24" strokeWidth="2"/>
             <line x1="138" y1="34" x2="214" y2="48" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
             <line x1="142" y1="52" x2="216" y2="64" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
@@ -3215,6 +3222,13 @@ function DayTradeView() {
             <polyline points="45,20 65,42 85,65 105,90 125,112 140,122" fill="none" stroke="#f87171" strokeWidth="2.5"/>
             <text x="55" y="100" fill="#f87171" fontSize="8" fontFamily="monospace" fontWeight="700">LE PÔLE</text>
             <text x="55" y="110" fill="#fca5a5" fontSize="6" fontFamily="monospace">2 sessions, 1 direction</text>
+            <line x1="140" y1="83" x2="300" y2="83" stroke="#4ade80" strokeWidth="0.7" strokeDasharray="2,3"/>
+            <text x="272" y="81" fill="#4ade80" fontSize="5.5" fontFamily="monospace">38.2%</text>
+            <line x1="140" y1="71" x2="300" y2="71" stroke="#fbbf24" strokeWidth="0.7" strokeDasharray="2,3"/>
+            <text x="272" y="69" fill="#fbbf24" fontSize="5.5" fontFamily="monospace">50%</text>
+            <rect x="140" y="55" width="160" height="7" fill="#a855f722"/>
+            <line x1="140" y1="59" x2="300" y2="59" stroke="#c084fc" strokeWidth="0.7" strokeDasharray="2,3"/>
+            <text x="248" y="53" fill="#c084fc" fontSize="5.5" fontFamily="monospace">61.8-65% G.POCKET</text>
             <polyline points="140,122 152,114 164,118 176,108 188,112 200,104 212,107" fill="none" stroke="#fbbf24" strokeWidth="2"/>
             <line x1="138" y1="126" x2="214" y2="112" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
             <line x1="142" y1="108" x2="216" y2="96" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
@@ -3231,6 +3245,18 @@ function DayTradeView() {
             <text x="226" y="12" fill="#f87171" fontSize="7" fontFamily="monospace">◀ Tokyo 19h</text>
           </svg>
           <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>① Pôle : Londres vend de 3h à 11h — le mouvement CONTINUE après l'ouverture de NY à 8h (le test de liquidité est passé) → ② Drapeau : après-midi NY, drift léger, le prix reste bas → ③ Cassure vers le bas (fin NY/Tokyo) = ENTRÉE → stop au-dessus du drapeau, target = hauteur du pôle projetée</div>
+        </div>
+
+        <div style={{marginBottom:12, padding:"10px 12px", background:"#160a2e", borderRadius:6, border:"1px solid #c084fc44"}}>
+          <div style={{fontSize:10, color:"#c084fc", fontWeight:700, marginBottom:6}}>📏 LA PROFONDEUR DU DRAPEAU — la logique institutionnelle du Fibonacci</div>
+          <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>
+            Le Flag te donne la <b style={{color:"#fbbf24"}}>STRUCTURE</b> (pôle → drapeau → cassure). Le Fibonacci te donne la <b style={{color:"#c084fc"}}>PROFONDEUR</b> — il mesure qui contrôle pendant la pause. Trace-le sur le pôle entier (du creux au sommet du mouvement de Londres) et regarde jusqu\u0027où le drift descend :<br/><br/>
+            <b style={{color:"#4ade80"}}>38.2% — les fonds ne lâchent RIEN.</b> Le prix respire à peine : les desks gardent tout, les acheteurs absorbent chaque petit repli avant même qu\u0027il se creuse. C\u0027est le drapeau le plus fort — la cassure part souvent vite et loin.<br/><br/>
+            <b style={{color:"#fbbf24"}}>50% — l\u0027équilibre, le drapeau classique.</b> La moitié du pôle rendue : les profits courts sont pris, mais personne n\u0027attaque la position de Londres. Respiration saine, structure intacte.<br/><br/>
+            <b style={{color:"#c084fc"}}>61.8-65% — le Golden Pocket, la zone de RECHARGEMENT.</b> Les fonds n\u0027achètent jamais le sommet : quand ils veulent grossir leur position, ils laissent le prix revenir là où la foule doute — l\u0027escompte. Des rejets répétés dans cette zone = ils rechargent. Le drapeau est profond mais encore valide : attends que les rejets tiennent, la cassure reste ton entrée.<br/><br/>
+            <b style={{color:"#f87171"}}>Sous le 65% — ce n\u0027était pas un drapeau.</b> Quand le prix rend plus des deux tiers du pôle, les desks ne consolident pas : ils SORTENT. La structure est morte — tu laisses passer, sans regret.<br/><br/>
+            <span style={{color:"#a5b4fc"}}>👉 Plus le drapeau est haut perché (38.2%), plus le pôle est dominant. Plus il descend vers le Pocket, plus la cassure devra prouver. Sous le Pocket, il n\u0027y a plus rien à prouver — c\u0027est non.</span>
+          </div>
         </div>
 
         <div style={{padding:"10px 12px", background:"#1a1500", borderRadius:4, border:"1px solid #fbbf2444", fontSize:9, color:TEXT, lineHeight:1.7}}>
