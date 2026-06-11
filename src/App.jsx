@@ -3178,6 +3178,12 @@ function DayTradeView() {
           <b style={{color:"#fbbf24"}}>La divergence (≥4 rangs) = la signature d'un vrai déséquilibre.</b> EUR #1 vs JPY #8 n'est pas du bruit : les desks achètent l'EUR ET vendent le JPY en même temps. Deux devises voisines (rang 3 et 4) = pas de conviction. Une divergence large = les gros ont tranché des deux côtés. C'est l'image temps réel de leur allocation.</div>
         </div>
 
+        <div style={{marginBottom:10, padding:"10px 11px", background:"#0a1420", borderRadius:6, borderLeft:"3px solid #f59e0b"}}>
+          <div style={{fontSize:10, color:"#f59e0b", fontWeight:700, marginBottom:4}}>② MOUVEMENT RÉEL (Top Gainers/Losers) — la preuve que les gros ont bougé AUJOURD'HUI</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Une paire majeure ne bouge pas de 0,3-0,4 % dans la journée à cause du retail. <b style={{color:"#f59e0b"}}>Un vrai mouvement de prix = du volume institutionnel.</b> Le Top Gainers/Losers te montre où ce volume s'est déversé aujourd'hui : c'est la preuve que le mouvement n'est pas théorique, il se passe vraiment.<br/><br/>
+          On exige que ta paire soit dans le <b style={{color:"#f59e0b"}}>Top 5</b> du bon côté (Top Gainers si tu achètes, Top Losers si tu vends). Signal encore plus fort : ta devise faible perd sur <b>plusieurs paires</b> à la fois (ex : l'AUD sur 4 paires) = faiblesse généralisée, pas un coup isolé.<br/><br/>
+          <b style={{color:"#f59e0b"}}>Attention :</b> cette condition confirme le PÔLE à l'analyse (10h30-11h00), elle ne dit pas d'entrer maintenant. Tu attends le drapeau de l'après-midi, puis la cassure dans le sens du pôle — tu n'achètes jamais le pôle en route.</div>
+        </div>
         <div style={{marginBottom:10, padding:"10px 11px", background:"#0a1420", borderRadius:6, borderLeft:"3px solid #34d399"}}>
           <div style={{fontSize:10, color:"#34d399", fontWeight:700, marginBottom:4}}>BONUS RETAIL CONTRARIEN — pourquoi faire l'INVERSE de la foule</div>
           <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Tu ne fais pas l'inverse du retail par mépris — tu le fais parce que <b style={{color:"#34d399"}}>les banques ont besoin du retail pour exécuter leurs trades</b>.<br/><br/>
@@ -3192,12 +3198,6 @@ function DayTradeView() {
           C'est cohérent avec toute ta stratégie : tu suis le mouvement frais, pas les vieilles positions. Le COT te donne le flux institutionnel récent en chiffres durs.</div>
         </div>
 
-        <div style={{marginBottom:10, padding:"10px 11px", background:"#0a1420", borderRadius:6, borderLeft:"3px solid #f59e0b"}}>
-          <div style={{fontSize:10, color:"#f59e0b", fontWeight:700, marginBottom:4}}>② MOUVEMENT RÉEL (Top Gainers/Losers) — la preuve que les gros ont bougé AUJOURD'HUI</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Une paire majeure ne bouge pas de 0,3-0,4 % dans la journée à cause du retail. <b style={{color:"#f59e0b"}}>Un vrai mouvement de prix = du volume institutionnel.</b> Le Top Gainers/Losers te montre où ce volume s'est déversé aujourd'hui : c'est la preuve que le mouvement n'est pas théorique, il se passe vraiment.<br/><br/>
-          On exige que ta paire soit dans le <b style={{color:"#f59e0b"}}>Top 5</b> du bon côté (Top Gainers si tu achètes, Top Losers si tu vends). Signal encore plus fort : ta devise faible perd sur <b>plusieurs paires</b> à la fois (ex : l'AUD sur 4 paires) = faiblesse généralisée, pas un coup isolé.<br/><br/>
-          <b style={{color:"#f59e0b"}}>Attention :</b> cette condition confirme le PÔLE à l'analyse (10h30-11h00), elle ne dit pas d'entrer maintenant. Tu attends le drapeau de l'après-midi, puis la cassure dans le sens du pôle — tu n'achètes jamais le pôle en route.</div>
-        </div>
         <div style={{marginBottom:12, padding:"10px 12px", background:"#1a1500", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
           <div style={{fontSize:10, color:"#fbbf24", fontWeight:700, marginBottom:4}}>BONUS ÉNERGIE (Most Volatile) — la force derrière le mouvement</div>
           <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>Le ② prouve que ta paire a une DIRECTION aujourd'hui. Ce bonus prouve qu'elle a de l'ÉNERGIE : il s'allume quand elle est dans le Top 5 Most Volatile — les paires où le prix se bat vraiment, avec du volume. Méfiance dans le Least Volatile : une paire endormie (range de 0,2%) ne peut pas construire un pôle digne d'un flag.<br/><br/>Direction (②) + énergie (bonus) = un pôle impulsif. C'est la différence entre une paire qui dérive mollement vers le haut et une paire que les institutions poussent avec conviction. Le flag a besoin de la deuxième : sans énergie dans le pôle, la cassure du drapeau n'a pas de carburant.</div>

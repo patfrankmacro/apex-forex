@@ -7,6 +7,18 @@ const CURS = ["USD","EUR","GBP","JPY","CHF","AUD","NZD","CAD"];
 function DtAnalyzer(){
   const [raw, setRaw] = useState("");
   const [res, setRes] = useState(null);
+  const [riskMode, setRiskMode] = useState(() => {
+    try { const s = JSON.parse(localStorage.getItem("apexRisk")||"null"); if (s && s.d === new Date().toDateString()) return s.m; } catch(e){}
+    return null;
+  });
+  const setRisk = (m) => { setRiskMode(m); try { localStorage.setItem("apexRisk", JSON.stringify({m, d:new Date().toDateString()})); } catch(e){} };
+  // Filtre 3 : alignement sentiment. Croisements JPY/CHF (quote JPY) : achat=RISK-ON, vente=RISK-OFF. Croisements AUD/NZD : achat=RISK-OFF, vente=RISK-ON.
+  const riskAligned = (quote, dir) => {
+    if (!riskMode || riskMode === "NEUTRE") return false;
+    const quoteRefuge = (quote === "JPY"); // nos 7 paires : quote = JPY ou AUD/NZD
+    if (quoteRefuge) return dir === "LONG" ? riskMode === "RISK-ON" : riskMode === "RISK-OFF";
+    return dir === "LONG" ? riskMode === "RISK-OFF" : riskMode === "RISK-ON";
+  };
   const analyze = () => {
     try {
       const nowET = new Date(new Date().toLocaleString("en-US",{timeZone:"America/New_York"}));
@@ -43,21 +55,38 @@ function DtAnalyzer(){
       DT_PAIRS.forEach(([b,q])=>{
         const gap=Math.abs(rank[b]-rank[q]);
         const dir = rank[b]<rank[q] ? "LONG" : "SHORT";
-        out.push({pair:b+"/"+q, base:b, quote:q, rb:rank[b], rq:rank[q], gap, dir, ok:gap>=3});
+        const aligned = riskAligned(q, dir);
+        out.push({pair:b+"/"+q, base:b, quote:q, rb:rank[b], rq:rank[q], gap, dir, ok:(gap>=3 && aligned), gapOk:gap>=3, aligned});
       });
       out.sort((a,b)=>b.gap-a.gap);
       // XAU/USD : cas special — l'or se trade contre la position du dollar seul
       const ru = rank["USD"];
       let xau = null;
-      if (ru <= 2) xau = {dir:"SHORT", why:"USD #"+ru+" (Top 2 = le dollar est LE moteur du jour) → l'or sous pression"};
-      else if (ru >= 7) xau = {dir:"LONG", why:"USD #"+ru+" (Bottom 2 = le dollar coule) → l'or respire"};
-      let xauNote = null;
+      let xauConflit = null;
+      if (ru <= 2 && riskMode === "RISK-ON") xau = {dir:"SHORT", why:"USD #"+ru+" + RISK-ON : les deux moteurs poussent l'or vers le bas — convergence"};
+      else if (ru >= 7 && riskMode === "RISK-OFF") xau = {dir:"LONG", why:"USD #"+ru+" + RISK-OFF : dollar faible + fuite vers le refuge — convergence"};
+      else if (ru <= 2 && riskMode === "RISK-OFF") xauConflit = "USD #"+ru+" pousse l'or en BAS mais RISK-OFF le pousse en HAUT — les deux moteurs se battent, jour de mèches, pas de trade or";
+      else if (ru >= 7 && riskMode === "RISK-ON") xauConflit = "USD #"+ru+" pousse l'or en HAUT mais RISK-ON le pousse en BAS — conflit, pas de trade or";
+      if (false && ru <= 2) xau = {dir:"SHORT", why:"USD #"+ru+" (Top 2 = le dollar est LE moteur du jour) → l'or sous pression"};
+      else if (false && ru >= 7) xau = {dir:"LONG", why:"USD #"+ru+" (Bottom 2 = le dollar coule) → l'or respire"};
+      let xauNote = xauConflit;
       setRes({order, out, xau, xauNote, ru, heure:String(nowET.getHours()).padStart(2,"0")+"h"+String(nowET.getMinutes()).padStart(2,"0")});
     } catch(e){ setRes({error:"Erreur: "+e.message}); }
   };
   return (
     <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #38bdf855", marginBottom:14}}>
       <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:8}}>🤖 SCAN 7H45-8H45 — COLLE TON CURRENCY STRENGTH</div>
+      <div style={{marginBottom:8, padding:"8px 10px", background:"#0d1420", borderRadius:6, border:"1px solid #33415555"}}>
+        <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:5}}>{"③ SENTIMENT DU JOUR (obligatoire) — lis le Risk Meter puis choisis :"}</div>
+        <div style={{display:"flex", gap:6}}>
+          {["RISK-ON","NEUTRE","RISK-OFF"].map(m => (
+            <button key={m} onClick={()=>setRisk(m)} style={{flex:1, padding:"7px 4px", borderRadius:5, fontSize:8.5, fontWeight:700, cursor:"pointer", border: riskMode===m ? "2px solid "+(m==="RISK-ON"?"#4ade80":m==="RISK-OFF"?"#f87171":"#94a3b8") : "1px solid #334155", background: riskMode===m ? (m==="RISK-ON"?"#052010":m==="RISK-OFF"?"#200505":"#1a2030") : "#0a0f1a", color: riskMode===m ? (m==="RISK-ON"?"#4ade80":m==="RISK-OFF"?"#f87171":"#94a3b8") : "#64748b"}}>{m==="RISK-ON"?"🟢 RISK-ON":m==="RISK-OFF"?"🔴 RISK-OFF":"⚪ NEUTRE"}</button>
+          ))}
+        </div>
+        <a href="https://www.babypips.com/tools/risk-on-risk-off-meter" target="_blank" rel="noopener noreferrer" style={{display:"block", marginTop:6, fontSize:8.5, color:"#7dd3fc", textDecoration:"none"}}>{"🌡️ Ouvrir le Risk-On/Risk-Off Meter (babypips) ↗"}</a>
+        {!riskMode && <div style={{fontSize:8, color:"#fbbf24", marginTop:4}}>{"⚠ Choisis le sentiment AVANT de scanner — sans lui, aucune paire ne peut être validée."}</div>}
+        {riskMode==="NEUTRE" && <div style={{fontSize:8, color:"#94a3b8", marginTop:4}}>{"NEUTRE = pas de courant de fond : le ③ n'est pas rempli, aucune paire validée aujourd'hui. L'or aussi a besoin d'un sentiment net."}</div>}
+      </div>
       <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle le snapshot MarketMilk (le Currency Strength Meter suffit — c'est le SEUL filtre données du Day Trade FX)..." style={{width:"100%", minHeight:80, background:"#001018", color:TEXT, border:"1px solid #1e3a5f", borderRadius:6, padding:8, fontSize:9, fontFamily:"monospace", resize:"vertical"}}/>
       <button onClick={analyze} style={{marginTop:8, width:"100%", padding:"10px", background:"#38bdf8", color:"#001018", border:"none", borderRadius:6, fontSize:11, fontWeight:700, letterSpacing:1, cursor:"pointer"}}>⚡ SCANNER</button>
       <a href="https://marketmilk.babypips.com/" target="_blank" rel="noopener noreferrer" style={{display:"block", textAlign:"center", marginTop:6, fontSize:8.5, color:"#7dd3fc", textDecoration:"none", fontWeight:700}}>🥛 Ouvrir MarketMilk ↗</a>
@@ -68,7 +97,7 @@ function DtAnalyzer(){
           {res.out.map((p,i)=>(
             <div key={i} style={{padding:"7px 9px", marginBottom:4, background:p.ok?(p.dir==="LONG"?"#052010":"#200505"):"#0f1622", borderRadius:5, borderLeft:"3px solid "+(p.ok?(p.dir==="LONG"?"#4ade80":"#f87171"):"#334155")}}>
               <div style={{fontSize:9.5, fontWeight:700, color:p.ok?(p.dir==="LONG"?"#4ade80":"#f87171"):"#64748b"}}>
-                {p.ok?"✅":"·"} {p.pair} {p.ok?(p.dir==="LONG"?"▲ ACHAT possible":"▼ VENTE possible"):""} — {p.base} #{p.rb} vs {p.quote} #{p.rq} = {p.gap} rang{p.gap>1?"s":""} {p.ok?"(≥3 ✓)":"(<3)"}
+                {p.ok?"✅":"·"} {p.pair} {p.ok?(p.dir==="LONG"?"▲ ACHAT possible":"▼ VENTE possible"):(p.gapOk && !p.aligned ? "⛔ "+p.gap+"r mais sentiment contraire" : "")} — {p.base} #{p.rb} vs {p.quote} #{p.rq} = {p.gap} rang{p.gap>1?"s":""} {p.ok?"(≥3 ✓)":"(<3)"}
               </div>
               {p.ok && <div style={{fontSize:8, color:TEXT_DIM, marginTop:3, lineHeight:1.5}}>Maintenant ton graphique M15 : pôle de Londres continu depuis 3h dans ce sens ? Flag dessiné depuis ~7h30 ? Pas de news US à 8h30 ? Alors attends la cassure du flag — c'est ton entrée.</div>}
             </div>
@@ -100,7 +129,7 @@ export default function DayTradeFxView(){
         {[
           {n:"1", icon:"📰", color:"#38bdf8", t:"6H-7H30 — QU'ONT FAIT L'ASIE ET LONDRES ?", sub:"News à fort impact + commentaires des banques centrales (session wraps Investing). Le POURQUOI derrière le mouvement de Londres."},
           {n:"2", icon:"👁️", color:"#38bdf8", t:"7H30-7H45 — LE PÔLE ET LE FLAG (M15)", sub:"Londres pousse dans UN sens depuis 3h (après le piège du matin) ? Le prix consolide en drift léger depuis ~7h30 ? Pôle + flag = la structure est là."},
-          {n:"3", icon:"🥛", color:"#fbbf24", t:"7H45-8H45 — SCANNE LE CURRENCY STRENGTH", sub:"Colle MarketMilk. Ta paire doit avoir ≥3 rangs d'écart dans le sens du pôle. C'est le SEUL filtre données — à 8h, le reste du snapshot n'est pas mûr."},
+          {n:"3", icon:"🥛", color:"#fbbf24", t:"7H45-8H45 — SCANNE LE CURRENCY STRENGTH", sub:"Colle MarketMilk. Ta paire doit avoir ≥3 rangs d'écart dans le sens du pôle. Avec le sentiment (③), c'est ton filtre données — à 8h, le reste du snapshot n'est pas mûr."},
           {n:"4", icon:"📅", color:"#f59e0b", t:"VÉRIFIE 8H30 (calendrier Investing)", sub:"News US majeure à 8h30 (CPI, NFP, FOMC) ? Tu n'entres PAS avant — tu attends 9h que le spike soit digéré. Pas de news = voie libre."},
           {n:"5", icon:"🚀", color:"#34d399", t:"8H-8H45 — ENTRE À LA CASSURE", sub:"NY ouvre, la liquidité double. Si elle pousse dans le sens de Londres, le flag casse : entre à la cassure confirmée (bougie M15 qui clôture hors du flag). Stop sur le flag · Target = hauteur du pôle."},
           {n:"6", icon:"🏁", color:"#f87171", t:"AVANT 17H — SORS. TOUJOURS.", sub:"Day trade = la journée seulement. Target atteint, stop touché, ou 17h : tu sors. Un day trade qui devient un swing involontaire = une discipline cassée."},
@@ -178,9 +207,26 @@ export default function DayTradeFxView(){
         <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Pourquoi pas de paires CAD ni de majors dollar ? Le CAD est une devise de session NY (pas de pôle de Londres propre), et les majors USD ont leur vraie vie après ta fenêtre. Tes 7 paires + l'or couvrent exactement le terrain où le flag de Londres existe.</div>
       </div>
 
+      <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #fbbf2455", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>{"🌡️ LE RISK METER — FILTRE ③ DU DAY TRADE"}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}>{"Le Risk-On/Risk-Off Meter de babypips mesure l'appétit au risque mondial en temps réel : il agrège actions, obligations, devises refuges et matières premières en un seul cadran. RISK-ON = les investisseurs achètent du rendement (actions, AUD, NZD) et lâchent les refuges (JPY, CHF, or). RISK-OFF = la peur domine, le capital fuit vers les refuges. C'est le COURANT DE FOND sous tes divergences : un JPY fort en Risk-Off est porté par le courant, un JPY fort en Risk-On nage contre lui."}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}>{"Pourquoi c'est OBLIGATOIRE : tes 7 paires opposent toutes une devise de Londres à une devise risquée (AUD, NZD) ou refuge (JPY). Chaque trade que tu prends EST un pari risk-on ou risk-off, que tu le saches ou non. Le filtre ③ s'assure que ton pari va dans le sens du courant mondial — jamais contre."}</div>
+        <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:5}}>{"📊 L'INFLUENCE SUR CE QUE TU TRADES"}</div>
+        <div style={{fontSize:8, color:TEXT, lineHeight:1.7, marginBottom:8}}>
+          <div style={{padding:"6px 8px", background:"#052010", borderRadius:5, marginBottom:4}}><b style={{color:"#4ade80"}}>{"🟢 RISK-ON (appétit)"}</b>{" — AUD/NZD achetées, JPY/CHF vendus : tes croisements JPY (GBP/JPY, EUR/JPY, CHF/JPY) montent → ACHATS validés · tes croisements AUD/NZD (EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD) descendent → VENTES validées · XAU/USD : le refuge dort → la VENTE or converge (si USD #1-2)."}</div>
+          <div style={{padding:"6px 8px", background:"#200505", borderRadius:5, marginBottom:4}}><b style={{color:"#f87171"}}>{"🔴 RISK-OFF (peur)"}</b>{" — fuite vers JPY/CHF, AUD/NZD lâchées : croisements JPY descendent → VENTES validées · croisements AUD/NZD montent → ACHATS validés · XAU/USD : fuite vers le refuge → l'ACHAT or converge (si USD #7-8)."}</div>
+          <div style={{padding:"6px 8px", background:"#1a2030", borderRadius:5}}><b style={{color:"#94a3b8"}}>{"⚪ NEUTRE"}</b>{" — pas de courant de fond : les divergences sont moins fiables, le ③ n'est pas rempli → pas de trade. Les jours neutres sont les jours de range."}</div>
+        </div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, padding:"8px 10px", background:"#1a1500", borderRadius:5}}>{"🥇 L'or et ses DEUX moteurs : le dollar (mécanique — l'or est coté en USD) et la peur (refuge). Quand ils convergent (USD fort + Risk-On = vente · USD faible + Risk-Off = achat), le mouvement est propre. Quand ils se BATTENT (USD fort + Risk-Off, typique des paniques où le cash dollar et l'or refuge montent ensemble), l'or fait des mèches dans les deux sens — le scanner te le dira : CONFLIT, pas de trade. C'est la convergence qui fait le trade, jamais un moteur seul."}</div>
+        <a href="https://www.babypips.com/tools/risk-on-risk-off-meter" target="_blank" rel="noopener noreferrer" style={{display:"block", marginTop:8, fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700}}>{"🌡️ Ouvrir le Risk-On/Risk-Off Meter ↗"}</a>
+      </div>
+
+      <div style={{display:"none"}}>
+      </div>
+
       <div style={{padding:"10px 12px", background:"#160a2e", borderRadius:8, border:"1px solid #c084fc44", marginBottom:14}}>
         <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:4}}>⚔️ DAY TRADE FX vs SWING FX — ne les mélange jamais</div>
-        <div style={{fontSize:8, color:TEXT, lineHeight:1.65}}>Même ADN (pôle → flag → cassure), deux animaux : le <b style={{color:"#38bdf8"}}>Day Trade</b> se scanne à 7h45-8h45 (Currency Strength seul, ≥3r), entre à 8h-8h45 sur M15, et meurt à 17h. Le <b style={{color:"#fbbf24"}}>Swing</b> s'analyse à 10h30-10h55 (5 filtres complets), entre le soir sur H1, et vit 1-3 jours. Un trade pris à 8h se gère en day trade jusqu'au bout — il ne devient JAMAIS un swing parce qu'il perd. Et un signal swing de 10h30 n'autorise aucune entrée anticipée du matin.</div>
+        <div style={{fontSize:8, color:TEXT, lineHeight:1.65}}>Même ADN (pôle → flag → cassure), deux animaux : le <b style={{color:"#38bdf8"}}>Day Trade</b> se scanne à 7h45-8h45 (Currency Strength seul, ≥3r), entre à 8h-8h45 sur M15, et meurt à 17h. Le <b style={{color:"#fbbf24"}}>Swing</b> s'analyse à 10h30-11h00 (signal ① + ② et ses bonus), entre le soir sur H1, et vit 1-3 jours. Un trade pris à 8h se gère en day trade jusqu'au bout — il ne devient JAMAIS un swing parce qu'il perd. Et un signal swing de 10h30 n'autorise aucune entrée anticipée du matin.</div>
       </div>
     </div>
   );
