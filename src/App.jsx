@@ -2791,7 +2791,7 @@ function DayTradeAnalyzer() {
   return (
     <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #fbbf2455", marginBottom:14}}>
       <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>🤖 ANALYSE AUTO — COLLE TES DONNÉES MARKETMILK</div>
-      <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici le contenu copié depuis marketmilk.babypips.com (le Currency Strength Meter suffit pour la divergence)..." style={{width:"100%", minHeight:90, background:"#001018", color:TEXT, border:"1px solid #1e3a5f", borderRadius:6, padding:8, fontSize:9, fontFamily:"monospace", resize:"vertical"}}/>
+      <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici le contenu copié depuis marketmilk.babypips.com (page complète : Currency Strength + Top Gainers/Losers — le signal ① + ② a besoin des deux)..." style={{width:"100%", minHeight:90, background:"#001018", color:TEXT, border:"1px solid #1e3a5f", borderRadius:6, padding:8, fontSize:9, fontFamily:"monospace", resize:"vertical"}}/>
       <button onClick={analyze} style={{marginTop:8, width:"100%", padding:"10px", background:"#fbbf24", color:"#1a1500", border:"none", borderRadius:6, fontSize:11, fontWeight:700, letterSpacing:1, cursor:"pointer"}}>⚡ ANALYSER</button>
 
       {!result && (()=>{
