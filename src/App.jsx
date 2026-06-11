@@ -2711,7 +2711,7 @@ function DayTradeAnalyzer() {
         }
         else if (!dg.fcot) dg.reason = lfMiss ? "Leveraged Funds non disponibles" : (strongCur+" pas plus favorisé que "+weakCur+" par les fonds");
         else if (!dg.f4) dg.reason = topEmpty ? "Top Gainers/Losers absent (colle le snapshot complet)" : (wpair+" pas dans le Top 5 "+(direction==="LONG"?"Gainers":"Losers")+" — mouvement pas confirmé");
-        else if (!dg.fvol) dg.reason = volEmpty ? "Most Volatile absent (colle le snapshot complet)" : (inLeast ? wpair+" dans le Least Volatile — paire endormie, pas de pôle possible" : wpair+" pas dans le Top 5 Most Volatile — pas assez d\u0027énergie pour un pôle");
+        else if (!dg.fvol) dg.reason = volEmpty ? "Most Volatile absent (colle le snapshot complet)" : (inLeast ? wpair+" dans le Least Volatile — paire endormie, pas de pôle possible" : wpair+" pas dans le Top 5 Most Volatile — pas assez d'énergie pour un pôle");
         else dg.reason = "PASSE TOUT";
         dg.status = dg.f1&&dg.f5&&dg.fcot&&dg.f4&&dg.fvol ? "passe" : "bloque";
         diagnostic.push(dg);
@@ -3268,12 +3268,12 @@ function DayTradeView() {
         <div style={{marginBottom:12, padding:"10px 12px", background:"#160a2e", borderRadius:6, border:"1px solid #c084fc44"}}>
           <div style={{fontSize:10, color:"#c084fc", fontWeight:700, marginBottom:6}}>📏 LA PROFONDEUR DU DRAPEAU — la logique institutionnelle du Fibonacci</div>
           <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>
-            Le Flag te donne la <b style={{color:"#fbbf24"}}>STRUCTURE</b> (pôle → drapeau → cassure). Le Fibonacci te donne la <b style={{color:"#c084fc"}}>PROFONDEUR</b> — il mesure qui contrôle pendant la pause. Trace-le sur le pôle entier (du creux au sommet du mouvement de Londres) et regarde jusqu\u0027où le drift descend :<br/><br/>
-            <b style={{color:"#4ade80"}}>38.2% — les fonds ne lâchent RIEN.</b> Le prix respire à peine : les desks gardent tout, les acheteurs absorbent chaque petit repli avant même qu\u0027il se creuse. C\u0027est le drapeau le plus fort — la cassure part souvent vite et loin.<br/><br/>
-            <b style={{color:"#fbbf24"}}>50% — l\u0027équilibre, le drapeau classique.</b> La moitié du pôle rendue : les profits courts sont pris, mais personne n\u0027attaque la position de Londres. Respiration saine, structure intacte.<br/><br/>
-            <b style={{color:"#c084fc"}}>61.8-65% — le Golden Pocket, la zone de RECHARGEMENT.</b> Les fonds n\u0027achètent jamais le sommet : quand ils veulent grossir leur position, ils laissent le prix revenir là où la foule doute — l\u0027escompte. Des rejets répétés dans cette zone = ils rechargent. Le drapeau est profond mais encore valide : attends que les rejets tiennent, la cassure reste ton entrée.<br/><br/>
-            <b style={{color:"#f87171"}}>Sous le 65% — ce n\u0027était pas un drapeau.</b> Quand le prix rend plus des deux tiers du pôle, les desks ne consolident pas : ils SORTENT. La structure est morte — tu laisses passer, sans regret.<br/><br/>
-            <span style={{color:"#a5b4fc"}}>👉 Plus le drapeau est haut perché (38.2%), plus le pôle est dominant. Plus il descend vers le Pocket, plus la cassure devra prouver. Sous le Pocket, il n\u0027y a plus rien à prouver — c\u0027est non.</span>
+            Le Flag te donne la <b style={{color:"#fbbf24"}}>STRUCTURE</b> (pôle → drapeau → cassure). Le Fibonacci te donne la <b style={{color:"#c084fc"}}>PROFONDEUR</b> — il mesure qui contrôle pendant la pause. Trace-le sur le pôle entier (du creux au sommet du mouvement de Londres) et regarde jusqu'où le drift descend :<br/><br/>
+            <b style={{color:"#4ade80"}}>38.2% — les fonds ne lâchent RIEN.</b> Le prix respire à peine : les desks gardent tout, les acheteurs absorbent chaque petit repli avant même qu'il se creuse. C'est le drapeau le plus fort — la cassure part souvent vite et loin.<br/><br/>
+            <b style={{color:"#fbbf24"}}>50% — l'équilibre, le drapeau classique.</b> La moitié du pôle rendue : les profits courts sont pris, mais personne n'attaque la position de Londres. Respiration saine, structure intacte.<br/><br/>
+            <b style={{color:"#c084fc"}}>61.8-65% — le Golden Pocket, la zone de RECHARGEMENT.</b> Les fonds n'achètent jamais le sommet : quand ils veulent grossir leur position, ils laissent le prix revenir là où la foule doute — l'escompte. Des rejets répétés dans cette zone = ils rechargent. Le drapeau est profond mais encore valide : attends que les rejets tiennent, la cassure reste ton entrée.<br/><br/>
+            <b style={{color:"#f87171"}}>Sous le 65% — ce n'était pas un drapeau.</b> Quand le prix rend plus des deux tiers du pôle, les desks ne consolident pas : ils SORTENT. La structure est morte — tu laisses passer, sans regret.<br/><br/>
+            <span style={{color:"#a5b4fc"}}>👉 Plus le drapeau est haut perché (38.2%), plus le pôle est dominant. Plus il descend vers le Pocket, plus la cassure devra prouver. Sous le Pocket, il n'y a plus rien à prouver — c'est non.</span>
           </div>
         </div>
 
