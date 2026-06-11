@@ -3093,6 +3093,7 @@ function DayTradeView() {
             </div>
 
             {/* BLOC CONVERGENCE */}
+              {false && (
             <div style={{ padding:12, background:"#0a0f1e", border:"1px solid #38bdf855", borderRadius:8 }}>
               <div style={{ fontSize:10, color:"#38bdf8", fontWeight:700, letterSpacing:1, marginBottom:6 }}>🎯 PAIRES QUI CONVERGENT</div>
               {converging.length===0 ? (
@@ -3119,7 +3120,7 @@ function DayTradeView() {
                   </div>
                 );
               })}
-            </div>
+            </div>)}
           </div>
         );
       })()}
