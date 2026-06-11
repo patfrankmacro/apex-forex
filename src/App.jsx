@@ -2722,8 +2722,8 @@ function DayTradeAnalyzer() {
         else if (!dg.fcot) dg.reason = lfMiss ? "Leveraged Funds non disponibles" : (strongCur+" pas plus favorisé que "+weakCur+" par les fonds");
         else if (!dg.f4) dg.reason = topEmpty ? "Top Gainers/Losers absent (colle le snapshot complet)" : (wpair+" pas dans le Top 5 "+(direction==="LONG"?"Gainers":"Losers")+" — mouvement pas confirmé");
         else if (!dg.fvol) dg.reason = volEmpty ? "Most Volatile absent (colle le snapshot complet)" : (inLeast ? wpair+" dans le Least Volatile — paire endormie, pas de pôle possible" : wpair+" pas dans le Top 5 Most Volatile — pas assez d'énergie pour un pôle");
-        else dg.reason = "SIGNAL ("+dg.gems+" 💎)";
-        if (dg.f1 && dg.f4) { dg.status = "passe"; dg.reason = "SIGNAL ("+dg.gems+" 💎)"; } else { dg.status = "bloque"; if (dg.f1 && !dg.f4) dg.reason = topEmpty ? "Top Gainers/Losers absent (colle le snapshot complet)" : (wpair+" pas dans le Top 5 "+(direction==="LONG"?"Gainers":"Losers")+" — mouvement pas confirmé"); }
+        else dg.reason = "SIGNAL ("+dg.gems+" bonus)";
+        if (dg.f1 && dg.f4) { dg.status = "passe"; dg.reason = "SIGNAL ("+dg.gems+" bonus)"; } else { dg.status = "bloque"; if (dg.f1 && !dg.f4) dg.reason = topEmpty ? "Top Gainers/Losers absent (colle le snapshot complet)" : (wpair+" pas dans le Top 5 "+(direction==="LONG"?"Gainers":"Losers")+" — mouvement pas confirmé"); }
         diagnostic.push(dg);
         // CANDIDAT REEL si SIGNAL (divergence + Top 5)
         if (!f1ok) return;
@@ -2765,7 +2765,7 @@ function DayTradeAnalyzer() {
         else degrade.push("COT absent — le filtre ③ ne peut pas être évalué");
       } catch(e){}
       if (gainersSet.size===0 && losersSet.size===0) degrade.push("Top Gainers/Losers absent du snapshot — le ② bloque tout, recolle la page MarketMilk complète");
-      if (volSet.size===0) degrade.push("Most Volatile absent du snapshot — le 💎 Énergie ne peut pas être évalué, recolle la page MarketMilk complète");
+      if (volSet.size===0) degrade.push("Most Volatile absent du snapshot — le bonus Énergie ne peut pas être évalué, recolle la page MarketMilk complète");
       const nbRMiss = diagnostic.filter(d=>d.rMiss).length;
       if (nbRMiss>0) degrade.push("Retail Myfxbook indisponible sur "+nbRMiss+" paire"+(nbRMiss>1?"s":"")+" — le ② ne peut pas être évalué dessus");
       // SAUVEGARDE HISTORIQUE (chaque analyse, meme 0 signal)
@@ -2833,7 +2833,7 @@ function DayTradeAnalyzer() {
 
       {result && result.diag7 && result.diag7.length>0 && (
         <div style={{marginTop:10, padding:"10px", background:"#0a1020", borderRadius:6, border:"1px solid #1e3a5f"}}>
-          <div style={{fontSize:9, color:"#7dd3fc", fontWeight:700, marginBottom:6}}>🔍 DIAGNOSTIC — tes 7 paires (signal ①+②, qualité en 💎)</div>
+          <div style={{fontSize:9, color:"#7dd3fc", fontWeight:700, marginBottom:6}}>🔍 DIAGNOSTIC — tes 7 paires (signal ①+②, qualité en bonus)</div>
           {result.diag7.map((d,i)=>{
             const col = d.status==="passe"?"#4ade80":d.status==="bloque"?"#f87171":"#64748b";
             const bg = d.status==="passe"?"#052010":d.status==="bloque"?"#1a0a00":"#0f1622";
@@ -2842,7 +2842,7 @@ function DayTradeAnalyzer() {
             <div key={i} style={{display:"flex", flexDirection:"column", gap:2, padding:"5px 7px", marginBottom:4, background:bg, borderRadius:4, borderLeft:"3px solid "+col, opacity:d.status==="dort"?0.6:1}}>
               <div style={{fontSize:9, color:TEXT, fontWeight:700}}>{pp} {d.direction&&d.status!=="dort"?<span style={{color:d.direction==="LONG"?"#4ade80":"#f87171"}}>{d.direction==="LONG"?"▲ ACHAT":"▼ VENTE"}</span>:""}</div>
               {d.status!=="dort" && (
-                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Divergence {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f4?"✓":"✗"} Top5 | 💎 {d.f5?"✓":"✗"} Retail · 💎 {d.fcot?"✓":"✗"} Fonds · 💎 {d.fvol?"✓":"✗"} Énergie</div>
+                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Divergence {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f4?"✓":"✗"} Top5 | bonus : {d.f5?"✓":"✗"} Retail · {d.fcot?"✓":"✗"} Fonds · {d.fvol?"✓":"✗"} Énergie</div>
               )}
               {d.status!=="dort" && !d.rMiss && d.rLong!=null && (
                 <div style={{marginTop:2}}>
@@ -2855,11 +2855,11 @@ function DayTradeAnalyzer() {
               {d.lfStrongNet!=null && d.lfWeakNet!=null && (
                 <div style={{fontSize:7.5, color:TEXT_DIM, fontFamily:"monospace"}}>💼 LF: {d.strongCur} {d.lfStrongNet>=0?"+":""}{d.lfStrongNet?.toLocaleString()} vs {d.weakCur} {d.lfWeakNet>=0?"+":""}{d.lfWeakNet?.toLocaleString()}</div>
               )}
-              <div style={{fontSize:8, color:col, fontWeight:600}}>{d.status==="passe"?("🎯 SIGNAL — "+((d.f5?1:0)+(d.fcot?1:0)+(d.fvol?1:0))+" 💎"):"✗ bloque : "+d.reason}</div>
+              <div style={{fontSize:8, color:col, fontWeight:600}}>{d.status==="passe"?("🎯 SIGNAL — "+((d.f5?1:0)+(d.fcot?1:0)+(d.fvol?1:0))+" bonus"):"✗ bloque : "+d.reason}</div>
             </div>
             );
           })}
-          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Vert = SIGNAL (① divergence ≥4r + ② Top 5). Les 💎 (Retail, Fonds, Énergie) mesurent la qualité : 0 = BRUT, 1-2 = CONFIRMÉ, 3 = PARFAIT.</div>
+          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Vert = SIGNAL (① divergence ≥4r + ② Top 5). Les bonus (Retail, Fonds, Énergie) mesurent la qualité : 0 = BRUT, 1-2 = CONFIRMÉ, 3 = PARFAIT.</div>
           {result.usdRank!=null && (
             <div style={{marginTop:8, padding:"7px 9px", background: result.usdRank<=2?"#200505":result.usdRank>=7?"#1a1500":"#0f1622", borderRadius:4, borderLeft:"3px solid "+(result.usdRank<=2?"#f87171":result.usdRank>=7?"#fbbf24":"#334155")}}>
               <div style={{fontSize:9, fontWeight:700, color: (result.usdRank<=2||result.usdRank>=7)?"#fbbf24":"#64748b"}}>{result.usdRank<=2 ? "🎯 XAU/USD (OR) ▼ VENTE possible — USD #"+result.usdRank+" (Top 2 : le dollar est LE moteur)" : result.usdRank>=7 ? "🎯 XAU/USD (OR) ▲ ACHAT possible — USD #"+result.usdRank+" (Bottom 2 : le dollar coule)" : "· XAU/USD (OR) — USD #"+result.usdRank+" au milieu (3-6), pas de conviction"}</div>
@@ -2891,7 +2891,7 @@ function DayTradeAnalyzer() {
                 );
               })}
             </div>
-            <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:6, fontStyle:"italic"}}>{hist.length} jour{hist.length>1?"s":""} analysé{hist.length>1?"s":""} · {avecSignal} avec signal · Procès des 💎 : note la qualité des cassures (BRUT vs PARFAIT) au journal. 30 jours conservés, 14 affichés.</div>
+            <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:6, fontStyle:"italic"}}>{hist.length} jour{hist.length>1?"s":""} analysé{hist.length>1?"s":""} · {avecSignal} avec signal · Procès des bonus : note la qualité des cassures (BRUT vs PARFAIT) au journal. 30 jours conservés, 14 affichés.</div>
           </div>
         );
       })()}
@@ -2932,7 +2932,7 @@ function DayTradeAnalyzer() {
             </div>
           );})}
           <div style={{marginTop:6, padding:"6px 8px", background:"#1a1500", borderRadius:4, fontSize:8, color:"#fbbf24", lineHeight:1.5}}>
-            ⚠ APEX INSTITUTIONNEL — chaque paire a le SIGNAL : ① divergence ≥4 rangs + ② Top 5 Gainers/Losers. Les 💎 (Retail, Fonds, Énergie) affichés mesurent la qualité du carburant. Tu suis les big boys de Londres. Vérifie le pôle sur H1 (mouvement continu de 3h à ton analyse, pas d'inversion à 8h), attends le drapeau de l'après-midi, entre à la cassure (fin NY ou Tokyo). Garde en swing 1 à 3 jours.
+            ⚠ APEX INSTITUTIONNEL — chaque paire a le SIGNAL : ① divergence ≥4 rangs + ② Top 5 Gainers/Losers. Les bonus (Retail, Fonds, Énergie) affichés mesurent la qualité du carburant. Tu suis les big boys de Londres. Vérifie le pôle sur H1 (mouvement continu de 3h à ton analyse, pas d'inversion à 8h), attends le drapeau de l'après-midi, entre à la cassure (fin NY ou Tokyo). Garde en swing 1 à 3 jours.
           </div>
         </div>
       )}
@@ -2953,8 +2953,8 @@ function DayTradeView() {
   };
   return (
     <div style={{padding:16, maxWidth:760, margin:"0 auto"}}>
-      <div style={{fontSize:15, color:"#fbbf24", fontWeight:900, letterSpacing:1.5, marginBottom:5}}>⚡ SWING TRADE FX</div><div style={{fontSize:9, color:"#fbbf24aa", fontWeight:700, letterSpacing:2, marginBottom:4}}>APEX INSTITUTIONNEL · SIGNAL ① + ② · BONUS 💎</div>
-      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (1-3 jours) — LE SIGNAL : ① divergence ≥4r + ② Top 5 · LA QUALITÉ : 💎 Retail 💎 Fonds 💎 Énergie · Tu suis les big boys de Londres</div>
+      <div style={{fontSize:15, color:"#fbbf24", fontWeight:900, letterSpacing:1.5, marginBottom:5}}>⚡ SWING TRADE FX</div><div style={{fontSize:9, color:"#fbbf24aa", fontWeight:700, letterSpacing:2, marginBottom:4}}>APEX INSTITUTIONNEL · SIGNAL ① + ② · BONUS QUALITÉ</div>
+      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (1-3 jours) — LE SIGNAL : ① divergence ≥4r + ② Top 5 · LA QUALITÉ : BONUS Retail · Fonds · Énergie · Tu suis les big boys de Londres</div>
 
       {/* SEQUENCE VISUELLE DU JOUR */}
       <div style={{padding:"11px 12px 4px", background:"linear-gradient(180deg,#0a0f1e,#0a1020)", borderRadius:10, border:"1px solid #38bdf855", marginBottom:14}}>
@@ -2966,7 +2966,7 @@ function DayTradeView() {
             {n:"2", icon:"👁️", color:"#38bdf8", t:"10H30 — VÉRIFIE LE PÔLE (H1)", sub:"Un seul flux continu de 3h à maintenant, sans inversion à 8h ? = PÔLE valide, qui confirme la narrative de l'étape 1. Inversé à 8h = pas de trade."},
             {n:"3", icon:"🥛", color:"#fbbf24", t:"10H30-11H00 — OUVRE MARKETMILK", sub:"Colle tes données, lance l'analyse. Quelle devise est FORTE ? Laquelle est FAIBLE ? (avant le Fix de 11h)"},
             {n:"4", icon:"🔍", color:"#a78bfa", t:"LE SIGNAL : ① + ②", sub:"① Divergence ≥4 rangs · ② Top 5 Gainers (achat) ou Losers (vente). 2/2 = SIGNAL."},
-            {n:"5", icon:"🎯", color:"#34d399", t:"SIGNAL ? LIS SES 💎", sub:"VERTE = achat ▲ · ROUGE = vente ▼. 💎 Retail/Fonds/Énergie = la qualité : 0 BRUT · 1-2 CONFIRMÉ · 3 PARFAIT. Tu identifies — tu n'entres pas encore."},
+            {n:"5", icon:"🎯", color:"#34d399", t:"SIGNAL ? LIS SES BONUS", sub:"VERTE = achat ▲ · ROUGE = vente ▼. Retail/Fonds/Énergie = la qualité : 0 bonus BRUT · 1-2 CONFIRMÉ · 3 PARFAIT. Tu identifies — tu n'entres pas encore."},
             {n:"6", icon:"⏳", color:"#f59e0b", t:"11H30-17H — ATTENDS LE DRAPEAU", sub:"Le prix consolide en drift léger contre-tendance, SANS s'effondrer. Mesure la profondeur au Fibonacci (38.2 / 50 / Golden Pocket)."},
             {n:"7", icon:"🚀", color:"#34d399", t:"FIN NY-TOKYO 19H — ENTRE À LA CASSURE", sub:"Cassure dans le sens du pôle. ⚠️ News majeure à moins de 2h (calendrier) ? Attends qu'elle passe. Stop sous le drapeau · Target = hauteur du pôle · 1-3 jours."},
           ];
@@ -2985,7 +2985,7 @@ function DayTradeView() {
           ));
         })()}
         <div style={{fontSize:8, color:"#38bdf8", textAlign:"center", padding:"8px", marginTop:4, background:"#001018", borderRadius:6, fontWeight:600, lineHeight:1.5}}>
-          Pas de signal ①+② ? = Pas de trade, c'est normal. Un signal BRUT (0 💎) reste tradable, mais sans carburant confirmé : taille ta position en conséquence.
+          Pas de signal ①+② ? = Pas de trade, c'est normal. Un signal BRUT (0 bonus) reste tradable, mais sans carburant confirmé : taille ta position en conséquence.
         </div>
       </div>
 
@@ -3097,7 +3097,7 @@ function DayTradeView() {
             <div style={{ padding:12, background:"#0a0f1e", border:"1px solid #38bdf855", borderRadius:8 }}>
               <div style={{ fontSize:10, color:"#38bdf8", fontWeight:700, letterSpacing:1, marginBottom:6 }}>🎯 PAIRES QUI CONVERGENT</div>
               {converging.length===0 ? (
-                <div style={{ fontSize:8.5, color:TEXT_DIM, lineHeight:1.5 }}>Aucun 💎 Retail + 💎 Fonds allumés ensemble pour l'instant — le radar est vide, mais le SIGNAL (① ②) reste possible à l'analyse de 10h30. Les 💎 sont des bonus, pas des conditions.</div>
+                <div style={{ fontSize:8.5, color:TEXT_DIM, lineHeight:1.5 }}>Aucun bonus Retail + Fonds allumés ensemble pour l'instant — le radar est vide, mais le SIGNAL (① ②) reste possible à l'analyse de 10h30. Ce sont des bonus, pas des conditions.</div>
               ) : converging.map(x=>{
                 const is3 = x.passed===3 && x.has3;
                 const isBuy = x.realDir ? x.realDir==="LONG" : x.direction==="LONG";
@@ -3110,13 +3110,13 @@ function DayTradeView() {
                       <span style={{ fontSize:8, fontWeight:700, padding:"2px 6px", borderRadius:3, background:is3?(isBuy?"#00ff88":"#ff3b3b"):"#fbbf2433", color:is3?"#001a0d":"#fbbf24" }}>{is3?"🟢 RADAR fort — vérifie ① ② à 10h30":"🟡 RADAR"}</span>
                     </div>
                     <div style={{ fontSize:8, color:TEXT, lineHeight:1.6 }}>
-                      <span style={{color:x.f1===true?"#4ade80":x.f1===false?"#f87171":"#64748b"}}>① Divergence {x.forceGap!=null?x.forceGap+"r "+(x.f1?"✓":"✗"):"– (colle MarketMilk)"}</span> · <span style={{color:"#4ade80"}}>💎 Retail {x.direction==="LONG"?"SHORT":"LONG"} {x.direction==="LONG"?x.rShort:x.rLong}% ✓</span> · <span style={{color:"#a78bfa"}}>💎 Fonds: {x.sCur} {x.lfS>=0?"+":""}{x.lfS?.toLocaleString()} vs {x.wCur} {x.lfW>=0?"+":""}{x.lfW?.toLocaleString()} ✓</span> · <span style={{color:"#64748b"}}>② Top5 – (colle MarketMilk)</span> · <span style={{color:"#64748b"}}>💎 Énergie – (colle MarketMilk)</span>
+                      <span style={{color:x.f1===true?"#4ade80":x.f1===false?"#f87171":"#64748b"}}>① Divergence {x.forceGap!=null?x.forceGap+"r "+(x.f1?"✓":"✗"):"– (colle MarketMilk)"}</span> · <span style={{color:"#4ade80"}}>Retail {x.direction==="LONG"?"SHORT":"LONG"} {x.direction==="LONG"?x.rShort:x.rLong}% ✓</span> · <span style={{color:"#a78bfa"}}>Fonds: {x.sCur} {x.lfS>=0?"+":""}{x.lfS?.toLocaleString()} vs {x.wCur} {x.lfW>=0?"+":""}{x.lfW?.toLocaleString()} ✓</span> · <span style={{color:"#64748b"}}>② Top5 – (colle MarketMilk)</span> · <span style={{color:"#64748b"}}>Énergie – (colle MarketMilk)</span>
                     </div>
                     <div style={{ fontSize:7.5, color:"#8b9bbf", marginTop:3, fontStyle:"italic" }}>💡 {x.lfS>=0 && x.lfW<0 ? `Les fonds achètent ${x.sCur} et vendent ${x.wCur} → ${x.sCur} plus fort` : (x.lfS<0 && x.lfW<0 ? `Les fonds vendent les deux, mais ${x.wCur} beaucoup plus → ${x.sCur} relativement plus fort` : `Les fonds achètent les deux, mais ${x.sCur} plus → ${x.sCur} favorisé`)}</div>
                     {is3 && <div style={{ fontSize:8, color:isBuy?"#86efac":"#fca5a5", marginTop:4, fontWeight:600 }}>→ Les 5 filtres convergent. {isBuy?"ACHÈTE":"VENDS"} {x.base}/{x.quote} : vérifie le pôle sur H1, laisse le drapeau se dessiner l\'après-midi, entre à la cassure (fin NY/Tokyo). Stop sous le drapeau, swing 1-3 jours.</div>}
-                    {x.qualite!=null && <div style={{fontSize:8.5, marginTop:4, fontWeight:700, color: x.qualite>=4?"#00ff88":x.qualite>=2?"#fbbf24":"#94a3b8"}}>{x.qualite>=4?"💎 DOMINANT":x.qualite>=2?"🔶 SOLIDE":"⚡ SERRÉ"} {x.qualite}/6 — {x.qualite>=4?"toutes les marges sont larges : le signal le plus net possible.":x.qualite>=2?"bonnes marges sur plusieurs filtres.":"signal sans marge — la cassure devra prouver, taille réduite."}</div>}
+                    {x.qualite!=null && <div style={{fontSize:8.5, marginTop:4, fontWeight:700, color: x.qualite>=4?"#00ff88":x.qualite>=2?"#fbbf24":"#94a3b8"}}>{x.qualite>=4?"DOMINANT":x.qualite>=2?"🔶 SOLIDE":"⚡ SERRÉ"} {x.qualite}/6 — {x.qualite>=4?"toutes les marges sont larges : le signal le plus net possible.":x.qualite>=2?"bonnes marges sur plusieurs filtres.":"signal sans marge — la cassure devra prouver, taille réduite."}</div>}
                     
-                    {!is3 && <div style={{ fontSize:7.5, color:"#fbbf24", marginTop:3 }}>💎 Retail + 💎 Fonds déjà allumés. Colle MarketMilk + Analyse pour vérifier le SIGNAL : divergence (①) et Top 5 (②) — le 💎 Énergie suivra.</div>}
+                    {!is3 && <div style={{ fontSize:7.5, color:"#fbbf24", marginTop:3 }}>Bonus Retail + Fonds déjà allumés. Colle MarketMilk + Analyse pour vérifier le SIGNAL : divergence (①) et Top 5 (②) — le bonus Énergie suivra.</div>}
                   </div>
                 );
               })}
@@ -3134,8 +3134,8 @@ function DayTradeView() {
           <b style={{color:"#fbbf24"}}>Pourquoi attendre 10h30 ?</b> Quand Londres ouvre à 3h, le prix sort souvent du range asiatique par une <b>fausse cassure</b> : les institutions chassent les stops (liquidity grab) avant de révéler leur vraie direction. Si tu lis à 4h ou 7h, tu vois le piège. À 10h30, la session de Londres tourne depuis 7h30 et son mouvement a survécu au test de liquidité de NY (ouvert à 8h) sans s'inverser : la <b>vraie direction est posée</b>. Tu lis alors un résultat mûr sur MarketMilk : quelle devise est forte, laquelle est faible.<br/><br/>
           <b style={{color:"#fbbf24"}}>Pourquoi une position peut durer 1 à 3 jours ?</b> Parce que les grosses positions institutionnelles ne se débouclent pas en quelques heures. Quand une tendance est forte, le mouvement <b>peut se prolonger de session en session</b> : Londres lance le matin, New York tient (8h-17h), l'Asie prend parfois le relais le soir, puis Londres rouvre à 3h. Tant que les fondamentaux tiennent, ça tend à se poursuivre — mais <b>ce n'est pas garanti</b>. Certaines tendances tiennent plusieurs jours, d'autres se referment vite. Tu réévalues chaque matin, tu ne présumes rien.<br/><br/>
           <b style={{color:"#fbbf24"}}>On ne devine pas. On SUIT les plus gros joueurs du marché.</b><br/><br/>
-          Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence Currency Strength), quand le mouvement du jour est réel (Top 5 Gainers/Losers) — c'est LE SIGNAL. Les 💎 (retail piégé, Leveraged Funds alignés, Most Volatile) mesurent ensuite le carburant derrière la cassure. La volatilité n'est pas du bruit : c'est la trace sonore des desks — une paire ne devient pas volatile toute seule, elle le devient parce que les gros se battent dessus.<br/><br/>
-          <b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> un 💎, pas une condition. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant.
+          Le principe : acheter la devise la plus <b style={{color:"#4ade80"}}>FORTE</b> contre la plus <b style={{color:"#f87171"}}>FAIBLE</b> (divergence Currency Strength), quand le mouvement du jour est réel (Top 5 Gainers/Losers) — c'est LE SIGNAL. Les bonus (retail piégé, Leveraged Funds alignés, Most Volatile) mesurent ensuite le carburant derrière la cassure. La volatilité n'est pas du bruit : c'est la trace sonore des desks — une paire ne devient pas volatile toute seule, elle le devient parce que les gros se battent dessus.<br/><br/>
+          <b style={{color:"#34d399"}}>🎭 Le retail contrarien (≥70%) :</b> un bonus, pas une condition. Si tu achètes une paire et que 70%+ du retail est SHORT (à contre-sens), parfait : les gros joueurs te suivent, le retail se fait piéger, leurs stops qui sautent alimentent ton mouvement. Le retail du mauvais côté = ton carburant (bonus).
         </div>
       </div>
 
@@ -3169,7 +3169,7 @@ function DayTradeView() {
 
       {/* CE QUE CHAQUE FILTRE REVELE */}
       <div style={{padding:"12px 14px", background:"#0d0a1a", borderRadius:8, border:"1px solid #818cf855", marginBottom:14}}>
-        <div style={{fontSize:12, color:"#a5b4fc", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #818cf833"}}>🔬 LE SIGNAL (① ②) ET LES DIAMANTS (💎) — CE QUE CHACUN RÉVÈLE SUR LES INSTITUTIONS</div>
+        <div style={{fontSize:12, color:"#a5b4fc", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #818cf833"}}>🔬 LE SIGNAL (① ②) ET LES BONUS — CE QUE CHACUN RÉVÈLE SUR LES INSTITUTIONS</div>
 
         <div style={{marginBottom:10, padding:"10px 11px", background:"#0a1420", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
           <div style={{fontSize:10, color:"#fbbf24", fontWeight:700, marginBottom:4}}>① CURRENCY STRENGTH — où le capital coule MAINTENANT</div>
@@ -3179,14 +3179,14 @@ function DayTradeView() {
         </div>
 
         <div style={{marginBottom:10, padding:"10px 11px", background:"#0a1420", borderRadius:6, borderLeft:"3px solid #34d399"}}>
-          <div style={{fontSize:10, color:"#34d399", fontWeight:700, marginBottom:4}}>💎 RETAIL CONTRARIEN (diamant) — pourquoi faire l'INVERSE de la foule</div>
+          <div style={{fontSize:10, color:"#34d399", fontWeight:700, marginBottom:4}}>BONUS RETAIL CONTRARIEN — pourquoi faire l'INVERSE de la foule</div>
           <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Tu ne fais pas l'inverse du retail par mépris — tu le fais parce que <b style={{color:"#34d399"}}>les banques ont besoin du retail pour exécuter leurs trades</b>.<br/><br/>
           Une banque qui veut acheter EUR/JPY pour des milliards a besoin de vendeurs en face — elle ne peut pas juste « cliquer acheter ». Quand 80% du retail est SHORT, leurs stops d'achat sont juste au-dessus du prix. La banque pousse le prix → les stops sautent → pour fermer un short il faut acheter → ces achats forcés sont <b style={{color:"#34d399"}}>exactement la liquidité que la banque absorbe</b>. Le retail piégé devient le carburant du mouvement.<br/><br/>
-          Donc le retail ≥70% te dit : <i>il y a une réserve de carburant d'un côté précis</i>. Ce 💎 allumé = ta cassure aura des stops à manger. Éteint (foule équilibrée, comme GBP/JPY le 11 juin à 50/50), le signal reste valide mais part sans ce réservoir.</div>
+          Donc le retail ≥70% te dit : <i>il y a une réserve de carburant d'un côté précis</i>. Ce bonus allumé = ta cassure aura des stops à manger. Éteint (foule équilibrée, comme GBP/JPY le 11 juin à 50/50), le signal reste valide mais part sans ce réservoir.</div>
         </div>
 
         <div style={{marginBottom:10, padding:"10px 11px", background:"#0a1420", borderRadius:6, borderLeft:"3px solid #a78bfa"}}>
-          <div style={{fontSize:10, color:"#a78bfa", fontWeight:700, marginBottom:4}}>💎 LEVERAGED FUNDS (diamant) — le flux frais des vrais gros</div>
+          <div style={{fontSize:10, color:"#a78bfa", fontWeight:700, marginBottom:4}}>BONUS LEVERAGED FUNDS — le flux frais des vrais gros</div>
           <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Le Currency Strength et le retail montrent l'instant. Le COT montre ce que les hedge funds font <b style={{color:"#a78bfa"}}>vraiment</b>, en chiffres réels déclarés à la CFTC — pas une déduction.<br/><br/>
           On regarde le <b style={{color:"#a78bfa"}}>changement de la semaine</b> (pas la position accumulée du passé). Pourquoi ? Parce qu'une grosse position héritée du passé ne garantit pas la suite — elle peut être en train d'être débouclée. Le changement hebdo capte le <b>flux frais</b> : dans quel sens les fonds bougent EN CE MOMENT. Un fonds qui vend agressivement le JPY cette semaine te dit « ils chargent maintenant » — info active, pas figée.<br/><br/>
           C'est cohérent avec toute ta stratégie : tu suis le mouvement frais, pas les vieilles positions. Le COT te donne le flux institutionnel récent en chiffres durs.</div>
@@ -3199,14 +3199,14 @@ function DayTradeView() {
           <b style={{color:"#f59e0b"}}>Attention :</b> cette condition confirme le PÔLE à l'analyse (10h30-11h00), elle ne dit pas d'entrer maintenant. Tu attends le drapeau de l'après-midi, puis la cassure dans le sens du pôle — tu n'achètes jamais le pôle en route.</div>
         </div>
         <div style={{marginBottom:12, padding:"10px 12px", background:"#1a1500", borderRadius:6, borderLeft:"3px solid #fbbf24"}}>
-          <div style={{fontSize:10, color:"#fbbf24", fontWeight:700, marginBottom:4}}>💎 ÉNERGIE (Most Volatile, diamant) — la force derrière le mouvement</div>
-          <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>Le ② prouve que ta paire a une DIRECTION aujourd'hui. Ce 💎 prouve qu'elle a de l'ÉNERGIE : ce 💎 s'allume quand elle est dans le Top 5 Most Volatile — les paires où le prix se bat vraiment, avec du volume. Méfiance dans le Least Volatile : une paire endormie (range de 0,2%) ne peut pas construire un pôle digne d'un flag.<br/><br/>Direction (②) + énergie (💎) = un pôle impulsif. C'est la différence entre une paire qui dérive mollement vers le haut et une paire que les institutions poussent avec conviction. Le flag a besoin de la deuxième : sans énergie dans le pôle, la cassure du drapeau n'a pas de carburant.</div>
+          <div style={{fontSize:10, color:"#fbbf24", fontWeight:700, marginBottom:4}}>BONUS ÉNERGIE (Most Volatile) — la force derrière le mouvement</div>
+          <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>Le ② prouve que ta paire a une DIRECTION aujourd'hui. Ce bonus prouve qu'elle a de l'ÉNERGIE : il s'allume quand elle est dans le Top 5 Most Volatile — les paires où le prix se bat vraiment, avec du volume. Méfiance dans le Least Volatile : une paire endormie (range de 0,2%) ne peut pas construire un pôle digne d'un flag.<br/><br/>Direction (②) + énergie (bonus) = un pôle impulsif. C'est la différence entre une paire qui dérive mollement vers le haut et une paire que les institutions poussent avec conviction. Le flag a besoin de la deuxième : sans énergie dans le pôle, la cassure du drapeau n'a pas de carburant.</div>
         </div>
 
         <div style={{padding:"10px 11px", background:"#160a2e", borderRadius:6, border:"1px solid #818cf844"}}>
-          <div style={{fontSize:10, color:"#a5b4fc", fontWeight:700, marginBottom:4}}>🎯 LE SIGNAL ET SES DIAMANTS — comment lire l'ensemble</div>
+          <div style={{fontSize:10, color:"#a5b4fc", fontWeight:700, marginBottom:4}}>🎯 LE SIGNAL ET SES BONUS — comment lire l'ensemble</div>
           <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>LE SIGNAL (① + ②) capture le couple qui compte : la divergence montre OÙ le capital coule, le Top 5 prouve que le mouvement est RÉEL aujourd'hui. <b style={{color:"#a5b4fc"}}>Les deux ensemble mentent rarement dans le même sens.</b><br/><br/>
-          Les 💎 ajoutent le contexte : Retail piégé = du carburant de stops pour ta cassure · Fonds alignés = le flux hebdo avec toi · Énergie = le feu du jour sur ta paire. Un signal 3 💎 (l'ancien 5/5) = le courant parfait. Un signal BRUT = la structure sans le carburant confirmé — tradable, taille réduite. L'historique tranche le débat avec le temps.</div>
+          Les bonus ajoutent le contexte : Retail piégé = du carburant de stops pour ta cassure · Fonds alignés = le flux hebdo avec toi · Énergie = le feu du jour sur ta paire. Un signal 3 bonus (l'ancien 5/5) = le courant parfait. Un signal BRUT = la structure sans le carburant confirmé — tradable, taille réduite. L'historique tranche le débat avec le temps.</div>
         </div>
       </div>
 
@@ -3222,7 +3222,7 @@ function DayTradeView() {
           <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>3.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Le mouvement peut durer plusieurs sessions.</b> Une fois entré à la cassure du drapeau, ta position peut être portée par New York, puis par la session asiatique le soir — chaque paire oppose une devise de Londres à une devise d'Asie, jamais deux de la même session. Tu te places dans un flux qui peut passer de main en main, pas dans un coup d'une heure — mais tu réévalues chaque jour, rien n'est acquis.</span></div>
           <div style={{display:"flex", gap:8, padding:"7px 9px", background:"#001018", borderRadius:5}}><span style={{color:"#4ade80", fontWeight:700}}>4.</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Le sentiment retail est mûr.</b> Le retail a réagi au mouvement, souvent à contre-sens. À 10h30 leur positionnement est lisible — ton filtre retail contrarien ≥70% capte ce déséquilibre exact.</span></div>
         </div>
-        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>💡 10h30 ET = le point de convergence : Londres a tranché + le mouvement a survécu au test de NY + le Top 5 confirme le mouvement réel (les 💎 te disent ensuite la qualité du carburant). Tu ne devines rien, tu te places dans un flux institutionnel validé que les sessions suivantes peuvent prolonger — souvent sur 1 à 3 jours quand la divergence persiste, sans que ce soit jamais garanti.</div>
+        <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>💡 10h30 ET = le point de convergence : Londres a tranché + le mouvement a survécu au test de NY + le Top 5 confirme le mouvement réel (les bonus te disent ensuite la qualité du carburant). Tu ne devines rien, tu te places dans un flux institutionnel validé que les sessions suivantes peuvent prolonger — souvent sur 1 à 3 jours quand la divergence persiste, sans que ce soit jamais garanti.</div>
       </div>
 
       <div style={{padding:"12px 14px", background:"#1a1500", borderRadius:8, border:"1px solid #fbbf2455", marginBottom:14}}>
@@ -3236,30 +3236,30 @@ function DayTradeView() {
       {/* SEQUENCE */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:12, color:"#38bdf8", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #38bdf833"}}>📋 LA SÉQUENCE — ÉTAPE PAR ÉTAPE</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie LE SIGNAL — 2 conditions obligatoires : ① divergence ≥4 rangs (où est le capital) + ② Top 5 Gainers/Losers (le mouvement est réel aujourd'hui). 2/2 = SIGNAL tradable. Les 3 💎 (Retail, Fonds, Énergie) sont des BONUS : ils mesurent le carburant derrière ta cassure, jamais le droit d'exister du signal.</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>L'app vérifie LE SIGNAL — 2 conditions obligatoires : ① divergence ≥4 rangs (où est le capital) + ② Top 5 Gainers/Losers (le mouvement est réel aujourd'hui). 2/2 = SIGNAL tradable. Les 3 BONUS (Retail, Fonds, Énergie) : ils mesurent le carburant derrière ta cassure, jamais le droit d'exister du signal.</div>
         <div style={{display:"flex", flexDirection:"column", gap:8}}>
           <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>DIVERGENCE ≥ 4 rangs</b> au Currency Strength : la devise forte et la faible séparées d'au moins 4 places (vraie divergence, pas 2 voisines)</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#f59e0b", fontWeight:700, minWidth:16}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#f59e0b"}}>② MOUVEMENT RÉEL (obligatoire)</b> : ta paire doit être dans le Top 5 Gainers (achat) ou Top 5 Losers (vente) de MarketMilk. Un vrai mouvement de prix = volume institutionnel aujourd'hui. Confirme le pôle à l'analyse — puis tu attends le drapeau et sa cassure pour entrer.</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#34d399", fontWeight:700, minWidth:16}}>💎</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>💎 RETAIL ≥ 70% (diamant, non-bloquant)</b> : si tu achètes, le retail doit être SHORT 70%+ ; si tu vends, LONG 70%+. La foule est piégée du mauvais côté — leurs stops qui sautent alimentent ton mouvement. Sans ce 💎, le signal reste valide mais part sans ce carburant.</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#a78bfa", fontWeight:700, minWidth:16}}>💎</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#a78bfa"}}>💎 FONDS ALIGNÉS (diamant, non-bloquant)</b> : le rapport COT (CFTC, publié chaque vendredi) montre ce que les hedge funds font VRAIMENT. La devise forte doit être plus achetée que la faible. C'est la VRAIE position institutionnelle — pas une déduction, des chiffres réels. Le COT a jusqu'à 9 jours de retard — c'est pour ça qu'il est un 💎 et plus un blocage.</span></div>
-          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>💎</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>💎 ÉNERGIE (diamant, non-bloquant)</b> : ta paire doit être dans le Top 5 Most Volatile de MarketMilk (et jamais dans le Least Volatile). La direction sans énergie = un drift mou. Ce top est souvent squatté par les paires dollar — c'est pour ça qu'il est un 💎 et plus un blocage.</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#34d399", fontWeight:700, minWidth:16}}>+</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#34d399"}}>BONUS RETAIL ≥ 70% (non-bloquant)</b> : si tu achètes, le retail doit être SHORT 70%+ ; si tu vends, LONG 70%+. La foule est piégée du mauvais côté — leurs stops qui sautent alimentent ton mouvement. Sans ce bonus, le signal reste valide mais part sans ce carburant.</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#a78bfa", fontWeight:700, minWidth:16}}>+</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#a78bfa"}}>BONUS FONDS ALIGNÉS (non-bloquant)</b> : le rapport COT (CFTC, publié chaque vendredi) montre ce que les hedge funds font VRAIMENT. La devise forte doit être plus achetée que la faible. C'est la VRAIE position institutionnelle — pas une déduction, des chiffres réels. Le COT a jusqu'à 9 jours de retard — c'est pour ça qu'il est un bonus et plus un blocage.</span></div>
+          <div style={{display:"flex", gap:8}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:16}}>+</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#fbbf24"}}>BONUS ÉNERGIE (non-bloquant)</b> : ta paire doit être dans le Top 5 Most Volatile de MarketMilk (et jamais dans le Least Volatile). La direction sans énergie = un drift mou. Ce top est souvent squatté par les paires dollar — c'est pour ça qu'il est un bonus et plus un blocage.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1020", borderRadius:5}}><span style={{color:"#64748b", fontWeight:700, minWidth:16}}>📋</span><span style={{fontSize:8.5, color:TEXT_DIM, lineHeight:1.45}}><b>Condition de base :</b> seules tes 7 paires sont scannées (EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD, GBP/JPY, EUR/JPY, CHF/JPY) — une devise de Londres contre une devise d'Asie-Pacifique. Plus XAU/USD (l'or) en logique dollar : USD #1-2 = vente or, USD #7-8 = achat or.</span></div>
           <div style={{display:"flex", gap:8}}><span style={{color:"#c084fc", fontWeight:700, minWidth:16}}>▶</span><span style={{fontSize:9, color:TEXT, lineHeight:1.5}}><b style={{color:"#c084fc"}}>ENTRÉE</b> : vérifie le pôle sur H1 (un mouvement continu de 3h jusqu'à ton analyse de 10h30, sans inversion à l'ouverture de NY à 8h), laisse le <b style={{color:"#c084fc"}}>drapeau</b> se dessiner l'après-midi, entre à la <b style={{color:"#c084fc"}}>cassure</b> dans le sens du pôle (fin NY ou Tokyo). Stop sous/sur le drapeau, target = hauteur du pôle. Swing 1 à 3 jours — réévalue chaque matin à 10h30</span></div>
         </div>
-        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ MEILLEURE (surbrillance) : parmi les SIGNAUX, celle qui combine la plus forte divergence ET le plus de 💎. C'est le signal le plus net du jour.</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginTop:8}}>⭐ MEILLEURE (surbrillance) : parmi les SIGNAUX, celle qui combine la plus forte divergence ET le plus de bonus. C'est le signal le plus net du jour.</div>
       </div>
 
       {/* EXEMPLE REEL - GBP/NZD */}
       <div style={{padding:"12px 14px", background:"#04140a", borderRadius:8, border:"1px solid #4ade8055", marginBottom:14}}>
         <div style={{fontSize:12, color:"#f87171", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #f8717133"}}>📐 EXEMPLE RÉEL — GBP/JPY VENTE (11 juin 2026)</div>
-        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Le jour où ce système est né. Pôle vendeur continu de 3h à 11h = -107 pips sur toute la session de Londres. L'ancien système (5 filtres obligatoires) la BLOQUAIT — le nouveau l'affiche : SIGNAL CONFIRMÉ 1 💎.</div>
+        <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:10}}>Le jour où ce système est né. Pôle vendeur continu de 3h à 11h = -107 pips sur toute la session de Londres. L'ancien système (5 filtres obligatoires) la BLOQUAIT — le nouveau l'affiche : SIGNAL CONFIRMÉ 1 bonus.</div>
         <div style={{display:"flex", flexDirection:"column", gap:6}}>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#fbbf24", fontWeight:700, minWidth:14}}>①</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>Divergence ✓</b> — JPY #1 (le plus fort) vs GBP #6 = 5 rangs d'écart à 10h45. La divergence a même grossi pendant la matinée (3r → 5r) : le courant s'accélérait.</span></div>
           <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#f59e0b", fontWeight:700, minWidth:14}}>②</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>② Mouvement réel ✓</b> — GBP/JPY est entrée dans le Top 5 Losers à 10h45 : la baisse était réelle, institutionnelle, en cours. ① + ② = SIGNAL ▼ VENTE.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#64748b", fontWeight:700, minWidth:14}}>💎</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>💎 Retail ✗ ÉTEINT</b> — la foule était à 50/50 : pas de carburant de stops confirmé. C'est exactement pourquoi ce 💎 est un bonus et plus un blocage — un déséquilibre retail est un PLUS, pas un droit d'exister.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#a78bfa", fontWeight:700, minWidth:14}}>💎</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>💎 Fonds ✓</b> — ALLUMÉ — les fonds vendaient le GBP (-1 476) et vendaient le JPY encore plus (-17 555)... mais le mouvement du jour était JPY fort : le flux INTRADAY peut dominer le COT vieux de 9 jours. Le 💎 comptait quand même GBP plus vendu en relatif ce matin-là : 1 💎.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#64748b", fontWeight:700, minWidth:14}}>💎</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>💎 Énergie ✗ ÉTEINT</b> — le Top 5 Most Volatile était 100% squatté par les paires dollar/CAD ce jour-là (8 snapshots consécutifs !). Aucune paire croisée n'y entrait. La preuve vivante que ce filtre ne pouvait plus être obligatoire.</span></div>
-          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1020", borderRadius:5}}><span style={{color:"#64748b", fontWeight:700, minWidth:14}}>📋</span><span style={{fontSize:8.5, color:TEXT_DIM, lineHeight:1.45}}><b>Condition de base ✓</b> — GBP/JPY est une de tes 7 paires (devise de Londres GBP contre devise d'Asie JPY). Verdict : SIGNAL ▼ VENTE · 1 💎 = CONFIRMÉ. Pôle de 107 pips — l'étude de cas n°1 du procès des 💎.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#64748b", fontWeight:700, minWidth:14}}>+</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>BONUS Retail ✗ ÉTEINT</b> — la foule était à 50/50 : pas de carburant de stops confirmé. C'est exactement pourquoi ce bonus n'est plus un blocage — un déséquilibre retail est un PLUS, pas un droit d'exister.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#a78bfa", fontWeight:700, minWidth:14}}>+</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>BONUS Fonds ✓</b> — ALLUMÉ — les fonds vendaient le GBP (-1 476) et vendaient le JPY encore plus (-17 555)... mais le mouvement du jour était JPY fort : le flux INTRADAY peut dominer le COT vieux de 9 jours. Le comptait quand même GBP plus vendu en relatif ce matin-là : 1.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 8px", background:"#001018", borderRadius:5}}><span style={{color:"#64748b", fontWeight:700, minWidth:14}}>+</span><span style={{fontSize:9, color:TEXT, lineHeight:1.45}}><b>BONUS Énergie ✗ ÉTEINT</b> — le Top 5 Most Volatile était 100% squatté par les paires dollar/CAD ce jour-là (8 snapshots consécutifs !). Aucune paire croisée n'y entrait. La preuve vivante que ce filtre ne pouvait plus être obligatoire.</span></div>
+          <div style={{display:"flex", gap:8, padding:"6px 9px", background:"#0a1020", borderRadius:5}}><span style={{color:"#64748b", fontWeight:700, minWidth:14}}>📋</span><span style={{fontSize:8.5, color:TEXT_DIM, lineHeight:1.45}}><b>Condition de base ✓</b> — GBP/JPY est une de tes 7 paires (devise de Londres GBP contre devise d'Asie JPY). Verdict : SIGNAL ▼ VENTE · 1 bonus = CONFIRMÉ. Pôle de 107 pips — l'étude de cas n°1 du procès des bonus.</span></div>
         </div>
         <div style={{fontSize:9, color:"#4ade80", marginTop:10, padding:"8px 10px", background:"#0a2010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>✅ Les 5 filtres réunis = ALERTE APEX. Sur ton H1 : Londres a acheté CHF/JPY de 3h à 11h — et le mouvement a continué après l'ouverture de NY à 8h, sans s'inverser. Le test de liquidité est passé : le PÔLE est là. L'après-midi, le prix a dérivé légèrement vers le bas SANS s'effondrer : le DRAPEAU. En soirée (Tokyo), cassure du drapeau vers le haut = ENTRÉE, stop sous le drapeau, target = hauteur du pôle projetée. Si la divergence persiste, Londres reprend CHF/JPY le lendemain et prolonge. La position tient plusieurs jours tant que CHF reste fort et JPY faible — tu vérifies chaque matin : si l'écart se referme, tu sors.</div>
       </div>
