@@ -2738,6 +2738,20 @@ function DayTradeAnalyzer() {
       const ordre={passe:0,bloque:1};
       diagnostic.sort((a,b)=> (ordre[a.status]-ordre[b.status]) || ((b.forceGap||0)-(a.forceGap||0)));
 
+      // SAUVEGARDE HISTORIQUE (chaque analyse, meme 0 signal)
+      try {
+        const hist = JSON.parse(localStorage.getItem("apexHistory")||"[]");
+        const entry = {
+          date: new Date().toLocaleDateString("fr-CA"),
+          heure: new Date().toLocaleTimeString("fr-CA",{hour:"2-digit",minute:"2-digit"}),
+          strongest, weakest,
+          signaux: top.map(t=>({pair:t.pair, dir:t.direction, gap:t.forceGap, retail:t.retailPct})),
+          diag: diagnostic.map(d=>({pair:d.pair, dir:d.direction, status:d.status, reason:d.reason, f1:d.f1, f5:d.f5, fcot:d.fcot, f4:d.f4, fvol:d.fvol, gap:d.forceGap}))
+        };
+        const sameDay = hist.findIndex(h=>h.date===entry.date);
+        if (sameDay>=0) hist[sameDay]=entry; else hist.unshift(entry);
+        localStorage.setItem("apexHistory", JSON.stringify(hist.slice(0,30)));
+      } catch(e){}
       if (top.length===0){ setResult({error:"AUCUNE opportunité APEX pour ta session — aucune de tes 7 paires ne réunit les 5 filtres (divergence + retail + Leveraged Funds + Top 5 Gainers/Losers + Most Volatile). Pas de trade = bonne décision.", strongest, weakest, diag7: diagnostic}); return; }
       setResult({ strongest, weakest, top, diag7: diagnostic });
     } catch(e){ setResult({error:"Erreur: "+e.message}); }
@@ -2782,6 +2796,33 @@ function DayTradeAnalyzer() {
           <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Vert = passe les 5 filtres · Rouge = bloque. Tri : prêtes en haut. LF = Leveraged Funds · Top5 = paire dans le Top 5 Gainers/Losers.</div>
         </div>
       )}
+
+      {(()=>{
+        let hist=[];
+        try { hist = JSON.parse(localStorage.getItem("apexHistory")||"[]"); } catch(e){}
+        if (!hist.length) return null;
+        const avecSignal = hist.filter(h=>h.signaux && h.signaux.length>0).length;
+        const blocVol = hist.reduce((n,h)=> n + (h.diag||[]).filter(d=>d.status==="bloque" && d.f1 && d.f5 && d.fcot && d.f4 && !d.fvol).length, 0);
+        return (
+          <div style={{marginTop:10, padding:"10px", background:"#0a1020", borderRadius:6, border:"1px solid #1e3a5f"}}>
+            <div style={{fontSize:9, color:"#7dd3fc", fontWeight:700, marginBottom:6}}>📒 HISTORIQUE — tes dernières analyses</div>
+            <div style={{display:"flex", flexDirection:"column", gap:4}}>
+              {hist.slice(0,14).map((h,i)=>{
+                const has = h.signaux && h.signaux.length>0;
+                const meilleurBloc = !has && h.diag ? h.diag.find(d=>d.status==="bloque") : null;
+                return (
+                  <div key={i} style={{padding:"5px 8px", background:has?"#052010":"#0f1622", borderRadius:4, borderLeft:"3px solid "+(has?"#4ade80":"#64748b"), fontSize:8, color:has?"#86efac":"#94a3b8", lineHeight:1.5}}>
+                    <b>{h.date}</b> {h.heure} · {h.strongest} fort → {h.weakest} faible · {has
+                      ? ("🎯 "+h.signaux.length+" signal"+(h.signaux.length>1?"aux":"")+" : "+h.signaux.map(s=>s.pair.slice(0,3)+"/"+s.pair.slice(3,6)+(s.dir==="LONG"?" ▲":" ▼")).join(", "))
+                      : ("— aucun 5/5"+(meilleurBloc?" (meilleure : "+meilleurBloc.pair.slice(0,3)+"/"+meilleurBloc.pair.slice(3,6)+" — "+meilleurBloc.reason+")":""))}
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:6, fontStyle:"italic"}}>{hist.length} jour{hist.length>1?"s":""} analysé{hist.length>1?"s":""} · {avecSignal} avec signal · le ⑤ (Most Volatile) a bloqué un 4/4 complet {blocVol} fois. 30 jours conservés, 14 affichés.</div>
+          </div>
+        );
+      })()}
 
       {result && !result.error && (
         <div style={{marginTop:10}}>
