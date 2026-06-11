@@ -2709,20 +2709,29 @@ function DayTradeAnalyzer() {
         const topEmpty = (gainersSet.size===0 && losersSet.size===0);
         dg.topEmpty = topEmpty;
         // raison de blocage
-        // SIGNAL = ① divergence + ② Top 5. Retail/Fonds/Energie = diamants (qualite, non bloquants)
         dg.gems = (dg.f5?1:0) + (dg.fcot?1:0) + (dg.fvol?1:0);
         if (!dg.f1) dg.reason = forceGap<GAP_MIN ? ("divergence "+forceGap+" rangs (<4)") : "force pas du bon cote";
+        else if (!dg.f5) {
+          if (rMiss) dg.reason = "retail non disponible";
+          else {
+            const besoinCote = direction==="LONG"?"SHORT":"LONG";
+            const cotePct = direction==="LONG"?rShort:rLong; // le % du cote contrarien voulu
+            dg.reason = "retail "+besoinCote+" "+cotePct+"% (<70%)";
+          }
+        }
+        else if (!dg.fcot) dg.reason = lfMiss ? "Leveraged Funds non disponibles" : (strongCur+" pas plus favorisé que "+weakCur+" par les fonds");
         else if (!dg.f4) dg.reason = topEmpty ? "Top Gainers/Losers absent (colle le snapshot complet)" : (wpair+" pas dans le Top 5 "+(direction==="LONG"?"Gainers":"Losers")+" — mouvement pas confirmé");
+        else if (!dg.fvol) dg.reason = volEmpty ? "Most Volatile absent (colle le snapshot complet)" : (inLeast ? wpair+" dans le Least Volatile — paire endormie, pas de pôle possible" : wpair+" pas dans le Top 5 Most Volatile — pas assez d'énergie pour un pôle");
         else dg.reason = "SIGNAL ("+dg.gems+" 💎)";
-        dg.status = dg.f1&&dg.f4 ? "passe" : "bloque";
+        if (dg.f1 && dg.f4) { dg.status = "passe"; dg.reason = "SIGNAL ("+dg.gems+" 💎)"; } else { dg.status = "bloque"; if (dg.f1 && !dg.f4) dg.reason = topEmpty ? "Top Gainers/Losers absent (colle le snapshot complet)" : (wpair+" pas dans le Top 5 "+(direction==="LONG"?"Gainers":"Losers")+" — mouvement pas confirmé"); }
         diagnostic.push(dg);
-        // CANDIDAT REEL si les 5 filtres passent
+        // CANDIDAT REEL si SIGNAL (divergence + Top 5)
         if (!f1ok) return;
         if (!f4ok) return;
         const gems = (f5ok?1:0) + (fcotok?1:0) + (fvolok?1:0);
         const isMaxDiv = (base===strongest&&quote===weakest)||(base===weakest&&quote===strongest);
         const lfGap = (lfStrongNet!=null&&lfWeakNet!=null) ? (lfStrongNet - lfWeakNet) : 0;
-        const score = forceGap*10 + gems*3 + (isMaxDiv?5:0) + Math.abs(lfGap)/1000;
+        const score = forceGap*10 + (isMaxDiv?5:0) + Math.abs(lfGap)/1000;
         candidates.push({pair:wpair, base, quote, direction, forceGap, isMaxDiv, score, gems, gemRetail:f5ok, gemLF:fcotok, gemVol:fvolok, retailPct:(direction==="LONG"?rShort:rLong), retailSide:(direction==="LONG"?"SHORT":"LONG"), retailMissing:rMiss, weakCur, strongCur, lfStrongNet, lfWeakNet,
           strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: nStr,
           inTop: f4ok, weakRepeat, strongRepeat, impulsif: volSet.has(wpair),
@@ -2800,13 +2809,13 @@ function DayTradeAnalyzer() {
             <div style={{fontSize:9, color: has?"#4ade80":"#94a3b8", fontWeight:700, marginBottom:6}}>📌 TON ANALYSE DU JOUR — faite à {h.heure} · {h.strongest} fort → {h.weakest} faible</div>
             {has ? h.signaux.map((s,i)=>(
               <div key={i} style={{padding:"6px 8px", background:"#0a2818", borderRadius:4, marginBottom:4, fontSize:9, color:"#86efac", fontWeight:700}}>
-                🎯 {s.pair.slice(0,3)}/{s.pair.slice(3,6)} {s.dir==="LONG"?"▲ ACHAT":"▼ VENTE"} · divergence {s.gap}r · SIGNAL{s.gems!==undefined?" "+(s.gems===3?"💎💎💎 PARFAIT":s.gems>0?s.gems+" 💎 CONFIRMÉ":"BRUT (0 💎)"):""} — surveille le drapeau, entre à la cassure (fin NY/Tokyo)
+                🎯 {s.pair.slice(0,3)}/{s.pair.slice(3,6)} {s.dir==="LONG"?"▲ ACHAT":"▼ VENTE"} · divergence {s.gap}r · SIGNAL — surveille le drapeau, entre à la cassure (fin NY/Tokyo)
               </div>
             )) : <div style={{fontSize:8.5, color:"#94a3b8", marginBottom:4}}>Aucun signal 5/5 aujourd'hui — pas de trade, c'est la discipline.</div>}
             <div style={{fontSize:8, color:"#7dd3fc", fontWeight:700, margin:"6px 0 4px"}}>Le diagnostic de tes 7 paires :</div>
             {(h.diag||[]).map((d,i)=>(
               <div key={i} style={{fontSize:7.5, color: d.status==="passe"?"#4ade80":"#94a3b8", lineHeight:1.5, padding:"2px 0"}}>
-                {d.status==="passe"?"✅":"·"} {d.pair.slice(0,3)}/{d.pair.slice(3,6)} {d.dir==="LONG"?"▲":"▼"} — {d.status==="passe"?"SIGNAL ①✓②✓":d.reason}
+                {d.status==="passe"?"✅":"·"} {d.pair.slice(0,3)}/{d.pair.slice(3,6)} {d.dir==="LONG"?"▲":"▼"} — {d.status==="passe"?"SIGNAL":d.reason}
               </div>
             ))}
             <div style={{fontSize:7, color:"#4a5070", marginTop:5, fontStyle:"italic"}}>Cette lecture reste affichée toute la journée — ta référence pendant le drapeau et jusqu'à la cassure.</div>
@@ -2833,7 +2842,7 @@ function DayTradeAnalyzer() {
             <div key={i} style={{display:"flex", flexDirection:"column", gap:2, padding:"5px 7px", marginBottom:4, background:bg, borderRadius:4, borderLeft:"3px solid "+col, opacity:d.status==="dort"?0.6:1}}>
               <div style={{fontSize:9, color:TEXT, fontWeight:700}}>{pp} {d.direction&&d.status!=="dort"?<span style={{color:d.direction==="LONG"?"#4ade80":"#f87171"}}>{d.direction==="LONG"?"▲ ACHAT":"▼ VENTE"}</span>:""}</div>
               {d.status!=="dort" && (
-                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Divergence {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f4?"✓":"✗"} Top5 &nbsp;|&nbsp; 💎 {d.f5?"✓":"✗"} Retail · 💎 {d.fcot?"✓":"✗"} Fonds · 💎 {d.fvol?"✓":"✗"} Énergie</div>
+                <div style={{fontSize:8, color:TEXT_DIM, fontFamily:"monospace"}}>① {d.f1?"✓":"✗"} Divergence {d.forceGap!=null?d.forceGap+"r":"?"} · ② {d.f4?"✓":"✗"} Top5 | 💎 {d.f5?"✓":"✗"} Retail · 💎 {d.fcot?"✓":"✗"} Fonds · 💎 {d.fvol?"✓":"✗"} Énergie</div>
               )}
               {d.status!=="dort" && !d.rMiss && d.rLong!=null && (
                 <div style={{marginTop:2}}>
@@ -2846,19 +2855,11 @@ function DayTradeAnalyzer() {
               {d.lfStrongNet!=null && d.lfWeakNet!=null && (
                 <div style={{fontSize:7.5, color:TEXT_DIM, fontFamily:"monospace"}}>💼 LF: {d.strongCur} {d.lfStrongNet>=0?"+":""}{d.lfStrongNet?.toLocaleString()} vs {d.weakCur} {d.lfWeakNet>=0?"+":""}{d.lfWeakNet?.toLocaleString()}</div>
               )}
-              <div style={{fontSize:8, color:col, fontWeight:600}}>{d.status==="passe"?"🎯 SIGNAL ①✓②✓ — "+((d.f5?1:0)+(d.fcot?1:0)+(d.fvol?1:0))+" 💎":"✗ bloque : "+d.reason}</div>
+              <div style={{fontSize:8, color:col, fontWeight:600}}>{d.status==="passe"?("🎯 SIGNAL — "+((d.f5?1:0)+(d.fcot?1:0)+(d.fvol?1:0))+" 💎"):"✗ bloque : "+d.reason}</div>
             </div>
             );
           })}
-          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Vert = SIGNAL (① divergence ≥4r + ② Top 5). Les 💎 (Retail, Fonds, Énergie) mesurent la qualité, pas le droit d'exister : 0 💎 = BRUT · 1-2 💎 = CONFIRMÉ · 3 💎 = PARFAIT.</div>
-          {result.usdRank!=null && (
-            <div style={{marginTop:8, padding:"7px 9px", background: result.usdRank<=2?"#200505":result.usdRank>=7?"#1a1500":"#0f1622", borderRadius:4, borderLeft:"3px solid "+(result.usdRank<=2?"#f87171":result.usdRank>=7?"#fbbf24":"#334155")}}>
-              <div style={{fontSize:9, fontWeight:700, color: result.usdRank<=2||result.usdRank>=7?"#fbbf24":"#64748b"}}>
-                {result.usdRank<=2?"🎯 XAU/USD (OR) ▼ VENTE possible — USD #"+result.usdRank+" (Top 2 : le dollar est LE moteur) → l'or sous pression":result.usdRank>=7?"🎯 XAU/USD (OR) ▲ ACHAT possible — USD #"+result.usdRank+" (Bottom 2 : le dollar coule) → l'or respire":"· XAU/USD (OR) — USD #"+result.usdRank+" au milieu (3-6), pas de conviction"}
-              </div>
-              {(result.usdRank<=2||result.usdRank>=7) && <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:3, lineHeight:1.5}}>L'or n'a pas de Top 5 MarketMilk : son ② c'est TON H1 — pôle continu de 3h à maintenant dans ce sens ? Alors même séquence : drapeau l'après-midi, cassure le soir (le COMEX donne du volume à l'or toute la session NY). Stop sur le drapeau, 1-3 jours.</div>}
-            </div>
-          )}
+          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>Vert = SIGNAL (① divergence ≥4r + ② Top 5). Les 💎 (Retail, Fonds, Énergie) mesurent la qualité : 0 = BRUT, 1-2 = CONFIRMÉ, 3 = PARFAIT.</div>
         </div>
       )}
 
@@ -2879,12 +2880,12 @@ function DayTradeAnalyzer() {
                   <div key={i} style={{padding:"5px 8px", background:has?"#052010":"#0f1622", borderRadius:4, borderLeft:"3px solid "+(has?"#4ade80":"#64748b"), fontSize:8, color:has?"#86efac":"#94a3b8", lineHeight:1.5}}>
                     <b>{h.date}</b> {h.heure} · {h.strongest} fort → {h.weakest} faible · {has
                       ? ("🎯 "+h.signaux.length+" signal"+(h.signaux.length>1?"aux":"")+" : "+h.signaux.map(s=>s.pair.slice(0,3)+"/"+s.pair.slice(3,6)+(s.dir==="LONG"?" ▲":" ▼")).join(", "))
-                      : ("— aucun signal ①+②"+(meilleurBloc?" (meilleure : "+meilleurBloc.pair.slice(0,3)+"/"+meilleurBloc.pair.slice(3,6)+" — "+meilleurBloc.reason+")":""))}
+                      : ("— aucun signal"+(meilleurBloc?" (meilleure : "+meilleurBloc.pair.slice(0,3)+"/"+meilleurBloc.pair.slice(3,6)+" — "+meilleurBloc.reason+")":""))}
                   </div>
                 );
               })}
             </div>
-            <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:6, fontStyle:"italic"}}>{hist.length} jour{hist.length>1?"s":""} analysé{hist.length>1?"s":""} · {avecSignal} avec signal · Procès des 💎 : compare les cassures des signaux BRUTS vs CONFIRMÉS vs PARFAITS dans ton journal. 30 jours conservés, 14 affichés.</div>
+            <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:6, fontStyle:"italic"}}>{hist.length} jour{hist.length>1?"s":""} analysé{hist.length>1?"s":""} · {avecSignal} avec signal · Procès des 💎 : note la qualité des cassures (BRUT vs PARFAIT) au journal. 30 jours conservés, 14 affichés.</div>
           </div>
         );
       })()}
@@ -2947,7 +2948,7 @@ function DayTradeView() {
   return (
     <div style={{padding:16, maxWidth:760, margin:"0 auto"}}>
       <div style={{fontSize:15, color:"#fbbf24", fontWeight:900, letterSpacing:1.5, marginBottom:5}}>⚡ SWING TRADE FX</div><div style={{fontSize:9, color:"#fbbf24aa", fontWeight:700, letterSpacing:2, marginBottom:4}}>APEX INSTITUTIONNEL · 5 FILTRES</div>
-      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (1-3 jours) — LE SIGNAL : ① divergence ≥4r + ② Top 5 Gainers/Losers · LA QUALITÉ : 💎 Retail · 💎 Fonds · 💎 Énergie · 7 paires + XAU/USD · Tu suis les big boys de Londres</div>
+      <div style={{fontSize:9, color:TEXT_DIM, marginBottom:16}}>Système court terme (1-3 jours) — LE SIGNAL : ① divergence ≥4r + ② Top 5 · LA QUALITÉ : 💎 Retail 💎 Fonds 💎 Énergie · Tu suis les big boys de Londres</div>
 
       {/* SEQUENCE VISUELLE DU JOUR */}
       <div style={{padding:"11px 12px 4px", background:"linear-gradient(180deg,#0a0f1e,#0a1020)", borderRadius:10, border:"1px solid #38bdf855", marginBottom:14}}>
@@ -2958,8 +2959,8 @@ function DayTradeView() {
             {n:"1", icon:"📰", color:"#38bdf8", t:"6H-8H — QU'ONT FAIT L'ASIE ET LONDRES ?", sub:"News à fort impact de la nuit et du matin + commentaires des banques centrales (session wraps Investing). Tu comprends le POURQUOI derrière ce que les desks font."},
             {n:"2", icon:"👁️", color:"#38bdf8", t:"10H30 — VÉRIFIE LE PÔLE (H1)", sub:"Un seul flux continu de 3h à maintenant, sans inversion à 8h ? = PÔLE valide, qui confirme la narrative de l'étape 1. Inversé à 8h = pas de trade."},
             {n:"3", icon:"🥛", color:"#fbbf24", t:"10H30-10H55 — OUVRE MARKETMILK", sub:"Colle tes données, lance l'analyse. Quelle devise est FORTE ? Laquelle est FAIBLE ? (avant le Fix de 11h)"},
-            {n:"4", icon:"🔍", color:"#a78bfa", t:"LE SIGNAL : ① + ②", sub:"① Divergence ≥4 rangs · ② Top 5 Gainers (achat) ou Losers (vente). Les deux cochés = SIGNAL. Pour l'or : USD #1-2 = vente, #7-8 = achat."},
-            {n:"5", icon:"🎯", color:"#34d399", t:"SIGNAL ? LIS SES 💎", sub:"Carte VERTE = achat ▲ · ROUGE = vente ▼. Les 💎 (Retail piégé, Fonds alignés, Énergie) = la qualité : 0 💎 BRUT · 1-2 CONFIRMÉ · 3 PARFAIT. Tu identifies — tu n'entres pas encore."},
+            {n:"4", icon:"🔍", color:"#a78bfa", t:"LE SIGNAL : ① + ②", sub:"① Divergence ≥4 rangs · ② Top 5 Gainers (achat) ou Losers (vente). 2/2 = SIGNAL."},
+            {n:"5", icon:"🎯", color:"#34d399", t:"SIGNAL ? LIS SES 💎", sub:"VERTE = achat ▲ · ROUGE = vente ▼. 💎 Retail/Fonds/Énergie = la qualité : 0 BRUT · 1-2 CONFIRMÉ · 3 PARFAIT. Tu identifies — tu n'entres pas encore."},
             {n:"6", icon:"⏳", color:"#f59e0b", t:"11H30-17H — ATTENDS LE DRAPEAU", sub:"Le prix consolide en drift léger contre-tendance, SANS s'effondrer. Mesure la profondeur au Fibonacci (38.2 / 50 / Golden Pocket)."},
             {n:"7", icon:"🚀", color:"#34d399", t:"FIN NY-TOKYO 19H — ENTRE À LA CASSURE", sub:"Cassure dans le sens du pôle. ⚠️ News majeure à moins de 2h (calendrier) ? Attends qu'elle passe. Stop sous le drapeau · Target = hauteur du pôle · 1-3 jours."},
           ];
@@ -2978,7 +2979,7 @@ function DayTradeView() {
           ));
         })()}
         <div style={{fontSize:8, color:"#38bdf8", textAlign:"center", padding:"8px", marginTop:4, background:"#001018", borderRadius:6, fontWeight:600, lineHeight:1.5}}>
-          Pas de signal ①+② aujourd'hui ? = Pas de trade. C'est normal. Et un signal BRUT (0 💎) = tradable, mais tu sais que tu pars sans carburant confirmé — taille ta position en conséquence.
+          Pas de signal ①+② ? = Pas de trade, c'est normal. Un signal BRUT (0 💎) reste tradable, mais sans carburant confirmé : taille ta position en conséquence.
         </div>
       </div>
 
