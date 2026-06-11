@@ -2731,7 +2731,7 @@ function DayTradeAnalyzer() {
         const gems = (f5ok?1:0) + (fcotok?1:0) + (fvolok?1:0);
         const isMaxDiv = (base===strongest&&quote===weakest)||(base===weakest&&quote===strongest);
         const lfGap = (lfStrongNet!=null&&lfWeakNet!=null) ? (lfStrongNet - lfWeakNet) : 0;
-        const score = forceGap*10 + (isMaxDiv?5:0) + Math.abs(lfGap)/1000;
+        const score = forceGap*10 + gems*3 + (isMaxDiv?5:0) + Math.abs(lfGap)/1000;
         candidates.push({pair:wpair, base, quote, direction, forceGap, isMaxDiv, score, gems, gemRetail:f5ok, gemLF:fcotok, gemVol:fvolok, retailPct:(direction==="LONG"?rShort:rLong), retailSide:(direction==="LONG"?"SHORT":"LONG"), retailMissing:rMiss, weakCur, strongCur, lfStrongNet, lfWeakNet,
           strongRank: sRank[strongCur], weakRank: sRank[weakCur], strengthLen: nStr,
           inTop: f4ok, weakRepeat, strongRepeat, impulsif: volSet.has(wpair),
