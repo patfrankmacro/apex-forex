@@ -273,7 +273,7 @@ export default function DayTradeFxView(){
 
       <div style={{padding:"10px 12px", background:"#160a2e", borderRadius:8, border:"1px solid #c084fc44", marginBottom:14}}>
         <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:4}}>⚔️ DAY TRADE FX vs SWING FX — ne les mélange jamais</div>
-        <div style={{fontSize:8, color:TEXT, lineHeight:1.65}}>Même ADN (pôle → flag → cassure), deux animaux : le <b style={{color:"#38bdf8"}}>Day Trade</b> se scanne à 7h45-8h45 (Currency Strength seul, ≥3r), entre à 8h-8h45 sur M15, et meurt à 17h. Le <b style={{color:"#fbbf24"}}>Swing</b> s'analyse à 10h30-11h00 (signal ① + ② et ses bonus), entre le soir sur H1, et vit 1-3 jours. Un trade pris à 8h se gère en day trade jusqu'au bout — il ne devient JAMAIS un swing parce qu'il perd. Et un signal swing de 10h30 n'autorise aucune entrée anticipée du matin.</div>
+        <div style={{fontSize:8, color:TEXT, lineHeight:1.65}}>Même ADN (pôle → flag → cassure), deux animaux : le <b style={{color:"#38bdf8"}}>Day Trade</b> se scanne à 7h45-8h45 (≥3 rangs + sentiment aligné), entre à 8h-8h45 sur M15, et meurt à 17h. Le <b style={{color:"#fbbf24"}}>Swing</b> s'analyse à 10h30-11h00 (signal ① + ② et ses bonus), entre le soir sur H1, et vit 1-3 jours. Un trade pris à 8h se gère en day trade jusqu'au bout — il ne devient JAMAIS un swing parce qu'il perd. Et un signal swing de 10h30 n'autorise aucune entrée anticipée du matin.</div>
       </div>
     </div>
   );
