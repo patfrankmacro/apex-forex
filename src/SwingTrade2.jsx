@@ -98,7 +98,7 @@ export default function SwingTrade2View() {
         {[
           ["1","📰","6H-8H — LE POURQUOI","News de la nuit (Asie) et du matin (Londres) + banques centrales (session wraps). L'histoire qui anime les desks aujourd'hui."],
           ["2","🌡️","11H — LE SENTIMENT (③)","Un regard sur le Risk Meter, un clic sur le bouton — mémorisé pour la journée, partagé avec ton Day Trade. Le courant de fond est posé."],
-          ["3","🥛","11H-16H — SCANNE (① + ②)","Colle la page MarketMilk complète. Le Fix de 11h a signé la fin du travail de Londres, NY le teste en direct : tu lis les DEUX sessions. Le scanner croise divergence ≥3r + ton sentiment, et signale le bonus ② (Top 5) quand le mouvement a déjà éclaté."],
+          ["3","🥛","11H-16H — SCANNE (① + ③)","Colle la page MarketMilk complète. Le Fix de 11h a signé la fin du travail de Londres, NY le teste en direct : tu lis les DEUX sessions. Le scanner croise divergence ≥3r + ton sentiment, et signale le bonus ② (Top 5) quand le mouvement a déjà éclaté."],
           ["4","👁️","VÉRIFIE LE PÔLE (H1)","Sur la paire signalée : un flux continu depuis 3h, porté par Londres PUIS par NY, sans inversion majeure. Le pôle des deux sessions = la matière première de ton flag."],
           ["5","⏳","17H-2H — TOKYO DESSINE LE FLAG","NY ferme, l'Asie respire : drift léger contre-tendance, SANS effondrement. Mesure au Fibonacci sur le pôle Londres+NY : 38.2% sain · 50% limite · Golden Pocket = dernière défense."],
           ["6","🚀","ENTRE À LA CASSURE DU FLAG","Tokyo casse dans le sens du pôle = entrée pendant la nuit · sinon Londres rouvre à 3h et casse = entrée à la reprise. C'est la cassure qui décide du moment, pas l'horloge. Stop derrière le flag · Target = hauteur du pôle · 1-3 jours."],
