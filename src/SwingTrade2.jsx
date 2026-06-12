@@ -50,7 +50,7 @@ export default function SwingTrade2View() {
       };
       const gainers = grabSection("Top Gainers", ["Top Losers"]);
       const losers  = grabSection("Top Losers",  ["Currency Volatility","Most Volatile"]);
-      if (gainers.length===0 && losers.length===0) { setRes({error:"Top Gainers/Losers absents du collage. Le ② est obligatoire : colle la page MarketMilk COMPLÈTE."}); return; }
+      // Top 5 absent = bonus simplement indisponible, pas bloquant
       const out=[];
       ST_PAIRS.forEach(([b,q])=>{
         const gap = Math.abs(rank[b]-rank[q]);
@@ -58,24 +58,23 @@ export default function SwingTrade2View() {
         const pairStr = b+"/"+q;
         const inTop = dir==="LONG" ? gainers.includes(pairStr) : losers.includes(pairStr);
         const aligned = riskAligned(q, dir);
-        const ok = gap>=3 && inTop && aligned;
+        const ok = gap>=3 && aligned;
         let pourquoi = "";
         if (ok) {
           const sens = dir==="LONG" ? "ACHAT" : "VENTE";
           const courant = (q==="JPY")
             ? (dir==="LONG" ? "RISK-ON : le JPY refuge est vendu, le courant porte ta paire vers le haut" : "RISK-OFF : la fuite vers le JPY refuge porte ta vente")
             : (dir==="LONG" ? "RISK-OFF : le "+q+" risqué est lâché, ta paire monte avec le courant" : "RISK-ON : le "+q+" risqué est acheté, ta paire descend avec le courant");
-          pourquoi = sens+" car TRIPLE CONVERGENCE — ① "+b+" #"+rank[b]+" vs "+q+" #"+rank[q]+" = "+gap+" rangs (le capital a tranché sur les deux sessions) + ② "+pairStr+" dans le Top 5 "+(dir==="LONG"?"Gainers":"Losers")+" (le mouvement Londres+NY est réel) + ③ "+courant+". Les trois juges disent la même chose.";
+          pourquoi = sens+" car CONVERGENCE — ① "+b+" #"+rank[b]+" vs "+q+" #"+rank[q]+" = "+gap+" rangs (le capital a tranché sur les deux sessions) + ③ "+courant+"."+(inTop?" 🔥 BONUS ② : "+pairStr+" est dans le Top 5 "+(dir==="LONG"?"Gainers":"Losers")+" — le mouvement est DÉJÀ en cours, signal renforcé.":" (② Top 5 éteint : le mouvement n'a pas encore éclaté sur cette paire — la divergence est là, sois plus exigeant sur ton pôle H1.)");
         } else {
           const manque = [];
           if (gap<3) manque.push("divergence "+gap+"r (<3)");
-          if (gap>=3 && !inTop) manque.push("pas dans le Top 5 "+(dir==="LONG"?"Gainers":"Losers"));
-          if (gap>=3 && inTop && !aligned) manque.push(riskMode ? (riskMode==="NEUTRE"?"sentiment NEUTRE":"③ "+riskMode+" pousse dans l'autre sens") : "sentiment non choisi");
+          if (gap>=3 && !aligned) manque.push(riskMode ? (riskMode==="NEUTRE"?"sentiment NEUTRE":"③ "+riskMode+" pousse dans l'autre sens") : "sentiment non choisi");
           pourquoi = manque.join(" · ");
         }
         out.push({pair:pairStr, base:b, quote:q, rb:rank[b], rq:rank[q], gap, dir, inTop, aligned, ok, pourquoi});
       });
-      out.sort((a,b2)=>(b2.ok?1:0)-(a.ok?1:0) || b2.gap-a.gap);
+      out.sort((a,b2)=>(b2.ok?1:0)-(a.ok?1:0) || (b2.inTop?1:0)-(a.inTop?1:0) || b2.gap-a.gap);
       const ru = rank["USD"];
       let xau=null, xauConflit=null;
       if (ru <= 2 && riskMode === "RISK-ON") xau = {dir:"SHORT", why:"VENTE car DOUBLE CONVERGENCE — moteur dollar : USD #"+ru+" (l'or coté en USD subit sa force) + moteur peur : RISK-ON (le refuge est délaissé). Les deux moteurs poussent vers le BAS. Ton H1 confirme le pôle Londres+NY, le flag se dessine à Tokyo."};
@@ -91,15 +90,15 @@ export default function SwingTrade2View() {
   return (
     <div>
       <div style={{fontSize:15, color:"#34d399", fontWeight:900, letterSpacing:1.5, marginBottom:5}}>⚡ SWING TRADE 2.0</div>
-      <div style={{fontSize:9, color:"#34d399aa", fontWeight:700, letterSpacing:2, marginBottom:4}}>LONDRES + NEW YORK · ENTRÉE TOKYO · ① ② ③ CONVERGENTS</div>
-      <div style={{fontSize:8.5, color:TEXT_DIM, lineHeight:1.6, marginBottom:14}}>Tu lis la journée COMPLÈTE des deux desks majeurs (scan 11h-16h), le flag se dessine à Tokyo, et tu entres à sa cassure. LE SIGNAL : ① divergence ≥3r + ② Top 5 + ③ sentiment aligné — les trois convergent ou pas de trade. Position 1-3 jours.</div>
+      <div style={{fontSize:9, color:"#34d399aa", fontWeight:700, letterSpacing:2, marginBottom:4}}>LONDRES + NEW YORK · ENTRÉE TOKYO · ① + ③ CONVERGENTS · ② BONUS</div>
+      <div style={{fontSize:8.5, color:TEXT_DIM, lineHeight:1.6, marginBottom:14}}>Tu lis la journée COMPLÈTE des deux desks majeurs (scan 11h-16h), le flag se dessine à Tokyo, et tu entres à sa cassure. LE SIGNAL : ① divergence ≥3r + ③ sentiment aligné — les deux convergent ou pas de trade. BONUS ② : Top 5 Gainers/Losers = le mouvement a déjà éclaté, signal renforcé. Position 1-3 jours.</div>
 
       <div style={S.sec}>
         <div style={S.h}>📋 TA SÉQUENCE DU JOUR</div>
         {[
           ["1","📰","6H-8H — LE POURQUOI","News de la nuit (Asie) et du matin (Londres) + banques centrales (session wraps). L'histoire qui anime les desks aujourd'hui."],
           ["2","🌡️","11H — LE SENTIMENT (③)","Un regard sur le Risk Meter, un clic sur le bouton — mémorisé pour la journée, partagé avec ton Day Trade. Le courant de fond est posé."],
-          ["3","🥛","11H-16H — SCANNE (① + ②)","Colle la page MarketMilk complète. Le Fix de 11h a signé la fin du travail de Londres, NY le teste en direct : tu lis les DEUX sessions. Le scanner croise divergence ≥3r + Top 5 + ton sentiment."],
+          ["3","🥛","11H-16H — SCANNE (① + ②)","Colle la page MarketMilk complète. Le Fix de 11h a signé la fin du travail de Londres, NY le teste en direct : tu lis les DEUX sessions. Le scanner croise divergence ≥3r + ton sentiment, et signale le bonus ② (Top 5) quand le mouvement a déjà éclaté."],
           ["4","👁️","VÉRIFIE LE PÔLE (H1)","Sur la paire signalée : un flux continu depuis 3h, porté par Londres PUIS par NY, sans inversion majeure. Le pôle des deux sessions = la matière première de ton flag."],
           ["5","⏳","17H-2H — TOKYO DESSINE LE FLAG","NY ferme, l'Asie respire : drift léger contre-tendance, SANS effondrement. Mesure au Fibonacci sur le pôle Londres+NY : 38.2% sain · 50% limite · Golden Pocket = dernière défense."],
           ["6","🚀","ENTRE À LA CASSURE DU FLAG","Tokyo casse dans le sens du pôle = entrée pendant la nuit · sinon Londres rouvre à 3h et casse = entrée à la reprise. C'est la cassure qui décide du moment, pas l'horloge. Stop derrière le flag · Target = hauteur du pôle · 1-3 jours."],
@@ -110,7 +109,7 @@ export default function SwingTrade2View() {
             <div><div style={{fontSize:9, fontWeight:700, color:"#e2e8f0"}}>{e[1]+" "+e[2]}</div><div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5, marginTop:2}}>{e[3]}</div></div>
           </div>
         ))}
-        <div style={{fontSize:8, color:"#fbbf24", marginTop:6, lineHeight:1.5}}>Pas de triple convergence ? = Pas de trade, c'est la discipline. Un seul juge qui manque casse la chaîne.</div>
+        <div style={{fontSize:8, color:"#fbbf24", marginTop:6, lineHeight:1.5}}>Pas de convergence ① + ③ ? = Pas de trade, c'est la discipline. Le ② éteint ne bloque pas — il te dit juste d'être plus exigeant sur le pôle H1.</div>
       </div>
 
       <div style={S.sec}>
@@ -159,10 +158,10 @@ export default function SwingTrade2View() {
         <div style={S.p}>Pendant que tu prépares ton café, les desks de Londres ouvrent à 3h, tendent leur piège, puis chargent leur vraie position par tranches jusqu'au Fix de 11h. À 8h, New York arrive avec la liquidité mondiale doublée : elle teste Londres, puis HÉRITE de sa direction et la porte jusqu'à 17h. Ta mission : lire l'œuvre des DEUX, puis monter dans le train quand l'Asie a fini de respirer.</div>
         <div style={S.p}><b style={{color:"#34d399"}}>6h-8h — Tu lis le POURQUOI.</b> Session wraps, banques centrales, news de la nuit. Quelle histoire anime les desks ? Sans le pourquoi, le classement n'est qu'un tableau de chiffres.</div>
         <div style={S.p}><b style={{color:"#34d399"}}>11h — Le Fix signe, tu choisis le sentiment.</b> Le travail de Londres est officiellement clos. Un regard sur le Risk Meter, un clic : le ③ est posé pour la journée.</div>
-        <div style={S.p}><b style={{color:"#34d399"}}>11h-16h — Tu scannes les DEUX sessions.</b> Le Currency Strength agrège ce que Londres a FAIT et ce que NY en FAIT : une divergence ≥3r qui tient à travers les deux sessions = un vrai programme institutionnel, pas un coup du matin. Le Top 5 prouve que le mouvement est réel, le sentiment qu'il est porté. Triple convergence = signal.</div>
+        <div style={S.p}><b style={{color:"#34d399"}}>11h-16h — Tu scannes les DEUX sessions.</b> Le Currency Strength agrège ce que Londres a FAIT et ce que NY en FAIT : une divergence ≥3r qui tient à travers les deux sessions = un vrai programme institutionnel, pas un coup du matin. Le sentiment confirme que le courant mondial la porte. ① + ③ = signal — et si la paire est en plus dans le Top 5 (②), le mouvement a déjà éclaté : bonus.</div>
         <div style={S.p}><b style={{color:"#34d399"}}>17h-2h — Tokyo dessine ton flag.</b> NY ferme, les desks asiatiques gèrent sans conviction directionnelle : le prix drifte contre la tendance, doucement. C'est la respiration que tu mesures au Fibonacci sur le pôle Londres+NY.</div>
         <div style={S.p}><b style={{color:"#34d399"}}>La cassure — Tokyo ou Londres décide.</b> Si l'Asie casse le flag dans le sens du pôle pendant la nuit : entrée. Si elle respire sagement jusqu'au matin : Londres rouvre à 3h et c'est SA reprise qui casse — entrée à la reprise. Tu ne choisis pas l'heure, tu obéis à la cassure confirmée (clôture H1 hors du flag).</div>
-        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, padding:"8px 10px", background:"#02100a", borderRadius:5}}>⚡ En une phrase : Londres construit (3h-11h), NY valide et porte (8h-17h), Tokyo respire (17h-2h), et la cassure du flag — asiatique ou londonienne — te fait entrer dans un mouvement que DEUX sessions majeures ont déjà signé. Si un seul juge manque au scan — divergence, Top 5, sentiment — la chaîne est cassée et tu passes ton tour.</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, padding:"8px 10px", background:"#02100a", borderRadius:5}}>⚡ En une phrase : Londres construit (3h-11h), NY valide et porte (8h-17h), Tokyo respire (17h-2h), et la cassure du flag — asiatique ou londonienne — te fait entrer dans un mouvement que DEUX sessions majeures ont déjà signé. Si la divergence ou le sentiment manque au scan, la chaîne est cassée et tu passes ton tour. Le Top 5 (②) est le thermomètre : allumé = déjà parti, éteint = vérifie ton pôle de près.</div>
       </div>
 
       <div style={S.sec}>
@@ -200,7 +199,7 @@ export default function SwingTrade2View() {
         <div style={S.p}><b style={{color:"#e2e8f0"}}>Pourquoi regarder les DEUX ensemble.</b> Londres seule, c'est une opinion — la plus grosse du marché (40% du volume mondial), mais une opinion d'une session. Quand New York, le deuxième desk de la planète, REPREND la direction de Londres au lieu de la combattre, l'opinion devient un consensus mondial : les deux plus grosses forces du forex poussent dans le même sens. C'est ce consensus que ton scan de 11h-16h photographie — une divergence qui survit au Fix ET à des heures de NY n'est plus un coup du matin, c'est un programme.</div>
         <div style={S.p}><b style={{color:"#e2e8f0"}}>Ce qu'ils font vraiment.</b> Deutsche, HSBC, BNP, Barclays côté Londres ; JPMorgan, Citi, Goldman côté NY. Deux moteurs : les ORDRES CLIENTS (flux obligatoires de milliards) et la CONVICTION macro. Un desk qui doit vendre 2 milliards de JPY étale ses tranches sur des heures — c'est mathématique, pas psychologique. Cette obligation d'étalement crée le pôle régulier sur ton H1 : tu ne regardes pas du bruit, tu regardes un programme d'exécution.</div>
         <div style={S.p}><b style={{color:"#e2e8f0"}}>Comment les suivre en tant que retail.</b> Tu ne peux pas voir leurs ordres — mais tu vois leurs TRACES, et elles ne mentent pas : ① le Currency Strength (leur allocation agrégée sur les deux sessions) · ② le Top 5 Gainers/Losers (où leur volume s'est déversé aujourd'hui) · ③ le Risk Meter (le courant mondial dans lequel ils nagent) · ④ ton H1 (le pôle, leur exécution dessinée). Ton edge n'est pas l'information — c'est la PATIENCE : eux doivent exécuter toute la journée, toi tu peux attendre que tout converge et entrer une seule fois, au meilleur moment, sur le flag que leur pause asiatique te dessine.</div>
-        <div style={S.p}><b style={{color:"#e2e8f0"}}>Quand NE PAS les suivre.</b> Si NY inverse Londres (pôle cassé dans l'après-midi) : les deux desks ne sont pas d'accord, pas de consensus, pas de trade. Si la divergence existe mais sans le Top 5 : le programme est théorique, le volume n'a pas suivi. Si le sentiment contredit : leur direction nage contre le courant mondial — même les desks perdent ces batailles-là. Trois juges, trois OUI, ou rien.</div>
+        <div style={S.p}><b style={{color:"#e2e8f0"}}>Quand NE PAS les suivre.</b> Si NY inverse Londres (pôle cassé dans l'après-midi) : les deux desks ne sont pas d'accord, pas de consensus, pas de trade. Si la divergence existe sans le Top 5 (② éteint) : le programme est en place mais le volume n'a pas encore éclaté sur ta paire — signal valide, ton pôle H1 devient le juge décisif. Si le sentiment contredit : leur direction nage contre le courant mondial — même les desks perdent ces batailles-là. Trois juges, trois OUI, ou rien.</div>
       </div>
 
       <div style={S.sec}>
@@ -221,13 +220,13 @@ export default function SwingTrade2View() {
           ))}
           <div style={{display:"flex", borderBottom:"1px solid #1e293b", background:"#1a150033"}}><span style={{flex:1.2, color:"#fbbf24", fontWeight:700}}>XAU/USD 🥇</span><span style={{flex:1, color:"#f87171"}}>▼ VENTE si USD #1-2</span><span style={{flex:1, color:"#4ade80"}}>▲ ACHAT si USD #7-8</span></div>
         </div>
-        <div style={{fontSize:7.5, color:TEXT_DIM, lineHeight:1.5}}>Lecture : la direction affichée est la SEULE validable sous ce sentiment. L'autre = ⛔ bloquée même à 3+ rangs et dans le Top 5. L'or exige en plus sa condition dollar. NEUTRE = rien n'est validable.</div>
+        <div style={{fontSize:7.5, color:TEXT_DIM, lineHeight:1.5}}>Lecture : la direction affichée est la SEULE validable sous ce sentiment. L'autre = ⛔ bloquée même à 3+ rangs. L'or exige en plus sa condition dollar. NEUTRE = rien n'est validable.</div>
       </div>
 
       <div style={S.sec}>
         <div style={S.h}>🎯 LA LOGIQUE</div>
         <div style={S.p}>Londres traite ~40% du volume mondial du forex, New York ~19%. Ensemble : près de 60% de tout le change de la planète. Quand les DEUX poussent dans le même sens toute une journée, ce n'est plus une opinion — c'est le consensus des plus grosses forces du marché, et il ne se déboucle pas en une nuit. C'est exactement pour ça qu'une position peut tenir 1 à 3 jours : Tokyo respire, Londres recharge, NY reporte, et ton flag de la nuit n'est qu'une pause dans leur programme.</div>
-        <div style={S.p}>Le principe : acheter la plus FORTE contre la plus FAIBLE (① divergence ≥3 rangs après deux sessions), quand le mouvement est RÉEL (② Top 5 Gainers/Losers) et PORTÉ par le courant mondial (③ sentiment aligné). Trois juges indépendants — l'allocation du capital, le volume du jour, l'appétit au risque planétaire — qui disent la même chose mentent rarement ensemble. Un seul qui manque, et tu passes : le marché te redonnera une convergence demain ou après-demain. La discipline du non-trade EST le système.</div>
+        <div style={S.p}>Le principe : acheter la plus FORTE contre la plus FAIBLE (① divergence ≥3 rangs après deux sessions), quand il est PORTÉ par le courant mondial (③ sentiment aligné). Deux juges indépendants — l'allocation du capital et l'appétit au risque planétaire — qui convergent. Le ② (Top 5) est le bonus : allumé, le mouvement a déjà éclaté et ton signal est renforcé. Un seul qui manque, et tu passes : le marché te redonnera une convergence demain ou après-demain. La discipline du non-trade EST le système.</div>
       </div>
 
       <div style={S.sec}>
