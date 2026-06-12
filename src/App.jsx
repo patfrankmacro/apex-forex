@@ -3233,6 +3233,44 @@ function DayTradeView() {
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65}}>{"Puis même séquence : drapeau l'après-midi (Fib), cassure le soir, stop sur le drapeau, target = hauteur du pôle, 1-3 jours. Le COMEX porte toute la session NY, l'Asie peut relayer le soir. La carte or s'affiche sous ton diagnostic à chaque analyse."}</div>
       </div>
 
+      {/* SWING MID */}
+      <div style={{padding:"12px 14px", background:"#0d1117", borderRadius:8, border:"1px solid #c084fc55", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#c084fc", fontWeight:700, marginBottom:8}}>{"🌙 SWING MID — LA TENDANCE DE FOND (M30/H1 · analyse manuelle)"}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:10}}>{"Ton troisième système : suivre une tendance établie depuis des SEMAINES, en entrant tôt (3h-5h, pendant que Londres charge) quand TOUS les outils convergent. Pas de scanner — les outils sont visuels : c\u0027est TON analyse. Tu trades sur M30/H1, tu tiens plusieurs jours."}</div>
+        <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:5}}>{"🧠 LA PSYCHOLOGIE DES DESKS — VERSION MULTI-SEMAINES"}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:10}}>{"Une tendance de 30 jours n\u0027est pas une opinion qui dure : c\u0027est un programme d\u0027exécution institutionnel. Quand un fonds décide de réduire son exposition GBP, il ne vend pas tout en un jour — il programmerait sa propre chute. Il vend par tranches, jour après jour, semaine après semaine. Les courbes du Chart 30j qui glissent en pente régulière = un programme d\u0027exécution qui travaille. Chaque matin à 3h, les desks de Londres reprennent : le piège d\u0027ouverture, puis les tranches dans le sens du fond. Ton edge : tu connais leur programme AVANT la reprise — la tendance du mois te dit ce qu\u0027ils vont faire aujourd\u0027hui. Tu entres à 3h-5h pendant qu\u0027ils chargent. NY hérite ensuite du mouvement et le porte (8h-17h) — deux sessions par jour travaillent TA position, pendant des jours."}</div>
+        <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:5}}>{"📋 TA SÉQUENCE — DANS CET ORDRE"}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.7, marginBottom:10}}>
+          <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"1. Currency Strength Chart (30 jours)"}</b>{" — la tendance de FOND. Deux courbes qui s\u0027écartent depuis des semaines : ta paire = la devise qui grimpe contre celle qui glisse."}</div>
+          <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"2. Trend Strength Matrix (5/20 SMA)"}</b>{" — la structure. Ta faible côté GAUCHE (bearish), ta forte côté DROIT (bullish). Coins opposés = tendance installée des deux côtés."}</div>
+          <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"3. Trend Momentum (0-100)"}</b>{" — le carburant. Ta faible sous 50, ta forte au-dessus. Tendance sans momentum = essoufflée, pas d\u0027entrée."}</div>
+          <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"4. Currency Strength Meter (instantané)"}</b>{" — le jour ne contredit pas le mois. Ta faible PAS au Top 3 du jour, ta forte PAS au Bottom 3 — sinon la tendance respire, attends demain."}</div>
+          <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"5. Risk Meter"}</b>{" — le courant mondial porte ta direction (tableau ci-dessous). NEUTRE = la tendance de fond peut porter seule, mais demi-position."}</div>
+          <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"6. TON GRAPHIQUE M30/H1 — les sessions."}</b>{" Qu\u0027ont fait Londres et NY HIER ? Poussé dans le sens du fond = relais en place. Puis tu attends ta structure d\u0027entrée."}</div>
+        </div>
+        <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:5}}>{"📐 LA MÉCANIQUE D\u0027ENTRÉE — FLAG ET FIBONACCI (M30/H1)"}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:10}}>{"Même ADN — pôle, flag, cassure — à l\u0027échelle de la tendance. Le PÔLE = la dernière jambe impulsive (la poussée Londres+NY d\u0027hier, en M30/H1). Le FLAG = la respiration : drift contre-tendance pendant la nuit/Asie, SANS s\u0027effondrer. Profondeur au Fibonacci sur la jambe : 38.2% = saine · 50% = limite · Golden Pocket (61.8-65%) = dernière défense, au-delà = setup MORT. ENTRÉE : à la reprise de Londres (3h-5h), cassure du flag dans le sens du fond. STOP : derrière le flag, au-delà du Golden Pocket. TARGET : pas de cible fixe — trailing sous chaque swing M30/H1, tu tiens TANT QUE matrice et momentum confirment. Réévalue chaque matin : un outil qui flanche = stop serré, deux = sortie."}</div>
+        <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:5}}>{"✅ LA CONVERGENCE EXIGÉE"}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:10, padding:"8px 10px", background:"#1a1030", borderRadius:5}}>{"Chart 30j + Matrice + Momentum + Meter non-contradictoire + Sentiment aligné + Sessions d\u0027hier dans le sens + Flag à profondeur saine = ENTRÉE à la reprise de Londres. UN outil qui contredit = pas de trade. Système de PATIENCE : la tendance donne des semaines d\u0027occasions."}</div>
+        <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:5}}>{"📊 L\u0027INFLUENCE DU SENTIMENT"}</div>
+        <div style={{fontSize:8, color:TEXT, lineHeight:1.7, marginBottom:8}}>
+          <div style={{padding:"6px 8px", background:"#052010", borderRadius:5, marginBottom:4}}><b style={{color:"#4ade80"}}>{"🟢 RISK-ON"}</b>{" — AUD/NZD achetées, JPY/CHF vendus : croisements JPY montent (ACHATS validés) · croisements AUD/NZD descendent (VENTES validées) · or : VENTE converge si USD #1-2."}</div>
+          <div style={{padding:"6px 8px", background:"#200505", borderRadius:5, marginBottom:4}}><b style={{color:"#f87171"}}>{"🔴 RISK-OFF"}</b>{" — fuite vers JPY/CHF, AUD/NZD lâchées : croisements JPY descendent (VENTES validées) · croisements AUD/NZD montent (ACHATS validés) · or : ACHAT converge si USD #7-8."}</div>
+          <div style={{padding:"6px 8px", background:"#1a2030", borderRadius:5}}><b style={{color:"#94a3b8"}}>{"⚪ NEUTRE"}</b>{" — pas de courant : la tendance de fond peut porter seule au Swing Mid, mais demi-position et stop serré."}</div>
+        </div>
+        <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:5}}>{"📋 PAIRE PAR PAIRE"}</div>
+        <div style={{fontSize:7.5, fontFamily:"monospace", lineHeight:1.9, marginBottom:8}}>
+          <div style={{display:"flex", borderBottom:"1px solid #334155", paddingBottom:3, marginBottom:3, fontWeight:700, color:"#94a3b8"}}><span style={{flex:1.2}}>PAIRE</span><span style={{flex:1, color:"#4ade80"}}>{"🟢 RISK-ON"}</span><span style={{flex:1, color:"#f87171"}}>{"🔴 RISK-OFF"}</span></div>
+          {[["GBP/JPY","▲ ACHAT","▼ VENTE","a","v"],["EUR/JPY","▲ ACHAT","▼ VENTE","a","v"],["CHF/JPY","▲ ACHAT","▼ VENTE","a","v"],["EUR/AUD","▼ VENTE","▲ ACHAT","v","a"],["GBP/AUD","▼ VENTE","▲ ACHAT","v","a"],["EUR/NZD","▼ VENTE","▲ ACHAT","v","a"],["GBP/NZD","▼ VENTE","▲ ACHAT","v","a"]].map((r,i)=>(
+            <div key={i} style={{display:"flex", borderBottom:"1px solid #1e293b"}}><span style={{flex:1.2, color:"#e2e8f0", fontWeight:700}}>{r[0]}</span><span style={{flex:1, color:r[3]==="a"?"#4ade80":"#f87171"}}>{r[1]}</span><span style={{flex:1, color:r[4]==="a"?"#4ade80":"#f87171"}}>{r[2]}</span></div>
+          ))}
+          <div style={{display:"flex", borderBottom:"1px solid #1e293b", background:"#1a150033"}}><span style={{flex:1.2, color:"#fbbf24", fontWeight:700}}>{"XAU/USD 🥇"}</span><span style={{flex:1, color:"#f87171"}}>{"▼ VENTE si USD #1-2"}</span><span style={{flex:1, color:"#4ade80"}}>{"▲ ACHAT si USD #7-8"}</span></div>
+        </div>
+        <a href="https://marketmilk.babypips.com/currency-strength" target="_blank" rel="noopener noreferrer" style={{display:"block", fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700, marginBottom:4}}>{"📈 MarketMilk Currency Strength (Chart 30j · Matrice · Momentum) ↗"}</a>
+        <a href="https://www.babypips.com/tools/risk-on-risk-off-meter" target="_blank" rel="noopener noreferrer" style={{display:"block", fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700}}>{"🌡️ Ouvrir le Risk-On/Risk-Off Meter ↗"}</a>
+      </div>
+
+
       {/* SEQUENCE */}
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:12, color:"#38bdf8", fontWeight:800, letterSpacing:0.5, marginBottom:10, paddingBottom:6, borderBottom:"1px solid #38bdf833"}}>📋 LA SÉQUENCE — ÉTAPE PAR ÉTAPE</div>
