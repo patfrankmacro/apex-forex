@@ -70,7 +70,7 @@ function DtAnalyzer(){
         }
         out.push({pair:b+"/"+q, base:b, quote:q, rb:rank[b], rq:rank[q], gap, dir, ok:(gap>=3 && aligned), gapOk:gap>=3, aligned, pourquoi});
       });
-      out.sort((a,b)=>b.gap-a.gap);
+      out.sort((a,b)=> (b.ok?1:0)-(a.ok?1:0) || b.gap-a.gap);
       // XAU/USD : cas special — l'or se trade contre la position du dollar seul
       const ru = rank["USD"];
       let xau = null;
@@ -106,15 +106,17 @@ function DtAnalyzer(){
       {res && res.out && (
         <div style={{marginTop:10}}>
           <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:6}}>Scan de {res.heure} · classement : {res.order.join(" > ")}</div>
-          {res.out.map((p,i)=>(
+          {res.out.filter(p=>p.ok).length===0 && <div style={{padding:"10px", background:"#1a1205", borderRadius:6, fontSize:9, color:"#fbbf24", marginBottom:6}}>{"Aucune paire validée — divergences et sentiment ne convergent pas aujourd'hui. Pas de trade FX, c'est la discipline."}</div>}
+          {res.out.filter(p=>p.ok).map((p,i)=>(
             <div key={i} style={{padding:"7px 9px", marginBottom:4, background:p.ok?(p.dir==="LONG"?"#052010":"#200505"):"#0f1622", borderRadius:5, borderLeft:"3px solid "+(p.ok?(p.dir==="LONG"?"#4ade80":"#f87171"):"#334155")}}>
               <div style={{fontSize:9.5, fontWeight:700, color:p.ok?(p.dir==="LONG"?"#4ade80":"#f87171"):"#64748b"}}>
-                {p.ok?"✅":"·"} {p.pair} {p.ok?(p.dir==="LONG"?"▲ ACHAT possible":"▼ VENTE possible"):(p.gapOk && !p.aligned ? "⛔ "+p.gap+"r mais sentiment contraire" : "")} — {p.base} #{p.rb} vs {p.quote} #{p.rq} = {p.gap} rang{p.gap>1?"s":""} {p.ok?"(≥3 ✓)":"(<3)"}
+                {p.ok?"✅":"·"} {p.pair} {p.ok?(p.dir==="LONG"?"▲ ACHAT possible":"▼ VENTE possible"):(p.gapOk && !p.aligned ? "⛔ "+p.gap+"r mais sentiment contraire" : "")} — {p.base} #{p.rb} vs {p.quote} #{p.rq} = {p.gap} rang{p.gap>1?"s":""} {p.ok?"(≥3 ✓)":(p.gapOk?"(≥3 mais ③ ✗)":"(<3)")}
               </div>
               {p.pourquoi && <div style={{fontSize:8, color:p.ok?"#86efac":"#fbbf24", marginTop:3, lineHeight:1.5, fontStyle:"italic"}}>{p.pourquoi}</div>}
               {p.ok && <div style={{fontSize:8, color:TEXT_DIM, marginTop:3, lineHeight:1.5}}>Maintenant ton graphique M15 : pôle de Londres continu depuis 3h dans ce sens ? Flag dessiné depuis ~7h30 ? Pas de news US à 8h30 ? Alors attends la cassure du flag — c'est ton entrée.</div>}
             </div>
           ))}
+          <div style={{fontSize:7.5, color:"#64748b", marginBottom:6}}>{res.out.filter(p=>!p.ok).length+" paire(s) écartée(s) — divergence insuffisante ou sentiment contraire"}</div>
           <div style={{padding:"7px 9px", marginBottom:4, background:res.xau?(res.xau.dir==="LONG"?"#1a1500":"#200505"):"#0f1622", borderRadius:5, borderLeft:"3px solid "+(res.xau?"#fbbf24":"#334155")}}>
             <div style={{fontSize:9.5, fontWeight:700, color:res.xau?"#fbbf24":"#64748b"}}>
               {res.xau?"✅":"·"} XAU/USD (OR) {res.xau?(res.xau.dir==="LONG"?"▲ ACHAT possible":"▼ VENTE possible"):(res.xauNote || "— USD #"+res.ru+" au milieu (3-6), pas de conviction")}
