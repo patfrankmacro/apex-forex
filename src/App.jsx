@@ -31,7 +31,7 @@ function SwingMidView() {
           <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"5. Risk Meter"}</b>{" — le courant mondial porte ta direction (tableau ci-dessous). NEUTRE = la tendance de fond peut porter seule, mais demi-position."}</div>
           <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"6. TON GRAPHIQUE M30/H1 — les sessions."}</b>{" Qu\u0027ont fait Londres et NY HIER ? Poussé dans le sens du fond = relais en place. Puis tu attends ta structure d\u0027entrée."}</div>
         </div>
-        <div style={{padding:"10px", background:"#0a0a14", borderRadius:6, marginBottom:10, fontFamily:"monospace", fontSize:8, lineHeight:1.5, color:"#c8d4f0", overflowX:"auto"}}>
+        <div style={{padding:"10px", background:"#0a0a14", borderRadius:6, marginBottom:10, fontFamily:"monospace", fontSize:8, lineHeight:1.5, color:"#c8d4f0", overflowX:"auto", whiteSpace:"pre"}}>
           <div style={{color:"#c084fc", fontWeight:700, marginBottom:6}}>{"VENTE (tendance de fond baissière) — le miroir haussier est identique, inversé :"}</div>
           <div>{"│\\"}</div>
           <div>{"│ \\  LA JAMBE (pôle) = Londres+NY d\u0027hier"}</div>
