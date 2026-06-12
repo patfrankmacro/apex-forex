@@ -1,5 +1,6 @@
 import SentimentView from "./SentimentView";
 import DayTradeFxView from "./DayTradeFx";
+import SwingTrade2View from "./SwingTrade2";
 import { useState, useMemo, useEffect } from "react";
 import { db } from "./firebase.js";
 import { ref, onValue, set } from "firebase/database";
@@ -3232,7 +3233,7 @@ function DayTradeView() {
 
         <div style={{padding:"10px 11px", background:"#160a2e", borderRadius:6, border:"1px solid #818cf844"}}>
           <div style={{fontSize:10, color:"#a5b4fc", fontWeight:700, marginBottom:4}}>🎯 LE SIGNAL ET SES BONUS — comment lire l'ensemble</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>LE SIGNAL (① + ②) capture le couple qui compte : la divergence montre OÙ le capital coule, le Top 5 prouve que le mouvement est RÉEL aujourd'hui. <b style={{color:"#a5b4fc"}}>Les deux ensemble mentent rarement dans le même sens.</b><br/><br/>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>LE SIGNAL (① + ② + ③) capture le trio qui compte : la divergence montre OÙ le capital coule, le Top 5 prouve que le mouvement est RÉEL et le sentiment confirme le courant mondial aujourd'hui. <b style={{color:"#a5b4fc"}}>Les trois ensemble mentent rarement dans le même sens.</b><br/><br/>
           Les bonus ajoutent le contexte : Retail piégé = du carburant de stops pour ta cassure · Fonds alignés = le flux hebdo avec toi · Énergie = le feu du jour sur ta paire. Un signal 3 bonus (l'ancien 5/5) = le courant parfait. Un signal BRUT = la structure sans le carburant confirmé — tradable, taille réduite. L'historique tranche le débat avec le temps.</div>
         </div>
       </div>
@@ -4028,6 +4029,7 @@ export default function App() {
         <div style={{ display:"flex", gap:6, flexWrap:"wrap", alignItems:"center" }}>
           <button onClick={()=>setView("daytrade")} style={{ padding:"6px 12px", borderRadius:6, fontSize:10, fontWeight:800, letterSpacing:1, cursor:"pointer", border: view==="daytrade"?"2px solid #fbbf24":"2px solid #fbbf2466", background: view==="daytrade"?"#fbbf24":"#1a1500", color: view==="daytrade"?"#1a1500":"#fbbf24", fontFamily:"'IBM Plex Mono'", boxShadow:"0 0 8px rgba(251,191,36,0.3)" }}>⚡ SWING TRADE FX</button>
           <button onClick={()=>setView("daytradefx")} style={{ padding:"6px 12px", borderRadius:6, fontSize:10, fontWeight:800, letterSpacing:1, cursor:"pointer", border: view==="daytradefx"?"2px solid #38bdf8":"2px solid #38bdf866", background: view==="daytradefx"?"#38bdf8":"#001018", color: view==="daytradefx"?"#001018":"#38bdf8", fontFamily:"'IBM Plex Mono'", boxShadow:"0 0 8px rgba(56,189,248,0.3)" }}>⚡ DAY TRADE FX</button>
+          <button onClick={()=>setView("swing2")} style={{ padding:"6px 12px", borderRadius:6, fontSize:10, fontWeight:800, letterSpacing:1, cursor:"pointer", border: view==="swing2"?"2px solid #34d399":"2px solid #34d39966", background: view==="swing2"?"#34d399":"#02100a", color: view==="swing2"?"#02100a":"#34d399", fontFamily:"'IBM Plex Mono'", boxShadow:"0 0 8px rgba(52,211,153,0.3)" }}>⚡ SWING 2.0</button>
           <div style={{ width:1, height:20, background:BORDER, margin:"0 2px" }} />
           {TABS.map(t=><button key={t.id} style={tabStyle(view===t.id)} onClick={()=>setView(t.id)}>{t.label}</button>)}
         </div>
@@ -4813,6 +4815,7 @@ const retailLoaded = opps.some(o => o.retailData);
       {view==="calc"    && <PositionCalc />}
       {view==="daytrade" && <DayTradeView />}
       {view==="daytradefx" && <DayTradeFxView />}
+      {view==="swing2" && <SwingTrade2View />}
     </div>
   );
 }
