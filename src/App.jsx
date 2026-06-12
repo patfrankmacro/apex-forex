@@ -15,6 +15,13 @@ function SwingMidView() {
         <div style={{fontSize:8.5, color:"#c8d4f0", lineHeight:1.65, marginBottom:10}}>{"Ton troisième système : suivre une tendance établie depuis des SEMAINES, en entrant tôt (3h-5h, pendant que Londres charge) quand TOUS les outils convergent. Pas de scanner — les outils sont visuels : c\u0027est TON analyse. Tu trades sur M30/H1, tu tiens plusieurs jours."}</div>
         <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:5}}>{"🧠 LA PSYCHOLOGIE DES DESKS — VERSION MULTI-SEMAINES"}</div>
         <div style={{fontSize:8.5, color:"#c8d4f0", lineHeight:1.65, marginBottom:10}}>{"Une tendance de 30 jours n\u0027est pas une opinion qui dure : c\u0027est un programme d\u0027exécution institutionnel. Quand un fonds décide de réduire son exposition GBP, il ne vend pas tout en un jour — il programmerait sa propre chute. Il vend par tranches, jour après jour, semaine après semaine. Les courbes du Chart 30j qui glissent en pente régulière = un programme d\u0027exécution qui travaille. Chaque matin à 3h, les desks de Londres reprennent : le piège d\u0027ouverture, puis les tranches dans le sens du fond. Ton edge : tu connais leur programme AVANT la reprise — la tendance du mois te dit ce qu\u0027ils vont faire aujourd\u0027hui. Tu entres à 3h-5h pendant qu\u0027ils chargent. NY hérite ensuite du mouvement et le porte (8h-17h) — deux sessions par jour travaillent TA position, pendant des jours."}</div>
+        <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:5}}>{"🧠 COMMENT LIRE LES BIG BOYS LE MATIN — ET POURQUOI LONDRES + NY"}</div>
+        <div style={{fontSize:8.5, color:"#c8d4f0", lineHeight:1.7, marginBottom:10}}>
+          <div style={{marginBottom:7}}><b style={{color:"#e2e8f0"}}>{"Ce que tu regardes sur ton M30/H1 entre 3h et 5h."}</b>{" Hier, Londres et NY ont laissé une trace : des bougies directionnelles dans le sens du fond (leurs tranches d\u0027exécution), puis la nuit/Asie qui drifte mollement contre — le marché respire, personne ne s\u0027oppose. À 3h, Londres rouvre. Les 30-60 premières minutes = le piège habituel : un pic contre la tendance qui chasse les stops. PUIS la reprise : des bougies M30 pleines, corps larges, dans le sens du fond — le programme redémarre. Cette reprise, cassant le flag de la nuit, c\u0027est ton signal."}</div>
+          <div style={{marginBottom:7}}><b style={{color:"#e2e8f0"}}>{"Distinguer la reprise du piège."}</b>{" Le piège est court, en mèches, et revient vite dans le flag. La reprise est soutenue : 2-3 bougies M30 consécutives qui CLÔTURENT hors du flag. Tu n\u0027entres jamais sur la première bougie — tu entres sur la clôture confirmée. Si Londres pousse CONTRE le fond avec conviction : le programme est peut-être fini — pas de trade, réévalue demain."}</div>
+          <div style={{marginBottom:7}}><b style={{color:"#e2e8f0"}}>{"Pourquoi Londres ET New York — le relais qui paye."}</b>{" Au Day Trade tu prends UNE session. Au Swing Mid tu encaisses le relais complet, plusieurs jours : Londres charge (3h-11h30), NY hérite et porte (8h-17h), l\u0027Asie respire (le soir = ton prochain flag), Londres recharge demain. Un programme de plusieurs semaines se déroule en vagues quotidiennes — chaque jour rejoue pôle-flag-reprise. Toi, tu es entré UNE fois, et tu laisses les vagues pousser. C\u0027est pour ça que le trailing remplace la target : tu ne sais pas combien de vagues il reste, mais la matrice et le momentum te disent quand le programme s\u0027essouffle."}</div>
+          <div style={{marginBottom:7}}><b style={{color:"#e2e8f0"}}>{"Pourquoi les desks ne peuvent pas cacher leur programme."}</b>{" Un fonds qui déballe des milliards DOIT étaler ses ordres — c\u0027est mathématique. Cet étalement crée la pente régulière du Chart 30j, les vagues sur ton M30, et la persistance que la matrice mesure. Le retail voit du bruit ; toi tu vois un programme. Ton travail : vérifier chaque matin qu\u0027il tourne (séquence ci-dessous), et monter dans la vague du jour."}</div>
+        </div>
         <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:5}}>{"📋 TA SÉQUENCE — DANS CET ORDRE"}</div>
         <div style={{fontSize:8.5, color:"#c8d4f0", lineHeight:1.7, marginBottom:10}}>
           <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"1. Currency Strength Chart (30 jours)"}</b>{" — la tendance de FOND. Deux courbes qui s\u0027écartent depuis des semaines : ta paire = la devise qui grimpe contre celle qui glisse."}</div>
@@ -23,6 +30,20 @@ function SwingMidView() {
           <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"4. Currency Strength Meter (instantané)"}</b>{" — le jour ne contredit pas le mois. Ta faible PAS au Top 3 du jour, ta forte PAS au Bottom 3 — sinon la tendance respire, attends demain."}</div>
           <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"5. Risk Meter"}</b>{" — le courant mondial porte ta direction (tableau ci-dessous). NEUTRE = la tendance de fond peut porter seule, mais demi-position."}</div>
           <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"6. TON GRAPHIQUE M30/H1 — les sessions."}</b>{" Qu\u0027ont fait Londres et NY HIER ? Poussé dans le sens du fond = relais en place. Puis tu attends ta structure d\u0027entrée."}</div>
+        </div>
+        <div style={{padding:"10px", background:"#0a0a14", borderRadius:6, marginBottom:10, fontFamily:"monospace", fontSize:8, lineHeight:1.5, color:"#c8d4f0", overflowX:"auto"}}>
+          <div style={{color:"#c084fc", fontWeight:700, marginBottom:6}}>{"VENTE (tendance de fond baissière) — le miroir haussier est identique, inversé :"}</div>
+          <div>{"│\\"}</div>
+          <div>{"│ \\  LA JAMBE (pôle) = Londres+NY d\u0027hier"}</div>
+          <div>{"│  \\"}</div>
+          <div>{"│   \\     ____ 38.2% (drift sain)"}</div>
+          <div>{"│    \\   /    \\"}</div>
+          <div style={{color:"#fbbf24"}}>{"│     \\_/ FLAG \\___ 50% (limite)"}</div>
+          <div style={{color:"#f87171"}}>{"│      (61.8-65% Golden Pocket = dernière défense)"}</div>
+          <div>{"│        \\"}</div>
+          <div style={{color:"#4ade80"}}>{"│         \\ ← CASSURE à la reprise de Londres (3h-5h)"}</div>
+          <div>{"│          ↓ TRAILING — pas de target fixe"}</div>
+          <div>{"└──────────────── temps (le flag = la nuit/Asie)"}</div>
         </div>
         <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:5}}>{"📐 LA MÉCANIQUE D\u0027ENTRÉE — FLAG ET FIBONACCI (M30/H1)"}</div>
         <div style={{fontSize:8.5, color:"#c8d4f0", lineHeight:1.65, marginBottom:10}}>{"Même ADN — pôle, flag, cassure — à l\u0027échelle de la tendance. Le PÔLE = la dernière jambe impulsive (la poussée Londres+NY d\u0027hier, en M30/H1). Le FLAG = la respiration : drift contre-tendance pendant la nuit/Asie, SANS s\u0027effondrer. Profondeur au Fibonacci sur la jambe : 38.2% = saine · 50% = limite · Golden Pocket (61.8-65%) = dernière défense, au-delà = setup MORT. ENTRÉE : à la reprise de Londres (3h-5h), cassure du flag dans le sens du fond. STOP : derrière le flag, au-delà du Golden Pocket. TARGET : pas de cible fixe — trailing sous chaque swing M30/H1, tu tiens TANT QUE matrice et momentum confirment. Réévalue chaque matin : un outil qui flanche = stop serré, deux = sortie."}</div>
@@ -44,6 +65,11 @@ function SwingMidView() {
         </div>
         <a href="https://marketmilk.babypips.com/currency-strength" target="_blank" rel="noopener noreferrer" style={{display:"block", fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700, marginBottom:4}}>{"📈 MarketMilk Currency Strength (Chart 30j · Matrice · Momentum) ↗"}</a>
         <a href="https://www.babypips.com/tools/risk-on-risk-off-meter" target="_blank" rel="noopener noreferrer" style={{display:"block", fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700}}>{"🌡️ Ouvrir le Risk-On/Risk-Off Meter ↗"}</a>
+        <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginTop:8, marginBottom:4}}>{"📰 TA PRÉPARATION DU MATIN (mêmes sources que le Swing)"}</div>
+        <a href="https://investinglive.com/" target="_blank" rel="noopener noreferrer" style={{display:"block", fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700, marginBottom:4}}>{"📰 InvestingLive — session wraps et news ↗"}</a>
+        <a href="https://www.financialjuice.com/home" target="_blank" rel="noopener noreferrer" style={{display:"block", fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700, marginBottom:4}}>{"🎧 FinancialJuice — le flux news en direct ↗"}</a>
+        <a href="https://www.babypips.com/economic-calendar?week=2026-W23" target="_blank" rel="noopener noreferrer" style={{display:"block", fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700, marginBottom:4}}>{"📅 Calendrier économique — vérifie les news avant d\u0027entrer ↗"}</a>
+        <a href="https://www.myfxbook.com/community/outlook" target="_blank" rel="noopener noreferrer" style={{display:"block", fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700}}>{"🎭 Myfxbook Outlook — le positionnement retail ↗"}</a>
       </div>
     </div>
   );
