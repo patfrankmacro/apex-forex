@@ -5,6 +5,35 @@ import { db } from "./firebase.js";
 import { ref, onValue, set } from "firebase/database";
 
 function SwingMidView() {
+  const [weak, setWeak] = useState(null);
+  const [strong, setStrong] = useState(null);
+  const [mtx, setMtx] = useState(null);
+  const [mom, setMom] = useState(null);
+  const [sent, setSent] = useState(() => { try { const s = JSON.parse(localStorage.getItem("apexRisk")||"null"); if (s && s.d === new Date().toDateString()) return s.m; } catch(e){} return null; });
+  const setSentP = (m) => { setSent(m); try { localStorage.setItem("apexRisk", JSON.stringify({m, d:new Date().toDateString()})); } catch(e){} };
+  const MID_PAIRS = [["EUR","AUD"],["GBP","AUD"],["EUR","NZD"],["GBP","NZD"],["GBP","JPY"],["EUR","JPY"],["CHF","JPY"]];
+  let verdict = null;
+  if (weak && strong && weak === strong) verdict = {ok:false, msg:"La même devise ne peut pas glisser ET grimper — revérifie ton Chart 30j."};
+  else if (weak && strong) {
+    const hit = MID_PAIRS.find(([b,q]) => (b===weak && q===strong) || (b===strong && q===weak));
+    if (!hit) verdict = {ok:false, msg:weak+" + "+strong+" ne forme aucune de tes 7 paires (Londres vs Asie-Pacifique). Cherche un autre couple sur le Chart 30j."};
+    else {
+      const dir = hit[0]===strong ? "ACHAT" : "VENTE";
+      const pair = hit[0]+"/"+hit[1];
+      const quote = hit[1];
+      const aligned = sent && sent!=="NEUTRE" && (quote==="JPY" ? (dir==="ACHAT" ? sent==="RISK-ON" : sent==="RISK-OFF") : (dir==="ACHAT" ? sent==="RISK-OFF" : sent==="RISK-ON"));
+      const manque = [];
+      if (mtx!=="OUI") manque.push("la Matrice (étape 2)");
+      if (mom!=="OUI") manque.push("le Momentum (étape 3)");
+      if (!sent) manque.push("le sentiment (étape 4)");
+      else if (sent==="NEUTRE") manque.push("sentiment NEUTRE : demi-position seulement");
+      else if (!aligned) manque.push("le sentiment "+sent+" pousse "+pair+" dans l\u0027autre sens");
+      if (manque.length===0) verdict = {ok:true, pair, dir, msg:dir+" "+pair+" — CONVERGENCE TOTALE : tendance 30j ("+strong+" grimpe, "+weak+" glisse) + structure + momentum + "+sent+" aligné. Maintenant ton M30/H1 : la jambe d\u0027hier, le flag de nuit ≤50% Fib, et tu entres à la cassure quand Londres reprend (3h-5h)."};
+      else if (sent==="NEUTRE" && mtx==="OUI" && mom==="OUI") verdict = {ok:true, pair, dir, demi:true, msg:dir+" "+pair+" — convergence sans courant (sentiment NEUTRE) : la tendance de fond peut porter seule, DEMI-POSITION et stop serré. Ton M30/H1 décide."};
+      else verdict = {ok:false, msg:pair+" "+dir+" en vue, mais il manque : "+manque.join(" · ")+". Pas de trade tant que tout ne converge pas."};
+    }
+  }
+  const curBtn = (cur, sel, setter) => null;
   return (
     <div>
       <div style={{fontSize:15, color:"#c084fc", fontWeight:900, letterSpacing:1.5, marginBottom:5}}>{"🌙 SWING MID"}</div>
@@ -27,9 +56,8 @@ function SwingMidView() {
           <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"1. Currency Strength Chart (30 jours)"}</b>{" — la tendance de FOND. Deux courbes qui s\u0027écartent depuis des semaines : ta paire = la devise qui grimpe contre celle qui glisse."}</div>
           <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"2. Trend Strength Matrix (5/20 SMA)"}</b>{" — la structure. Ta faible côté GAUCHE (bearish), ta forte côté DROIT (bullish). Coins opposés = tendance installée des deux côtés."}</div>
           <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"3. Trend Momentum (0-100)"}</b>{" — le carburant. Ta faible sous 50, ta forte au-dessus. Tendance sans momentum = essoufflée, pas d\u0027entrée."}</div>
-          <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"4. Currency Strength Meter (instantané)"}</b>{" — le jour ne contredit pas le mois. Ta faible PAS au Top 3 du jour, ta forte PAS au Bottom 3 — sinon la tendance respire, attends demain."}</div>
-          <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"5. Risk Meter"}</b>{" — le courant mondial porte ta direction (tableau ci-dessous). NEUTRE = la tendance de fond peut porter seule, mais demi-position."}</div>
-          <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"6. TON GRAPHIQUE M30/H1 — les sessions."}</b>{" Qu\u0027ont fait Londres et NY HIER ? Poussé dans le sens du fond = relais en place. Puis tu attends ta structure d\u0027entrée."}</div>
+          <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"4. Risk Meter"}</b>{" — le courant mondial porte ta direction (tableau ci-dessous). NEUTRE = la tendance de fond peut porter seule, mais demi-position."}</div>
+          <div style={{marginBottom:6}}><b style={{color:"#e2e8f0"}}>{"5. TON GRAPHIQUE M30/H1 — les sessions."}</b>{" Qu\u0027ont fait Londres et NY HIER ? Poussé dans le sens du fond = relais en place. Puis tu attends ta structure d\u0027entrée."}</div>
         </div>
         <div style={{padding:"10px", background:"#0a0a14", borderRadius:6, marginBottom:10, fontFamily:"monospace", fontSize:8, lineHeight:1.5, color:"#c8d4f0", overflowX:"auto", whiteSpace:"pre"}}>
           <div style={{color:"#c084fc", fontWeight:700, marginBottom:6}}>{"VENTE (tendance de fond baissière) — le miroir haussier est identique, inversé :"}</div>
@@ -47,8 +75,42 @@ function SwingMidView() {
         </div>
         <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:5}}>{"📐 LA MÉCANIQUE D\u0027ENTRÉE — FLAG ET FIBONACCI (M30/H1)"}</div>
         <div style={{fontSize:8.5, color:"#c8d4f0", lineHeight:1.65, marginBottom:10}}>{"Même ADN — pôle, flag, cassure — à l\u0027échelle de la tendance. Le PÔLE = la dernière jambe impulsive (la poussée Londres+NY d\u0027hier, en M30/H1). Le FLAG = la respiration : drift contre-tendance pendant la nuit/Asie, SANS s\u0027effondrer. Profondeur au Fibonacci sur la jambe : 38.2% = saine · 50% = limite · Golden Pocket (61.8-65%) = dernière défense, au-delà = setup MORT. ENTRÉE : à la reprise de Londres (3h-5h), cassure du flag dans le sens du fond. STOP : derrière le flag, au-delà du Golden Pocket. TARGET : pas de cible fixe — trailing sous chaque swing M30/H1, tu tiens TANT QUE matrice et momentum confirment. Réévalue chaque matin : un outil qui flanche = stop serré, deux = sortie."}</div>
+        <div style={{padding:"10px", background:"#14081f", borderRadius:6, border:"1px solid #c084fc44", marginBottom:10}}>
+          <div style={{fontSize:9.5, color:"#c084fc", fontWeight:700, marginBottom:6}}>{"🤖 TON CHECKER DE CONVERGENCE — réponds avec tes yeux, l\u0027app croise"}</div>
+          <div style={{fontSize:8, color:"#94a3b8", marginBottom:3}}>{"1. Quelle devise GLISSE depuis des semaines (Chart 30j) ?"}</div>
+          <div style={{display:"flex", gap:4, flexWrap:"wrap", marginBottom:6}}>
+            {["EUR","GBP","CHF","AUD","NZD","JPY"].map(d => (
+              <button key={d} onClick={()=>setWeak(d)} style={{padding:"5px 9px", borderRadius:4, fontSize:8.5, fontWeight:700, cursor:"pointer", border: weak===d?"2px solid #f87171":"1px solid #334155", background: weak===d?"#200505":"#0a0f1a", color: weak===d?"#f87171":"#64748b"}}>{d}</button>
+            ))}
+          </div>
+          <div style={{fontSize:8, color:"#94a3b8", marginBottom:3}}>{"2. Quelle devise GRIMPE ?"}</div>
+          <div style={{display:"flex", gap:4, flexWrap:"wrap", marginBottom:6}}>
+            {["EUR","GBP","CHF","AUD","NZD","JPY"].map(d => (
+              <button key={d} onClick={()=>setStrong(d)} style={{padding:"5px 9px", borderRadius:4, fontSize:8.5, fontWeight:700, cursor:"pointer", border: strong===d?"2px solid #4ade80":"1px solid #334155", background: strong===d?"#052010":"#0a0f1a", color: strong===d?"#4ade80":"#64748b"}}>{d}</button>
+            ))}
+          </div>
+          <div style={{fontSize:8, color:"#94a3b8", marginBottom:3}}>{"3. Matrice OK ? (faible à GAUCHE, forte à DROITE)"}</div>
+          <div style={{display:"flex", gap:4, marginBottom:6}}>
+            {["OUI","NON"].map(v => (
+              <button key={v} onClick={()=>setMtx(v)} style={{flex:1, padding:"5px", borderRadius:4, fontSize:8.5, fontWeight:700, cursor:"pointer", border: mtx===v?(v==="OUI"?"2px solid #4ade80":"2px solid #f87171"):"1px solid #334155", background: mtx===v?(v==="OUI"?"#052010":"#200505"):"#0a0f1a", color: mtx===v?(v==="OUI"?"#4ade80":"#f87171"):"#64748b"}}>{v}</button>
+            ))}
+          </div>
+          <div style={{fontSize:8, color:"#94a3b8", marginBottom:3}}>{"4. Momentum OK ? (faible sous 50, forte au-dessus)"}</div>
+          <div style={{display:"flex", gap:4, marginBottom:6}}>
+            {["OUI","NON"].map(v => (
+              <button key={v} onClick={()=>setMom(v)} style={{flex:1, padding:"5px", borderRadius:4, fontSize:8.5, fontWeight:700, cursor:"pointer", border: mom===v?(v==="OUI"?"2px solid #4ade80":"2px solid #f87171"):"1px solid #334155", background: mom===v?(v==="OUI"?"#052010":"#200505"):"#0a0f1a", color: mom===v?(v==="OUI"?"#4ade80":"#f87171"):"#64748b"}}>{v}</button>
+            ))}
+          </div>
+          <div style={{fontSize:8, color:"#94a3b8", marginBottom:3}}>{"5. Le Risk Meter dit quoi ? (partagé avec ton Day Trade)"}</div>
+          <div style={{display:"flex", gap:4, marginBottom:8}}>
+            {["RISK-ON","NEUTRE","RISK-OFF"].map(m => (
+              <button key={m} onClick={()=>setSentP(m)} style={{flex:1, padding:"5px", borderRadius:4, fontSize:8, fontWeight:700, cursor:"pointer", border: sent===m?"2px solid "+(m==="RISK-ON"?"#4ade80":m==="RISK-OFF"?"#f87171":"#94a3b8"):"1px solid #334155", background: sent===m?(m==="RISK-ON"?"#052010":m==="RISK-OFF"?"#200505":"#1a2030"):"#0a0f1a", color: sent===m?(m==="RISK-ON"?"#4ade80":m==="RISK-OFF"?"#f87171":"#94a3b8"):"#64748b"}}>{m}</button>
+            ))}
+          </div>
+          {verdict && <div style={{padding:"8px 10px", borderRadius:5, fontSize:8.5, lineHeight:1.6, fontWeight:600, background: verdict.ok?(verdict.demi?"#1a1500":"#052010"):"#200505", color: verdict.ok?(verdict.demi?"#fbbf24":"#4ade80"):"#f87171", border:"1px solid "+(verdict.ok?(verdict.demi?"#fbbf2455":"#4ade8055"):"#f8717155")}}>{(verdict.ok?(verdict.demi?"🌗 ":"✅ "):"⛔ ")+verdict.msg}</div>}
+        </div>
         <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:5}}>{"✅ LA CONVERGENCE EXIGÉE"}</div>
-        <div style={{fontSize:8.5, color:"#c8d4f0", lineHeight:1.65, marginBottom:10, padding:"8px 10px", background:"#1a1030", borderRadius:5}}>{"Chart 30j + Matrice + Momentum + Meter non-contradictoire + Sentiment aligné + Sessions d\u0027hier dans le sens + Flag à profondeur saine = ENTRÉE à la reprise de Londres. UN outil qui contredit = pas de trade. Système de PATIENCE : la tendance donne des semaines d\u0027occasions."}</div>
+        <div style={{fontSize:8.5, color:"#c8d4f0", lineHeight:1.65, marginBottom:10, padding:"8px 10px", background:"#1a1030", borderRadius:5}}>{"Chart 30j + Matrice + Momentum + Sentiment aligné + Sessions d\u0027hier dans le sens + Flag à profondeur saine = ENTRÉE à la reprise de Londres. UN outil qui contredit = pas de trade. Système de PATIENCE : la tendance donne des semaines d\u0027occasions."}</div>
         <div style={{fontSize:9, color:"#c084fc", fontWeight:700, marginBottom:5}}>{"📊 L\u0027INFLUENCE DU SENTIMENT"}</div>
         <div style={{fontSize:8, color:"#c8d4f0", lineHeight:1.7, marginBottom:8}}>
           <div style={{padding:"6px 8px", background:"#052010", borderRadius:5, marginBottom:4}}><b style={{color:"#4ade80"}}>{"🟢 RISK-ON"}</b>{" — AUD/NZD achetées, JPY/CHF vendus : croisements JPY montent (ACHATS validés) · croisements AUD/NZD descendent (VENTES validées) · or : VENTE converge si USD #1-2."}</div>
