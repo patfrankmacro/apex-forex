@@ -23,9 +23,9 @@ function DtAnalyzer(){
     try {
       const nowET = new Date(new Date().toLocaleString("en-US",{timeZone:"America/New_York"}));
       const m = nowET.getHours()*60+nowET.getMinutes();
-      if (m < 540 || m > 570) {
+      if (!((m >= 465 && m <= 525) || (m >= 540 && m <= 570))) {
         const hh=String(nowET.getHours()).padStart(2,"0"), mm=String(nowET.getMinutes()).padStart(2,"0");
-        setRes({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade FX se scanne entre 9h et 9h30 ET — la tendance de Londres a mûri (3h-9h30) et NY l'a déjà testée 1h30. À 9h30 le NYSE ouvre et RETRACE contre Londres : tu entres dans ce retracement, au rebond Fibonacci (38.2/50/61.8) sur M5, dans le sens du pôle. Avant 9h = NY pas ouverte. Après 9h30 = le retracement est passé. Reviens demain 9h.`});
+        setRes({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade FX se scanne sur DEUX fenêtres : 7h45-8h45 ET (cassure de Londres à l'ouverture du forex NY) OU 9h-9h30 ET (entrée au retracement du NYSE, rebond Fib sur M5). Une seule entrée par jour — tu choisis ta porte. Hors de ces deux créneaux, reviens à 7h45 ou à 9h.`});
         return;
       }
       const lines = raw.split("\n").map(l=>l.trim()).filter(Boolean);
