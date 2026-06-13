@@ -150,6 +150,7 @@ export default function DayTradeFxView(){
         <div style={{fontSize:9, color:"#7dd3fc", fontWeight:700}}>LE PÔLE DE LONDRES · DEUX ENTRÉES</div>
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:4, lineHeight:1.5}}>Le pôle de Londres se construit de 3h à 9h30 — c'est le programme des desks, le MÊME chaque jour. Tu as deux façons de le suivre : la CASSURE de 8h (tu montes sur la continuation fraîche, pendant qu'ils chargent) ou le RETRACEMENT de 9h30 (tu montes dans le creux au rebond Fib sur M5, après leur dernier piège). Une entrée par jour, sortie avant 17h, jamais d'overnight.</div>
       </div>
+      <DtAnalyzer />
 
       <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:10, color:"#7dd3fc", fontWeight:700, marginBottom:8}}>📋 TA SÉQUENCE DU JOUR</div>
@@ -192,7 +193,6 @@ export default function DayTradeFxView(){
       <div style={{display:"none"}}><div></div>
       </div>
 
-      <DtAnalyzer />
 
       <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div style={{fontSize:10, color:"#c084fc", fontWeight:700, marginBottom:6}}>📐 LA MÉCANIQUE — LE PÔLE ET SES DEUX ENTRÉES</div>
