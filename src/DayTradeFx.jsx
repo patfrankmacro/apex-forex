@@ -143,6 +143,7 @@ function DtAnalyzer(){
 }
 
 export default function DayTradeFxView(){
+  const [openJpy, setOpenJpy] = useState(false);
   return (
     <div style={{maxWidth:520, margin:"0 auto"}}>
       <div style={{textAlign:"center", marginBottom:12}}>
@@ -252,6 +253,28 @@ export default function DayTradeFxView(){
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8}}><b style={{color:"#38bdf8"}}>Tes 7 paires</b> — EUR/AUD · GBP/AUD · EUR/NZD · GBP/NZD · GBP/JPY · EUR/JPY · CHF/JPY. Une devise de Londres (EUR, GBP, CHF) contre une devise d'Asie-Pacifique (AUD, NZD, JPY) : le pôle que tu trades est construit par les desks de Londres eux-mêmes. <b>Lecture :</b> écart ≥3 rangs au Currency Strength entre les deux devises, la plus forte au-dessus = la direction. Le scanner calcule, ton M15 confirme le pôle.</div>
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8}}><b style={{color:"#fbbf24"}}>XAU/USD (l'or)</b> — un cas spécial : pas deux devises à comparer, UNE seule question — où est le dollar ? L'or est coté en dollars : dollar fort = or sous pression, dollar faible = or qui respire. <b>Lecture :</b> USD #1-2 au Currency Strength = VENTE possible · USD #7-8 = ACHAT possible · USD au milieu (#3-6) = pas de conviction, pas de trade or. Même mécanique que tes paires : à 9h30 le NYSE et le COMEX injectent leur volume ensemble, l'or fait son propre retracement de la tendance de Londres, et tu entres au rebond Fib sur M5. Seul le signal change — dollar + peur convergents au lieu d'une divergence de rangs.</div>
         <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Pourquoi pas de paires CAD ni de majors dollar ? Le CAD est une devise de session NY (pas de pôle de Londres propre), et les majors USD ont leur vraie vie après ta fenêtre. Tes 7 paires + l'or couvrent exactement le terrain où la tendance de Londres existe.</div>
+      </div>
+      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #3a2a1f", marginBottom:12}}>
+        <div onClick={()=>setOpenJpy(!openJpy)} style={{fontSize:11, color:"#fbbf24", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <span>🐉 TES PAIRES JPY — LE MOTEUR & QUAND SUIVRE LES DESKS</span>
+          <span style={{fontSize:13}}>{openJpy ? "▲" : "▼"}</span>
+        </div>
+        {openJpy && <div style={{marginTop:10}}>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#fbbf24"}}>1. Le carry trade — le moteur de fond.</b> GBP/JPY et EUR/JPY sont portées par le carry trade. La BoE et la BCE gardent des taux hauts, la BoJ reste ultra-basse (~0.75% contre 3.50%+ aux US, jusqu'à 300 points d'écart). Les desks empruntent le yen pas cher et achètent du rendement en GBP/EUR — ils VENDENT le yen en permanence. Résultat : un biais LONG structurel sur tes deux paires. C'est pour ça qu'elles tendent si bien : un courant de fond les pousse, tant que l'écart de taux tient.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#fbbf24"}}>2. Le risk-on/off — ton ③ EST le moteur.</b> Sur ces paires, le Risk Meter n'est pas un filtre de plus, c'est LE signal. RISK-ON = le carry roule, les desks chargent du long, tes paires montent. RISK-OFF = panique, ils débouclent le carry, fuite vers le yen refuge, tes paires plongent. Surveille les actions et les rendements US. Sentiment franc = tendance fiable. Sentiment qui hésite = carry incertain = tendance molle = tu passes.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#fbbf24"}}>3. Pourquoi JPY-cross et pas USD/JPY.</b> Tes cross (sans dollar) suivent PROPREMENT le risk-on/off. USD/JPY, lui, est pollué par les rendements US et peut se découpler : pendant qu'EUR/JPY et GBP/JPY continuent de tendre, USD/JPY cale ou s'inverse. C'est pour ça que tant de traders se font piéger sur USD/JPY. Tes paires sont les plus LISIBLES.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#f87171"}}>4. Le danger — la BoJ.</b> Quand le yen est trop faible, la Banque du Japon INTERVIENT (achète du yen) = retournement violent. Et quand le carry se débuncle d'un coup, c'est brutal (le VIX peut spiker comme en 2024). Méfie-toi les jours où le yen est à un niveau extrême + grosse news US ou BoJ. Ton ③ et ta vérif des news du matin doivent capter ce switch.</div>
+          <div style={{fontSize:9, color:"#7dd3fc", fontWeight:700, marginTop:10, marginBottom:6}}>⏰ LEUR JOURNÉE — QUAND TU PEUX LES SUIVRE (heure ET)</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}>• Nuit-3h : Tokyo forme le range asiatique. Tu dors.</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}>• 3h-7h : Londres CHARGE la tendance (carry). Tu lis le pourquoi, tu prépares.</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}>• 7h30-8h : pause — les desks soufflent, le flag se dessine.</div>
+          <div style={{fontSize:8, color:"#34d399", lineHeight:1.6, marginBottom:3, fontWeight:600}}>• 8h : NY relance, ils rechargent → ta CASSURE.</div>
+          <div style={{fontSize:8, color:"#34d399", lineHeight:1.6, marginBottom:3, fontWeight:600}}>• 9h30 : le NYSE balaye puis repart → ton RETRACEMENT.</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3, fontWeight:600}}>• 8h-12h : TA FENÊTRE — Londres ET New York poussent ensemble.</div>
+          <div style={{fontSize:8, color:"#fbbf24", lineHeight:1.6, marginBottom:3, fontWeight:600}}>• 11h-12h : London Fix — les desks DÉBOUCLENT. Surveille ta sortie.</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:8}}>• 12h-17h : Londres parti, NY seul. Tes cross JPY perdent leur moteur.</div>
+          <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>🔑 La règle JPY : les desks de Londres sont présents de 3h à 12h ET. Ton vrai créneau = 8h-12h. Le gros épuisement arrive souvent au fix de midi, PAS à 17h — ne traîne pas l'après-midi sur ces cross.</div>
+        </div>}
       </div>
 
       <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #fbbf2455", marginBottom:14}}>
