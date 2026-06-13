@@ -50,6 +50,7 @@ export default function SwingTrade2View() {
       };
       const gainers = grabSection("Top Gainers", ["Top Losers"]);
       const losers  = grabSection("Top Losers",  ["Currency Volatility","Most Volatile"]);
+      const least   = grabSection("Least Volatile", ["MarketMilk","As of"]);
       // Top 5 absent = bonus simplement indisponible, pas bloquant
       const out=[];
       ST_PAIRS.forEach(([b,q])=>{
@@ -65,7 +66,7 @@ export default function SwingTrade2View() {
           const courant = (q==="JPY")
             ? (dir==="LONG" ? "RISK-ON : le JPY refuge est vendu, le courant porte ta paire vers le haut" : "RISK-OFF : la fuite vers le JPY refuge porte ta vente")
             : (dir==="LONG" ? "RISK-OFF : le "+q+" risqué est lâché, ta paire monte avec le courant" : "RISK-ON : le "+q+" risqué est acheté, ta paire descend avec le courant");
-          pourquoi = sens+" car CONVERGENCE — ① "+b+" #"+rank[b]+" vs "+q+" #"+rank[q]+" = "+gap+" rangs (le capital a tranché sur les deux sessions) + ③ "+courant+"."+(inTop?" 🔥 BONUS ② : "+pairStr+" est dans le Top 5 "+(dir==="LONG"?"Gainers":"Losers")+" — le mouvement est DÉJÀ en cours, signal renforcé.":" (② Top 5 éteint : le mouvement n'a pas encore éclaté sur cette paire — la divergence est là, sois plus exigeant sur ton pôle H1.)");
+          pourquoi = sens+" car CONVERGENCE — ① "+b+" #"+rank[b]+" vs "+q+" #"+rank[q]+" = "+gap+" rangs (le capital a tranché sur les deux sessions) + ③ "+courant+"."+(inTop?" 🔥 BONUS ② : "+pairStr+" est dans le Top 5 "+(dir==="LONG"?"Gainers":"Losers")+" — le mouvement est DÉJÀ en cours, signal renforcé.":" (② Top 5 éteint : le mouvement n'a pas encore éclaté sur cette paire — la divergence est là, sois plus exigeant sur ton pôle H1.)"+(least.includes(pairStr)?" ❄️ ATTENTION : aussi dans le Least Volatile — la paire DORT aujourd'hui. Le programme peut éclater demain, mais ce soir ton flag risque d'être plat : pôle H1 impeccable exigé, sinon passe.":""));
         } else {
           const manque = [];
           if (gap<3) manque.push("divergence "+gap+"r (<3)");

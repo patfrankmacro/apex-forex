@@ -51,14 +51,25 @@ function DtAnalyzer(){
       const vorder=[];
       if (vstart>=0) for (let i=vstart;i<vend;i++){ const t=lines[i]; if (CURS.includes(t) && !vorder.includes(t)) vorder.push(t); }
       const vrankUSD = vorder.indexOf("USD")+1; // 0 si absent
+      // Least Volatile (veto : pas de carburant)
+      let lstart=-1, lend=lines.length;
+      for (let i=0;i<lines.length;i++){
+        if (lstart<0 && lines[i].includes("Least Volatile")) lstart=i;
+        else if (lstart>=0 && (lines[i].includes("As of")||lines[i].includes("MarketMilk"))){ lend=i; break; }
+      }
+      const leastSet = new Set();
+      if (lstart>=0) for (let i=lstart;i<lend;i++){ const mm2=lines[i].match(/^([A-Z]{3})\/([A-Z]{3})$/); if (mm2 && leastSet.size<5) leastSet.add(mm2[1]+"/"+mm2[2]); }
       const out=[];
       DT_PAIRS.forEach(([b,q])=>{
         const gap=Math.abs(rank[b]-rank[q]);
         const dir = rank[b]<rank[q] ? "LONG" : "SHORT";
         const aligned = riskAligned(q, dir);
         const quoteRefuge = (q === "JPY");
+        const frozen = leastSet.has(b+"/"+q);
         let pourquoi = "";
-        if (gap>=3 && aligned) {
+        if (gap>=3 && aligned && frozen) {
+          pourquoi = "❄️ VETO — ①③ validés MAIS Top 5 Least Volatile : Londres n\u0027a presque pas bougé cette paire depuis 3h. Pôle mou, pas de carburant pour la cassure de 8h — le signal est théorique aujourd\u0027hui.";
+        } else if (gap>=3 && aligned) {
           const sens = dir==="LONG" ? "ACHAT" : "VENTE";
           const cs = b+" #"+rank[b]+" vs "+q+" #"+rank[q]+" = "+gap+" rangs";
           const courant = quoteRefuge
@@ -68,7 +79,7 @@ function DtAnalyzer(){
         } else if (gap>=3 && !aligned) {
           pourquoi = riskMode ? (riskMode==="NEUTRE" ? "3+ rangs mais sentiment NEUTRE : pas de courant de fond pour porter le mouvement" : gap+" rangs au Strength mais le "+riskMode+" pousse cette paire dans l'AUTRE sens — divergence sans courant = piège possible") : "choisis le sentiment (③) pour valider";
         }
-        out.push({pair:b+"/"+q, base:b, quote:q, rb:rank[b], rq:rank[q], gap, dir, ok:(gap>=3 && aligned), gapOk:gap>=3, aligned, pourquoi});
+        out.push({pair:b+"/"+q, base:b, quote:q, rb:rank[b], rq:rank[q], gap, dir, ok:(gap>=3 && aligned && !frozen), frozen, gapOk:gap>=3, aligned, pourquoi});
       });
       out.sort((a,b)=> (b.ok?1:0)-(a.ok?1:0) || b.gap-a.gap);
       // XAU/USD : cas special — l'or se trade contre la position du dollar seul
@@ -98,8 +109,9 @@ function DtAnalyzer(){
         <a href="https://www.babypips.com/tools/risk-on-risk-off-meter" target="_blank" rel="noopener noreferrer" style={{display:"block", marginTop:6, fontSize:8.5, color:"#7dd3fc", textDecoration:"none"}}>{"🌡️ Ouvrir le Risk-On/Risk-Off Meter (babypips) ↗"}</a>
         {!riskMode && <div style={{fontSize:8, color:"#fbbf24", marginTop:4}}>{"⚠ Choisis le sentiment AVANT de scanner — sans lui, aucune paire ne peut être validée."}</div>}
         {riskMode==="NEUTRE" && <div style={{fontSize:8, color:"#94a3b8", marginTop:4}}>{"NEUTRE = pas de courant de fond : le ③ n'est pas rempli, aucune paire validée aujourd'hui. L'or aussi a besoin d'un sentiment net."}</div>}
+        <div style={{fontSize:8, color:"#64748b", marginTop:4}}>{"❄️ VETO carburant : une paire dans le Top 5 Least Volatile est bloquée même à ①②③ validés — Londres ne l'a pas travaillée, le pôle est mou, la cassure de 8h n'a rien à manger."}</div>
       </div>
-      <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle le snapshot MarketMilk (le Currency Strength Meter suffit) — le scanner le croise avec ton sentiment ③..." style={{width:"100%", minHeight:80, background:"#001018", color:TEXT, border:"1px solid #1e3a5f", borderRadius:6, padding:8, fontSize:9, fontFamily:"monospace", resize:"vertical"}}/>
+      <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle la page MarketMilk COMPLÈTE (Currency Strength + Least Volatile) — le scanner croise ① ② ③ et vérifie le carburant ❄️..." style={{width:"100%", minHeight:80, background:"#001018", color:TEXT, border:"1px solid #1e3a5f", borderRadius:6, padding:8, fontSize:9, fontFamily:"monospace", resize:"vertical"}}/>
       <button onClick={analyze} style={{marginTop:8, width:"100%", padding:"10px", background:"#38bdf8", color:"#001018", border:"none", borderRadius:6, fontSize:11, fontWeight:700, letterSpacing:1, cursor:"pointer"}}>⚡ SCANNER</button>
       <a href="https://marketmilk.babypips.com/" target="_blank" rel="noopener noreferrer" style={{display:"block", textAlign:"center", marginTop:6, fontSize:8.5, color:"#7dd3fc", textDecoration:"none", fontWeight:700}}>🥛 Ouvrir MarketMilk ↗</a>
       {res && res.error && <div style={{marginTop:10, padding:"10px", background:"#1a0a00", borderRadius:6, fontSize:9, color:"#fbbf24", lineHeight:1.6}}>{res.error}</div>}
