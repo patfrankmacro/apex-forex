@@ -160,6 +160,37 @@ export default function DayTradeFxView(){
         <div style={{fontSize:8, color:TEXT_DIM, marginTop:4, lineHeight:1.5}}>Le pôle de Londres se construit de 3h à 9h30 — c'est le programme des desks, le MÊME chaque jour. Tu as deux façons de le suivre : la CASSURE de 8h (tu montes sur la continuation fraîche, pendant qu'ils chargent) ou le RETRACEMENT de 9h30 (tu montes dans le creux au rebond Fib sur M5, après leur dernier piège). Une entrée par jour, sortie avant 17h, jamais d'overnight.</div>
       </div>
       <DtAnalyzer />
+      <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #fbbf2455", marginBottom:14}}>
+        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>{"🌡️ LE RISK METER — FILTRE ③ DU DAY TRADE"}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}>{"Le Risk-On/Risk-Off Meter de babypips mesure l'appétit au risque mondial en temps réel : il agrège actions, obligations, devises refuges et matières premières en un seul cadran. RISK-ON = les investisseurs achètent du rendement (actions, AUD, NZD) et lâchent les refuges (JPY, CHF, or). RISK-OFF = la peur domine, le capital fuit vers les refuges. C'est le COURANT DE FOND sous tes divergences : un JPY fort en Risk-Off est porté par le courant, un JPY fort en Risk-On nage contre lui."}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}>{"Pourquoi c'est OBLIGATOIRE : tes 7 paires opposent toutes une devise de Londres à une devise risquée (AUD, NZD) ou refuge (JPY). Chaque trade que tu prends EST un pari risk-on ou risk-off, que tu le saches ou non. Le filtre ③ s'assure que ton pari va dans le sens du courant mondial — jamais contre."}</div>
+        <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:5}}>{"📊 L'INFLUENCE SUR CE QUE TU TRADES"}</div>
+        <div style={{fontSize:8, color:TEXT, lineHeight:1.7, marginBottom:8}}>
+          <div style={{padding:"6px 8px", background:"#052010", borderRadius:5, marginBottom:4}}><b style={{color:"#4ade80"}}>{"🟢 RISK-ON (appétit)"}</b>{" — AUD/NZD achetées, JPY/CHF vendus : tes croisements JPY (GBP/JPY, EUR/JPY, CHF/JPY) montent → ACHATS validés · tes croisements AUD/NZD (EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD) descendent → VENTES validées · XAU/USD : le refuge dort → la VENTE or converge (si USD #1-2)."}</div>
+          <div style={{padding:"6px 8px", background:"#200505", borderRadius:5, marginBottom:4}}><b style={{color:"#f87171"}}>{"🔴 RISK-OFF (peur)"}</b>{" — fuite vers JPY/CHF, AUD/NZD lâchées : croisements JPY descendent → VENTES validées · croisements AUD/NZD montent → ACHATS validés · XAU/USD : fuite vers le refuge → l'ACHAT or converge (si USD #7-8)."}</div>
+          <div style={{padding:"6px 8px", background:"#1a2030", borderRadius:5}}><b style={{color:"#94a3b8"}}>{"⚪ NEUTRE"}</b>{" — pas de courant de fond : les divergences sont moins fiables, le ③ n'est pas rempli → pas de trade. Les jours neutres sont les jours de range."}</div>
+        </div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, padding:"8px 10px", background:"#1a1500", borderRadius:5}}>{"🥇 L'or et ses DEUX moteurs : le dollar (mécanique — l'or est coté en USD) et la peur (refuge). Quand ils convergent (USD fort + Risk-On = vente · USD faible + Risk-Off = achat), le mouvement est propre. Quand ils se BATTENT (USD fort + Risk-Off, typique des paniques où le cash dollar et l'or refuge montent ensemble), l'or fait des mèches dans les deux sens — le scanner te le dira : CONFLIT, pas de trade. C'est la convergence qui fait le trade, jamais un moteur seul."}</div>
+        <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginTop:10, marginBottom:5}}>{"📋 PAIRE PAR PAIRE — CE QUE CHAQUE SENTIMENT VALIDE"}</div>
+        <div style={{fontSize:7.5, fontFamily:"monospace", lineHeight:1.9}}>
+          <div style={{display:"flex", borderBottom:"1px solid #334155", paddingBottom:3, marginBottom:3, fontWeight:700, color:"#94a3b8"}}><span style={{flex:1.2}}>PAIRE</span><span style={{flex:1, color:"#4ade80"}}>🟢 RISK-ON</span><span style={{flex:1, color:"#f87171"}}>🔴 RISK-OFF</span></div>
+          {[
+            ["GBP/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)","achat","vente"],
+            ["EUR/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)","achat","vente"],
+            ["CHF/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)","achat","vente"],
+            ["EUR/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)","vente","achat"],
+            ["GBP/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)","vente","achat"],
+            ["EUR/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)","vente","achat"],
+            ["GBP/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)","vente","achat"],
+          ].map((r,i)=>(
+            <div key={i} style={{display:"flex", borderBottom:"1px solid #1e293b"}}><span style={{flex:1.2, color:"#e2e8f0", fontWeight:700}}>{r[0]}</span><span style={{flex:1, color:r[3]==="achat"?"#4ade80":"#f87171"}}>{r[1]}</span><span style={{flex:1, color:r[4]==="achat"?"#4ade80":"#f87171"}}>{r[2]}</span></div>
+          ))}
+          <div style={{display:"flex", borderBottom:"1px solid #1e293b", background:"#1a150033"}}><span style={{flex:1.2, color:"#fbbf24", fontWeight:700}}>XAU/USD 🥇</span><span style={{flex:1, color:"#f87171"}}>{"▼ VENTE si USD #1-2"}</span><span style={{flex:1, color:"#4ade80"}}>{"▲ ACHAT si USD #7-8"}</span></div>
+        </div>
+        <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:5, lineHeight:1.5}}>{"Lecture : la direction affichée est la SEULE validable sous ce sentiment. L'autre direction = ⛔ bloquée même à 3+ rangs. L'or exige en plus sa condition dollar — sentiment seul ne suffit jamais pour XAU. NEUTRE = rien n'est validable, paires comme or."}</div>
+        
+        <a href="https://www.babypips.com/tools/risk-on-risk-off-meter" target="_blank" rel="noopener noreferrer" style={{display:"block", marginTop:8, fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700}}>{"🌡️ Ouvrir le Risk-On/Risk-Off Meter ↗"}</a>
+      </div>
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #3a2a1f", marginBottom:12}}>
         <div onClick={()=>setOpenJpy(!openJpy)} style={{fontSize:11, color:"#fbbf24", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
           <span>🐉 TES PAIRES JPY — LE MOTEUR & QUAND SUIVRE LES DESKS</span>
@@ -319,37 +350,6 @@ export default function DayTradeFxView(){
         </>}
       </div>
 
-      <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #fbbf2455", marginBottom:14}}>
-        <div style={{fontSize:11, color:"#fbbf24", fontWeight:700, marginBottom:8}}>{"🌡️ LE RISK METER — FILTRE ③ DU DAY TRADE"}</div>
-        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}>{"Le Risk-On/Risk-Off Meter de babypips mesure l'appétit au risque mondial en temps réel : il agrège actions, obligations, devises refuges et matières premières en un seul cadran. RISK-ON = les investisseurs achètent du rendement (actions, AUD, NZD) et lâchent les refuges (JPY, CHF, or). RISK-OFF = la peur domine, le capital fuit vers les refuges. C'est le COURANT DE FOND sous tes divergences : un JPY fort en Risk-Off est porté par le courant, un JPY fort en Risk-On nage contre lui."}</div>
-        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}>{"Pourquoi c'est OBLIGATOIRE : tes 7 paires opposent toutes une devise de Londres à une devise risquée (AUD, NZD) ou refuge (JPY). Chaque trade que tu prends EST un pari risk-on ou risk-off, que tu le saches ou non. Le filtre ③ s'assure que ton pari va dans le sens du courant mondial — jamais contre."}</div>
-        <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:5}}>{"📊 L'INFLUENCE SUR CE QUE TU TRADES"}</div>
-        <div style={{fontSize:8, color:TEXT, lineHeight:1.7, marginBottom:8}}>
-          <div style={{padding:"6px 8px", background:"#052010", borderRadius:5, marginBottom:4}}><b style={{color:"#4ade80"}}>{"🟢 RISK-ON (appétit)"}</b>{" — AUD/NZD achetées, JPY/CHF vendus : tes croisements JPY (GBP/JPY, EUR/JPY, CHF/JPY) montent → ACHATS validés · tes croisements AUD/NZD (EUR/AUD, GBP/AUD, EUR/NZD, GBP/NZD) descendent → VENTES validées · XAU/USD : le refuge dort → la VENTE or converge (si USD #1-2)."}</div>
-          <div style={{padding:"6px 8px", background:"#200505", borderRadius:5, marginBottom:4}}><b style={{color:"#f87171"}}>{"🔴 RISK-OFF (peur)"}</b>{" — fuite vers JPY/CHF, AUD/NZD lâchées : croisements JPY descendent → VENTES validées · croisements AUD/NZD montent → ACHATS validés · XAU/USD : fuite vers le refuge → l'ACHAT or converge (si USD #7-8)."}</div>
-          <div style={{padding:"6px 8px", background:"#1a2030", borderRadius:5}}><b style={{color:"#94a3b8"}}>{"⚪ NEUTRE"}</b>{" — pas de courant de fond : les divergences sont moins fiables, le ③ n'est pas rempli → pas de trade. Les jours neutres sont les jours de range."}</div>
-        </div>
-        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, padding:"8px 10px", background:"#1a1500", borderRadius:5}}>{"🥇 L'or et ses DEUX moteurs : le dollar (mécanique — l'or est coté en USD) et la peur (refuge). Quand ils convergent (USD fort + Risk-On = vente · USD faible + Risk-Off = achat), le mouvement est propre. Quand ils se BATTENT (USD fort + Risk-Off, typique des paniques où le cash dollar et l'or refuge montent ensemble), l'or fait des mèches dans les deux sens — le scanner te le dira : CONFLIT, pas de trade. C'est la convergence qui fait le trade, jamais un moteur seul."}</div>
-        <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginTop:10, marginBottom:5}}>{"📋 PAIRE PAR PAIRE — CE QUE CHAQUE SENTIMENT VALIDE"}</div>
-        <div style={{fontSize:7.5, fontFamily:"monospace", lineHeight:1.9}}>
-          <div style={{display:"flex", borderBottom:"1px solid #334155", paddingBottom:3, marginBottom:3, fontWeight:700, color:"#94a3b8"}}><span style={{flex:1.2}}>PAIRE</span><span style={{flex:1, color:"#4ade80"}}>🟢 RISK-ON</span><span style={{flex:1, color:"#f87171"}}>🔴 RISK-OFF</span></div>
-          {[
-            ["GBP/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)","achat","vente"],
-            ["EUR/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)","achat","vente"],
-            ["CHF/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)","achat","vente"],
-            ["EUR/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)","vente","achat"],
-            ["GBP/AUD","▼ VENTE (AUD acheté)","▲ ACHAT (AUD lâché)","vente","achat"],
-            ["EUR/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)","vente","achat"],
-            ["GBP/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)","vente","achat"],
-          ].map((r,i)=>(
-            <div key={i} style={{display:"flex", borderBottom:"1px solid #1e293b"}}><span style={{flex:1.2, color:"#e2e8f0", fontWeight:700}}>{r[0]}</span><span style={{flex:1, color:r[3]==="achat"?"#4ade80":"#f87171"}}>{r[1]}</span><span style={{flex:1, color:r[4]==="achat"?"#4ade80":"#f87171"}}>{r[2]}</span></div>
-          ))}
-          <div style={{display:"flex", borderBottom:"1px solid #1e293b", background:"#1a150033"}}><span style={{flex:1.2, color:"#fbbf24", fontWeight:700}}>XAU/USD 🥇</span><span style={{flex:1, color:"#f87171"}}>{"▼ VENTE si USD #1-2"}</span><span style={{flex:1, color:"#4ade80"}}>{"▲ ACHAT si USD #7-8"}</span></div>
-        </div>
-        <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:5, lineHeight:1.5}}>{"Lecture : la direction affichée est la SEULE validable sous ce sentiment. L'autre direction = ⛔ bloquée même à 3+ rangs. L'or exige en plus sa condition dollar — sentiment seul ne suffit jamais pour XAU. NEUTRE = rien n'est validable, paires comme or."}</div>
-        
-        <a href="https://www.babypips.com/tools/risk-on-risk-off-meter" target="_blank" rel="noopener noreferrer" style={{display:"block", marginTop:8, fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700}}>{"🌡️ Ouvrir le Risk-On/Risk-Off Meter ↗"}</a>
-      </div>
 
       <div style={{display:"none"}}>
       </div>
