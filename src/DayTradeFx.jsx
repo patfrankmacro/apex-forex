@@ -23,9 +23,9 @@ function DtAnalyzer(){
     try {
       const nowET = new Date(new Date().toLocaleString("en-US",{timeZone:"America/New_York"}));
       const m = nowET.getHours()*60+nowET.getMinutes();
-      if (!((m >= 465 && m <= 525) || (m >= 540 && m <= 570))) {
+      if (!(m >= 540 && m <= 570)) {
         const hh=String(nowET.getHours()).padStart(2,"0"), mm=String(nowET.getMinutes()).padStart(2,"0");
-        setRes({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade FX se scanne sur DEUX fenêtres : 7h45-8h45 ET (cassure de Londres à l'ouverture du forex NY) OU 9h-9h30 ET (entrée au retracement du NYSE, rebond Fib sur M5). Une seule entrée par jour — tu choisis ta figure. Hors de ces deux créneaux, reviens à 7h45 ou à 9h.`});
+        setRes({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade FX se scanne de 9h à 9h30 ET — l'entrée au retracement du NYSE (rebond Fib sur M5). Le scan de la cassure 8h est désactivé pour le moment. Reviens entre 9h et 9h30.`});
         return;
       }
       const lines = raw.split("\n").map(l=>l.trim()).filter(Boolean);
@@ -98,7 +98,7 @@ function DtAnalyzer(){
   };
   return (
     <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #38bdf855", marginBottom:14}}>
-      <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:8}}>🤖 SCAN 7H45-8H45 OU 9H-9H30 — COLLE TA PAGE MARKETMILK</div>
+      <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:8}}>🤖 SCAN 9H-9H30 — COLLE TA PAGE MARKETMILK</div>
       <div style={{marginBottom:8, padding:"8px 10px", background:"#0d1420", borderRadius:6, border:"1px solid #33415555"}}>
         <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:5}}>{"③ SENTIMENT DU JOUR (obligatoire) — lis le Risk Meter puis choisis :"}</div>
         <div style={{display:"flex", gap:6}}>
