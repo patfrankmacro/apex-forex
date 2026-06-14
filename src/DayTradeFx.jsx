@@ -144,6 +144,7 @@ function DtAnalyzer(){
 
 export default function DayTradeFxView(){
   const [openJpy, setOpenJpy] = useState(false);
+  const [openScan, setOpenScan] = useState(false);
   return (
     <div style={{maxWidth:520, margin:"0 auto"}}>
       <div style={{textAlign:"center", marginBottom:12}}>
@@ -180,6 +181,20 @@ export default function DayTradeFxView(){
           <div style={{fontSize:8, color:"#34d399", lineHeight:1.6, marginBottom:3, fontWeight:600}}>9h30 : re-test (secondary test) puis reprise = ton retracement.</div>
           <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:8}}><b style={{color:"#f87171"}}>Après 12h :</b> GBP/JPY se vide (NY préfère les paires USD) → sors.</div>
           <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>💡 Pourquoi 9h30 : tu n'entres JAMAIS pendant la bataille (8h-9h, incertain et violent). Tu attends que le vainqueur soit connu et tu entres sur le retracement confirmé.</div>
+        </div>}
+      </div>
+      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:12}}>
+        <div onClick={()=>setOpenScan(!openScan)} style={{fontSize:11, color:"#38bdf8", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <span>⏰ POURQUOI SCANNER À 9h — PAS AVANT</span>
+          <span style={{fontSize:13}}>{openScan ? "▲" : "▼"}</span>
+        </div>
+        {openScan && <div style={{marginTop:10}}>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#38bdf8"}}>1. La bataille de 8h est tranchée.</b> À 8h, NY ouvre et décide : continuation OU retournement de la tendance de Londres. C'est violent et incertain pendant 30-60 min. À 9h, le vainqueur est connu. Tu ne devines plus.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#38bdf8"}}>2. Les news US de 8h30 sont digérées.</b> CPI, NFP tombent à 8h30 et peuvent tout retourner. À 9h, le marché a réagi et s'est stabilisé. Ton ③ est fiable.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#38bdf8"}}>3. Le Currency Strength est MÛR.</b> À 9h, Londres a poussé 6h + NY a confirmé 1h. Le scan reflète TOUT ça — la photo la plus complète et stable de la journée.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#38bdf8"}}>4. Tu captes le pic de liquidité de 10h ET.</b> La liquidité est optimale vers 15h Londres = 10h ET (BabyPips). Ton entrée à 9h30 te place juste avant ce pic.</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:8}}>Le coût honnête : tu rates la cassure de 8h (meilleur prix si la continuation est franche). Mais elle est risquée — tu entres pendant la bataille. Tu échanges « meilleur prix mais risqué » contre « prix correct mais sûr ».</div>
+          <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>💡 En une phrase : à 9h tu trades du CERTAIN, pas du probable. Tu attends que tout soit décidé, puis tu entres sur du confirmé.</div>
         </div>}
       </div>
 
