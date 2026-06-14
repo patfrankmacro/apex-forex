@@ -200,7 +200,7 @@ export default function DayTradeFxView(){
         <a href="https://www.babypips.com/tools/risk-on-risk-off-meter" target="_blank" rel="noopener noreferrer" style={{display:"block", marginTop:8, fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700}}>{"🌡️ Ouvrir le Risk-On/Risk-Off Meter ↗"}</a>
       </div>
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #3a2a1f", marginBottom:12}}>
-        <div onClick={()=>setOpenJpy(!openJpy)} style={{fontSize:11, color:"#fbbf24", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+        <div onClick={()=>setOpenJpy(!openJpy)} style={{fontSize:11, color:"#7dd3fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
           <span>🐉 TES PAIRES JPY — LE MOTEUR & QUAND SUIVRE LES DESKS</span>
           <span style={{fontSize:13}}>{openJpy ? "▲" : "▼"}</span>
         </div>
@@ -230,7 +230,7 @@ export default function DayTradeFxView(){
         </div>}
       </div>
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:12}}>
-        <div onClick={()=>setOpenScan(!openScan)} style={{fontSize:11, color:"#38bdf8", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+        <div onClick={()=>setOpenScan(!openScan)} style={{fontSize:11, color:"#7dd3fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
           <span>⏰ POURQUOI SCANNER À 9h — PAS AVANT</span>
           <span style={{fontSize:13}}>{openScan ? "▲" : "▼"}</span>
         </div>
@@ -244,7 +244,7 @@ export default function DayTradeFxView(){
         </div>}
       </div>
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:12}}>
-        <div onClick={()=>setOpenJour(!openJour)} style={{fontSize:11, color:"#fbbf24", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+        <div onClick={()=>setOpenJour(!openJour)} style={{fontSize:11, color:"#7dd3fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
           <span>📅 LE MEILLEUR JOUR POUR TRADER</span>
           <span style={{fontSize:13}}>{openJour ? "▲" : "▼"}</span>
         </div>
@@ -297,7 +297,7 @@ export default function DayTradeFxView(){
 
 
       <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
-        <div onClick={()=>setOpenMeca(!openMeca)} style={{fontSize:10, color:"#c084fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>📐 LA MÉCANIQUE — LE PÔLE ET SES DEUX ENTRÉES</span><span style={{fontSize:12}}>{openMeca ? "▲" : "▼"}</span></div>
+        <div onClick={()=>setOpenMeca(!openMeca)} style={{fontSize:10, color:"#7dd3fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>📐 LA MÉCANIQUE — LE PÔLE ET SES DEUX ENTRÉES</span><span style={{fontSize:12}}>{openMeca ? "▲" : "▼"}</span></div>
         {openMeca && <>
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:10}}>{"La tendance de Londres (3h-9h30) est ta JAMBE commune aux deux figures. CASSURE 8h : à 8h le flag de Londres casse, tu entres sur la clôture M15 dans le sens du pôle (la continuation fraîche). RETRACEMENT 9h30 : à 9h30 le NYSE fait RETRACER la jambe, tu traces le Fibonacci et tu guettes le rebond — 38.2% = retracement peu profond (tendance forte) · 50% = sain · 61.8% = dernière défense. Au-delà = mort, pas de trade. Le schéma ci-dessous illustre le retracement 9h30 (le retracement sur M5)."}</div>
         <svg viewBox="0 0 320 180" style={{width:"100%", maxWidth:340, display:"block", margin:"0 auto 8px"}}>
@@ -354,7 +354,7 @@ export default function DayTradeFxView(){
       </div>
 
       <div style={{padding:"12px 14px", background:"#160a2e", borderRadius:8, border:"1px solid #c084fc44", marginBottom:14}}>
-        <div onClick={()=>setOpenTete(!openTete)} style={{fontSize:10, color:"#c084fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>🧠 DANS LA TÊTE DES DESKS DE LONDRES</span><span style={{fontSize:12}}>{openTete ? "▲" : "▼"}</span></div>
+        <div onClick={()=>setOpenTete(!openTete)} style={{fontSize:10, color:"#7dd3fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>🧠 DANS LA TÊTE DES DESKS DE LONDRES</span><span style={{fontSize:12}}>{openTete ? "▲" : "▼"}</span></div>
         {openTete && <>
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#c084fc"}}>Qui ils sont.</b> Des équipes d'exécution dans les banques (Deutsche, HSBC, BNP, Barclays) avec deux moteurs : les ORDRES CLIENTS (fonds, multinationales qui doivent convertir des milliards aujourd'hui — flux obligatoires) et la CONVICTION macro de la banque (« la BoJ reste accommodante, on vend le JPY »). Ils ne devinent pas le marché : ils SONT le marché — ton edge n'est pas de les battre, c'est de lire leur trace.</div>
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#c084fc"}}>Comment ils pensent.</b> Un desk qui doit vendre 2 milliards de JPY ne clique pas « vendre » : il lui faut des ACHETEURS en face. D'où le piège de 3h — pousser le prix contre la tendance prévue pour déclencher les stops et les entrées du retail, qui fournissent la liquidité. Puis il charge sa vraie position par tranches (4h-7h30), en laissant le prix respirer entre chaque tranche pour ne pas révéler sa main. Le pôle propre que tu vois sur M15 = des tranches d'exécution disciplinées, pas un coup de tête.</div>
@@ -379,7 +379,7 @@ export default function DayTradeFxView(){
       </div>
 
       <div style={{padding:"10px 12px", background:"#160a2e", borderRadius:8, border:"1px solid #c084fc44", marginBottom:14}}>
-        <div onClick={()=>setOpenVs(!openVs)} style={{fontSize:9, color:"#c084fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>⚔️ DAY TRADE FX vs SWING FX — ne les mélange jamais</span><span style={{fontSize:11}}>{openVs ? "▲" : "▼"}</span></div>
+        <div onClick={()=>setOpenVs(!openVs)} style={{fontSize:9, color:"#7dd3fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>⚔️ DAY TRADE FX vs SWING FX — ne les mélange jamais</span><span style={{fontSize:11}}>{openVs ? "▲" : "▼"}</span></div>
         {openVs && <>
         <div style={{fontSize:8, color:TEXT, lineHeight:1.65}}>Même ADN (pôle → repli → reprise), deux animaux : le <b style={{color:"#38bdf8"}}>Day Trade</b> se scanne sur deux fenêtres (7h45-8h45 pour la cassure du flag à 8h, OU 9h-9h30 pour le retracement Fib à 9h30), une seule entrée par jour, et meurt à 17h. Le <b style={{color:"#fbbf24"}}>Swing</b> et le <b style={{color:"#34d399"}}>Swing 2.0</b> se scannent à 11h-16h, entrent à la cassure le soir/Tokyo sur H1, et vivent 1-3 jours. Un trade Day Trade se gère en day trade jusqu'au bout — il ne devient JAMAIS un swing parce qu'il perd.</div>
         </>}
