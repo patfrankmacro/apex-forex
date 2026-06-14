@@ -199,6 +199,44 @@ export default function DayTradeFxView(){
         
         <a href="https://www.babypips.com/tools/risk-on-risk-off-meter" target="_blank" rel="noopener noreferrer" style={{display:"block", marginTop:8, fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700}}>{"🌡️ Ouvrir le Risk-On/Risk-Off Meter ↗"}</a>
       </div>
+      <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
+        <div onClick={()=>setOpenSeq(!openSeq)} style={{fontSize:10, color:"#38bdf8", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>📋 TA SÉQUENCE DU JOUR</span><span style={{fontSize:12}}>{openSeq ? "▲" : "▼"}</span></div>
+        {openSeq && <>
+        {[
+          {n:"1", icon:"📰", color:"#38bdf8", t:"6H-9H — QU'ONT FAIT L'ASIE ET LONDRES ?", sub:"News à fort impact + commentaires des banques centrales (session wraps Investing). Le POURQUOI derrière la tendance de Londres qui se construit depuis 3h."},
+          {n:"2", icon:"👁️", color:"#38bdf8", t:"7H45 ou 9H — LA TENDANCE DE LONDRES (M15)", sub:"Londres pousse dans UN sens depuis 3h (après le piège) ? La jambe est claire sur ton M15 = le pôle est posé. C'est la matière première des DEUX figures : tu y traceras ton Fibonacci (retracement 9h30) ou tu guetteras la cassure de son flag (cassure 8h)."},
+          {n:"3", icon:"🥛", color:"#fbbf24", t:"7H45-8H45 ou 9H-9H30 — SCANNE LE CURRENCY STRENGTH", sub:"Colle MarketMilk. Ta paire doit avoir ≥3 rangs d'écart dans le sens du pôle, le sentiment ③ aligné, et PAS dans le Least Volatile (❄️ veto carburant). Pour l'or (XAU) : double convergence obligatoire (USD #1-2 + RISK-ON = vente · USD #7-8 + RISK-OFF = achat). Le scan vaut pour les deux figures."},
+          {n:"4", icon:"📅", color:"#f59e0b", t:"VÉRIFIE QUE TON ③ TIENT (news du matin passées)", sub:"Les news US de 8h30 sont déjà tombées avant ton scan — bon. Mais vérifie : ont-elles retourné l'humeur risk-on/off ? Si le sentiment a basculé depuis l'ouverture, re-clique le bon ③. Tu entres seulement si le courant tient."},
+          {n:"5", icon:"🚀", color:"#34d399", t:"ENTRE — CHOISIS TA FIGURE", sub:"CASSURE 8h : le forex NY ouvre, le flag de Londres casse dans le sens du pôle — tu entres sur la clôture M15 confirmée, stop large pour survivre au balayage de 9h30. RETRACEMENT 9h30 : le NYSE retrace, tu traces le Fib sur la jambe et tu entres au rebond (38.2/50/61.8%) sur M5, stop sous le retracement. UNE entrée par jour. Target = hauteur du pôle."},
+          {n:"6", icon:"🏁", color:"#f87171", t:"AVANT 17H — SORS. TOUJOURS.", sub:"Day trade = la journée seulement. Target atteint, stop touché, ou 17h : tu sors. Un day trade qui devient un swing involontaire = une discipline cassée."},
+        ].map((s,i)=>(
+          <div key={i} style={{display:"flex", gap:10, padding:"8px 0", borderBottom:i<5?"1px solid #1e293b":"none"}}>
+            <div style={{minWidth:22, height:22, borderRadius:11, background:s.color+"22", border:"1px solid "+s.color, color:s.color, fontSize:10, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center"}}>{s.n}</div>
+            <div><div style={{fontSize:9.5, fontWeight:700, color:s.color}}>{s.icon} {s.t}</div>
+            <div style={{fontSize:8, color:TEXT, lineHeight:1.55, marginTop:2}}>{s.sub}</div></div>
+          </div>
+        ))}
+        <div style={{fontSize:8, color:"#fbbf24", marginTop:8, padding:"7px 9px", background:"#1a1500", borderRadius:5, lineHeight:1.5}}>Pas de pôle propre, pas de ≥3 rangs, ❄️ paire endormie (Least Volatile), ③ retourné par les news du matin, ou retracement qui dépasse le 61.8% ? = Pas de trade aujourd'hui. Une entrée par jour MAXIMUM — la deuxième tentative est toujours la mauvaise.</div>
+        </>}
+      </div>
+
+      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:12}}>
+        <div onClick={()=>setOpenJour(!openJour)} style={{fontSize:11, color:"#fbbf24", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <span>📅 LE MEILLEUR JOUR POUR TRADER</span>
+          <span style={{fontSize:13}}>{openJour ? "▲" : "▼"}</span>
+        </div>
+        {openJour && <div style={{marginTop:10}}>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}>Données BabyPips — fourchette de pips par jour sur tes 2 paires. Plus de pips = plus de mouvement à capter.</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}><b style={{color:"#e2e8f0"}}>GBP/JPY :</b> Lun 137 · Mar 132 · Mer 146 · <b style={{color:"#4ade80"}}>Jeu 165</b> · Ven 152</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:8}}><b style={{color:"#e2e8f0"}}>EUR/JPY :</b> Lun 114 · Mar 113 · Mer 114 · <b style={{color:"#4ade80"}}>Jeu 140</b> · Ven 126</div>
+          <div style={{fontSize:8, color:"#4ade80", lineHeight:1.6, marginBottom:3, fontWeight:600}}>✅ JEUDI = le meilleur jour (le sommet de la semaine, le plus de pips).</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}>👍 Mardi-mercredi = très bons. Milieu de semaine = activité max.</div>
+          <div style={{fontSize:8, color:"#f59e0b", lineHeight:1.6, marginBottom:3}}>⚠️ Vendredi = MATIN seulement. BabyPips : chargé jusqu'à midi ET, puis le marché s'effondre. Sors tôt.</div>
+          <div style={{fontSize:8, color:"#f87171", lineHeight:1.6, marginBottom:8}}>🚫 Lundi = le plus mou (le moins de pips). Prudence, souvent du range.</div>
+          <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>🔑 Ta stratégie complète : bon JOUR (jeudi) + bonne HEURE (9h-9h30) + bonne PAIRE (GBP/JPY, EUR/JPY) + bon SETUP (retracement). Les 4 alignés = ta meilleure probabilité.</div>
+        </div>}
+      </div>
+
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #3a2a1f", marginBottom:12}}>
         <div onClick={()=>setOpenJpy(!openJpy)} style={{fontSize:11, color:"#fbbf24", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
           <span>🐉 TES PAIRES JPY — LE MOTEUR & QUAND SUIVRE LES DESKS</span>
@@ -243,44 +281,6 @@ export default function DayTradeFxView(){
           <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>💡 En une phrase : à 9h tu trades du CERTAIN, pas du probable. Tu attends que tout soit décidé, puis tu entres sur du confirmé.</div>
         </div>}
       </div>
-      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:12}}>
-        <div onClick={()=>setOpenJour(!openJour)} style={{fontSize:11, color:"#fbbf24", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <span>📅 LE MEILLEUR JOUR POUR TRADER</span>
-          <span style={{fontSize:13}}>{openJour ? "▲" : "▼"}</span>
-        </div>
-        {openJour && <div style={{marginTop:10}}>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}>Données BabyPips — fourchette de pips par jour sur tes 2 paires. Plus de pips = plus de mouvement à capter.</div>
-          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}><b style={{color:"#e2e8f0"}}>GBP/JPY :</b> Lun 137 · Mar 132 · Mer 146 · <b style={{color:"#4ade80"}}>Jeu 165</b> · Ven 152</div>
-          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:8}}><b style={{color:"#e2e8f0"}}>EUR/JPY :</b> Lun 114 · Mar 113 · Mer 114 · <b style={{color:"#4ade80"}}>Jeu 140</b> · Ven 126</div>
-          <div style={{fontSize:8, color:"#4ade80", lineHeight:1.6, marginBottom:3, fontWeight:600}}>✅ JEUDI = le meilleur jour (le sommet de la semaine, le plus de pips).</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}>👍 Mardi-mercredi = très bons. Milieu de semaine = activité max.</div>
-          <div style={{fontSize:8, color:"#f59e0b", lineHeight:1.6, marginBottom:3}}>⚠️ Vendredi = MATIN seulement. BabyPips : chargé jusqu'à midi ET, puis le marché s'effondre. Sors tôt.</div>
-          <div style={{fontSize:8, color:"#f87171", lineHeight:1.6, marginBottom:8}}>🚫 Lundi = le plus mou (le moins de pips). Prudence, souvent du range.</div>
-          <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>🔑 Ta stratégie complète : bon JOUR (jeudi) + bonne HEURE (9h-9h30) + bonne PAIRE (GBP/JPY, EUR/JPY) + bon SETUP (retracement). Les 4 alignés = ta meilleure probabilité.</div>
-        </div>}
-      </div>
-
-      <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
-        <div onClick={()=>setOpenSeq(!openSeq)} style={{fontSize:10, color:"#38bdf8", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>📋 TA SÉQUENCE DU JOUR</span><span style={{fontSize:12}}>{openSeq ? "▲" : "▼"}</span></div>
-        {openSeq && <>
-        {[
-          {n:"1", icon:"📰", color:"#38bdf8", t:"6H-9H — QU'ONT FAIT L'ASIE ET LONDRES ?", sub:"News à fort impact + commentaires des banques centrales (session wraps Investing). Le POURQUOI derrière la tendance de Londres qui se construit depuis 3h."},
-          {n:"2", icon:"👁️", color:"#38bdf8", t:"7H45 ou 9H — LA TENDANCE DE LONDRES (M15)", sub:"Londres pousse dans UN sens depuis 3h (après le piège) ? La jambe est claire sur ton M15 = le pôle est posé. C'est la matière première des DEUX figures : tu y traceras ton Fibonacci (retracement 9h30) ou tu guetteras la cassure de son flag (cassure 8h)."},
-          {n:"3", icon:"🥛", color:"#fbbf24", t:"7H45-8H45 ou 9H-9H30 — SCANNE LE CURRENCY STRENGTH", sub:"Colle MarketMilk. Ta paire doit avoir ≥3 rangs d'écart dans le sens du pôle, le sentiment ③ aligné, et PAS dans le Least Volatile (❄️ veto carburant). Pour l'or (XAU) : double convergence obligatoire (USD #1-2 + RISK-ON = vente · USD #7-8 + RISK-OFF = achat). Le scan vaut pour les deux figures."},
-          {n:"4", icon:"📅", color:"#f59e0b", t:"VÉRIFIE QUE TON ③ TIENT (news du matin passées)", sub:"Les news US de 8h30 sont déjà tombées avant ton scan — bon. Mais vérifie : ont-elles retourné l'humeur risk-on/off ? Si le sentiment a basculé depuis l'ouverture, re-clique le bon ③. Tu entres seulement si le courant tient."},
-          {n:"5", icon:"🚀", color:"#34d399", t:"ENTRE — CHOISIS TA FIGURE", sub:"CASSURE 8h : le forex NY ouvre, le flag de Londres casse dans le sens du pôle — tu entres sur la clôture M15 confirmée, stop large pour survivre au balayage de 9h30. RETRACEMENT 9h30 : le NYSE retrace, tu traces le Fib sur la jambe et tu entres au rebond (38.2/50/61.8%) sur M5, stop sous le retracement. UNE entrée par jour. Target = hauteur du pôle."},
-          {n:"6", icon:"🏁", color:"#f87171", t:"AVANT 17H — SORS. TOUJOURS.", sub:"Day trade = la journée seulement. Target atteint, stop touché, ou 17h : tu sors. Un day trade qui devient un swing involontaire = une discipline cassée."},
-        ].map((s,i)=>(
-          <div key={i} style={{display:"flex", gap:10, padding:"8px 0", borderBottom:i<5?"1px solid #1e293b":"none"}}>
-            <div style={{minWidth:22, height:22, borderRadius:11, background:s.color+"22", border:"1px solid "+s.color, color:s.color, fontSize:10, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center"}}>{s.n}</div>
-            <div><div style={{fontSize:9.5, fontWeight:700, color:s.color}}>{s.icon} {s.t}</div>
-            <div style={{fontSize:8, color:TEXT, lineHeight:1.55, marginTop:2}}>{s.sub}</div></div>
-          </div>
-        ))}
-        <div style={{fontSize:8, color:"#fbbf24", marginTop:8, padding:"7px 9px", background:"#1a1500", borderRadius:5, lineHeight:1.5}}>Pas de pôle propre, pas de ≥3 rangs, ❄️ paire endormie (Least Volatile), ③ retourné par les news du matin, ou retracement qui dépasse le 61.8% ? = Pas de trade aujourd'hui. Une entrée par jour MAXIMUM — la deuxième tentative est toujours la mauvaise.</div>
-        </>}
-      </div>
-
       <div style={{padding:"12px 14px", background:"#0a1220", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:12}}>
         <div onClick={()=>setOpenEntrees(!openEntrees)} style={{fontSize:11, color:"#c084fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>{"\ud83d\udd2d TES DEUX ENTRÉES — SELON OÙ EN SONT LES DESKS"}</span><span style={{fontSize:12}}>{openEntrees ? "▲" : "▼"}</span></div>
         {openEntrees && <>
@@ -328,6 +328,19 @@ export default function DayTradeFxView(){
       </div>
 
       <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
+        <div onClick={()=>setOpenTrades(!openTrades)} style={{fontSize:10, color:"#fbbf24", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>🎯 CE QUE TU TRADES — ET COMMENT LIRE CHACUN</span><span style={{fontSize:12}}>{openTrades ? "▲" : "▼"}</span></div>
+        {openTrades && <>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8}}><b style={{color:"#38bdf8"}}>Tes 7 paires</b> — EUR/AUD · GBP/AUD · EUR/NZD · GBP/NZD · GBP/JPY · EUR/JPY · CHF/JPY. Une devise de Londres (EUR, GBP, CHF) contre une devise d'Asie-Pacifique (AUD, NZD, JPY) : le pôle que tu trades est construit par les desks de Londres eux-mêmes. <b>Lecture :</b> écart ≥3 rangs au Currency Strength entre les deux devises, la plus forte au-dessus = la direction. Le scanner calcule, ton M15 confirme le pôle.</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8}}><b style={{color:"#fbbf24"}}>XAU/USD (l'or)</b> — un cas spécial : pas deux devises à comparer, UNE seule question — où est le dollar ? L'or est coté en dollars : dollar fort = or sous pression, dollar faible = or qui respire. <b>Lecture :</b> USD #1-2 au Currency Strength = VENTE possible · USD #7-8 = ACHAT possible · USD au milieu (#3-6) = pas de conviction, pas de trade or. Même mécanique que tes paires : à 9h30 le NYSE et le COMEX injectent leur volume ensemble, l'or fait son propre retracement de la tendance de Londres, et tu entres au rebond Fib sur M5. Seul le signal change — dollar + peur convergents au lieu d'une divergence de rangs.</div>
+        <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Pourquoi pas de paires CAD ni de majors dollar ? Le CAD est une devise de session NY (pas de pôle de Londres propre), et les majors USD ont leur vraie vie après ta fenêtre. Tes 7 paires + l'or couvrent exactement le terrain où la tendance de Londres existe.</div>
+        </>}
+      </div>
+
+
+      <div style={{display:"none"}}>
+      </div>
+
+      <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
         <div onClick={()=>setOpenDesks(!openDesks)} style={{fontSize:10, color:"#c084fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>🧠 OÙ SONT LES DESKS — VERSION INTRADAY</span><span style={{fontSize:12}}>{openDesks ? "▲" : "▼"}</span></div>
         {openDesks && <>
         {[
@@ -363,19 +376,6 @@ export default function DayTradeFxView(){
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#c084fc"}}>Quand les suivre — et quand pas.</b> JAMAIS sur le premier mouvement (3h-4h = le piège, par définition). Tu les suis quand leur travail est VISIBLE et TESTÉ : le pôle construit (4h-7h30), puis tu montes derrière eux par UNE des deux figures — la cassure du flag à 8h (cassure 8h) ou le rebond du retracement Fib à 9h30 (retracement 9h30). Dans les deux cas, tu entres au moment précis où la liquidité de NY confirme que le train roule. Pas de pôle propre = ils hésitent = toi aussi tu t'abstiens. Et le ❄️ Least Volatile le confirme en chiffres : une paire dans ce top n'a pas reçu leurs tranches aujourd'hui.</div>
         <div style={{fontSize:8, color:"#fbbf24", lineHeight:1.6, padding:"7px 9px", background:"#1a1500", borderRadius:5}}>⏱️ Le timing en une ligne : ils piègent à 3h, chargent de 4h à 7h30, soufflent de 7h30 à 8h. Toi : tu lis à 6h-9h, tu scannes (7h45-8h45 ou 9h-9h30), et tu entres soit à la cassure du flag de 8h (cassure 8h), soit au rebond du retracement de 9h30 (retracement 9h30). Tu n'es jamais en avance sur eux — tu es juste derrière, là où c'est payé.</div>
         </>}
-      </div>
-
-      <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
-        <div onClick={()=>setOpenTrades(!openTrades)} style={{fontSize:10, color:"#fbbf24", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>🎯 CE QUE TU TRADES — ET COMMENT LIRE CHACUN</span><span style={{fontSize:12}}>{openTrades ? "▲" : "▼"}</span></div>
-        {openTrades && <>
-        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8}}><b style={{color:"#38bdf8"}}>Tes 7 paires</b> — EUR/AUD · GBP/AUD · EUR/NZD · GBP/NZD · GBP/JPY · EUR/JPY · CHF/JPY. Une devise de Londres (EUR, GBP, CHF) contre une devise d'Asie-Pacifique (AUD, NZD, JPY) : le pôle que tu trades est construit par les desks de Londres eux-mêmes. <b>Lecture :</b> écart ≥3 rangs au Currency Strength entre les deux devises, la plus forte au-dessus = la direction. Le scanner calcule, ton M15 confirme le pôle.</div>
-        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8}}><b style={{color:"#fbbf24"}}>XAU/USD (l'or)</b> — un cas spécial : pas deux devises à comparer, UNE seule question — où est le dollar ? L'or est coté en dollars : dollar fort = or sous pression, dollar faible = or qui respire. <b>Lecture :</b> USD #1-2 au Currency Strength = VENTE possible · USD #7-8 = ACHAT possible · USD au milieu (#3-6) = pas de conviction, pas de trade or. Même mécanique que tes paires : à 9h30 le NYSE et le COMEX injectent leur volume ensemble, l'or fait son propre retracement de la tendance de Londres, et tu entres au rebond Fib sur M5. Seul le signal change — dollar + peur convergents au lieu d'une divergence de rangs.</div>
-        <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Pourquoi pas de paires CAD ni de majors dollar ? Le CAD est une devise de session NY (pas de pôle de Londres propre), et les majors USD ont leur vraie vie après ta fenêtre. Tes 7 paires + l'or couvrent exactement le terrain où la tendance de Londres existe.</div>
-        </>}
-      </div>
-
-
-      <div style={{display:"none"}}>
       </div>
 
       <div style={{padding:"10px 12px", background:"#160a2e", borderRadius:8, border:"1px solid #c084fc44", marginBottom:14}}>
