@@ -172,6 +172,14 @@ export default function DayTradeFxView(){
           <div style={{fontSize:8, color:"#fbbf24", lineHeight:1.6, marginBottom:3, fontWeight:600}}>• 11h-12h : London Fix — les desks DÉBOUCLENT. Surveille ta sortie.</div>
           <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:8}}>• 12h-17h : Londres parti, NY seul. Tes cross JPY perdent leur moteur.</div>
           <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>🔑 La règle JPY : les desks de Londres sont présents de 3h à 12h ET. Ton vrai créneau = 8h-12h. Le gros épuisement arrive souvent au fix de midi, PAS à 17h — ne traîne pas l'après-midi sur ces cross.</div>
+          <div style={{fontSize:9, color:"#f87171", fontWeight:700, marginTop:10, marginBottom:6}}>⚔️ LA BATAILLE DE 8h — GBP/JPY HEURE PAR HEURE</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}><b style={{color:"#7dd3fc"}}>Avant 8h :</b> Londres a DÉJÀ dessiné la tendance (depuis 3h ET).</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}><b style={{color:"#f59e0b"}}>8h :</b> NY ouvre → la bataille commence : continuation OU retournement.</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}><b style={{color:"#f59e0b"}}>8h-9h :</b> les 30-60 min décisives — le scénario se révèle.</div>
+          <div style={{fontSize:8, color:"#34d399", lineHeight:1.6, marginBottom:3, fontWeight:600}}>✅ 9h-9h30 : la question est tranchée — TON scan, TON entrée.</div>
+          <div style={{fontSize:8, color:"#34d399", lineHeight:1.6, marginBottom:3, fontWeight:600}}>9h30 : re-test (secondary test) puis reprise = ton retracement.</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:8}}><b style={{color:"#f87171"}}>Après 12h :</b> GBP/JPY se vide (NY préfère les paires USD) → sors.</div>
+          <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>💡 Pourquoi 9h30 : tu n'entres JAMAIS pendant la bataille (8h-9h, incertain et violent). Tu attends que le vainqueur soit connu et tu entres sur le retracement confirmé.</div>
         </div>}
       </div>
 
