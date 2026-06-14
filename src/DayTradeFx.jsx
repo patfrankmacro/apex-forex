@@ -152,6 +152,7 @@ export default function DayTradeFxView(){
   const [openTete, setOpenTete] = useState(false);
   const [openTrades, setOpenTrades] = useState(false);
   const [openVs, setOpenVs] = useState(false);
+  const [openJour, setOpenJour] = useState(false);
   const [liveRisk, setLiveRisk] = useState(null);
   useEffect(() => {
     const read = () => { try { setLiveRisk(JSON.parse(localStorage.getItem("apexRisk")||"null")); } catch(e){} };
@@ -240,6 +241,22 @@ export default function DayTradeFxView(){
           <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#38bdf8"}}>4. Tu captes le pic de liquidité de 10h ET.</b> La liquidité est optimale vers 15h Londres = 10h ET (BabyPips). Ton entrée à 9h30 te place juste avant ce pic.</div>
           <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:8}}>Le coût honnête : tu rates la cassure de 8h (meilleur prix si la continuation est franche). Mais elle est risquée — tu entres pendant la bataille. Tu échanges « meilleur prix mais risqué » contre « prix correct mais sûr ».</div>
           <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>💡 En une phrase : à 9h tu trades du CERTAIN, pas du probable. Tu attends que tout soit décidé, puis tu entres sur du confirmé.</div>
+        </div>}
+      </div>
+      <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:12}}>
+        <div onClick={()=>setOpenJour(!openJour)} style={{fontSize:11, color:"#fbbf24", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <span>📅 LE MEILLEUR JOUR POUR TRADER</span>
+          <span style={{fontSize:13}}>{openJour ? "▲" : "▼"}</span>
+        </div>
+        {openJour && <div style={{marginTop:10}}>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}>Données BabyPips — fourchette de pips par jour sur tes 2 paires. Plus de pips = plus de mouvement à capter.</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}><b style={{color:"#e2e8f0"}}>GBP/JPY :</b> Lun 137 · Mar 132 · Mer 146 · <b style={{color:"#4ade80"}}>Jeu 165</b> · Ven 152</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:8}}><b style={{color:"#e2e8f0"}}>EUR/JPY :</b> Lun 114 · Mar 113 · Mer 114 · <b style={{color:"#4ade80"}}>Jeu 140</b> · Ven 126</div>
+          <div style={{fontSize:8, color:"#4ade80", lineHeight:1.6, marginBottom:3, fontWeight:600}}>✅ JEUDI = le meilleur jour (le sommet de la semaine, le plus de pips).</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}>👍 Mardi-mercredi = très bons. Milieu de semaine = activité max.</div>
+          <div style={{fontSize:8, color:"#f59e0b", lineHeight:1.6, marginBottom:3}}>⚠️ Vendredi = MATIN seulement. BabyPips : chargé jusqu'à midi ET, puis le marché s'effondre. Sors tôt.</div>
+          <div style={{fontSize:8, color:"#f87171", lineHeight:1.6, marginBottom:8}}>🚫 Lundi = le plus mou (le moins de pips). Prudence, souvent du range.</div>
+          <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>🔑 Ta stratégie complète : bon JOUR (jeudi) + bonne HEURE (9h-9h30) + bonne PAIRE (GBP/JPY, EUR/JPY) + bon SETUP (retracement). Les 4 alignés = ta meilleure probabilité.</div>
         </div>}
       </div>
 
