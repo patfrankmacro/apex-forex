@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const TEXT="#c8d4f0", TEXT_DIM="#4a5070";
 const DT_PAIRS = [["EUR","AUD"],["GBP","AUD"],["EUR","NZD"],["GBP","NZD"],["GBP","JPY"],["EUR","JPY"],["CHF","JPY"]];
@@ -152,6 +152,13 @@ export default function DayTradeFxView(){
   const [openTete, setOpenTete] = useState(false);
   const [openTrades, setOpenTrades] = useState(false);
   const [openVs, setOpenVs] = useState(false);
+  const [liveRisk, setLiveRisk] = useState(null);
+  useEffect(() => {
+    const read = () => { try { setLiveRisk(JSON.parse(localStorage.getItem("apexRisk")||"null")); } catch(e){} };
+    read();
+    const id = setInterval(read, 600);
+    return () => clearInterval(id);
+  }, []);
   return (
     <div style={{maxWidth:520, margin:"0 auto"}}>
       <div style={{textAlign:"center", marginBottom:12}}>
@@ -173,7 +180,7 @@ export default function DayTradeFxView(){
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, padding:"8px 10px", background:"#1a1500", borderRadius:5}}>{"🥇 L'or et ses DEUX moteurs : le dollar (mécanique — l'or est coté en USD) et la peur (refuge). Quand ils convergent (USD fort + Risk-On = vente · USD faible + Risk-Off = achat), le mouvement est propre. Quand ils se BATTENT (USD fort + Risk-Off, typique des paniques où le cash dollar et l'or refuge montent ensemble), l'or fait des mèches dans les deux sens — le scanner te le dira : CONFLIT, pas de trade. C'est la convergence qui fait le trade, jamais un moteur seul."}</div>
         <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginTop:10, marginBottom:5}}>{"📋 PAIRE PAR PAIRE — CE QUE CHAQUE SENTIMENT VALIDE"}</div>
         <div style={{fontSize:7.5, fontFamily:"monospace", lineHeight:1.9}}>
-          <div style={{display:"flex", borderBottom:"1px solid #334155", paddingBottom:3, marginBottom:3, fontWeight:700, color:"#94a3b8"}}><span style={{flex:1.2}}>PAIRE</span><span style={{flex:1, color:"#4ade80"}}>🟢 RISK-ON</span><span style={{flex:1, color:"#f87171"}}>🔴 RISK-OFF</span></div>
+          <div style={{display:"flex", borderBottom:"1px solid #334155", paddingBottom:3, marginBottom:3, fontWeight:700, color:"#94a3b8"}}><span style={{flex:1.2}}>PAIRE</span><span style={{flex:1, color:"#4ade80", background:liveRisk==="RISK-ON"?"#0a2818":"transparent", borderRadius:3, opacity:(liveRisk&&liveRisk!=="RISK-ON")?0.3:1}}>🟢 RISK-ON</span><span style={{flex:1, color:"#f87171", background:liveRisk==="RISK-OFF"?"#2a0a0a":"transparent", borderRadius:3, opacity:(liveRisk&&liveRisk!=="RISK-OFF")?0.3:1}}>🔴 RISK-OFF</span></div>
           {[
             ["GBP/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)","achat","vente"],
             ["EUR/JPY","▲ ACHAT (JPY vendu)","▼ VENTE (fuite vers JPY)","achat","vente"],
@@ -183,7 +190,7 @@ export default function DayTradeFxView(){
             ["EUR/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)","vente","achat"],
             ["GBP/NZD","▼ VENTE (NZD acheté)","▲ ACHAT (NZD lâché)","vente","achat"],
           ].map((r,i)=>(
-            <div key={i} style={{display:"flex", borderBottom:"1px solid #1e293b"}}><span style={{flex:1.2, color:"#e2e8f0", fontWeight:700}}>{r[0]}</span><span style={{flex:1, color:r[3]==="achat"?"#4ade80":"#f87171"}}>{r[1]}</span><span style={{flex:1, color:r[4]==="achat"?"#4ade80":"#f87171"}}>{r[2]}</span></div>
+            <div key={i} style={{display:"flex", borderBottom:"1px solid #1e293b"}}><span style={{flex:1.2, color:"#e2e8f0", fontWeight:700}}>{r[0]}</span><span style={{flex:1, color:r[3]==="achat"?"#4ade80":"#f87171", background:liveRisk==="RISK-ON"?"#0a2818":"transparent", borderRadius:3, opacity:(liveRisk&&liveRisk!=="RISK-ON")?0.3:1}}>{r[1]}</span><span style={{flex:1, color:r[4]==="achat"?"#4ade80":"#f87171", background:liveRisk==="RISK-OFF"?"#2a0a0a":"transparent", borderRadius:3, opacity:(liveRisk&&liveRisk!=="RISK-OFF")?0.3:1}}>{r[2]}</span></div>
           ))}
           <div style={{display:"flex", borderBottom:"1px solid #1e293b", background:"#1a150033"}}><span style={{flex:1.2, color:"#fbbf24", fontWeight:700}}>XAU/USD 🥇</span><span style={{flex:1, color:"#f87171"}}>{"▼ VENTE si USD #1-2"}</span><span style={{flex:1, color:"#4ade80"}}>{"▲ ACHAT si USD #7-8"}</span></div>
         </div>
