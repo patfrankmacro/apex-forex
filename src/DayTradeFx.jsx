@@ -145,6 +145,7 @@ function DtAnalyzer(){
 export default function DayTradeFxView(){
   const [openJpy, setOpenJpy] = useState(false);
   const [openScan, setOpenScan] = useState(false);
+  const [openSeq, setOpenSeq] = useState(false);
   return (
     <div style={{maxWidth:520, margin:"0 auto"}}>
       <div style={{textAlign:"center", marginBottom:12}}>
@@ -199,7 +200,8 @@ export default function DayTradeFxView(){
       </div>
 
       <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
-        <div style={{fontSize:10, color:"#7dd3fc", fontWeight:700, marginBottom:8}}>📋 TA SÉQUENCE DU JOUR</div>
+        <div onClick={()=>setOpenSeq(!openSeq)} style={{fontSize:10, color:"#7dd3fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>📋 TA SÉQUENCE DU JOUR</span><span style={{fontSize:12}}>{openSeq ? "▲" : "▼"}</span></div>
+        {openSeq && <>
         {[
           {n:"1", icon:"📰", color:"#38bdf8", t:"6H-9H — QU'ONT FAIT L'ASIE ET LONDRES ?", sub:"News à fort impact + commentaires des banques centrales (session wraps Investing). Le POURQUOI derrière la tendance de Londres qui se construit depuis 3h."},
           {n:"2", icon:"👁️", color:"#38bdf8", t:"7H45 ou 9H — LA TENDANCE DE LONDRES (M15)", sub:"Londres pousse dans UN sens depuis 3h (après le piège) ? La jambe est claire sur ton M15 = le pôle est posé. C'est la matière première des DEUX figures : tu y traceras ton Fibonacci (retracement 9h30) ou tu guetteras la cassure de son flag (cassure 8h)."},
@@ -215,6 +217,7 @@ export default function DayTradeFxView(){
           </div>
         ))}
         <div style={{fontSize:8, color:"#fbbf24", marginTop:8, padding:"7px 9px", background:"#1a1500", borderRadius:5, lineHeight:1.5}}>Pas de pôle propre, pas de ≥3 rangs, ❄️ paire endormie (Least Volatile), ③ retourné par les news du matin, ou retracement qui dépasse le 61.8% ? = Pas de trade aujourd'hui. Une entrée par jour MAXIMUM — la deuxième tentative est toujours la mauvaise.</div>
+        </>}
       </div>
 
       <div style={{padding:"12px 14px", background:"#0a1220", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:12}}>
