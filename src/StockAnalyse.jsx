@@ -16,12 +16,13 @@ function grab(txt, label) {
 
 // Pour les metriques presentes 2x (valeur $ ET croissance %) : prend l'occurrence avec %
 function grabPrice(txt) {
-  // Cherche "Price\n5.51" ou "Price $5.51" — evite "Target Price" et "Prev Close"
-  const m = txt.match(/(?:^|\s)Price\s*[\r\n]+\s*([0-9]+(?:\.[0-9]+)?)/m);
-  if (m) return parseFloat(m[1]);
-  // Fallback: cherche le pattern Price suivi d'un nombre apres whitespace
-  const m2 = txt.match(/\bPrice\b(?!\s*(?:Target|Prev|\$))\s*[\r\n\s]+([0-9]+(?:\.[0-9]+)?)/);
-  if (m2) return parseFloat(m2[1]);
+  const ls = txt.split(/\r?\n/);
+  for (let i = 0; i < ls.length - 1; i++) {
+    if (ls[i].trim() === "Price") {
+      const v = parseFloat(ls[i+1].trim());
+      if (!isNaN(v)) return v;
+    }
+  }
   return null;
 }
 
