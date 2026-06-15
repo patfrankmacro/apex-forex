@@ -127,20 +127,6 @@ function valorisation(f) {
   return { price, epsN, stop, methodes, low, high, scenarios, rr, baseGain: +baseGain.toFixed(2), risque: +risque.toFixed(2) };
 }
 
-function autoVigilance(f) {
-  const lines = [];
-  if (f.insiderTrans!==null && f.insiderTrans<-20) lines.push("Insider Trans "+f.insiderTrans+"% → les DIRIGEANTS vendent massivement. Ils connaissent mieux que quiconque l'avenir de l'entreprise. A surveiller de pres.");
-  if (f.rsi!==null && f.rsi>70) lines.push("RSI "+f.rsi+" → zone de surachat (>70). Risque de correction technique a court terme. Attends un repli avant d'entrer.");
-  if (f.rsi!==null && f.rsi>65 && f.rsi<=70) lines.push("RSI "+f.rsi+" → proche de la zone de surachat (70). Peu de marge. Surveille une consolidation avant le breakout.");
-  const profitM = f.netMargin || null;
-  if (f.roe!==null && f.roe<10) lines.push("ROE "+f.roe+"% → rendement sur capital faible (<10%). La rentabilite reste fragile — surveille l'evolution des marges.");
-  if (f.debteq!==null && f.debteq>1) lines.push("Debt/Equity "+f.debteq+" → endettement eleve. En cas de ralentissement, la dette peut peser sur la croissance.");
-  if (f.instTrans!==null && f.instTrans<0) lines.push("Inst. Trans "+f.instTrans+"% → les FONDS institutionnels reduisent leur position. Le smart money sort — surveille si ca continue.");
-  if (f.relvol!==null && f.relvol<1.5) lines.push("Rel Volume "+f.relvol+"x → volume relatif faible. Le breakout n'est pas encore confirme par un volume fort.");
-  if (lines.length===0) lines.push("Aucun signal de vigilance majeur detecte sur les donnees disponibles. Reste vigilant sur le chart (VCP, volume).");
-  return lines.join("\n\n");
-}
-
 function autoThese(f) {
   const lines = [];
   if (f.epsQQ!==null && f.epsThisY!==null && f.epsNextY!==null) {
@@ -296,14 +282,8 @@ function StockAnalyseView() {
             )}
             <textarea value={theseGrowth} onChange={e=>setTheseGrowth(e.target.value)} placeholder="Ajoute ici le catalyseur business spécifique (levier opérationnel, expansion géo, nouveau produit...)"
               style={{width:"100%", minHeight:36, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:6, padding:8, fontSize:8.5, fontFamily:"inherit", boxSizing:"border-box", marginBottom:5}} />
-            {res.valo && autoVigilance(res.f) && (
-              <div style={{width:"100%", background:"#1a0505", border:"1px solid #3a1a1a", borderRadius:6, padding:8, fontSize:8.5, color:"#f87171", lineHeight:1.6, marginBottom:5, whiteSpace:"pre-wrap", fontFamily:"inherit"}}>
-                <span style={{fontSize:8, color:"#f8717188", fontWeight:700, display:"block", marginBottom:4}}>⚠️ VIGILANCE — generee automatiquement</span>
-                {autoVigilance(res.f)}
-              </div>
-            )}
-            <textarea value={risques} onChange={e=>setRisques(e.target.value)} placeholder="Ajoute ici les risques business specifiques (concurrence, reglementation, dilution...)"
-              style={{width:"100%", minHeight:36, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:6, padding:8, fontSize:8.5, fontFamily:"inherit", boxSizing:"border-box", marginBottom:5}} />
+            <textarea value={risques} onChange={e=>setRisques(e.target.value)} placeholder="LES RISQUES — concurrence, réglementation, dépendances, dilution..."
+              style={{width:"100%", minHeight:42, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:6, padding:8, fontSize:8.5, fontFamily:"inherit", boxSizing:"border-box", marginBottom:5}} />
             <div style={{fontSize:7.5, color:TEXT_DIM, lineHeight:1.45, fontStyle:"italic"}}>La thèse tient tant que : (1) les EPS continuent d'accélérer, (2) les Inst. Trans restent positifs, (3) le prix reste au-dessus de la SMA200. Si une de ces 3 conditions casse → réduis ou coupe.</div>
           </div>
           )}
