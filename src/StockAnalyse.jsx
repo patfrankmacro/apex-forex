@@ -95,6 +95,12 @@ function StockAnalyseView() {
   const [openStrat, setOpenStrat] = useState(false);
   const [openRisk, setOpenRisk] = useState(false);
   const [openVcp, setOpenVcp] = useState(false);
+  const [openCascade, setOpenCascade] = useState(false);
+  const [openFonds, setOpenFonds] = useState(false);
+  const [openHigh, setOpenHigh] = useState(false);
+  const [openType, setOpenType] = useState(false);
+  const [openRoutine, setOpenRoutine] = useState(false);
+  const [openFiltres, setOpenFiltres] = useState(false);
 
   const run = () => {
     if (!raw.trim()) { setRes({error:"Colle d'abord le tableau de stats Finviz de l'action."}); return; }
@@ -195,6 +201,76 @@ function StockAnalyseView() {
           <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}>Série de contractions de moins en moins profondes (-15%, -10%, -6%, -3%). Le volume diminue à chaque contraction : les vendeurs s'épuisent, les institutionnels accumulent en silence. Puis BREAKOUT avec volume 2-3x la moyenne.</div>
           <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:AMBER}}>Durée</b> : 3 à 8 semaines minimum — plus long = meilleur setup. Le prix reste au-dessus de SMA50 et SMA200 pendant toute la phase.</div>
           <div style={{fontSize:8, color:GREEN, lineHeight:1.55, padding:"6px 8px", background:"#052010", borderRadius:5, fontWeight:600}}>💡 Le VCP EST la signature graphique de l'accumulation institutionnelle : quand un fonds absorbe l'offre sur des semaines, la volatilité se contracte. Quand il a fini, la moindre demande fait exploser le prix.</div>
+        </div>}
+      </div>
+
+      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
+        <div onClick={()=>setOpenCascade(!openCascade)} style={{fontSize:11, color:GREEN, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <span>⚡ L'EFFET CASCADE — BOTH POSITIVE SURPRISE</span><span style={{fontSize:13}}>{openCascade?"▲":"▼"}</span>
+        </div>
+        {openCascade && <div style={{marginTop:8}}>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}>Le filtre le plus puissant : l'entreprise bat SIMULTANÉMENT ses prévisions d'EPS ET de ventes. Pas juste la croissance — la SURPRISE par rapport aux attentes des analystes.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:RED}}>EPS surprise seul</b> = l'entreprise a coupé ses coûts pour battre les EPS, mais les ventes déçoivent. Signal faible et trompeur.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:RED}}>Revenue surprise seul</b> = les ventes surprennent mais les bénéfices déçoivent. Problème de marges. Signal ambigu.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}><b style={{color:GREEN}}>BOTH POSITIVE</b> = croissance réelle et saine. Le signal le plus puissant du marché.</div>
+          <div style={{fontSize:8, color:GREEN, lineHeight:1.6, padding:"7px 9px", background:"#052010", borderRadius:5, fontWeight:600}}>La cascade : 1) Les algos détectent la double surprise → 2) Les analystes relèvent leurs estimations futures → 3) Les fonds augmentent leur allocation → 4) Le prix monte 10-30% rapidement. Le screener capture le DÉBUT de ce cycle.</div>
+        </div>}
+      </div>
+
+      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
+        <div onClick={()=>setOpenFonds(!openFonds)} style={{fontSize:11, color:BLUE, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <span>🏦 COMMENT LES FONDS INSTITUTIONNELS ANALYSENT</span><span style={{fontSize:13}}>{openFonds?"▲":"▼"}</span>
+        </div>
+        {openFonds && <div style={{marginTop:8}}>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}>Pour suivre les institutionnels, il faut penser comme eux. Leur processus exact — que le screener reproduit :</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:BLUE}}>1. Screening quantitatif</b> sur +8000 actions → EPS QoQ/YoY &gt;25%, Sales &gt;25%, SMA200+. Filtre 99% des actions.</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:BLUE}}>2. Vérif double surprise</b> → Both Positive EPS &amp; Revenue. Confirme une croissance réelle, pas artificielle.</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:BLUE}}>3. Analyse dynamique institutionnelle</b> → Inst. Trans positif, Inst. Own &gt;10%. Suit l'argent intelligent qui accumule.</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:BLUE}}>4. Validation consensus analyste</b> → Strong Buy. Confirmation externe indépendante.</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:BLUE}}>5. Vérif liquidité</b> → Avg Vol &gt;200K, Price &gt;$5, Rel Vol &gt;1. Entrée/sortie sans impact prix.</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:BLUE}}>6. Timing technique</b> → SMA50&gt;SMA200, Prix&gt;SMA200, 50-Day High. Entrée au meilleur moment.</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6}}><b style={{color:BLUE}}>7. Accumulation silencieuse</b> → ils achètent sur 3-8 semaines. C'est là que le VCP se forme sur le chart.</div>
+        </div>}
+      </div>
+
+      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
+        <div onClick={()=>setOpenHigh(!openHigh)} style={{fontSize:11, color:AMBER, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <span>🎯 LE 50-DAY NEW HIGH — LE SIGNAL DE BREAKOUT</span><span style={{fontSize:13}}>{openHigh?"▲":"▼"}</span>
+        </div>
+        {openHigh && <div style={{marginTop:8}}>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}>Le filtre que la plupart des screeners publics n'incluent pas. Il confirme que le breakout est réel et que le momentum institutionnel est au maximum.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:AMBER}}>Pourquoi 50 jours et pas 20 ?</b> 20 jours = 4 semaines = résistance faible, beaucoup de faux signaux. 50 jours = 10 semaines = résistance MAJEURE brisée, signal fiable, et c'est ce que les algos institutionnels sont programmés pour acheter.</div>
+          <div style={{fontSize:8, color:AMBER, lineHeight:1.6, padding:"7px 9px", background:"#1a1500", borderRadius:5, fontWeight:600}}>La séquence parfaite : Phase 1 accumulation silencieuse → Phase 2 contraction VCP (volume baisse) → Phase 3 50-Day New High → Phase 4 BREAKOUT explosif (volume 2-3x). Le point d'entrée Minervini.</div>
+        </div>}
+      </div>
+
+      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
+        <div onClick={()=>setOpenType(!openType)} style={{fontSize:11, color:PURPLE, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <span>⚖️ MINERVINI — TRADER OU INVESTISSEUR ?</span><span style={{fontSize:13}}>{openType?"▲":"▼"}</span>
+        </div>
+        {openType && <div style={{marginTop:8}}>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}>« Je suis un investisseur de croissance avec une discipline et une précision de trader. » Il sélectionne comme un investisseur (fondamentaux solides) mais exécute et gère le risque comme un trader (stop strict, entrée précise, sortie sans émotion).</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:PURPLE}}>Horizon</b> : 3 semaines à 12 mois (entre le day trader en minutes et le buy &amp; hold en années).</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:PURPLE}}>Stop loss</b> : 7-8% strict (le day trader &lt;1%, le buy &amp; hold aucun).</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:PURPLE}}>Sélection</b> : Fondamentaux + Technique (pas l'un sans l'autre).</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:PURPLE}}>Entrée</b> : point pivot précis (le breakout du VCP), jamais au hasard.</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6}}><b style={{color:PURPLE}}>Marché baissier</b> : il réduit l'exposition et passe en cash (ne garde pas tout comme le buy &amp; hold).</div>
+        </div>}
+      </div>
+
+      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
+        <div onClick={()=>setOpenRoutine(!openRoutine)} style={{fontSize:11, color:GREEN, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <span>📅 LA ROUTINE QUOTIDIENNE</span><span style={{fontSize:13}}>{openRoutine?"▲":"▼"}</span>
+        </div>
+        {openRoutine && <div style={{marginTop:8}}>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:GREEN}}>9h-10h</b> : ouvre le screener avant/pendant l'ouverture du marché US.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:GREEN}}>Interprète le nombre de résultats</b> : 0-3 = marché difficile, prudence · 4-8 = conditions idéales · 9+ = marché fort, sois sélectif.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}><b style={{color:GREEN}}>Vérifie le chart manuellement</b> : cherche le VCP sur chaque candidate, attends le breakout (le volume doit exploser).</div>
+          <div style={{fontSize:8.5, color:AMBER, fontWeight:700, marginBottom:4}}>Les 3 questions pour chaque action :</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}>1. Les EPS accélèrent-ils depuis au moins 2 trimestres consécutifs ?</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}>2. Le chart montre-t-il un VCP avec volume décroissant ?</div>
+          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:6}}>3. Le rapport risque/rendement est-il d'au moins 3:1 ?</div>
+          <div style={{fontSize:8, color:RED, lineHeight:1.6, padding:"7px 9px", background:"#200505", borderRadius:5, fontWeight:600}}>⚠️ Règle absolue : le screener trouve les candidates, ce n'est PAS un signal d'achat automatique. Chaque action doit passer ton analyse manuelle du chart.</div>
         </div>}
       </div>
 
