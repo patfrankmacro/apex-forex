@@ -35,7 +35,21 @@ function grabGrowth(txt, label) {
 
 function analyse(raw, manualTicker) {
   const t = raw;
-  const ticker = (manualTicker && manualTicker.trim()) ? manualTicker.trim().toUpperCase() : ((t.match(/finviz\.com\/stock\?t=([A-Za-z]+)/i) || [])[1] || "?");
+  let ticker = "?";
+  if (manualTicker && manualTicker.trim()) {
+    ticker = manualTicker.trim().toUpperCase();
+  } else {
+    // Essai 1 : URL dans le texte
+    const m1 = t.match(/finviz\.com\/stock\?t=([A-Za-z]+)/i);
+    if (m1) ticker = m1[1].toUpperCase();
+    // Essai 2 : premiere ligne non vide courte = ticker
+    else {
+      const ls = t.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
+      for (const l of ls) {
+        if (/^[A-Z]{1,6}$/.test(l)) { ticker = l; break; }
+      }
+    }
+  }
   const f = {
     mktcap: grab(t, "Market Cap"), price: grabPrice(t), avgvol: grab(t, "Avg Volume"),
     relvol: grab(t, "Rel Volume"), recom: grab(t, "Recom"), epsQQ: grab(t, "EPS Q/Q"),
