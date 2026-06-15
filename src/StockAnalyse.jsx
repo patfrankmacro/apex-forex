@@ -15,6 +15,16 @@ function grab(txt, label) {
 }
 
 // Pour les metriques presentes 2x (valeur $ ET croissance %) : prend l'occurrence avec %
+function grabPrice(txt) {
+  // Cherche "Price\n5.51" ou "Price $5.51" — evite "Target Price" et "Prev Close"
+  const m = txt.match(/(?:^|\s)Price\s*[\r\n]+\s*([0-9]+(?:\.[0-9]+)?)/m);
+  if (m) return parseFloat(m[1]);
+  // Fallback: cherche le pattern Price suivi d'un nombre apres whitespace
+  const m2 = txt.match(/\bPrice\b(?!\s*(?:Target|Prev|\$))\s*[\r\n\s]+([0-9]+(?:\.[0-9]+)?)/);
+  if (m2) return parseFloat(m2[1]);
+  return null;
+}
+
 function grabGrowth(txt, label) {
   const esc = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const re = new RegExp(esc + "\\s*[\\r\\n]*\\s*(-?[0-9]+(?:\\.[0-9]+)?)\\s*%", "gi");
@@ -27,7 +37,7 @@ function analyse(raw, manualTicker) {
   const t = raw;
   const ticker = (manualTicker && manualTicker.trim()) ? manualTicker.trim().toUpperCase() : ((t.match(/finviz\.com\/stock\?t=([A-Za-z]+)/i) || [])[1] || "?");
   const f = {
-    mktcap: grab(t, "Market Cap"), price: grab(t, "Price"), avgvol: grab(t, "Avg Volume"),
+    mktcap: grab(t, "Market Cap"), price: grabPrice(t), avgvol: grab(t, "Avg Volume"),
     relvol: grab(t, "Rel Volume"), recom: grab(t, "Recom"), epsQQ: grab(t, "EPS Q/Q"),
     epsThisY: grab(t, "EPS this Y"), salesQQ: grab(t, "Sales Q/Q"), instOwn: grab(t, "Inst Own"),
     instTrans: grab(t, "Inst Trans"), insiderTrans: grab(t, "Insider Trans"), perfHalfY: grab(t, "Perf Half Y"),
