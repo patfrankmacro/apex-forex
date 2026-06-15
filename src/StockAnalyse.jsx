@@ -133,19 +133,19 @@ function valorisation(f) {
   const low = cibles.length ? Math.min(...cibles) : null;
   const high = cibles.length ? Math.max(...cibles) : null;
   // 3 scenarios bases sur le forward P/E reel
-  // P/E de reference : P/E actuel TTM si dispo, sinon Forward P/E
-  const ttmPE = (price && epsN && epsN > 0) ? price/epsN : null;
-  const basePE = ttmPE || fwdPE || 25;
-  // EPS N+1 pour les scenarios
+  // EPS N+2 = EPS N+1 x (1 + epsNextY/100) pour projeter encore un an
   const epsF = f.epsNextYval && f.epsNextYval > 0 ? f.epsNextYval : epsN * 1.25;
-  // Scenarios : on garde le P/E TTM et on projette sur EPS N+1
-  // Bull = P/E TTM x 1.3 sur EPS N+1
-  // Base = P/E TTM sur EPS N+1 (expansion naturelle)
-  // Bear = P/E TTM x 0.65 sur EPS N+1
+  const growthRate = f.epsNextY && f.epsNextY > 0 ? f.epsNextY/100 : 0.25;
+  const epsF2 = +(epsF * (1 + growthRate)).toFixed(2);
+  // P/E cible : Forward P/E actuel comme reference de marche
+  const basePE = fwdPE || (price && epsF ? price/epsF : 25);
+  // Bull : EPS N+2 x PE actuel x 1.3 (acceleration + prime)
+  // Base : EPS N+2 x PE actuel (croissance continue, meme multiple)
+  // Bear : EPS N+1 x PE x 0.65 (deception)
   const scenarios = [
-    { nom: "BULL", hyp: "Acceleration EPS + expansion multiple — marche paie une prime", pe: +(basePE*1.3).toFixed(0), prix: +(epsF*basePE*1.3).toFixed(2), c: "#34d399" },
-    { nom: "BASE", hyp: "EPS N+1 atteints, P/E stable — trajectoire normale", pe: +basePE.toFixed(0), prix: +(epsF*basePE).toFixed(2), c: "#fbbf24" },
-    { nom: "BEAR", hyp: "EPS decevants + compression multiple", pe: +(basePE*0.65).toFixed(0), prix: +(epsF*basePE*0.65).toFixed(2), c: "#f87171" },
+    { nom: "BULL", hyp: "EPS continuent d'accelerer (+"+Math.round(growthRate*100)+"%) + marche paie une prime", pe: +(basePE*1.3).toFixed(0), prix: +(epsF2*basePE*1.3).toFixed(2), c: "#34d399" },
+    { nom: "BASE", hyp: "EPS N+2 atteints (+" +Math.round(growthRate*100)+"%), meme P/E qu'aujourd'hui", pe: +basePE.toFixed(0), prix: +(epsF2*basePE).toFixed(2), c: "#fbbf24" },
+    { nom: "BEAR", hyp: "Croissance decoit, multiples comprimes", pe: +(basePE*0.65).toFixed(0), prix: +(epsF*basePE*0.65).toFixed(2), c: "#f87171" },
   ];
   // R/R sur le meilleur objectif realiste (Bull Case ou Target analystes)
   const bullTarget = scenarios[0].prix;
