@@ -173,16 +173,45 @@ function autoVigilance(f) {
 
 function autoThese(f) {
   const lines = [];
+
+  // 1. ACCELERATION EPS
   if (f.epsQQ!==null && f.epsThisY!==null && f.epsNextY!==null && f.epsQQ>0 && f.epsThisY>0 && f.epsNextY>0) {
-    const acc = f.epsQQ>50?"acceleration explosive":f.epsQQ>25?"acceleration solide":"acceleration moderee";
-    lines.push("EPS QoQ +"+f.epsQQ+"% · EPS this Y +"+f.epsThisY+"% · EPS next Y +"+f.epsNextY+"% → "+acc+" confirmee sur 3 horizons simultanement — exactement ce que Minervini cherche.");
+    const acc = f.epsQQ>50?"EXPLOSIVE":f.epsQQ>25?"SOLIDE":"MODEREE";
+    const det = f.epsQQ>50?"Les algorithmes institutionnels le detectent en temps reel et declenchent des ordres automatiques.":"Confirme que la machine de croissance est en marche et que les analystes vont relever leurs estimations.";
+    lines.push("ACCELERATION EPS — "+acc+"\nEPS QoQ +"+f.epsQQ+"% (ce trimestre vs trimestre precedent) · EPS This Year +"+f.epsThisY+"% (tendance annuelle confirmee) · EPS Next Year +"+f.epsNextY+"% (visibilite future validee par les analystes).\n"+det+" Minervini exige cette triple acceleration — moins de 2% des actions y parviennent.");
   }
-  if (f.salesQQ!==null && f.salesQQ>0) lines.push("Sales QoQ +"+f.salesQQ+"% → la croissance des EPS vient de vraies ventes, pas de coupures de couts. Double validation de la qualite.");
-  if (f.epsSurpr!==null && f.salesSurpr!==null && f.epsSurpr>0 && f.salesSurpr>0) lines.push("Both Positive Surprise EPS +"+f.epsSurpr+"% / Ventes +"+f.salesSurpr+"% → les analystes relevent immediatement leurs estimations futures. L'effet cascade est declenche.");
-  if (f.roe!==null && f.roe>17) lines.push("ROE "+f.roe+"% (> 17% Minervini) → l'entreprise cree vraiment de la valeur avec chaque dollar investi. Qualite du management validee.");
-  if (f.debteq!==null && f.debteq>=0 && f.debteq<0.3) lines.push("Debt/Equity "+f.debteq+" → bilan quasi sans dette. L'entreprise se finance par sa croissance, pas par l'endettement. Resilience en cas de ralentissement.");
-  if (f.instTrans!==null && f.instTrans>0) lines.push("Inst. Trans +"+f.instTrans+"% → les fonds institutionnels accumulent en silence. Quand le smart money achete, il faut etre avec eux.");
-  return lines.join("\n\n");
+
+  // 2. VENTES
+  if (f.salesQQ!==null && f.salesQQ>0) {
+    const qual = f.salesQQ>50?"EXPLOSIVE":f.salesQQ>25?"FORTE":"CORRECTE";
+    lines.push("CROISSANCE DES VENTES — "+qual+"\nSales QoQ +"+f.salesQQ+"% confirme que la croissance des EPS vient de VRAIES ventes supplementaires, pas de coupures de couts. Un fonds institutionnel refuse d'investir si les EPS croissent mais pas les ventes. Ici les deux accelerent ensemble : double validation de la qualite fondamentale.");
+  }
+
+  // 3. BOTH POSITIVE
+  if (f.epsSurpr!==null && f.salesSurpr!==null && f.epsSurpr>0 && f.salesSurpr>0) {
+    lines.push("BOTH POSITIVE SURPRISE — EFFET CASCADE DECLENCHE\nEPS Surprise +"+f.epsSurpr+"% · Revenue Surprise +"+f.salesSurpr+"%.\nCe qui se passe dans les minutes qui suivent : (1) Les algorithmes detectent la double surprise → (2) Les analystes relevent leurs estimations → (3) Les fonds augmentent leur allocation → (4) Le prix monte 10-30% rapidement. Notre screener capture le debut de ce cycle.");
+  }
+
+  // 4. ROE
+  if (f.roe!==null && f.roe>17) {
+    lines.push("ROE "+f.roe+"% — AU-DESSUS DU SEUIL MINERVINI (17%)\nPour chaque 100$ investis par les actionnaires, l'entreprise genere "+f.roe+"$ de profit net. Les fonds institutionnels comparent ce ratio entre toutes les entreprises du secteur. Un ROE superieur signal un avantage competitif durable et une qualite de management rare.");
+  }
+
+  // 5. BILAN
+  if (f.debteq!==null && f.debteq>=0 && f.debteq<0.3) {
+    lines.push("BILAN SAIN — Debt/Equity "+f.debteq+"\nQuasi zero dette. L'entreprise se finance par sa propre croissance. En cas de ralentissement ou de hausse des taux, elle n'est pas vulnerable. Les fonds institutionnels evitent les entreprises sur-endettees — un bilan sain est un critere eliminatoire pour beaucoup de gestionnaires.");
+  } else if (f.debteq!==null && f.debteq>=0.3 && f.debteq<1) {
+    lines.push("DETTE MODEREE — Debt/Equity "+f.debteq+"\nNiveau acceptable mais a surveiller. Si la croissance ralentit, la dette peut devenir un fardeau. Les fonds tolerent ce niveau si les EPS justifient l'endettement.");
+  }
+
+  // 6. INST TRANS
+  if (f.instTrans!==null && f.instTrans>0) {
+    const intensite = f.instTrans>10?"ACCUMULATION FORTE (+10%)":"ACCUMULATION EN COURS";
+    lines.push("INST. TRANSACTIONS +"+f.instTrans+"% — "+intensite+"\nLes fonds institutionnels (BlackRock, Vanguard, Fidelity...) ont AUGMENTE leur position de "+f.instTrans+"%. Ces equipes gerent des milliards avec des analystes et modeles inaccessibles au public. Quand le smart money accumule en silence — c'est le signal le plus fiable qui existe. Ils achetent progressivement sur plusieurs semaines pour ne pas faire monter le prix : c'est exactement ce qui cree le VCP sur le chart.");
+  }
+
+  if (lines.length===0) return "Donnees insuffisantes. Verifie que tu as colle le tableau complet de Finviz.";
+  return lines.join("\n\n---\n\n");
 }
 
 function Row({ c }) {
