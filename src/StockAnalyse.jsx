@@ -143,14 +143,14 @@ function autoVigilance(f) {
 
 function autoThese(f) {
   const lines = [];
-  if (f.epsQQ!==null && f.epsThisY!==null && f.epsNextY!==null) {
+  if (f.epsQQ!==null && f.epsThisY!==null && f.epsNextY!==null && f.epsQQ>0 && f.epsThisY>0 && f.epsNextY>0) {
     const acc = f.epsQQ>50?"acceleration explosive":f.epsQQ>25?"acceleration solide":"acceleration moderee";
     lines.push("EPS QoQ +"+f.epsQQ+"% · EPS this Y +"+f.epsThisY+"% · EPS next Y +"+f.epsNextY+"% → "+acc+" confirmee sur 3 horizons simultanement — exactement ce que Minervini cherche.");
   }
-  if (f.salesQQ!==null) lines.push("Sales QoQ +"+f.salesQQ+"% → la croissance des EPS vient de vraies ventes, pas de coupures de couts. Double validation de la qualite.");
-  if (f.epsSurpr!==null && f.salesSurpr!==null) lines.push("Both Positive Surprise EPS +"+f.epsSurpr+"% / Ventes +"+f.salesSurpr+"% → les analystes relevent immediatement leurs estimations futures. L'effet cascade est declenche.");
+  if (f.salesQQ!==null && f.salesQQ>0) lines.push("Sales QoQ +"+f.salesQQ+"% → la croissance des EPS vient de vraies ventes, pas de coupures de couts. Double validation de la qualite.");
+  if (f.epsSurpr!==null && f.salesSurpr!==null && f.epsSurpr>0 && f.salesSurpr>0) lines.push("Both Positive Surprise EPS +"+f.epsSurpr+"% / Ventes +"+f.salesSurpr+"% → les analystes relevent immediatement leurs estimations futures. L'effet cascade est declenche.");
   if (f.roe!==null && f.roe>17) lines.push("ROE "+f.roe+"% (> 17% Minervini) → l'entreprise cree vraiment de la valeur avec chaque dollar investi. Qualite du management validee.");
-  if (f.debteq!==null && f.debteq<0.3) lines.push("Debt/Equity "+f.debteq+" → bilan quasi sans dette. L'entreprise se finance par sa croissance, pas par l'endettement. Resilience en cas de ralentissement.");
+  if (f.debteq!==null && f.debteq>=0 && f.debteq<0.3) lines.push("Debt/Equity "+f.debteq+" → bilan quasi sans dette. L'entreprise se finance par sa croissance, pas par l'endettement. Resilience en cas de ralentissement.");
   if (f.instTrans!==null && f.instTrans>0) lines.push("Inst. Trans +"+f.instTrans+"% → les fonds institutionnels accumulent en silence. Quand le smart money achete, il faut etre avec eux.");
   return lines.join("\n\n");
 }
