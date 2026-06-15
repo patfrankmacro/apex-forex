@@ -44,7 +44,7 @@ function analyse(raw, manualTicker) {
     if (m1) ticker = m1[1].toUpperCase();
     // Essai 2 : premiere ligne non vide courte = ticker (ignore labels Finviz connus)
     else {
-      const IGNORE = new Set(["INDEX","PEG","P/E","P/S","P/B","P/C","ROA","ROE","ATR","EPS","TTM","IPO","ETF","N/A","YES","NO","AMC","BMO"]);
+      const IGNORE = new Set(["INDEX","PEG","P/E","P/S","P/B","P/C","ROA","ROE","ROI","ATR","EPS","TTM","IPO","ETF","N/A","YES","NO","AMC","BMO","ROIC","BETA","INCOME","SALES","PEERS","HELD","SCROLL","RECOM","PAYOUT","BETA","ROIC","HELD","RUT","SPX","NDX","DJI","NYSE","NASD","AMAT","LRCX","MKSI","VTI","IWM","SCHA","BLOK","VXF","ITOT","VCR","SCHB","ONEQ","DFAS","DFMC","IWC","BSVO","DFAC","AVSC","AVUV","EHLS","ISCV"]);
       const ls = t.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
       for (const l of ls) {
         if (/^[A-Z]{2,6}$/.test(l) && !IGNORE.has(l)) { ticker = l; break; }
