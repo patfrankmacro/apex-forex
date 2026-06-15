@@ -42,11 +42,12 @@ function analyse(raw, manualTicker) {
     // Essai 1 : URL dans le texte
     const m1 = t.match(/finviz\.com\/stock\?t=([A-Za-z]+)/i);
     if (m1) ticker = m1[1].toUpperCase();
-    // Essai 2 : premiere ligne non vide courte = ticker
+    // Essai 2 : premiere ligne non vide courte = ticker (ignore labels Finviz connus)
     else {
+      const IGNORE = new Set(["INDEX","PEG","P/E","P/S","P/B","P/C","ROA","ROE","ATR","EPS","TTM","IPO","ETF","N/A","YES","NO","AMC","BMO"]);
       const ls = t.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
       for (const l of ls) {
-        if (/^[A-Z]{1,6}$/.test(l)) { ticker = l; break; }
+        if (/^[A-Z]{2,6}$/.test(l) && !IGNORE.has(l)) { ticker = l; break; }
       }
     }
   }
