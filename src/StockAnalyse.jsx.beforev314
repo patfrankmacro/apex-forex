@@ -117,11 +117,8 @@ function valorisation(f) {
     { nom: "BASE", hyp: "Croissance normale, valorisation actuelle", pe: +basePE.toFixed(0), prix: +(epsN*basePE).toFixed(2), c: "#fbbf24" },
     { nom: "BEAR", hyp: "Ralentissement, multiples comprimes", pe: +(basePE*0.65).toFixed(0), prix: +(epsN*basePE*0.65).toFixed(2), c: "#f87171" },
   ];
-  // R/R sur le meilleur objectif realiste (Bull Case ou Target analystes)
-  const bullTarget = scenarios[0].prix;
-  const analystTarget = f.targetPrice || 0;
-  const objectif = Math.max(bullTarget, analystTarget > price ? analystTarget : 0, bullTarget);
-  const baseGain = objectif - price;
+  // R/R sur le base case
+  const baseGain = scenarios[1].prix - price;
   const risque = price - stop;
   const rr = risque>0 ? +(baseGain/risque).toFixed(1) : null;
   return { price, epsN, stop, methodes, low, high, scenarios, rr, baseGain: +baseGain.toFixed(2), risque: +risque.toFixed(2) };
@@ -253,7 +250,7 @@ function StockAnalyseView() {
             ))}
 
             <div style={{fontSize:9, color:TEXT, padding:"7px 9px", background:"#052010", borderRadius:5, marginTop:6, lineHeight:1.5, fontWeight:600}}>
-              📐 Ratio R/R (Bull/Target) : <b style={{color: res.valo.rr>=3?GREEN:AMBER}}>{res.valo.rr}:1</b> — gain potentiel +${res.valo.baseGain} vs risque -${res.valo.risque} (stop ${res.valo.stop}). {res.valo.rr>=3?"✅ Respecte le minimum 3:1 de Minervini.":"⚠️ Sous le 3:1 — le Bull Case pourrait justifier, sinon passe."}
+              📐 Ratio R/R (Base Case) : <b style={{color: res.valo.rr>=3?GREEN:AMBER}}>{res.valo.rr}:1</b> — gain potentiel +${res.valo.baseGain} vs risque -${res.valo.risque} (stop ${res.valo.stop}). {res.valo.rr>=3?"✅ Respecte le minimum 3:1 de Minervini.":"⚠️ Sous le 3:1 — le Bull Case pourrait justifier, sinon passe."}
             </div>
 
             <div style={{fontSize:9.5, color:PURPLE, fontWeight:700, marginTop:12, marginBottom:5}}>✍️ TA THÈSE — remplis le qualitatif</div>
