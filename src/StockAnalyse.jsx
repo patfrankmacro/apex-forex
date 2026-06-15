@@ -35,6 +35,13 @@ function analyse(raw, manualTicker) {
     rsi: grab(t, "RSI \\(14\\)"), change: grab(t, "Change"), epsYYTTM: grab(t, "EPS Y/Y TTM"),
     salesYYTTM: grab(t, "Sales Y/Y TTM"), roe: grab(t, "ROE"), debteq: grab(t, "Debt/Eq"),
     epsNextY: grabGrowth(t, "EPS next Y"),
+    fwdPE: grab(t, "Forward P/E"),
+    peg: grab(t, "PEG"),
+    ps: grab(t, "P/S"),
+    targetPrice: grab(t, "Target Price"),
+    salesAbs: grab(t, "Sales"),
+    shsOut: grab(t, "Shs Outstand"),
+    epsNextYval: grab(t, "EPS next Y"),
   };
   const surpr = t.match(/EPS\/Sales Surpr\.?\s*[\r\n]*\s*(-?[0-9.]+)%?\s*(-?[0-9.]+)?/i);
   f.epsSurpr = surpr ? parseFloat(surpr[1]) : null;
@@ -79,6 +86,44 @@ function vigilance(f) {
   return v;
 }
 
+
+// Valorisation institutionnelle : croise plusieurs methodes a partir des vrais multiples Finviz
+function valorisation(f) {
+  const price = f.price;
+  const epsN = f.epsNextYval; // EPS prevu N+1 en $
+  const fwdPE = f.fwdPE;
+  const ps = f.ps;
+  const salesM = f.salesAbs; // en millions
+  const shs = f.shsOut; // en millions
+  if (!price || !epsN) return null;
+  const stop = +(price * 0.92).toFixed(2); // -8%
+  const methodes = [];
+  // 1. Forward P/E : EPS prevu x P/E actuel
+  if (fwdPE) methodes.push({ nom: "Forward P/E", calc: "EPS $"+epsN+" x P/E "+fwdPE, cible: +(epsN*fwdPE).toFixed(2) });
+  // 2. Price/Sales : ventes x P/S / actions
+  if (ps && salesM && shs) methodes.push({ nom: "Price/Sales", calc: "Ventes x P/S "+ps+" / "+shs+"M actions", cible: +((salesM*ps)/shs).toFixed(2) });
+  // 3. Target analystes (consensus Finviz)
+  if (f.targetPrice) methodes.push({ nom: "Consensus analystes", calc: "Target Price Finviz", cible: +f.targetPrice.toFixed(2) });
+  // 4. PEG : si PEG dispo, prix justifie = EPS x (PEG x croissance)
+  if (f.peg && f.epsNextY && f.peg > 0) methodes.push({ nom: "PEG", calc: "EPS $"+epsN+" x PEG "+f.peg+" x croiss "+f.epsNextY+"%", cible: +(epsN*f.peg*(f.epsNextY)).toFixed(2) });
+  // Fourchette
+  const cibles = methodes.map(m=>m.cible).filter(x=>x>0 && isFinite(x));
+  const low = cibles.length ? Math.min(...cibles) : null;
+  const high = cibles.length ? Math.max(...cibles) : null;
+  // 3 scenarios bases sur le forward P/E reel
+  const basePE = fwdPE || (price/epsN);
+  const scenarios = [
+    { nom: "BULL", hyp: "Croissance se maintient, le marche paie une prime", pe: +(basePE*1.3).toFixed(0), prix: +(epsN*basePE*1.3).toFixed(2), c: "#34d399" },
+    { nom: "BASE", hyp: "Croissance normale, valorisation actuelle", pe: +basePE.toFixed(0), prix: +(epsN*basePE).toFixed(2), c: "#fbbf24" },
+    { nom: "BEAR", hyp: "Ralentissement, multiples comprimes", pe: +(basePE*0.65).toFixed(0), prix: +(epsN*basePE*0.65).toFixed(2), c: "#f87171" },
+  ];
+  // R/R sur le base case
+  const baseGain = scenarios[1].prix - price;
+  const risque = price - stop;
+  const rr = risque>0 ? +(baseGain/risque).toFixed(1) : null;
+  return { price, epsN, stop, methodes, low, high, scenarios, rr, baseGain: +baseGain.toFixed(2), risque: +risque.toFixed(2) };
+}
+
 function Row({ c }) {
   return (
     <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"3px 0", borderBottom:"1px solid #1e293b"}}>
@@ -91,6 +136,10 @@ function Row({ c }) {
 function StockAnalyseView() {
   const [raw, setRaw] = useState("");
   const [ticker, setTicker] = useState("");
+  const [catalyseur, setCatalyseur] = useState("");
+  const [theseGrowth, setTheseGrowth] = useState("");
+  const [risques, setRisques] = useState("");
+  const [openThese, setOpenThese] = useState(false);
   const [res, setRes] = useState(null);
   const [openStrat, setOpenStrat] = useState(false);
   const [openRisk, setOpenRisk] = useState(false);
@@ -109,7 +158,7 @@ function StockAnalyseView() {
     const all = [...ch.desc, ...ch.fond, ...ch.tech];
     const passed = all.filter(c=>c.ok).length;
     const total = all.length;
-    setRes({ ticker: tk, f, ch, passed, total, vig: vigilance(f) });
+    setRes({ ticker: tk, f, ch, passed, total, vig: vigilance(f), valo: valorisation(f) });
   };
 
   return (
@@ -175,6 +224,46 @@ function StockAnalyseView() {
             <div style={{fontSize:10, color:GREEN, fontWeight:700, marginBottom:5}}>🎯 SI TU ENTRES — LES RÈGLES DE RISQUE</div>
             <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Stop loss <b style={{color:RED}}>-7 à -8%</b> sous l'entrée, sans exception · Ratio R/R <b style={{color:GREEN}}>min 3:1</b> (stop -8% = objectif +24%) · Position <b>max 10-15%</b> du portefeuille · Jamais moyenner à la baisse · Entre <b>au breakout du VCP</b>, jamais avant.</div>
           </div>
+          {res.valo && (
+          <div style={{padding:"12px 14px", background:"#0d0a18", borderRadius:10, marginBottom:14, border:"1px solid #2a1f3a"}}>
+            <div style={{fontSize:11, color:PURPLE, fontWeight:800, marginBottom:8, textAlign:"center"}}>🏛️ THÈSE INSTITUTIONNELLE — {res.ticker}</div>
+
+            <div style={{fontSize:9.5, color:PURPLE, fontWeight:700, marginBottom:5}}>💰 VALORISATION — 4 méthodes croisées</div>
+            {res.valo.methodes.map((m,i)=>(
+              <div key={i} style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"3px 0", borderBottom:"1px solid #1e293b"}}>
+                <span style={{fontSize:8, color:TEXT_DIM}}>{m.nom} <span style={{color:"#64748b"}}>({m.calc})</span></span>
+                <span style={{fontSize:9, color:TEXT2, fontWeight:700}}>${m.cible}</span>
+              </div>
+            ))}
+            {res.valo.low!==null && <div style={{fontSize:8.5, color:GREEN, marginTop:5, fontWeight:600, lineHeight:1.5}}>→ Valeur converge entre ${res.valo.low} et ${res.valo.high} · prix actuel ${res.valo.price}</div>}
+
+            <div style={{fontSize:9.5, color:PURPLE, fontWeight:700, marginTop:10, marginBottom:5}}>🎲 LES 3 SCÉNARIOS</div>
+            {res.valo.scenarios.map((s,i)=>(
+              <div key={i} style={{padding:"6px 8px", background:"#0a0a12", borderRadius:5, marginBottom:4, borderLeft:"3px solid "+s.c}}>
+                <div style={{display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+                  <span style={{fontSize:9, color:s.c, fontWeight:800}}>{s.nom} CASE</span>
+                  <span style={{fontSize:9.5, color:TEXT2, fontWeight:700}}>${s.prix} <span style={{fontSize:7.5, color:TEXT_DIM}}>(P/E {s.pe}x)</span></span>
+                </div>
+                <div style={{fontSize:7.5, color:TEXT_DIM, lineHeight:1.4, marginTop:2}}>{s.hyp}</div>
+                <div style={{fontSize:7.5, color: s.prix>res.valo.price?GREEN:RED, marginTop:2, fontWeight:600}}>{s.prix>res.valo.price?"+":""}{(((s.prix-res.valo.price)/res.valo.price)*100).toFixed(0)}% vs prix actuel</div>
+              </div>
+            ))}
+
+            <div style={{fontSize:9, color:TEXT, padding:"7px 9px", background:"#052010", borderRadius:5, marginTop:6, lineHeight:1.5, fontWeight:600}}>
+              📐 Ratio R/R (Base Case) : <b style={{color: res.valo.rr>=3?GREEN:AMBER}}>{res.valo.rr}:1</b> — gain potentiel +${res.valo.baseGain} vs risque -${res.valo.risque} (stop ${res.valo.stop}). {res.valo.rr>=3?"✅ Respecte le minimum 3:1 de Minervini.":"⚠️ Sous le 3:1 — le Bull Case pourrait justifier, sinon passe."}
+            </div>
+
+            <div style={{fontSize:9.5, color:PURPLE, fontWeight:700, marginTop:12, marginBottom:5}}>✍️ TA THÈSE — remplis le qualitatif</div>
+            <div style={{fontSize:7.5, color:TEXT_DIM, marginBottom:4}}>L'app calcule les chiffres. À toi d'écrire l'histoire (comme un analyste).</div>
+            <textarea value={catalyseur} onChange={e=>setCatalyseur(e.target.value)} placeholder="LE CATALYSEUR MACRO — pourquoi maintenant ? (nouveau marché, loi, produit, contrat...)"
+              style={{width:"100%", minHeight:42, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:6, padding:8, fontSize:8.5, fontFamily:"inherit", boxSizing:"border-box", marginBottom:5}} />
+            <textarea value={theseGrowth} onChange={e=>setTheseGrowth(e.target.value)} placeholder="LA THÈSE DE CROISSANCE — pourquoi les EPS accélèrent (levier opérationnel, expansion, marges...)"
+              style={{width:"100%", minHeight:42, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:6, padding:8, fontSize:8.5, fontFamily:"inherit", boxSizing:"border-box", marginBottom:5}} />
+            <textarea value={risques} onChange={e=>setRisques(e.target.value)} placeholder="LES RISQUES — concurrence, réglementation, dépendances, dilution..."
+              style={{width:"100%", minHeight:42, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:6, padding:8, fontSize:8.5, fontFamily:"inherit", boxSizing:"border-box", marginBottom:5}} />
+            <div style={{fontSize:7.5, color:TEXT_DIM, lineHeight:1.45, fontStyle:"italic"}}>La thèse tient tant que : (1) les EPS continuent d'accélérer, (2) les Inst. Trans restent positifs, (3) le prix reste au-dessus de la SMA200. Si une de ces 3 conditions casse → réduis ou coupe.</div>
+          </div>
+          )}
         </div>
         );
       })()}
