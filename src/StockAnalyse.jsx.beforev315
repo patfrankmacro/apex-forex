@@ -127,20 +127,6 @@ function valorisation(f) {
   return { price, epsN, stop, methodes, low, high, scenarios, rr, baseGain: +baseGain.toFixed(2), risque: +risque.toFixed(2) };
 }
 
-function autoThese(f) {
-  const lines = [];
-  if (f.epsQQ!==null && f.epsThisY!==null && f.epsNextY!==null) {
-    const acc = f.epsQQ>50?"acceleration explosive":f.epsQQ>25?"acceleration solide":"acceleration moderee";
-    lines.push("EPS QoQ +"+f.epsQQ+"% · EPS this Y +"+f.epsThisY+"% · EPS next Y +"+f.epsNextY+"% → "+acc+" confirmee sur 3 horizons simultanement — exactement ce que Minervini cherche.");
-  }
-  if (f.salesQQ!==null) lines.push("Sales QoQ +"+f.salesQQ+"% → la croissance des EPS vient de vraies ventes, pas de coupures de couts. Double validation de la qualite.");
-  if (f.epsSurpr!==null && f.salesSurpr!==null) lines.push("Both Positive Surprise EPS +"+f.epsSurpr+"% / Ventes +"+f.salesSurpr+"% → les analystes relevent immediatement leurs estimations futures. L'effet cascade est declenche.");
-  if (f.roe!==null && f.roe>17) lines.push("ROE "+f.roe+"% (> 17% Minervini) → l'entreprise cree vraiment de la valeur avec chaque dollar investi. Qualite du management validee.");
-  if (f.debteq!==null && f.debteq<0.3) lines.push("Debt/Equity "+f.debteq+" → bilan quasi sans dette. L'entreprise se finance par sa croissance, pas par l'endettement. Resilience en cas de ralentissement.");
-  if (f.instTrans!==null && f.instTrans>0) lines.push("Inst. Trans +"+f.instTrans+"% → les fonds institutionnels accumulent en silence. Quand le smart money achete, il faut etre avec eux.");
-  return lines.join("\n\n");
-}
-
 function Row({ c }) {
   return (
     <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"3px 0", borderBottom:"1px solid #1e293b"}}>
@@ -274,14 +260,8 @@ function StockAnalyseView() {
             <div style={{fontSize:7.5, color:TEXT_DIM, marginBottom:4}}>L'app calcule les chiffres. À toi d'écrire l'histoire (comme un analyste).</div>
             <textarea value={catalyseur} onChange={e=>setCatalyseur(e.target.value)} placeholder="LE CATALYSEUR MACRO — pourquoi maintenant ? (nouveau marché, loi, produit, contrat...)"
               style={{width:"100%", minHeight:42, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:6, padding:8, fontSize:8.5, fontFamily:"inherit", boxSizing:"border-box", marginBottom:5}} />
-            {res.valo && autoThese(res.f) && (
-              <div style={{width:"100%", background:"#051a05", border:"1px solid #1a3a1a", borderRadius:6, padding:8, fontSize:8.5, color:GREEN, lineHeight:1.6, marginBottom:5, whiteSpace:"pre-wrap", fontFamily:"inherit"}}>
-                <span style={{fontSize:8, color:"#34d39988", fontWeight:700, display:"block", marginBottom:4}}>📈 THÈSE DE CROISSANCE — générée automatiquement</span>
-                {autoThese(res.f)}
-              </div>
-            )}
-            <textarea value={theseGrowth} onChange={e=>setTheseGrowth(e.target.value)} placeholder="Ajoute ici le catalyseur business spécifique (levier opérationnel, expansion géo, nouveau produit...)"
-              style={{width:"100%", minHeight:36, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:6, padding:8, fontSize:8.5, fontFamily:"inherit", boxSizing:"border-box", marginBottom:5}} />
+            <textarea value={theseGrowth} onChange={e=>setTheseGrowth(e.target.value)} placeholder="LA THÈSE DE CROISSANCE — pourquoi les EPS accélèrent (levier opérationnel, expansion, marges...)"
+              style={{width:"100%", minHeight:42, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:6, padding:8, fontSize:8.5, fontFamily:"inherit", boxSizing:"border-box", marginBottom:5}} />
             <textarea value={risques} onChange={e=>setRisques(e.target.value)} placeholder="LES RISQUES — concurrence, réglementation, dépendances, dilution..."
               style={{width:"100%", minHeight:42, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:6, padding:8, fontSize:8.5, fontFamily:"inherit", boxSizing:"border-box", marginBottom:5}} />
             <div style={{fontSize:7.5, color:TEXT_DIM, lineHeight:1.45, fontStyle:"italic"}}>La thèse tient tant que : (1) les EPS continuent d'accélérer, (2) les Inst. Trans restent positifs, (3) le prix reste au-dessus de la SMA200. Si une de ces 3 conditions casse → réduis ou coupe.</div>
