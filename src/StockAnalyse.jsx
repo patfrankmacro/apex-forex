@@ -18,10 +18,9 @@ function grab(txt, label) {
 function grabPrice(txt) {
   const ls = txt.split(/\r?\n/);
   for (let i = 0; i < ls.length - 1; i++) {
-    if (ls[i].trim() === "Price") {
-      const v = parseFloat(ls[i+1].trim());
-      if (!isNaN(v)) return v;
-    }
+    const cur = ls[i].trim();
+    const nxt = ls[i+1].trim();
+    if (cur === "Price" && /^[0-9]+(\.[0-9]+)?$/.test(nxt)) return parseFloat(nxt);
   }
   return null;
 }
