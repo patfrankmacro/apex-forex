@@ -1,0 +1,205 @@
+import { useState } from "react";
+
+const TEXT = "#cbd5e1", TEXT_DIM = "#94a3b8", TEXT2 = "#e2e8f0";
+const GREEN = "#34d399", RED = "#f87171", AMBER = "#fbbf24", BLUE = "#38bdf8", PURPLE = "#c084fc";
+
+function grab(txt, label) {
+  const esc = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(esc + "\\s*[\\r\\n]*\\s*(-?[0-9]+(?:\\.[0-9]+)?)\\s*(%|B|M|K)?", "i");
+  const m = txt.match(re);
+  if (!m) return null;
+  let v = parseFloat(m[1]);
+  if (m[2] === "B") v *= 1000;
+  if (m[2] === "K") v /= 1000;
+  return v;
+}
+
+function analyse(raw) {
+  const t = raw;
+  const ticker = (t.match(/finviz\.com\/stock\?t=([A-Za-z]+)/i) || [])[1] || (t.match(/\bt=([A-Za-z]{1,5})\b/) || [])[1] || "?";
+  const f = {
+    mktcap: grab(t, "Market Cap"), price: grab(t, "Price"), avgvol: grab(t, "Avg Volume"),
+    relvol: grab(t, "Rel Volume"), recom: grab(t, "Recom"), epsQQ: grab(t, "EPS Q/Q"),
+    epsThisY: grab(t, "EPS this Y"), salesQQ: grab(t, "Sales Q/Q"), instOwn: grab(t, "Inst Own"),
+    instTrans: grab(t, "Inst Trans"), insiderTrans: grab(t, "Insider Trans"), perfHalfY: grab(t, "Perf Half Y"),
+    perfYear: grab(t, "Perf Year"), sma200: grab(t, "SMA200"), sma50: grab(t, "SMA50"),
+    rsi: grab(t, "RSI \\(14\\)"), change: grab(t, "Change"), epsYYTTM: grab(t, "EPS Y/Y TTM"),
+    salesYYTTM: grab(t, "Sales Y/Y TTM"), roe: grab(t, "ROE"), debteq: grab(t, "Debt/Eq"),
+    epsNextY: grab(t, "EPS next Y"),
+  };
+  const surpr = t.match(/EPS\/Sales Surpr\.?\s*[\r\n]*\s*(-?[0-9.]+)%?\s*(-?[0-9.]+)?/i);
+  f.epsSurpr = surpr ? parseFloat(surpr[1]) : null;
+  f.salesSurpr = surpr && surpr[2] ? parseFloat(surpr[2]) : null;
+  return { ticker, f };
+}
+
+const C = (label, val, ok, detail) => ({ label, val, ok, detail });
+
+function checks(f) {
+  const desc = [
+    C("Market Cap > 300M", f.mktcap, f.mktcap!==null && f.mktcap>300, f.mktcap!==null?(f.mktcap>=1000?(f.mktcap/1000).toFixed(2)+"B":f.mktcap.toFixed(0)+"M"):"?"),
+    C("Price > $5", f.price, f.price!==null && f.price>5, f.price!==null?"$"+f.price:"?"),
+    C("Avg Volume > 200K", f.avgvol, f.avgvol!==null && f.avgvol>0.2, f.avgvol!==null?f.avgvol.toFixed(2)+"M":"?"),
+    C("Rel Volume > 1", f.relvol, f.relvol!==null && f.relvol>1, f.relvol!==null?f.relvol.toFixed(2)+"x":"?"),
+    C("Strong Buy (Recom < 2)", f.recom, f.recom!==null && f.recom<2, f.recom!==null?f.recom.toFixed(2):"?"),
+  ];
+  const fond = [
+    C("EPS Q/Q > 25%", f.epsQQ, f.epsQQ!==null && f.epsQQ>25, f.epsQQ!==null?"+"+f.epsQQ+"%":"?"),
+    C("EPS this Y > 25%", f.epsThisY, f.epsThisY!==null && f.epsThisY>25, f.epsThisY!==null?"+"+f.epsThisY+"%":"?"),
+    C("EPS next Y > 25%", f.epsNextY, f.epsNextY!==null && f.epsNextY>25, f.epsNextY!==null?"+"+f.epsNextY+"%":"?"),
+    C("Sales Q/Q > 25%", f.salesQQ, f.salesQQ!==null && f.salesQQ>25, f.salesQQ!==null?"+"+f.salesQQ+"%":"?"),
+    C("Inst. Own > 10%", f.instOwn, f.instOwn!==null && f.instOwn>10, f.instOwn!==null?f.instOwn+"%":"?"),
+    C("Inst. Trans positif", f.instTrans, f.instTrans!==null && f.instTrans>0, f.instTrans!==null?(f.instTrans>0?"+":"")+f.instTrans+"%":"?"),
+    C("Both Surprise positif", f.epsSurpr, f.epsSurpr!==null && f.salesSurpr!==null && f.epsSurpr>0 && f.salesSurpr>0, (f.epsSurpr!==null?f.epsSurpr+"%":"?")+" / "+(f.salesSurpr!==null?f.salesSurpr+"%":"?")),
+  ];
+  const tech = [
+    C("Perf 6M > 30%", f.perfHalfY, f.perfHalfY!==null && f.perfHalfY>30, f.perfHalfY!==null?"+"+f.perfHalfY+"%":"?"),
+    C("Perf 1Y > 20%", f.perfYear, f.perfYear!==null && f.perfYear>20, f.perfYear!==null?"+"+f.perfYear+"%":"?"),
+    C("Prix > SMA200", f.sma200, f.sma200!==null && f.sma200>0, f.sma200!==null?(f.sma200>0?"+":"")+f.sma200+"%":"?"),
+    C("Prix > SMA50", f.sma50, f.sma50!==null && f.sma50>0, f.sma50!==null?(f.sma50>0?"+":"")+f.sma50+"%":"?"),
+    C("Change up (jour)", f.change, f.change!==null && f.change>0, f.change!==null?(f.change>0?"+":"")+f.change+"%":"?"),
+  ];
+  return { desc, fond, tech };
+}
+
+function vigilance(f) {
+  const v = [];
+  if (f.insiderTrans!==null && f.insiderTrans<0) v.push("Insider Trans "+f.insiderTrans+"% — les dirigeants vendent (a surveiller, pas eliminatoire).");
+  if (f.rsi!==null && f.rsi>70) v.push("RSI "+f.rsi+" — proche/en surachat. Risque de repli court terme : attends un pullback pour entrer.");
+  if (f.debteq!==null && f.debteq>1) v.push("Debt/Eq "+f.debteq+" — endettement eleve, verifie la solidite du bilan.");
+  return v;
+}
+
+function Row({ c }) {
+  return (
+    <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"3px 0", borderBottom:"1px solid #1e293b"}}>
+      <span style={{fontSize:9, color: c.ok?TEXT2:TEXT_DIM}}>{c.ok?"✅":"❌"} {c.label}</span>
+      <span style={{fontSize:8.5, color: c.ok?GREEN:RED, fontWeight:700}}>{c.detail}</span>
+    </div>
+  );
+}
+
+function StockAnalyseView() {
+  const [raw, setRaw] = useState("");
+  const [res, setRes] = useState(null);
+  const [openStrat, setOpenStrat] = useState(false);
+  const [openRisk, setOpenRisk] = useState(false);
+  const [openVcp, setOpenVcp] = useState(false);
+
+  const run = () => {
+    if (!raw.trim()) { setRes({error:"Colle d'abord le tableau de stats Finviz de l'action."}); return; }
+    const { ticker, f } = analyse(raw);
+    const ch = checks(f);
+    const all = [...ch.desc, ...ch.fond, ...ch.tech];
+    const passed = all.filter(c=>c.ok).length;
+    const total = all.length;
+    setRes({ ticker, f, ch, passed, total, vig: vigilance(f) });
+  };
+
+  return (
+    <div style={{maxWidth:540, margin:"0 auto", padding:"0 4px"}}>
+      <div style={{textAlign:"center", marginBottom:10}}>
+        <div style={{fontSize:15, color:PURPLE, fontWeight:900, letterSpacing:1.5, marginBottom:5}}>📊 STOCK ANALYSE</div>
+        <div style={{fontSize:9, color:PURPLE+"aa", fontWeight:700, letterSpacing:2}}>METHODE MINERVINI SEPA · SCREENER FINVIZ</div>
+      </div>
+
+      <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:10, padding:"8px 10px", background:"#0d0a18", borderRadius:8, border:"1px solid #2a1f3a"}}>
+        Va sur <b style={{color:PURPLE}}>finviz.com/stock?t=TICKER</b>, copie le tableau de stats complet (Market Cap, EPS, SMA200, Volume...) et colle-le ci-dessous. L'app verifie les filtres SEPA de Minervini et te donne le verdict.
+      </div>
+
+      <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici le tableau de stats Finviz (P/E, EPS Q/Q, SMA200, Inst Trans...)"
+        style={{width:"100%", minHeight:90, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:8, padding:10, fontSize:9, fontFamily:"monospace", boxSizing:"border-box", marginBottom:8}} />
+
+      <button onClick={run} style={{width:"100%", padding:"11px", background:PURPLE, color:"#1a0a2a", border:"none", borderRadius:8, fontSize:12, fontWeight:900, letterSpacing:1, cursor:"pointer", marginBottom:6}}>⚡ ANALYSER</button>
+      <a href="https://finviz.com/screener.ashx" target="_blank" rel="noreferrer" style={{display:"block", textAlign:"center", fontSize:9, color:PURPLE, marginBottom:14}}>🔍 Ouvrir Finviz ↗</a>
+
+      {res?.error && <div style={{fontSize:9, color:AMBER, padding:"10px 12px", background:"#1a1500", borderRadius:8, lineHeight:1.5}}>{res.error}</div>}
+
+      {res?.ticker && (() => {
+        const pct = Math.round(res.passed/res.total*100);
+        const verdict = pct>=85 ? {t:"✅ CANDIDATE SEPA", c:GREEN, bg:"#052010"} : pct>=65 ? {t:"⚠️ PARTIELLE — analyse fine", c:AMBER, bg:"#1a1500"} : {t:"❌ NE PASSE PAS", c:RED, bg:"#200505"};
+        return (
+        <div>
+          <div style={{padding:"12px 14px", background:verdict.bg, borderRadius:10, border:"1px solid "+verdict.c+"55", marginBottom:12, textAlign:"center"}}>
+            <div style={{fontSize:16, color:TEXT2, fontWeight:900, marginBottom:3}}>{res.ticker}</div>
+            <div style={{fontSize:13, color:verdict.c, fontWeight:800, marginBottom:4}}>{verdict.t}</div>
+            <div style={{fontSize:10, color:TEXT_DIM}}>{res.passed}/{res.total} filtres ({pct}%)</div>
+          </div>
+
+          <div style={{padding:"10px 12px", background:"#0a1220", borderRadius:8, marginBottom:10}}>
+            <div style={{fontSize:10, color:BLUE, fontWeight:700, marginBottom:6}}>📋 DESCRIPTIFS — le terrain de chasse</div>
+            {res.ch.desc.map((c,i)=><Row key={i} c={c} />)}
+          </div>
+          <div style={{padding:"10px 12px", background:"#0a1220", borderRadius:8, marginBottom:10}}>
+            <div style={{fontSize:10, color:GREEN, fontWeight:700, marginBottom:6}}>📈 FONDAMENTAUX — l'acceleration</div>
+            {res.ch.fond.map((c,i)=><Row key={i} c={c} />)}
+          </div>
+          <div style={{padding:"10px 12px", background:"#0a1220", borderRadius:8, marginBottom:10}}>
+            <div style={{fontSize:10, color:AMBER, fontWeight:700, marginBottom:6}}>📉 TECHNIQUES — la tendance</div>
+            {res.ch.tech.map((c,i)=><Row key={i} c={c} />)}
+          </div>
+
+          {res.vig.length>0 && (
+            <div style={{padding:"10px 12px", background:"#1a1500", borderRadius:8, marginBottom:10, border:"1px solid #3a2a1f"}}>
+              <div style={{fontSize:10, color:AMBER, fontWeight:700, marginBottom:5}}>⚠️ POINTS DE VIGILANCE</div>
+              {res.vig.map((v,i)=><div key={i} style={{fontSize:8.5, color:TEXT, lineHeight:1.55, marginBottom:3}}>• {v}</div>)}
+            </div>
+          )}
+
+          <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
+            <div style={{fontSize:10, color:PURPLE, fontWeight:700, marginBottom:5}}>🔍 À VÉRIFIER À L'ŒIL (Finviz ne le donne pas)</div>
+            <div style={{fontSize:8.5, color:TEXT, lineHeight:1.55, marginBottom:3}}>• <b>Le VCP</b> : sur le chart, cherche 3-4 contractions de moins en moins profondes, volume qui baisse. C'est LA signature de l'accumulation institutionnelle.</div>
+            <div style={{fontSize:8.5, color:TEXT, lineHeight:1.55, marginBottom:3}}>• <b>50-Day New High</b> : le prix casse-t-il son plus haut des 50 derniers jours sur gros volume ? = le breakout.</div>
+            <div style={{fontSize:8.5, color:TEXT, lineHeight:1.55}}>• <b>Golden Cross</b> : SMA50 réellement au-dessus de SMA200 sur le chart.</div>
+          </div>
+
+          <div style={{padding:"10px 12px", background:"#052010", borderRadius:8, marginBottom:14, border:"1px solid #1a3a2a"}}>
+            <div style={{fontSize:10, color:GREEN, fontWeight:700, marginBottom:5}}>🎯 SI TU ENTRES — LES RÈGLES DE RISQUE</div>
+            <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Stop loss <b style={{color:RED}}>-7 à -8%</b> sous l'entrée, sans exception · Ratio R/R <b style={{color:GREEN}}>min 3:1</b> (stop -8% = objectif +24%) · Position <b>max 10-15%</b> du portefeuille · Jamais moyenner à la baisse · Entre <b>au breakout du VCP</b>, jamais avant.</div>
+          </div>
+        </div>
+        );
+      })()}
+
+      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
+        <div onClick={()=>setOpenStrat(!openStrat)} style={{fontSize:11, color:GREEN, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <span>🏛️ LA MÉTHODE SEPA — LES 4 PILIERS</span><span style={{fontSize:13}}>{openStrat?"▲":"▼"}</span>
+        </div>
+        {openStrat && <div style={{marginTop:8}}>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}>Mark Minervini a gagné le US Investing Championship avec +155% à +334%/an. Sa méthode SEPA trouve les actions explosives AVANT que les gros fonds les découvrent.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:GREEN}}>1. Fondamentaux en accélération</b> — des EPS qui croissent de plus en plus vite, trimestre après trimestre.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:GREEN}}>2. Catalyseur réel</b> — nouveau produit, contrat majeur, entrée dans un indice, changement de direction.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:GREEN}}>3. Technique Stage 2</b> — prix en tendance haussière, au-dessus de toutes les moyennes mobiles.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}><b style={{color:GREEN}}>4. Point d'entrée précis</b> — acheter exactement au breakout du VCP, jamais avant.</div>
+        </div>}
+      </div>
+
+      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
+        <div onClick={()=>setOpenVcp(!openVcp)} style={{fontSize:11, color:AMBER, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <span>📐 LE VCP — LE SECRET DE MINERVINI</span><span style={{fontSize:13}}>{openVcp?"▲":"▼"}</span>
+        </div>
+        {openVcp && <div style={{marginTop:8}}>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}>Le VCP (Volatility Contraction Pattern) est le seul élément que Finviz ne détecte pas — tu le cherches à l'œil sur le chart.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}>Série de contractions de moins en moins profondes (-15%, -10%, -6%, -3%). Le volume diminue à chaque contraction : les vendeurs s'épuisent, les institutionnels accumulent en silence. Puis BREAKOUT avec volume 2-3x la moyenne.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:AMBER}}>Durée</b> : 3 à 8 semaines minimum — plus long = meilleur setup. Le prix reste au-dessus de SMA50 et SMA200 pendant toute la phase.</div>
+          <div style={{fontSize:8, color:GREEN, lineHeight:1.55, padding:"6px 8px", background:"#052010", borderRadius:5, fontWeight:600}}>💡 Le VCP EST la signature graphique de l'accumulation institutionnelle : quand un fonds absorbe l'offre sur des semaines, la volatilité se contracte. Quand il a fini, la moindre demande fait exploser le prix.</div>
+        </div>}
+      </div>
+
+      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:20, border:"1px solid #2a1f3a"}}>
+        <div onClick={()=>setOpenRisk(!openRisk)} style={{fontSize:11, color:RED, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <span>🛡️ GESTION DU RISQUE — LES RÈGLES ABSOLUES</span><span style={{fontSize:13}}>{openRisk?"▲":"▼"}</span>
+        </div>
+        {openRisk && <div style={{marginTop:8}}>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:RED}}>Stop loss -7 à -8%</b> sous l'entrée. Sans exception. Une perte de 8% se récupère ; une perte de 50% demande +100% pour s'en remettre.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:RED}}>Ratio R/R min 3:1</b>. Stop -8% = objectif min +24%. Sinon, passe à la suivante.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:RED}}>Position max 10-15%</b> du portefeuille sur une seule action. 5 à 10 positions max.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:RED}}>Ne jamais moyenner à la baisse</b>. Le marché te dit que tu avais tort — écoute-le, coupe.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}><b style={{color:RED}}>Trailing stop</b> : quand l'action monte de 20-30%, remonte ton stop pour protéger les gains.</div>
+        </div>}
+      </div>
+    </div>
+  );
+}
+
+export default StockAnalyseView;

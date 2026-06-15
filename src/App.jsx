@@ -1,5 +1,6 @@
 import SentimentView from "./SentimentView";
 import DayTradeFxView from "./DayTradeFx";
+import StockAnalyseView from "./StockAnalyse";
 import SwingTrade2View from "./SwingTrade2";
 import { useState, useMemo, useEffect } from "react";
 import { db } from "./firebase.js";
@@ -4027,6 +4028,7 @@ export default function App() {
           </div>
         </div>
         <div style={{ display:"flex", gap:6, flexWrap:"wrap", alignItems:"center" }}>
+          <button onClick={()=>setView("stock")} style={{ padding:"6px 12px", borderRadius:6, fontSize:10, fontWeight:800, letterSpacing:1, cursor:"pointer", border: view==="stock"?"2px solid #c084fc":"2px solid #c084fc66", background: view==="stock"?"#c084fc":"#0d0a18", color: view==="stock"?"#0d0a18":"#c084fc", fontFamily:"'IBM Plex Mono'", boxShadow:"0 0 8px rgba(192,132,252,0.3)" }}>📊 STOCK ANALYSE</button>
           <button onClick={()=>setView("daytrade")} style={{ padding:"6px 12px", borderRadius:6, fontSize:10, fontWeight:800, letterSpacing:1, cursor:"pointer", border: view==="daytrade"?"2px solid #fbbf24":"2px solid #fbbf2466", background: view==="daytrade"?"#fbbf24":"#1a1500", color: view==="daytrade"?"#1a1500":"#fbbf24", fontFamily:"'IBM Plex Mono'", boxShadow:"0 0 8px rgba(251,191,36,0.3)" }}>⚡ SWING TRADE FX</button>
           <button onClick={()=>setView("daytradefx")} style={{ padding:"6px 12px", borderRadius:6, fontSize:10, fontWeight:800, letterSpacing:1, cursor:"pointer", border: view==="daytradefx"?"2px solid #38bdf8":"2px solid #38bdf866", background: view==="daytradefx"?"#38bdf8":"#001018", color: view==="daytradefx"?"#001018":"#38bdf8", fontFamily:"'IBM Plex Mono'", boxShadow:"0 0 8px rgba(56,189,248,0.3)" }}>⚡ DAY TRADE FX</button>
           <button onClick={()=>setView("swing2")} style={{ padding:"6px 12px", borderRadius:6, fontSize:10, fontWeight:800, letterSpacing:1, cursor:"pointer", border: view==="swing2"?"2px solid #34d399":"2px solid #34d39966", background: view==="swing2"?"#34d399":"#02100a", color: view==="swing2"?"#02100a":"#34d399", fontFamily:"'IBM Plex Mono'", boxShadow:"0 0 8px rgba(52,211,153,0.3)" }}>⚡ SWING 2.0</button>
@@ -4814,6 +4816,7 @@ const retailLoaded = opps.some(o => o.retailData);
       {view==="journal" && <JournalView />}
       {view==="calc"    && <PositionCalc />}
       {view==="daytrade" && <DayTradeView />}
+      {view==="stock" && <StockAnalyseView />}
       {view==="daytradefx" && <DayTradeFxView />}
       {view==="swing2" && <SwingTrade2View />}
     </div>
