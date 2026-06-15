@@ -14,9 +14,18 @@ function grab(txt, label) {
   return v;
 }
 
-function analyse(raw) {
+// Pour les metriques presentes 2x (valeur $ ET croissance %) : prend l'occurrence avec %
+function grabGrowth(txt, label) {
+  const esc = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(esc + "\\s*[\\r\\n]*\\s*(-?[0-9]+(?:\\.[0-9]+)?)\\s*%", "gi");
+  let m, last = null;
+  while ((m = re.exec(txt)) !== null) { last = parseFloat(m[1]); }
+  return last;
+}
+
+function analyse(raw, manualTicker) {
   const t = raw;
-  const ticker = (t.match(/finviz\.com\/stock\?t=([A-Za-z]+)/i) || [])[1] || (t.match(/\bt=([A-Za-z]{1,5})\b/) || [])[1] || "?";
+  const ticker = (manualTicker && manualTicker.trim()) ? manualTicker.trim().toUpperCase() : ((t.match(/finviz\.com\/stock\?t=([A-Za-z]+)/i) || [])[1] || "?");
   const f = {
     mktcap: grab(t, "Market Cap"), price: grab(t, "Price"), avgvol: grab(t, "Avg Volume"),
     relvol: grab(t, "Rel Volume"), recom: grab(t, "Recom"), epsQQ: grab(t, "EPS Q/Q"),
@@ -25,7 +34,7 @@ function analyse(raw) {
     perfYear: grab(t, "Perf Year"), sma200: grab(t, "SMA200"), sma50: grab(t, "SMA50"),
     rsi: grab(t, "RSI \\(14\\)"), change: grab(t, "Change"), epsYYTTM: grab(t, "EPS Y/Y TTM"),
     salesYYTTM: grab(t, "Sales Y/Y TTM"), roe: grab(t, "ROE"), debteq: grab(t, "Debt/Eq"),
-    epsNextY: grab(t, "EPS next Y"),
+    epsNextY: grabGrowth(t, "EPS next Y"),
   };
   const surpr = t.match(/EPS\/Sales Surpr\.?\s*[\r\n]*\s*(-?[0-9.]+)%?\s*(-?[0-9.]+)?/i);
   f.epsSurpr = surpr ? parseFloat(surpr[1]) : null;
@@ -81,6 +90,7 @@ function Row({ c }) {
 
 function StockAnalyseView() {
   const [raw, setRaw] = useState("");
+  const [ticker, setTicker] = useState("");
   const [res, setRes] = useState(null);
   const [openStrat, setOpenStrat] = useState(false);
   const [openRisk, setOpenRisk] = useState(false);
@@ -88,12 +98,12 @@ function StockAnalyseView() {
 
   const run = () => {
     if (!raw.trim()) { setRes({error:"Colle d'abord le tableau de stats Finviz de l'action."}); return; }
-    const { ticker, f } = analyse(raw);
+    const { ticker: tk, f } = analyse(raw, ticker);
     const ch = checks(f);
     const all = [...ch.desc, ...ch.fond, ...ch.tech];
     const passed = all.filter(c=>c.ok).length;
     const total = all.length;
-    setRes({ ticker, f, ch, passed, total, vig: vigilance(f) });
+    setRes({ ticker: tk, f, ch, passed, total, vig: vigilance(f) });
   };
 
   return (
@@ -107,6 +117,8 @@ function StockAnalyseView() {
         Va sur <b style={{color:PURPLE}}>finviz.com/stock?t=TICKER</b>, copie le tableau de stats complet (Market Cap, EPS, SMA200, Volume...) et colle-le ci-dessous. L'app verifie les filtres SEPA de Minervini et te donne le verdict.
       </div>
 
+      <input value={ticker} onChange={e=>setTicker(e.target.value)} placeholder="TICKER (ex: RSI) — ecris-le ici"
+        style={{width:"100%", background:"#0a0a12", color:"#c084fc", border:"1px solid #2a1f3a", borderRadius:8, padding:"9px 10px", fontSize:12, fontWeight:800, letterSpacing:1, fontFamily:"monospace", boxSizing:"border-box", marginBottom:8, textTransform:"uppercase"}} />
       <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici le tableau de stats Finviz (P/E, EPS Q/Q, SMA200, Inst Trans...)"
         style={{width:"100%", minHeight:90, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:8, padding:10, fontSize:9, fontFamily:"monospace", boxSizing:"border-box", marginBottom:8}} />
 
