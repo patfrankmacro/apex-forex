@@ -42,13 +42,10 @@ function analyse(raw, manualTicker) {
     // Essai 1 : URL dans le texte
     const m1 = t.match(/finviz\.com\/stock\?t=([A-Za-z]+)/i);
     if (m1) ticker = m1[1].toUpperCase();
-    // Essai 2 : premiere ligne non vide courte = ticker (ignore labels Finviz connus)
+    // Essai 2 : cherche le ticker dans l'URL du texte colle
     else {
-      const IGNORE = new Set(["INDEX","PEG","P/E","P/S","P/B","P/C","ROA","ROE","ROI","ATR","EPS","TTM","IPO","ETF","N/A","YES","NO","AMC","BMO","ROIC","BETA","INCOME","SALES","PEERS","HELD","SCROLL","RECOM","PAYOUT","BETA","ROIC","HELD","RUT","SPX","NDX","DJI","NYSE","NASD","AMAT","LRCX","MKSI","VTI","IWM","SCHA","BLOK","VXF","ITOT","VCR","SCHB","ONEQ","DFAS","DFMC","IWC","BSVO","DFAC","AVSC","AVUV","EHLS","ISCV"]);
-      const ls = t.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
-      for (const l of ls) {
-        if (/^[A-Z]{2,6}$/.test(l) && !IGNORE.has(l)) { ticker = l; break; }
-      }
+      const m2 = t.match(/stock\?t=([A-Z]{1,6})/i);
+      if (m2) ticker = m2[1].toUpperCase();
     }
   }
   const f = {
@@ -228,7 +225,7 @@ function StockAnalyseView() {
         Va sur <b style={{color:PURPLE}}>finviz.com/stock?t=TICKER</b>, copie le tableau de stats complet (Market Cap, EPS, SMA200, Volume...) et colle-le ci-dessous. L'app verifie les filtres SEPA de Minervini et te donne le verdict.
       </div>
 
-      <input value={ticker} onChange={e=>setTicker(e.target.value)} placeholder="TICKER (ex: RSI) — ecris-le ici"
+      <input value={ticker} onChange={e=>setTicker(e.target.value)} placeholder="⚠️ TICKER OBLIGATOIRE (ex: ASYS, RSI, BTSG...)"
         style={{width:"100%", background:"#0a0a12", color:"#c084fc", border:"1px solid #2a1f3a", borderRadius:8, padding:"9px 10px", fontSize:12, fontWeight:800, letterSpacing:1, fontFamily:"monospace", boxSizing:"border-box", marginBottom:8, textTransform:"uppercase"}} />
       <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici le tableau de stats Finviz (P/E, EPS Q/Q, SMA200, Inst Trans...)"
         style={{width:"100%", minHeight:90, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:8, padding:10, fontSize:9, fontFamily:"monospace", boxSizing:"border-box", marginBottom:8}} />
