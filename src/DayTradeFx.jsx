@@ -23,9 +23,9 @@ function DtAnalyzer(){
     try {
       const nowET = new Date(new Date().toLocaleString("en-US",{timeZone:"America/New_York"}));
       const m = nowET.getHours()*60+nowET.getMinutes();
-      if (!(m >= 540 && m <= 570)) {
+      if (!(m >= 465 && m <= 525)) {
         const hh=String(nowET.getHours()).padStart(2,"0"), mm=String(nowET.getMinutes()).padStart(2,"0");
-        setRes({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade FX se scanne de 9h à 9h30 ET — l'entrée au retracement du NYSE (rebond Fib sur M5). Le scan de la cassure 8h est désactivé pour le moment. Reviens entre 9h et 9h30.`});
+        setRes({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade FX se scanne de 7h45 à 8h45 ET — cassure de 8h (continuation du pôle de Londres). Reviens entre 7h45 et 8h45.`});
         return;
       }
       const lines = raw.split("\n").map(l=>l.trim()).filter(Boolean);
@@ -98,7 +98,7 @@ function DtAnalyzer(){
   };
   return (
     <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #38bdf855", marginBottom:14}}>
-      <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:8}}>🤖 SCAN 9H-9H30 — COLLE TA PAGE MARKETMILK</div>
+      <div style={{fontSize:11, color:"#38bdf8", fontWeight:700, marginBottom:8}}>🤖 SCAN 7H45-8H45 — COLLE TA PAGE MARKETMILK</div>
       <div style={{marginBottom:8, padding:"8px 10px", background:"#0d1420", borderRadius:6, border:"1px solid #33415555"}}>
         <div style={{fontSize:9, color:"#fbbf24", fontWeight:700, marginBottom:5}}>{"③ SENTIMENT DU JOUR (obligatoire) — lis le Risk Meter puis choisis :"}</div>
         <div style={{display:"flex", gap:6}}>
@@ -109,7 +109,7 @@ function DtAnalyzer(){
         <a href="https://www.babypips.com/tools/risk-on-risk-off-meter" target="_blank" rel="noopener noreferrer" style={{display:"block", marginTop:6, fontSize:8.5, color:"#7dd3fc", textDecoration:"none"}}>{"🌡️ Ouvrir le Risk-On/Risk-Off Meter (babypips) ↗"}</a>
         {!riskMode && <div style={{fontSize:8, color:"#fbbf24", marginTop:4}}>{"⚠ Choisis le sentiment AVANT de scanner — sans lui, aucune paire ne peut être validée."}</div>}
         {riskMode==="NEUTRE" && <div style={{fontSize:8, color:"#94a3b8", marginTop:4}}>{"NEUTRE = pas de courant de fond : le ③ n'est pas rempli, aucune paire validée aujourd'hui. L'or aussi a besoin d'un sentiment net."}</div>}
-        <div style={{fontSize:8, color:"#64748b", marginTop:4}}>{"❄️ VETO carburant : une paire dans le Top 5 Least Volatile est bloquée même à ①②③ validés — Londres ne l'a pas travaillée, le pôle est mou, le retracement de 9h30 n'a rien à manger."}</div>
+        <div style={{fontSize:8, color:"#64748b", marginTop:4}}>{"❄️ VETO carburant : une paire dans le Top 5 Least Volatile est bloquée même à ①②③ validés — Londres ne l'a pas travaillée, le pôle est mou, la cassure de 8h n'a rien à manger."}</div>
       </div>
       <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle la page MarketMilk COMPLÈTE (Currency Strength + Least Volatile) — le scanner croise ① ② ③ et vérifie le carburant ❄️..." style={{width:"100%", minHeight:80, background:"#001018", color:TEXT, border:"1px solid #1e3a5f", borderRadius:6, padding:8, fontSize:9, fontFamily:"monospace", resize:"vertical"}}/>
       <button onClick={analyze} style={{marginTop:8, width:"100%", padding:"10px", background:"#38bdf8", color:"#001018", border:"none", borderRadius:6, fontSize:11, fontWeight:700, letterSpacing:1, cursor:"pointer"}}>⚡ SCANNER</button>
@@ -125,7 +125,7 @@ function DtAnalyzer(){
                 {p.ok?"✅":"·"} {p.pair} {p.ok?(p.dir==="LONG"?"▲ ACHAT possible":"▼ VENTE possible"):(p.gapOk && !p.aligned ? "⛔ "+p.gap+"r mais sentiment contraire" : "")} — {p.base} #{p.rb} vs {p.quote} #{p.rq} = {p.gap} rang{p.gap>1?"s":""} {p.ok?"(≥3 ✓)":(p.gapOk?"(≥3 mais ③ ✗)":"(<3)")}
               </div>
               {p.pourquoi && <div style={{fontSize:8, color:p.ok?"#86efac":"#fbbf24", marginTop:3, lineHeight:1.5, fontStyle:"italic"}}>{p.pourquoi}</div>}
-              {p.ok && <div style={{fontSize:8, color:TEXT_DIM, marginTop:3, lineHeight:1.5}}>Maintenant ton graphique M15 : pôle de Londres continu depuis 3h dans ce sens ? Flag dessiné depuis ~7h30 ? Pas de news US à 8h30 ? Alors attends le retracement du NYSE de 9h30 et entre au rebond Fib — c'est ton entrée.</div>}
+              {p.ok && <div style={{fontSize:8, color:TEXT_DIM, marginTop:3, lineHeight:1.5}}>Maintenant ton graphique M15 : pôle de Londres continu depuis 3h dans ce sens ? Flag dessiné depuis ~7h30 ? Pas de news US à 8h30 ? Alors guette la cassure du flag à 8h sur clôture M15 — c'est ton entrée.</div>}
             </div>
           ))}
           <div style={{fontSize:7.5, color:"#64748b", marginBottom:6}}>{res.out.filter(p=>!p.ok).length+" paire(s) écartée(s) — divergence insuffisante ou sentiment contraire"}</div>
@@ -133,9 +133,9 @@ function DtAnalyzer(){
             <div style={{fontSize:9.5, fontWeight:700, color:res.xau?"#fbbf24":"#64748b"}}>
               {res.xau?"✅":"·"} XAU/USD (OR) {res.xau?(res.xau.dir==="LONG"?"▲ ACHAT possible":"▼ VENTE possible"):(res.xauNote || "— USD #"+res.ru+" au milieu (3-6), pas de conviction")}
             </div>
-            {res.xau && <div style={{fontSize:8, color:TEXT_DIM, marginTop:3, lineHeight:1.5}}>{res.xau.why}. Même structure : pôle de Londres sur M15, flag pôle 3h-9h30, retracement NY à 9h30 (rebond Fib sur M5) — et le COMEX porte la session NY. Stop sous le 61.8%, sortie avant 17h.</div>}
+            {res.xau && <div style={{fontSize:8, color:TEXT_DIM, marginTop:3, lineHeight:1.5}}>{res.xau.why}. Même structure : pôle de Londres sur M15, flag 3h-8h, cassure NY à 8h (clôture M15 confirmée) — et le COMEX porte la session NY. Stop sous le flag, sortie avant 17h.</div>}
           </div>
-          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>≥3 rangs à 8h = l'équivalent jeune du ≥4 rangs de 10h30 : le classement n'a que 5h de construction. Le scan donne la DIRECTION — le pôle (M15) et le retracement (M5) se lisent sur TON graphique.</div>
+          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:4, fontStyle:"italic"}}>≥3 rangs à 7h45 = le classement a 5h de construction. Le scan donne la DIRECTION — le pôle et le flag se lisent sur TON graphique M15.</div>
         </div>
       )}
     </div>
@@ -164,8 +164,8 @@ export default function DayTradeFxView(){
     <div style={{maxWidth:520, margin:"0 auto"}}>
       <div style={{textAlign:"center", marginBottom:12}}>
         <div style={{fontSize:14, fontWeight:800, color:"#38bdf8", letterSpacing:1}}>⚡ DAY TRADE FX</div>
-        <div style={{fontSize:9, color:"#7dd3fc", fontWeight:700}}>LE PÔLE DE LONDRES · DEUX ENTRÉES</div>
-        <div style={{fontSize:8, color:TEXT_DIM, marginTop:4, lineHeight:1.5}}>Le pôle de Londres se construit de 3h à 9h30 — c'est le programme des desks, le MÊME chaque jour. Tu as deux façons de le suivre : la CASSURE de 8h (tu montes sur la continuation fraîche, pendant qu'ils chargent) ou le RETRACEMENT de 9h30 (tu montes dans le creux au rebond Fib sur M5, après leur dernier piège). Une entrée par jour, sortie avant 17h, jamais d'overnight.</div>
+        <div style={{fontSize:9, color:"#7dd3fc", fontWeight:700}}>LE PÔLE DE LONDRES · CASSURE DE 8H</div>
+        <div style={{fontSize:8, color:TEXT_DIM, marginTop:4, lineHeight:1.5}}>Le pôle de Londres se construit de 3h à 7h30 — c'est le programme des desks, le MÊME chaque jour. De 7h30 à 8h ils soufflent : le flag se dessine. À 8h NY ouvre et le flag casse dans le sens du pôle — c'est ton entrée. Une entrée par jour, sortie avant 17h, jamais d'overnight.</div>
       </div>
       <DtAnalyzer />
       <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #fbbf2455", marginBottom:14}}>
@@ -199,26 +199,6 @@ export default function DayTradeFxView(){
         
         <a href="https://www.babypips.com/tools/risk-on-risk-off-meter" target="_blank" rel="noopener noreferrer" style={{display:"block", marginTop:8, fontSize:9, color:"#7dd3fc", textDecoration:"none", fontWeight:700}}>{"🌡️ Ouvrir le Risk-On/Risk-Off Meter ↗"}</a>
       </div>
-      <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
-        <div onClick={()=>setOpenSeq(!openSeq)} style={{fontSize:10, color:"#34d399", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>📋 TA SÉQUENCE DU JOUR</span><span style={{fontSize:12}}>{openSeq ? "▲" : "▼"}</span></div>
-        {openSeq && <>
-        {[
-          {n:"1", icon:"📰", color:"#38bdf8", t:"6H-9H — QU'ONT FAIT L'ASIE ET LONDRES ?", sub:"News à fort impact + commentaires des banques centrales (session wraps Investing). Le POURQUOI derrière la tendance de Londres qui se construit depuis 3h."},
-          {n:"2", icon:"👁️", color:"#38bdf8", t:"7H45 ou 9H — LA TENDANCE DE LONDRES (M15)", sub:"Londres pousse dans UN sens depuis 3h (après le piège) ? La jambe est claire sur ton M15 = le pôle est posé. C'est la matière première des DEUX figures : tu y traceras ton Fibonacci (retracement 9h30) ou tu guetteras la cassure de son flag (cassure 8h)."},
-          {n:"3", icon:"🥛", color:"#fbbf24", t:"7H45-8H45 ou 9H-9H30 — SCANNE LE CURRENCY STRENGTH", sub:"Colle MarketMilk. Ta paire doit avoir ≥3 rangs d'écart dans le sens du pôle, le sentiment ③ aligné, et PAS dans le Least Volatile (❄️ veto carburant). Pour l'or (XAU) : double convergence obligatoire (USD #1-2 + RISK-ON = vente · USD #7-8 + RISK-OFF = achat). Le scan vaut pour les deux figures."},
-          {n:"4", icon:"📅", color:"#f59e0b", t:"VÉRIFIE QUE TON ③ TIENT (news du matin passées)", sub:"Les news US de 8h30 sont déjà tombées avant ton scan — bon. Mais vérifie : ont-elles retourné l'humeur risk-on/off ? Si le sentiment a basculé depuis l'ouverture, re-clique le bon ③. Tu entres seulement si le courant tient."},
-          {n:"5", icon:"🚀", color:"#34d399", t:"ENTRE — CHOISIS TA FIGURE", sub:"CASSURE 8h : le forex NY ouvre, le flag de Londres casse dans le sens du pôle — tu entres sur la clôture M15 confirmée, stop large pour survivre au balayage de 9h30. RETRACEMENT 9h30 : le NYSE retrace, tu traces le Fib sur la jambe et tu entres au rebond (38.2/50/61.8%) sur M5, stop sous le retracement. UNE entrée par jour. Target = hauteur du pôle."},
-          {n:"6", icon:"🏁", color:"#f87171", t:"AVANT 17H — SORS. TOUJOURS.", sub:"Day trade = la journée seulement. Target atteint, stop touché, ou 17h : tu sors. Un day trade qui devient un swing involontaire = une discipline cassée."},
-        ].map((s,i)=>(
-          <div key={i} style={{display:"flex", gap:10, padding:"8px 0", borderBottom:i<5?"1px solid #1e293b":"none"}}>
-            <div style={{minWidth:22, height:22, borderRadius:11, background:s.color+"22", border:"1px solid "+s.color, color:s.color, fontSize:10, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center"}}>{s.n}</div>
-            <div><div style={{fontSize:9.5, fontWeight:700, color:s.color}}>{s.icon} {s.t}</div>
-            <div style={{fontSize:8, color:TEXT, lineHeight:1.55, marginTop:2}}>{s.sub}</div></div>
-          </div>
-        ))}
-        <div style={{fontSize:8, color:"#fbbf24", marginTop:8, padding:"7px 9px", background:"#1a1500", borderRadius:5, lineHeight:1.5}}>Pas de pôle propre, pas de ≥3 rangs, ❄️ paire endormie (Least Volatile), ③ retourné par les news du matin, ou retracement qui dépasse le 61.8% ? = Pas de trade aujourd'hui. Une entrée par jour MAXIMUM — la deuxième tentative est toujours la mauvaise.</div>
-        </>}
-      </div>
 
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:12}}>
         <div onClick={()=>setOpenJour(!openJour)} style={{fontSize:11, color:"#34d399", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
@@ -233,7 +213,7 @@ export default function DayTradeFxView(){
           <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}>👍 Mardi-mercredi = très bons. Milieu de semaine = activité max.</div>
           <div style={{fontSize:8, color:"#f59e0b", lineHeight:1.6, marginBottom:3}}>⚠️ Vendredi = MATIN seulement. BabyPips : chargé jusqu'à midi ET, puis le marché s'effondre. Sors tôt.</div>
           <div style={{fontSize:8, color:"#f87171", lineHeight:1.6, marginBottom:8}}>🚫 Lundi = le plus mou (le moins de pips). Prudence, souvent du range.</div>
-          <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>🔑 Ta stratégie complète : bon JOUR (jeudi) + bonne HEURE (9h-9h30) + bonne PAIRE (GBP/JPY, EUR/JPY) + bon SETUP (retracement). Les 4 alignés = ta meilleure probabilité.</div>
+          <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>🔑 Ta stratégie complète : bon JOUR (jeudi) + bonne HEURE (7h45-8h45) + bonne PAIRE (GBP/JPY, EUR/JPY) + bon SETUP (cassure 8h). Les 4 alignés = ta meilleure probabilité.</div>
         </div>}
       </div>
 
@@ -252,7 +232,7 @@ export default function DayTradeFxView(){
           <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}>• 3h-7h : Londres CHARGE la tendance (carry). Tu lis le pourquoi, tu prépares.</div>
           <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}>• 7h30-8h : pause — les desks soufflent, le flag se dessine.</div>
           <div style={{fontSize:8, color:"#34d399", lineHeight:1.6, marginBottom:3, fontWeight:600}}>• 8h : NY relance, ils rechargent → ta CASSURE.</div>
-          <div style={{fontSize:8, color:"#34d399", lineHeight:1.6, marginBottom:3, fontWeight:600}}>• 9h30 : le NYSE balaye puis repart → ton RETRACEMENT.</div>
+          <div style={{fontSize:8, color:"#34d399", lineHeight:1.6, marginBottom:3, fontWeight:600}}>• 9h30 : le NYSE balaye — ton stop tient si le pôle est solide.</div>
           <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3, fontWeight:600}}>• 8h-12h : TA FENÊTRE — Londres ET New York poussent ensemble.</div>
           <div style={{fontSize:8, color:"#fbbf24", lineHeight:1.6, marginBottom:3, fontWeight:600}}>• 11h-12h : London Fix — les desks DÉBOUCLENT. Surveille ta sortie.</div>
           <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:8}}>• 12h-17h : Londres parti, NY seul. Tes cross JPY perdent leur moteur.</div>
@@ -261,33 +241,33 @@ export default function DayTradeFxView(){
           <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}><b style={{color:"#7dd3fc"}}>Avant 8h :</b> Londres a DÉJÀ dessiné la tendance (depuis 3h ET).</div>
           <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}><b style={{color:"#f59e0b"}}>8h :</b> NY ouvre → la bataille commence : continuation OU retournement.</div>
           <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:3}}><b style={{color:"#f59e0b"}}>8h-9h :</b> les 30-60 min décisives — le scénario se révèle.</div>
-          <div style={{fontSize:8, color:"#34d399", lineHeight:1.6, marginBottom:3, fontWeight:600}}>✅ 9h-9h30 : la question est tranchée — TON scan, TON entrée.</div>
-          <div style={{fontSize:8, color:"#34d399", lineHeight:1.6, marginBottom:3, fontWeight:600}}>9h30 : re-test (secondary test) puis reprise = ton retracement.</div>
+          <div style={{fontSize:8, color:"#34d399", lineHeight:1.6, marginBottom:3, fontWeight:600}}>✅ 7h45-8h45 : le flag se dessine — TON scan, TON entrée.</div>
+          <div style={{fontSize:8, color:"#34d399", lineHeight:1.6, marginBottom:3, fontWeight:600}}>9h30 : re-test (secondary test) — ton stop tient, le trade continue.</div>
           <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:8}}><b style={{color:"#f87171"}}>Après 12h :</b> GBP/JPY se vide (NY préfère les paires USD) → sors.</div>
-          <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>💡 Pourquoi 9h30 : tu n'entres JAMAIS pendant la bataille (8h-9h, incertain et violent). Tu attends que le vainqueur soit connu et tu entres sur le retracement confirmé.</div>
+          <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>💡 Pourquoi 8h : tu entres AU MOMENT où NY ouvre et double la liquidité — le flag casse dans le sens du pôle. Tu suis les desks pendant qu'ils finissent d'exécuter.</div>
         </div>}
       </div>
       <div style={{padding:"12px 14px", background:"#0a1628", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:12}}>
         <div onClick={()=>setOpenScan(!openScan)} style={{fontSize:11, color:"#fbbf24", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <span>⏰ POURQUOI SCANNER À 9h — PAS AVANT</span>
+          <span>⏰ POURQUOI SCANNER À 7H45 — LA CASSURE DE 8H</span>
           <span style={{fontSize:13}}>{openScan ? "▲" : "▼"}</span>
         </div>
         {openScan && <div style={{marginTop:10}}>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#38bdf8"}}>1. La bataille de 8h est tranchée.</b> À 8h, NY ouvre et décide : continuation OU retournement de la tendance de Londres. C'est violent et incertain pendant 30-60 min. À 9h, le vainqueur est connu. Tu ne devines plus.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#38bdf8"}}>2. Les news US de 8h30 sont digérées.</b> CPI, NFP tombent à 8h30 et peuvent tout retourner. À 9h, le marché a réagi et s'est stabilisé. Ton ③ est fiable.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#38bdf8"}}>3. Le Currency Strength est MÛR.</b> À 9h, Londres a poussé 6h + NY a confirmé 1h. Le scan reflète TOUT ça — la photo la plus complète et stable de la journée.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#38bdf8"}}>4. Tu captes le pic de liquidité de 10h ET.</b> La liquidité est optimale vers 15h Londres = 10h ET (BabyPips). Ton entrée à 9h30 te place juste avant ce pic.</div>
-          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:8}}>Le coût honnête : tu rates la cassure de 8h (meilleur prix si la continuation est franche). Mais elle est risquée — tu entres pendant la bataille. Tu échanges « meilleur prix mais risqué » contre « prix correct mais sûr ».</div>
-          <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>💡 En une phrase : à 9h tu trades du CERTAIN, pas du probable. Tu attends que tout soit décidé, puis tu entres sur du confirmé.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#38bdf8"}}>1. Le flag est dessiné.</b> De 3h à 7h30 les desks ont construit le pôle. De 7h30 à 8h ils soufflent — le flag se dessine. À 8h NY ouvre : tu vois si le flag casse. Tu ne devines pas.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#38bdf8"}}>2. Tu scannes AVANT les news US de 8h30.</b> Tu identifies ta paire à 7h45-8h. Les news tombent à 8h30 — APRÈS ton scan. Si elles retournent le sentiment, tu ne prends pas le trade.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#38bdf8"}}>3. Le Currency Strength est exploitable.</b> À 7h45, Londres a poussé 5h. Le scan reflète leur conviction — assez mûr pour lire la direction, assez tôt pour entrer à la cassure.</div>
+          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#38bdf8"}}>4. Tu captes l'ouverture NY à 8h.</b> NY ouvre à 8h et double la liquidité — les desks finissent d'exécuter leur pôle. Ton entrée suit leur dernier mouvement.</div>
+          <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.6, marginBottom:8}}>Le flag se lit sur M15 : après le pôle (3h-7h30), le prix consolide en légère contre-tendance (7h30-8h). À 8h, la clôture M15 casse hors du flag dans le sens du pôle — c'est ton signal.</div>
+          <div style={{fontSize:8, color:"#4ade80", padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.55, fontWeight:600}}>💡 En une phrase : à 8h tu entres sur du VIVANT — NY vient d'ouvrir, la liquidité est là, le flag casse. Stop sous le flag, target = hauteur du pôle.</div>
         </div>}
       </div>
       <div style={{padding:"12px 14px", background:"#0a1220", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:12}}>
-        <div onClick={()=>setOpenEntrees(!openEntrees)} style={{fontSize:11, color:"#f59e0b", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>{"\ud83d\udd2d TES DEUX ENTRÉES — SELON OÙ EN SONT LES DESKS"}</span><span style={{fontSize:12}}>{openEntrees ? "▲" : "▼"}</span></div>
+        <div onClick={()=>setOpenEntrees(!openEntrees)} style={{fontSize:11, color:"#f59e0b", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>{"🔭 LA CASSURE 8H — COMMENT MONTER DERRIÈRE LES DESKS"}</span><span style={{fontSize:12}}>{openEntrees ? "▲" : "▼"}</span></div>
         {openEntrees && <>
-        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8}}>{"Le pôle de Londres est le MÊME dans les deux cas — c'est leur programme du jour. Ce qui change, c'est OÙ tu montes dans leur exécution. Une seule entrée par jour : tu choisis selon ton tempérament et la propreté du pôle."}</div>
-        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8, padding:"8px 10px", background:"#0d1828", borderRadius:6}}><b style={{color:"#34d399"}}>{"\ud83d\udeaa LA CASSURE 8h (scan 7h45-8h45) : tu montes pendant qu'ils chargent."}</b>{" À 8h, les desks de Londres n'ont pas fini : ils ont piégé à 3h, chargé leurs tranches depuis 4h, et ils gardent leur dernière grosse poussée pour l'instant où le forex de New York ouvre et double la liquidité — un gros ordre a besoin de contreparties. Cette dernière poussée, c'est la cassure de leur flag. Tu la vois sur M15 : ils soufflent (le flag, 7h45-8h), puis NY arrive et ils chargent — le flag casse. Tu entres sur la clôture M15 confirmée, derrière leur volume. Tu les suis AU MOMENT où ils finissent d'exécuter — meilleur prix, mais leur dernier balayage (9h30) tombera APRÈS toi : stop assez large pour le survivre."}</div>
-        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8, padding:"8px 10px", background:"#0d1828", borderRadius:6}}><b style={{color:"#fbbf24"}}>{"\ud83d\udeaa LE RETRACEMENT 9h30 (scan 9h-9h30) : tu montes après leur dernier piège."}</b>{" À 9h30, l'ouverture des actions est leur pic de liquidité — et leur dernier coup tordu : ils tirent le prix CONTRE leur propre tendance pour ramasser les stops des retail entrés trop tôt, avant de repartir. Tu laisses ce balayage se faire. Quand le prix rebondit sur ton Fib en M5 (38.2 / 50 / 61.8%) = ils ont fini de ramasser et rechargent. Tu entres derrière le rebond. Tu les suis APRÈS leur dernier piège, jamais dedans — le vrai sentiment (actions ouvertes) est posé, et tu as vu leur mouvement avant de cliquer."}</div>
-        <div style={{fontSize:8, color:"#4ade80", lineHeight:1.5, padding:"7px 9px", background:"#052010", borderRadius:5, fontWeight:600}}>{"La règle des desks : la CASSURE 8h = tu paries qu'ils tiennent à travers le balayage de 9h30. le RETRACEMENT 9h30 = tu attends que le balayage soit fini et tu montes sur le rebond confirmé. Deux façons de suivre le MÊME pôle de Londres — UNE seule par jour, jamais les deux. La deuxième tentative est toujours la mauvaise."}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8}}>{"Londres construit le pôle de 3h à 7h30, puis souffle de 7h30 à 8h — c'est le flag. À 8h NY ouvre et double la liquidité : les desks finissent d'exécuter. Le flag casse. Une seule entrée par jour."}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8, padding:"8px 10px", background:"#0d1828", borderRadius:6}}><b style={{color:"#34d399"}}>{"\ud83d\udeaa LA CASSURE 8h (scan 7h45-8h45) : tu montes pendant qu'ils chargent."}</b>{" À 8h, les desks de Londres n'ont pas fini : ils ont piégé à 3h, chargé leurs tranches depuis 4h, et ils gardent leur dernière grosse poussée pour l'instant où le forex de New York ouvre et double la liquidité — un gros ordre a besoin de contreparties. Cette dernière poussée, c'est la cassure de leur flag. Tu la vois sur M15 : ils soufflent (le flag, 7h45-8h), puis NY arrive et ils chargent — le flag casse. Tu entres sur la clôture M15 confirmée, derrière leur volume. Tu les suis AU MOMENT où ils finissent d'exécuter — meilleur prix — stop sous le flag pour survivre au balayage de 9h30 qui peut venir après."}</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8, padding:"8px 10px", background:"#0d1828", borderRadius:6}}><b style={{color:"#fbbf24"}}>{"⚠️ Le balayage de 9h30."}</b>{" Après ton entrée, le NYSE peut tirer le prix CONTRE la tendance pour ramasser les stops retail. C'est normal et prévisible. Ton stop sous le flag te protège — si le pôle est solide, le trade reprend dans le sens de Londres."}</div>
+        <div style={{fontSize:8, color:"#4ade80", lineHeight:1.5, padding:"7px 9px", background:"#052010", borderRadius:5, fontWeight:600}}>{"La règle des desks : CASSURE 8h = tu entres pendant qu'ils finissent de charger, stop sous le flag. UNE seule entrée par jour. La deuxième tentative est toujours la mauvaise."}</div>
         </>}
       </div>
 
@@ -297,33 +277,31 @@ export default function DayTradeFxView(){
 
 
       <div style={{padding:"12px 14px", background:"#0d1420", borderRadius:8, border:"1px solid #1e3a5f", marginBottom:14}}>
-        <div onClick={()=>setOpenMeca(!openMeca)} style={{fontSize:10, color:"#f59e0b", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>📐 LA MÉCANIQUE — LE PÔLE ET SES DEUX ENTRÉES</span><span style={{fontSize:12}}>{openMeca ? "▲" : "▼"}</span></div>
+        <div onClick={()=>setOpenMeca(!openMeca)} style={{fontSize:10, color:"#f59e0b", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>📐 LA MÉCANIQUE — LE PÔLE ET LA CASSURE DE 8H</span><span style={{fontSize:12}}>{openMeca ? "▲" : "▼"}</span></div>
         {openMeca && <>
-        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:10}}>{"La tendance de Londres (3h-9h30) est ta JAMBE commune aux deux figures. CASSURE 8h : à 8h le flag de Londres casse, tu entres sur la clôture M15 dans le sens du pôle (la continuation fraîche). RETRACEMENT 9h30 : à 9h30 le NYSE fait RETRACER la jambe, tu traces le Fibonacci et tu guettes le rebond — 38.2% = retracement peu profond (tendance forte) · 50% = sain · 61.8% = dernière défense. Au-delà = mort, pas de trade. Le schéma ci-dessous illustre le retracement 9h30 (le retracement sur M5)."}</div>
-        <svg viewBox="0 0 320 180" style={{width:"100%", maxWidth:340, display:"block", margin:"0 auto 8px"}}>
-          <rect x="20" y="155" width="115" height="8" fill="#1e3a5f"/>
-          <text x="40" y="175" fill="#7dd3fc" fontSize="6.5" fontFamily="monospace">LONDRES 3h-9h30</text>
-          <rect x="135" y="155" width="165" height="8" fill="#14532d"/>
-          <text x="160" y="175" fill="#4ade80" fontSize="6.5" fontFamily="monospace">NY retrace 9h30 = TON ENTRÉE</text>
-          <polyline points="25,140 45,120 65,128 85,95 105,102 135,60" fill="none" stroke="#4ade80" strokeWidth="2.5"/>
-          <text x="28" y="105" fill="#4ade80" fontSize="7" fontFamily="monospace" fontWeight="700">PÔLE</text>
-          <text x="28" y="115" fill="#86efac" fontSize="5.5" fontFamily="monospace">Londres 3h→9h30</text>
-          <polyline points="135,60 150,72 165,85 178,92" fill="none" stroke="#fbbf24" strokeWidth="2"/>
-          <text x="150" y="50" fill="#fbbf24" fontSize="7" fontFamily="monospace" fontWeight="700">RETRACEMENT NY</text>
-          <line x1="135" y1="73" x2="300" y2="73" stroke="#64748b" strokeWidth="0.8" strokeDasharray="2,2"/>
-          <text x="285" y="71" fill="#94a3b8" fontSize="5.5" fontFamily="monospace">38.2</text>
-          <line x1="135" y1="85" x2="300" y2="85" stroke="#64748b" strokeWidth="0.8" strokeDasharray="2,2"/>
-          <text x="285" y="83" fill="#94a3b8" fontSize="5.5" fontFamily="monospace">50</text>
-          <line x1="135" y1="95" x2="300" y2="95" stroke="#f87171" strokeWidth="0.8" strokeDasharray="2,2"/>
-          <text x="282" y="103" fill="#f87171" fontSize="5.5" fontFamily="monospace">61.8</text>
-          <polyline points="178,92 200,65 225,42 255,25" fill="none" stroke="#4ade80" strokeWidth="2.5"/>
-          <text x="195" y="38" fill="#4ade80" fontSize="7" fontFamily="monospace" fontWeight="700">REBOND = ENTRÉE</text>
-          <line x1="178" y1="100" x2="220" y2="100" stroke="#f87171" strokeWidth="1.2" strokeDasharray="3,2"/>
-          <text x="178" y="110" fill="#f87171" fontSize="6" fontFamily="monospace">STOP sous 61.8%</text>
-          <line x1="240" y1="12" x2="300" y2="12" stroke="#4ade80" strokeWidth="1.2" strokeDasharray="3,2"/>
-          <text x="235" y="10" fill="#4ade80" fontSize="6" fontFamily="monospace">TARGET = hauteur du pôle</text>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:10}}>{"La tendance de Londres (3h-7h30) est ta JAMBE. De 7h30 à 8h le flag se dessine. CASSURE 8h : NY ouvre, le flag casse dans le sens du pôle — tu entres sur la clôture M15 confirmée, stop sous le flag. Target = hauteur du pôle, sortie avant 17h. Le schéma ci-dessous illustre la cassure du flag à 8h (sur M15)."}</div>
+        <svg width="100%" viewBox="0 0 340 185" height="280" style={{background:"#0a0f1a", borderRadius:6, marginBottom:8, display:"block"}}>
+          <text x="8" y="12" fill="#64748b" fontSize="6" fontFamily="monospace">M15 — cassure de flag · Londres 3h-8h ET</text>
+          <text x="8" y="175" fill="#38bdf8" fontSize="5.5" fontFamily="monospace">PÔLE LONDRES (3h-7h30)</text>
+          <text x="160" y="175" fill="#fbbf24" fontSize="5.5" fontFamily="monospace">FLAG (7h30-8h)</text>
+          <text x="220" y="175" fill="#4ade80" fontSize="5.5" fontFamily="monospace">CASSURE 8h NY</text>
+          <polyline points="10,155 25,140 38,145 52,128 65,133 80,112 93,117 108,97 120,101 138,80 150,83" fill="none" stroke="#4ade80" strokeWidth="2.5"/>
+          <polyline points="150,83 160,87 170,84 180,88 190,85 200,89" fill="none" stroke="#fbbf24" strokeWidth="2"/>
+          <line x1="150" y1="79" x2="200" y2="83" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
+          <line x1="150" y1="91" x2="200" y2="95" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3,2"/>
+          <line x1="200" y1="20" x2="200" y2="160" stroke="#38bdf8" strokeWidth="1" strokeDasharray="4,2"/>
+          <polyline points="200,89 215,68 232,50 250,33 268,18" fill="none" stroke="#4ade80" strokeWidth="2.5"/>
+          <text x="205" y="60" fill="#4ade80" fontSize="7" fontFamily="monospace" fontWeight="700">CASSURE</text>
+          <text x="205" y="70" fill="#86efac" fontSize="6" fontFamily="monospace">clôture M15 ✓</text>
+          <line x1="188" y1="98" x2="240" y2="98" stroke="#f87171" strokeWidth="1.2" strokeDasharray="3,2"/>
+          <text x="188" y="108" fill="#f87171" fontSize="6" fontFamily="monospace">STOP sous le flag</text>
+          <line x1="268" y1="14" x2="320" y2="14" stroke="#4ade80" strokeWidth="1" strokeDasharray="3,2"/>
+          <text x="248" y="11" fill="#4ade80" fontSize="5.5" fontFamily="monospace">TARGET = hauteur du pôle</text>
+          <text x="30" y="100" fill="#4ade80" fontSize="7" fontFamily="monospace" fontWeight="700">PÔLE</text>
+          <text x="30" y="110" fill="#86efac" fontSize="5.5" fontFamily="monospace">Londres 3h→7h30</text>
+          <text x="152" y="72" fill="#fbbf24" fontSize="6.5" fontFamily="monospace" fontWeight="700">FLAG</text>
         </svg>
-        <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>{"\u2460 Pôle : Londres pousse de 3h à 9h30 (ta jambe, sur M15), testée par NY sans s\u0027inverser. \u2192 CASSURE 8h : le forex NY double la liquidité, le flag casse \u2014 entrée sur la clôture M15, stop derrière le flag. \u2192 RETRACEMENT 9h30 : le NYSE fait retracer vers un niveau Fib (38.2/50/61.8% sur M5), entrée au rebond, stop sous le 61.8%. Les deux : target = hauteur du pôle, sortie avant 17h. Miroir baissier identique, inversé."}</div>
+        <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>{"① Pôle : Londres pousse de 3h à 7h30 (jambe haussière M15). ② Flag : consolidation 7h30-8h (légère contre-tendance). ③ Cassure 8h : clôture M15 hors du flag dans le sens du pôle = entrée. Stop sous le flag. Target = hauteur du pôle. Miroir baissier identique, inversé."}</div>
         </>}
       </div>
 
@@ -331,7 +309,7 @@ export default function DayTradeFxView(){
         <div onClick={()=>setOpenTrades(!openTrades)} style={{fontSize:10, color:"#38bdf8", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>🎯 CE QUE TU TRADES — ET COMMENT LIRE CHACUN</span><span style={{fontSize:12}}>{openTrades ? "▲" : "▼"}</span></div>
         {openTrades && <>
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8}}><b style={{color:"#38bdf8"}}>Tes 7 paires</b> — EUR/AUD · GBP/AUD · EUR/NZD · GBP/NZD · GBP/JPY · EUR/JPY · CHF/JPY. Une devise de Londres (EUR, GBP, CHF) contre une devise d'Asie-Pacifique (AUD, NZD, JPY) : le pôle que tu trades est construit par les desks de Londres eux-mêmes. <b>Lecture :</b> écart ≥3 rangs au Currency Strength entre les deux devises, la plus forte au-dessus = la direction. Le scanner calcule, ton M15 confirme le pôle.</div>
-        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8}}><b style={{color:"#fbbf24"}}>XAU/USD (l'or)</b> — un cas spécial : pas deux devises à comparer, UNE seule question — où est le dollar ? L'or est coté en dollars : dollar fort = or sous pression, dollar faible = or qui respire. <b>Lecture :</b> USD #1-2 au Currency Strength = VENTE possible · USD #7-8 = ACHAT possible · USD au milieu (#3-6) = pas de conviction, pas de trade or. Même mécanique que tes paires : à 9h30 le NYSE et le COMEX injectent leur volume ensemble, l'or fait son propre retracement de la tendance de Londres, et tu entres au rebond Fib sur M5. Seul le signal change — dollar + peur convergents au lieu d'une divergence de rangs.</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8}}><b style={{color:"#fbbf24"}}>XAU/USD (l'or)</b> — un cas spécial : pas deux devises à comparer, UNE seule question — où est le dollar ? L'or est coté en dollars : dollar fort = or sous pression, dollar faible = or qui respire. <b>Lecture :</b> USD #1-2 au Currency Strength = VENTE possible · USD #7-8 = ACHAT possible · USD au milieu (#3-6) = pas de conviction, pas de trade or. Même mécanique que tes paires : à 8h NY et le COMEX ouvrent ensemble — l'or casse son flag de Londres, tu entres sur la clôture M15 confirmée. Seul le signal change — dollar + peur convergents au lieu d'une divergence de rangs.</div>
         <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.5}}>Pourquoi pas de paires CAD ni de majors dollar ? Le CAD est une devise de session NY (pas de pôle de Londres propre), et les majors USD ont leur vraie vie après ta fenêtre. Tes 7 paires + l'or couvrent exactement le terrain où la tendance de Londres existe.</div>
         </>}
       </div>
@@ -346,11 +324,11 @@ export default function DayTradeFxView(){
         {[
           {h:"3h", t:"Londres ouvre et tend le piège", d:"Fausse cassure du range asiatique, chasse aux stops. Le premier mouvement MENT.", n:"Tu dors ou tu prépares. Jamais de position ici."},
           {h:"4h-7h30", t:"Le pôle se construit", d:"Le piège passé, les desks chargent leur vraie position par tranches. Un flux continu sur ton M15 = leur conviction. Puis 7h30-8h ils soufflent : le flag se dessine, la pause avant NY.", n:"Tu lis le POURQUOI (6h-9h), tu repères la jambe et les bornes du flag."},
-          {h:"8h", t:"Forex NY ouvre — CASSURE 8h", d:"La liquidité double. Si les desks ont une conviction, leur flag casse dans le sens du pôle = la continuation fraîche de leur tendance du matin.", n:"Entrée cassure 8h : clôture M15 hors du flag. Stop large — le balayage de 9h30 viendra APRÈS toi."},
-          {h:"8h30", t:"⚠️ Les news US", d:"CPI, NFP, claims tombent à 8h30 — AVANT ta fenêtre maintenant. Elles peuvent retourner l'humeur risk-on/off.", n:"Bon timing : tu scannes APRÈS, à 9h. Vérifie juste que ton ③ tient toujours."},
-          {h:"9h-9h30", t:"Ta fenêtre de scan", d:"Londres a poussé 6h30, NY a testé 1h30 : le Currency Strength est mûr, le pôle est clair. Tu identifies ta paire (① ≥3r + ③ + pas Least Volatile).", n:"Tu scannes UNE fois, tu traces ton Fib sur la jambe, tu prépares ton ordre."},
-          {h:"9h30", t:"Le NYSE ouvre — RETRACEMENT 9h30", d:"Le NYSE injecte son volume et tire le prix CONTRE la tendance de Londres : il ramasse la liquidité avant de repartir. C'est ton point d'entrée, pas un danger.", n:"Entrée retracement 9h30 : rebond sur un niveau Fib (38.2/50/61.8%) sur M5, dans le sens du pôle. Au-delà du 61.8% = setup mort."},
-          {h:"9h30-16h", t:"NY porte la tendance", d:"Le retracement épuisé, NY reprend dans le sens de Londres et porte le mouvement l'après-midi. Ton trade vit sa vie : stop et target font le travail.", n:"Tu ne touches à rien. Pas de stop déplacé, pas de target gourmand."},
+          {h:"8h", t:"Forex NY ouvre — CASSURE 8h", d:"La liquidité double. Si les desks ont une conviction, leur flag casse dans le sens du pôle = la continuation fraîche de leur tendance du matin.", n:"Entrée cassure 8h : clôture M15 hors du flag. Stop sous le flag — si 9h30 balaye, ton stop tient."},
+          {h:"8h30", t:"⚠️ Les news US", d:"CPI, NFP, claims tombent à 8h30 — APRÈS ton entrée à 8h. Si une grosse news retourne le sentiment, ton stop te sort proprement.", n:"Tu ne touches à rien. Stop et target gèrent."},
+          {h:"8h", t:"CASSURE — TON ENTRÉE", d:"NY ouvre, la liquidité double, le flag de Londres casse dans le sens du pôle. Tu entres sur la clôture M15 confirmée.", n:"Stop sous le flag. Target = hauteur du pôle. Sortie avant 17h."},
+          {h:"9h30", t:"Balayage NYSE — ton stop tient", d:"Le NYSE peut tirer le prix CONTRE la tendance de Londres pour ramasser les stops retail. Si ton stop est sous le flag, tu survis et le trade continue.", n:"Tu ne touches à rien. Stop et target font le travail."},
+          {h:"9h30-17h", t:"NY porte la tendance", d:"Le balayage passé, NY reprend dans le sens de Londres et porte le mouvement l'après-midi. Ton trade vit sa vie : stop et target font le travail.", n:"Tu ne touches à rien. Pas de stop déplacé, pas de target gourmand."},
           {h:"17h", t:"Fin de NY — fin de ton trade", d:"Les desks de NY clôturent. Après 17h, le marché passe à l'Asie : autre logique, autre session — plus TON trade.", n:"Tu sors, gagnant ou perdant. Le Day Trade meurt à 17h, sans exception."},
         ].map((x,i)=>(
           <div key={i} style={{display:"flex", gap:8, padding:"7px 9px", marginBottom:4, background:"#0a1020", borderRadius:5}}>
@@ -362,7 +340,7 @@ export default function DayTradeFxView(){
             </div>
           </div>
         ))}
-        <div style={{fontSize:8, color:"#4ade80", marginTop:6, padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>La règle d'or intraday : Londres construit la tendance (3h-9h30). Tu montes derrière les desks par UNE des deux figures — la cassure du flag à 8h (cassure 8h, continuation) ou le rebond du retracement Fib à 9h30 (retracement 9h30). Tu sors avant 17h. Une seule entrée, zéro overnight.</div>
+        <div style={{fontSize:8, color:"#4ade80", marginTop:6, padding:"7px 9px", background:"#052010", borderRadius:5, lineHeight:1.5, fontWeight:600}}>La règle d'or intraday : Londres construit la tendance (3h-7h30). Tu montes derrière les desks à la CASSURE du flag à 8h — NY ouvre, la liquidité double, tu entres sur la clôture M15 confirmée. Tu sors avant 17h. Une seule entrée, zéro overnight.</div>
         </>}
       </div>
 
@@ -371,17 +349,17 @@ export default function DayTradeFxView(){
         {openTete && <>
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#c084fc"}}>Qui ils sont.</b> Des équipes d'exécution dans les banques (Deutsche, HSBC, BNP, Barclays) avec deux moteurs : les ORDRES CLIENTS (fonds, multinationales qui doivent convertir des milliards aujourd'hui — flux obligatoires) et la CONVICTION macro de la banque (« la BoJ reste accommodante, on vend le JPY »). Ils ne devinent pas le marché : ils SONT le marché — ton edge n'est pas de les battre, c'est de lire leur trace.</div>
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#c084fc"}}>Comment ils pensent.</b> Un desk qui doit vendre 2 milliards de JPY ne clique pas « vendre » : il lui faut des ACHETEURS en face. D'où le piège de 3h — pousser le prix contre la tendance prévue pour déclencher les stops et les entrées du retail, qui fournissent la liquidité. Puis il charge sa vraie position par tranches (4h-7h30), en laissant le prix respirer entre chaque tranche pour ne pas révéler sa main. Le pôle propre que tu vois sur M15 = des tranches d'exécution disciplinées, pas un coup de tête.</div>
-        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#fbbf24"}}>Le déjeuner et le déboucle.</b> Vers 7h-8h ET, les desks de Londres déjeunent — la tendance ralentit, c'est ton flag. Mais à leur retour, méfiance : en fin de session, ils BLOQUENT souvent leurs bénéfices. La cassure de 8h peut donc être une vraie continuation OU un déboucle de prise de profits. C'est à 9h30, quand NY tranche, que tu sais : le retracement rebondit = la tendance survit · il casse le 61.8% = ils ont débouclé, tu ne prends pas. Voilà pourquoi le retracement 9h30 est l'entrée la plus sûre : la question "continuation ou déboucle ?" y est déjà résolue.</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#fbbf24"}}>Le déjeuner et le déboucle.</b> Vers 7h-8h ET, les desks de Londres déjeunent — la tendance ralentit, c'est ton flag. Mais à leur retour, méfiance : en fin de session, ils BLOQUENT souvent leurs bénéfices. La cassure de 8h peut donc être une vraie continuation OU un déboucle de prise de profits. Si le flag casse proprement à 8h sur clôture M15 = continuation. Si la clôture échoue = déboucle. Tu lis la bougie — c'est elle qui tranche.</div>
         <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#c084fc"}}>Comment les observer.</b> Trois fenêtres : ① le M15 (la trace brute — un flux continu après 4h = conviction, des mèches dans les deux sens = indécision, pas de trade) · ② le Currency Strength (leur allocation agrégée — quelle devise reçoit le capital, laquelle le perd) · ③ les session wraps de 6h-7h30 (le POURQUOI — quel commentaire de banque centrale, quelle news anime leur conviction). Quand les trois racontent la même histoire, tu lis juste.</div>
-        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#c084fc"}}>Quand les suivre — et quand pas.</b> JAMAIS sur le premier mouvement (3h-4h = le piège, par définition). Tu les suis quand leur travail est VISIBLE et TESTÉ : le pôle construit (4h-7h30), puis tu montes derrière eux par UNE des deux figures — la cassure du flag à 8h (cassure 8h) ou le rebond du retracement Fib à 9h30 (retracement 9h30). Dans les deux cas, tu entres au moment précis où la liquidité de NY confirme que le train roule. Pas de pôle propre = ils hésitent = toi aussi tu t'abstiens. Et le ❄️ Least Volatile le confirme en chiffres : une paire dans ce top n'a pas reçu leurs tranches aujourd'hui.</div>
-        <div style={{fontSize:8, color:"#fbbf24", lineHeight:1.6, padding:"7px 9px", background:"#1a1500", borderRadius:5}}>⏱️ Le timing en une ligne : ils piègent à 3h, chargent de 4h à 7h30, soufflent de 7h30 à 8h. Toi : tu lis à 6h-9h, tu scannes (7h45-8h45 ou 9h-9h30), et tu entres soit à la cassure du flag de 8h (cassure 8h), soit au rebond du retracement de 9h30 (retracement 9h30). Tu n'es jamais en avance sur eux — tu es juste derrière, là où c'est payé.</div>
+        <div style={{fontSize:8.5, color:TEXT, lineHeight:1.65, marginBottom:8}}><b style={{color:"#c084fc"}}>Quand les suivre — et quand pas.</b> JAMAIS sur le premier mouvement (3h-4h = le piège, par définition). Tu les suis quand leur travail est VISIBLE et TESTÉ : le pôle construit (4h-7h30), flag dessiné (7h30-8h), puis tu entres à la cassure du flag à 8h. Au moment précis où la liquidité de NY confirme que le train roule. Pas de pôle propre = ils hésitent = toi aussi tu t'abstiens. Et le ❄️ Least Volatile le confirme : une paire dans ce top n'a pas reçu leurs tranches aujourd'hui.</div>
+        <div style={{fontSize:8, color:"#fbbf24", lineHeight:1.6, padding:"7px 9px", background:"#1a1500", borderRadius:5}}>⏱️ Le timing en une ligne : ils piègent à 3h, chargent de 4h à 7h30, soufflent de 7h30 à 8h. Toi : tu lis à 6h-9h, tu scannes (7h45-8h45), et tu entres à la cassure du flag de 8h (clôture M15 confirmée). Tu n'es jamais en avance sur eux — tu es juste derrière, là où c'est payé.</div>
         </>}
       </div>
 
       <div style={{padding:"10px 12px", background:"#160a2e", borderRadius:8, border:"1px solid #c084fc44", marginBottom:14}}>
         <div onClick={()=>setOpenVs(!openVs)} style={{fontSize:9, color:"#c084fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>⚔️ DAY TRADE FX vs SWING FX — ne les mélange jamais</span><span style={{fontSize:11}}>{openVs ? "▲" : "▼"}</span></div>
         {openVs && <>
-        <div style={{fontSize:8, color:TEXT, lineHeight:1.65}}>Même ADN (pôle → repli → reprise), deux animaux : le <b style={{color:"#38bdf8"}}>Day Trade</b> se scanne sur deux fenêtres (7h45-8h45 pour la cassure du flag à 8h, OU 9h-9h30 pour le retracement Fib à 9h30), une seule entrée par jour, et meurt à 17h. Le <b style={{color:"#fbbf24"}}>Swing</b> et le <b style={{color:"#34d399"}}>Swing 2.0</b> se scannent à 11h-16h, entrent à la cassure le soir/Tokyo sur H1, et vivent 1-3 jours. Un trade Day Trade se gère en day trade jusqu'au bout — il ne devient JAMAIS un swing parce qu'il perd.</div>
+        <div style={{fontSize:8, color:TEXT, lineHeight:1.65}}>Même ADN (pôle → repli → reprise), deux animaux : le <b style={{color:"#38bdf8"}}>Day Trade</b> se scanne de 7h45 à 8h45 (cassure du flag à 8h), une seule entrée par jour, et meurt à 17h. Le <b style={{color:"#fbbf24"}}>Swing</b> et le <b style={{color:"#34d399"}}>Swing 2.0</b> se scannent à 11h-16h, entrent à la cassure le soir/Tokyo sur H1, et vivent 1-3 jours. Un trade Day Trade se gère en day trade jusqu'au bout — il ne devient JAMAIS un swing parce qu'il perd.</div>
         </>}
       </div>
     </div>
