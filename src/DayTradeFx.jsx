@@ -23,9 +23,9 @@ function DtAnalyzer(){
     try {
       const nowET = new Date(new Date().toLocaleString("en-US",{timeZone:"America/New_York"}));
       const m = nowET.getHours()*60+nowET.getMinutes();
-      if (!(m >= 465 && m <= 525)) {
+      if (!(m >= 435 && m <= 525)) {
         const hh=String(nowET.getHours()).padStart(2,"0"), mm=String(nowET.getMinutes()).padStart(2,"0");
-        setRes({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade FX se scanne de 7h45 à 8h45 ET — cassure de 8h (continuation du pôle de Londres). Reviens entre 7h45 et 8h45.`});
+        setRes({error:`⏰ Il est ${hh}h${mm} à New York. Le Day Trade FX se scanne de 7h15 à 8h45 ET — cassure de 8h (continuation du pôle de Londres). Reviens entre 7h15 et 8h45.`});
         return;
       }
       const lines = raw.split("\n").map(l=>l.trim()).filter(Boolean);
@@ -143,6 +143,7 @@ function DtAnalyzer(){
 }
 
 export default function DayTradeFxView(){
+  const [showTradeEx, setShowTradeEx] = useState(false);
   const [openJpy, setOpenJpy] = useState(false);
   const [openScan, setOpenScan] = useState(false);
   const [openSeq, setOpenSeq] = useState(false);
@@ -162,6 +163,72 @@ export default function DayTradeFxView(){
   }, []);
   return (
     <div style={{maxWidth:520, margin:"0 auto"}}>
+      {/* BULLE FLOTTANTE EXEMPLE TRADE */}
+      <div onClick={()=>setShowTradeEx(true)} style={{position:"sticky", top:6, zIndex:50, marginBottom:8, cursor:"pointer", animation:"floatBubble 2.8s ease-in-out infinite", background:"radial-gradient(circle at 30% 30%,#0a3018,#052010)", border:"2px solid #4ade80", borderRadius:"50px 50px 50px 8px", padding:"7px 12px", display:"inline-flex", alignItems:"center", gap:6, boxShadow:"0 4px 14px rgba(74,222,128,0.4)", marginLeft:"auto", marginRight:6, float:"right"}}>
+        <span style={{fontSize:15}}>💡</span>
+        <span style={{fontSize:8.5, fontWeight:800, color:"#4ade80"}}>TRADE GAGNANT</span>
+      </div>
+      <style>{`@keyframes floatBubble{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-6px) rotate(1deg)}}`}</style>
+      <div style={{clear:"both"}}></div>
+
+      {showTradeEx && (
+        <div onClick={()=>setShowTradeEx(false)} style={{position:"fixed", inset:0, zIndex:100, background:"rgba(0,0,0,0.85)", display:"flex", alignItems:"flex-start", justifyContent:"center", padding:"20px 10px", overflowY:"auto"}}>
+          <div onClick={e=>e.stopPropagation()} style={{maxWidth:480, width:"100%", background:"#0a0f1a", border:"2px solid #4ade80", borderRadius:12, padding:14, marginTop:10}}>
+            <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10}}>
+              <span style={{fontSize:13, fontWeight:800, color:"#4ade80"}}>💡 TRADE GAGNANT — GBP/JPY VENTE</span>
+              <span onClick={()=>setShowTradeEx(false)} style={{fontSize:20, color:"#f87171", cursor:"pointer", fontWeight:800, lineHeight:1}}>✕</span>
+            </div>
+            <div style={{fontSize:9, color:TEXT, lineHeight:1.5, marginBottom:12, padding:"8px 10px", background:"#052010", borderRadius:6}}>17 juin 2026 — Setup parfait : les 3 filtres alignés + cassure du flag à 8h. La VENTE a couru jusqu'au TP. Voici les 4 étapes telles que vues en direct.</div>
+
+            <div style={{fontSize:9.5, fontWeight:700, color:"#fbbf24", marginBottom:4}}>① LE SCAN (7h45-8h45) — GBP/JPY VENTE validée</div>
+            <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:4, lineHeight:1.4}}>6 rangs d'écart (GBP #7 vs JPY #1) + RISK-OFF aligné = convergence. Le scanner valide la VENTE.</div>
+            <img src="/trade-exemple/1-scanner.jpg" style={{width:"100%", borderRadius:6, marginBottom:6, border:"1px solid #1e293b"}}/>
+            <div style={{fontSize:8, color:TEXT, marginBottom:12, lineHeight:1.5, padding:"7px 9px", background:"#0d1828", borderRadius:6}}><b style={{color:"#7dd3fc"}}>📊 La divergence de force (6 rangs) :</b> GBP est #7 (presque le plus faible) et JPY est #1 (le plus fort). Les deux poussent dans le MÊME sens : le GBP s'effondre ET le JPY monte → GBP/JPY chute fort. Plus l'écart de rangs est grand, plus le mouvement est puissant. 6 rangs = signal très fort.</div>
+
+            <div style={{fontSize:9.5, fontWeight:700, color:"#fbbf24", marginBottom:4}}>② LE CURRENCY STRENGTH — JPY #1, GBP #7</div>
+            <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:4, lineHeight:1.4}}>Le JPY domine (en haut, vert), le GBP s'effondre (en bas, rose). L'écart maximal = le pôle le plus propre.</div>
+            <img src="/trade-exemple/3-strength.png" style={{width:"100%", borderRadius:6, marginBottom:12, border:"1px solid #1e293b"}}/>
+
+            <div style={{fontSize:9.5, fontWeight:700, color:"#fbbf24", marginBottom:4}}>③ LE RISK METER — 38 (côté RISK-OFF)</div>
+            <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:4, lineHeight:1.4}}>L'aiguille penche vers le rouge (peur) = fuite vers le JPY refuge. Le filtre ③ confirme la VENTE des cross JPY.</div>
+            <img src="/trade-exemple/2-meter.png" style={{width:"100%", borderRadius:6, marginBottom:12, border:"1px solid #1e293b"}}/>
+
+            <div style={{fontSize:9.5, fontWeight:700, color:"#fbbf24", marginBottom:4}}>④ LA CASSURE 8h — clôture M15 → TP touché</div>
+            <div style={{fontSize:8.5, color:TEXT_DIM, marginBottom:4, lineHeight:1.4}}>Le pôle baissier de Londres, le flag (consolidation), puis la grosse bougie rouge à 8h qui casse le flag. Stop sous le flag, le prix a couru jusqu'au TP. ✅</div>
+            <div style={{fontSize:9, fontWeight:800, color:"#f87171", marginBottom:4, textAlign:"center", padding:"4px", background:"#200505", borderRadius:5, border:"1px solid #f87171"}}>📐 PATTERN : BEAR FLAG (drapeau baissier)</div>
+            <svg width="100%" viewBox="0 0 360 280" style={{background:"#0a0f1a", borderRadius:8, marginBottom:6, border:"1px solid #1e293b", display:"block"}}>
+              <text x="10" y="18" fill="#94a3b8" fontSize="9" fontFamily="monospace" fontWeight="700">GBP/JPY · M15 · BEAR FLAG</text>
+              <line x1="20" y1="45" x2="350" y2="45" stroke="#f87171" strokeWidth="1" strokeDasharray="4,3"/>
+              <text x="24" y="40" fill="#f87171" fontSize="8" fontFamily="monospace" fontWeight="700">SL 215.077</text>
+              <polyline points="30,55 45,58 55,52 68,80 78,115" fill="none" stroke="#f87171" strokeWidth="3.5" strokeLinejoin="round" strokeLinecap="round"/>
+              <text x="14" y="100" fill="#86efac" fontSize="9" fontFamily="monospace" fontWeight="700">PÔLE</text>
+              <text x="14" y="112" fill="#86efac" fontSize="7" fontFamily="monospace">baissier</text>
+              <polyline points="78,115 98,105 118,125 138,113 158,135 178,120 195,142" fill="none" stroke="#fbbf24" strokeWidth="2.8" strokeLinejoin="round" strokeLinecap="round"/>
+              
+              <line x1="78" y1="108" x2="200" y2="128" stroke="#a78bfa" strokeWidth="1.2" strokeDasharray="3,3"/>
+              <line x1="85" y1="125" x2="205" y2="150" stroke="#a78bfa" strokeWidth="1.2" strokeDasharray="3,3"/>
+              <text x="110" y="95" fill="#fbbf24" fontSize="9" fontFamily="monospace" fontWeight="700">FLAG</text>
+              <text x="100" y="170" fill="#c4b5fd" fontSize="7" fontFamily="monospace">consolidation ↗</text>
+              <line x1="230" y1="35" x2="230" y2="250" stroke="#38bdf8" strokeWidth="1.5" strokeDasharray="5,3"/>
+              <text x="210" y="268" fill="#38bdf8" fontSize="9" fontFamily="monospace" fontWeight="700">8h NY ouvre</text>
+              <polyline points="195,142 215,130 230,122 240,165 252,205 262,235" fill="none" stroke="#f87171" strokeWidth="4" strokeLinejoin="round" strokeLinecap="round"/>
+              <text x="245" y="135" fill="#f87171" fontSize="10" fontFamily="monospace" fontWeight="700">CASSURE</text>
+              <text x="258" y="148" fill="#f87171" fontSize="10" fontFamily="monospace" fontWeight="700">▼</text>
+              <line x1="100" y1="128" x2="230" y2="128" stroke="#fb923c" strokeWidth="1" strokeDasharray="4,3"/>
+              <text x="100" y="123" fill="#fb923c" fontSize="8" fontFamily="monospace" fontWeight="700">Entrée 214.92</text>
+              <line x1="200" y1="235" x2="350" y2="235" stroke="#4ade80" strokeWidth="1.5" strokeDasharray="5,3"/>
+              <text x="265" y="230" fill="#4ade80" fontSize="9" fontFamily="monospace" fontWeight="700">TP 214.71 ✓</text>
+              <rect x="255" y="245" width="95" height="24" rx="5" fill="#052010" stroke="#4ade80" strokeWidth="1.2"/>
+              <text x="266" y="261" fill="#4ade80" fontSize="11" fontFamily="monospace" fontWeight="800">+21 pips ✅</text>
+            </svg>
+            <div style={{fontSize:7.5, color:TEXT_DIM, marginBottom:12, lineHeight:1.4, fontStyle:"italic"}}>Le Bear Flag = pôle baissier + consolidation qui remonte en biais (le flag) + cassure dans le sens du pôle. Sur tendance baissière, le flag penche vers le HAUT.</div>
+
+            <div style={{fontSize:9, color:"#4ade80", fontWeight:700, padding:"8px 10px", background:"#052010", borderRadius:6, lineHeight:1.5}}>🔑 La leçon : quand les 3 filtres convergent (rangs + strength + sentiment), tu attends juste la cassure du flag à 8h. Tu entres sur la clôture M15, stop sous le flag, et tu laisses courir jusqu'au TP.</div>
+            <div onClick={()=>setShowTradeEx(false)} style={{marginTop:12, textAlign:"center", padding:"10px", background:"#1e3a5f", borderRadius:6, fontSize:10, fontWeight:700, color:"#7dd3fc", cursor:"pointer"}}>Fermer</div>
+          </div>
+        </div>
+      )}
+
       <div style={{textAlign:"center", marginBottom:12}}>
         <div style={{fontSize:14, fontWeight:800, color:"#38bdf8", letterSpacing:1}}>⚡ DAY TRADE FX</div>
         <div style={{fontSize:9, color:"#7dd3fc", fontWeight:700}}>LE PÔLE DE LONDRES · CASSURE DE 8H</div>
@@ -359,7 +426,7 @@ export default function DayTradeFxView(){
       <div style={{padding:"10px 12px", background:"#160a2e", borderRadius:8, border:"1px solid #c084fc44", marginBottom:14}}>
         <div onClick={()=>setOpenVs(!openVs)} style={{fontSize:9, color:"#c084fc", fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}><span>⚔️ DAY TRADE FX vs SWING FX — ne les mélange jamais</span><span style={{fontSize:11}}>{openVs ? "▲" : "▼"}</span></div>
         {openVs && <>
-        <div style={{fontSize:8, color:TEXT, lineHeight:1.65}}>Même ADN (pôle → repli → reprise), deux animaux : le <b style={{color:"#38bdf8"}}>Day Trade</b> se scanne de 7h45 à 8h45 (cassure du flag à 8h), une seule entrée par jour, et meurt à 17h. Le <b style={{color:"#fbbf24"}}>Swing</b> et le <b style={{color:"#34d399"}}>Swing 2.0</b> se scannent à 11h-16h, entrent à la cassure le soir/Tokyo sur H1, et vivent 1-3 jours. Un trade Day Trade se gère en day trade jusqu'au bout — il ne devient JAMAIS un swing parce qu'il perd.</div>
+        <div style={{fontSize:8, color:TEXT, lineHeight:1.65}}>Même ADN (pôle → repli → reprise), deux animaux : le <b style={{color:"#38bdf8"}}>Day Trade</b> se scanne de 7h15 à 8h45 (cassure du flag à 8h), une seule entrée par jour, et meurt à 17h. Le <b style={{color:"#fbbf24"}}>Swing</b> et le <b style={{color:"#34d399"}}>Swing 2.0</b> se scannent à 11h-16h, entrent à la cassure le soir/Tokyo sur H1, et vivent 1-3 jours. Un trade Day Trade se gère en day trade jusqu'au bout — il ne devient JAMAIS un swing parce qu'il perd.</div>
         </>}
       </div>
     </div>
