@@ -287,30 +287,25 @@ function convictionScore(f, secInfo, s1passed, s1total, s2passed, s2total) {
 
 function InsideCandleSVG() {
   return (
-    <svg viewBox="0 0 320 200" style={{width:"100%", height:"auto", background:"#0a0e16", borderRadius:8, border:"1px solid #1a2230"}}>
-      {/* Bougie mere (grande verte) */}
-      <line x1="80" y1="30" x2="80" y2="170" stroke="#34d399" strokeWidth="1.5" />
-      <rect x="66" y="55" width="28" height="90" fill="#34d399" rx="2" />
-      <text x="55" y="188" fill="#34d399" fontSize="8" fontWeight="bold">BOUGIE MERE</text>
-      {/* lignes de range haut/bas de la mere */}
-      <line x1="60" y1="55" x2="270" y2="55" stroke="#475569" strokeWidth="1" strokeDasharray="3,3" />
-      <line x1="60" y1="145" x2="270" y2="145" stroke="#475569" strokeWidth="1" strokeDasharray="3,3" />
-      <text x="210" y="51" fill="#64748b" fontSize="7">haut de la mere</text>
-      <text x="210" y="156" fill="#64748b" fontSize="7">bas de la mere</text>
-      {/* Inside candle (petite, contenue) */}
-      <line x1="150" y1="72" x2="150" y2="128" stroke="#fbbf24" strokeWidth="1.5" />
-      <rect x="140" y="85" width="20" height="32" fill="#fbbf24" rx="2" />
-      <text x="120" y="80" fill="#fbbf24" fontSize="8" fontWeight="bold">INSIDE</text>
-      {/* fleche compression */}
-      <text x="125" y="135" fill="#fbbf24" fontSize="6.5">(contenue dedans)</text>
-      {/* Breakout */}
-      <line x1="150" y1="85" x2="240" y2="35" stroke="#34d399" strokeWidth="2.5" />
-      <polygon points="240,35 232,38 238,44" fill="#34d399" />
-      <text x="200" y="30" fill="#34d399" fontSize="8" fontWeight="bold">BREAKOUT</text>
-      <text x="198" y="40" fill="#64748b" fontSize="6.5">(casse le haut + volume)</text>
-      {/* Stop */}
-      <line x1="120" y1="160" x2="200" y2="160" stroke="#f87171" strokeWidth="1.3" strokeDasharray="2,2" />
-      <text x="202" y="163" fill="#f87171" fontSize="7" fontWeight="bold">STOP (bas inside)</text>
+    <svg viewBox="0 0 320 210" style={{width:"100%", height:"auto", background:"#0a0e16", borderRadius:8, border:"1px solid #1a2230"}}>
+      <line x1="55" y1="50" x2="300" y2="50" stroke="#475569" strokeWidth="1" strokeDasharray="4,3" />
+      <line x1="55" y1="150" x2="300" y2="150" stroke="#475569" strokeWidth="1" strokeDasharray="4,3" />
+      <text x="240" y="46" fill="#94a3b8" fontSize="7.5">HAUT mere</text>
+      <text x="240" y="162" fill="#94a3b8" fontSize="7.5">BAS mere</text>
+      <line x1="80" y1="50" x2="80" y2="150" stroke="#34d399" strokeWidth="1.5" />
+      <rect x="68" y="65" width="24" height="75" fill="#34d399" rx="2" />
+      <text x="58" y="178" fill="#34d399" fontSize="8" fontWeight="bold">1. MERE</text>
+      <line x1="150" y1="78" x2="150" y2="122" stroke="#fbbf24" strokeWidth="1.5" />
+      <rect x="138" y="88" width="24" height="26" fill="#fbbf24" rx="2" />
+      <text x="120" y="178" fill="#fbbf24" fontSize="8" fontWeight="bold">2. INSIDE</text>
+      <text x="106" y="190" fill="#64748b" fontSize="6.5">(contenue dans la mere)</text>
+      <line x1="220" y1="25" x2="220" y2="70" stroke="#22d3ee" strokeWidth="1.5" />
+      <rect x="208" y="32" width="24" height="50" fill="#22d3ee" rx="2" />
+      <text x="184" y="178" fill="#22d3ee" fontSize="8" fontWeight="bold">3. BREAKOUT</text>
+      <text x="244" y="40" fill="#22d3ee" fontSize="7" fontWeight="bold">ENTREE</text>
+      <text x="244" y="50" fill="#64748b" fontSize="6.5">cloture + volume</text>
+      <line x1="128" y1="122" x2="175" y2="122" stroke="#f87171" strokeWidth="1.3" />
+      <text x="92" y="125" fill="#f87171" fontSize="6.5" fontWeight="bold">STOP</text>
     </svg>
   );
 }
@@ -582,6 +577,16 @@ function StockAnalyseView() {
                 <b style={{color:RED}}>Stop :</b> sous le bas du drapeau (~${(res.f.price*0.92).toFixed(2)}, repère -8%).{"\n"}
                 <b style={{color:GREEN}}>Objectif 1 :</b> projeter la hauteur du mât depuis le breakout.{"\n"}
                 <b style={{color:BLUE}}>Objectif 2 :</b> affiner avec les niveaux de Fibonacci.
+              </div>
+              <div style={{marginTop:8, padding:"8px 10px", background:"#0a1810", borderRadius:6, border:"1px solid #14321f"}}>
+                <div style={{fontSize:9, color:GREEN, fontWeight:800, marginBottom:4}}>✅ N'ENTRE QU'APRÈS CONFIRMATION (méthode Pete)</div>
+                <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>
+                  Ne devine pas le breakout — attends la PREUVE que les institutions ont acheté :{"\n"}
+                  <b style={{color:GREEN}}>1. Clôture au-dessus</b> du niveau (pas juste une mèche qui retombe = ils ont tenu l'offre).{"\n"}
+                  <b style={{color:GREEN}}>2. Volume ≥ 1.5-2x</b> la moyenne sur la bougie de cassure (les gros sont entrés, pas le retail).{"\n"}
+                  <b style={{color:GREEN}}>3. Le retest tient</b> : le prix revient tester le niveau cassé et rebondit dessus (l'ancienne résistance devient support).{"\n"}
+                  <span style={{color:TEXT_DIM, fontStyle:"italic"}}>Patience : Pete attend ~15 min après l'ouverture que le marché révèle sa direction. Pas de FOMO.</span>
+                </div>
               </div>
             </div>
           )}
