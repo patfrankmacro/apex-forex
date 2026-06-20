@@ -285,6 +285,36 @@ function convictionScore(f, secInfo, s1passed, s1total, s2passed, s2total) {
   return { score, label, color };
 }
 
+function InsideCandleSVG() {
+  return (
+    <svg viewBox="0 0 320 200" style={{width:"100%", height:"auto", background:"#0a0e16", borderRadius:8, border:"1px solid #1a2230"}}>
+      {/* Bougie mere (grande verte) */}
+      <line x1="80" y1="30" x2="80" y2="170" stroke="#34d399" strokeWidth="1.5" />
+      <rect x="66" y="55" width="28" height="90" fill="#34d399" rx="2" />
+      <text x="55" y="188" fill="#34d399" fontSize="8" fontWeight="bold">BOUGIE MERE</text>
+      {/* lignes de range haut/bas de la mere */}
+      <line x1="60" y1="55" x2="270" y2="55" stroke="#475569" strokeWidth="1" strokeDasharray="3,3" />
+      <line x1="60" y1="145" x2="270" y2="145" stroke="#475569" strokeWidth="1" strokeDasharray="3,3" />
+      <text x="210" y="51" fill="#64748b" fontSize="7">haut de la mere</text>
+      <text x="210" y="156" fill="#64748b" fontSize="7">bas de la mere</text>
+      {/* Inside candle (petite, contenue) */}
+      <line x1="150" y1="72" x2="150" y2="128" stroke="#fbbf24" strokeWidth="1.5" />
+      <rect x="140" y="85" width="20" height="32" fill="#fbbf24" rx="2" />
+      <text x="120" y="80" fill="#fbbf24" fontSize="8" fontWeight="bold">INSIDE</text>
+      {/* fleche compression */}
+      <text x="125" y="135" fill="#fbbf24" fontSize="6.5">(contenue dedans)</text>
+      {/* Breakout */}
+      <line x1="150" y1="85" x2="240" y2="35" stroke="#34d399" strokeWidth="2.5" />
+      <polygon points="240,35 232,38 238,44" fill="#34d399" />
+      <text x="200" y="30" fill="#34d399" fontSize="8" fontWeight="bold">BREAKOUT</text>
+      <text x="198" y="40" fill="#64748b" fontSize="6.5">(casse le haut + volume)</text>
+      {/* Stop */}
+      <line x1="120" y1="160" x2="200" y2="160" stroke="#f87171" strokeWidth="1.3" strokeDasharray="2,2" />
+      <text x="202" y="163" fill="#f87171" fontSize="7" fontWeight="bold">STOP (bas inside)</text>
+    </svg>
+  );
+}
+
 function BullFlagSVG() {
   return (
     <svg viewBox="0 0 320 200" style={{width:"100%", height:"auto", background:"#0a0e16", borderRadius:8, border:"1px solid #1a2230"}}>
@@ -621,17 +651,11 @@ Pourquoi weekly : filtre le bruit, le volume hebdo confirme l'engagement institu
       </Accordion>
 
       <Accordion icon="🕯️" titre="L'INSIDE CANDLE — LE SETUP DE PETE" color={PURPLE} open={a10} setOpen={setA10}>
+<div style={{marginBottom:10}}><InsideCandleSVG /></div>
 {`L'inside candle est le signal d'entrée court terme de Pete Renzulli. Attention : Finviz ne le donne PAS — tu le repères à l'oeil sur le chart.
 
 QU'EST-CE QUE C'EST ?
-Une bougie dont le range (haut ET bas) est entierement CONTENU dans la bougie precedente. Le marche fait une pause, il se comprime.
-
-   |        Bougie mere (grande)
-   |####|
-   |####|   |        <- inside candle
-   |####|   |##|        (contenue dedans)
-   |####|   |##|
-   |
+Une bougie dont le range (haut ET bas) est entierement CONTENU dans la bougie precedente (la "bougie mere"). Le marche fait une pause, il se comprime. Sur le schema ci-dessus : la bougie jaune (inside) tient entierement entre le haut et le bas de la grande bougie verte.
 
 POURQUOI C'EST PUISSANT ?
 La compression = les vendeurs s'epuisent, l'energie s'accumule. Quand le prix CASSE le haut de la bougie mere sur volume -> mouvement explosif. C'est le mini-equivalent du Bull Flag, mais sur 1-2 bougies.
