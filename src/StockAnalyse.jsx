@@ -129,13 +129,15 @@ function valorisation(f) {
     { nom: "BEAR", hyp: "Croissance decoit, multiples comprimes", pe: +(basePE*0.65).toFixed(0), prix: +(epsF*basePE*0.65).toFixed(2), c: RED },
   ];
   const bullTarget = scenarios[0].prix;
-  const analystTarget = f.targetPrice || 0;
-  const objectif = Math.max(bullTarget, analystTarget > price ? analystTarget : 0);
-  const baseGain = objectif - price;
+  const baseTarget = scenarios[1].prix;
   const risque = price - stop;
-  let rr = risque>0 ? +(baseGain/risque).toFixed(1) : null;
-  if (rr && rr > 20) rr = 20;
-  return { price, epsN, stop, methodes, low, high, scenarios, rr, baseGain: +baseGain.toFixed(2), risque: +risque.toFixed(2) };
+  const gainBull = bullTarget - price;
+  const gainBase = baseTarget - price;
+  let rrBull = risque>0 ? +(gainBull/risque).toFixed(1) : null;
+  let rrBase = risque>0 ? +(gainBase/risque).toFixed(1) : null;
+  if (rrBull && rrBull > 20) rrBull = 20;
+  if (rrBase && rrBase > 20) rrBase = 20;
+  return { price, epsN, stop, methodes, low, high, scenarios, rrBull, rrBase, gainBull:+gainBull.toFixed(2), gainBase:+gainBase.toFixed(2), risque: +risque.toFixed(2) };
 }
 
 function autoThese(f, mode, secInfo) {
@@ -162,10 +164,16 @@ function autoThese(f, mode, secInfo) {
       const acc = f.epsQQ>50?"EXPLOSIVE":f.epsQQ>25?"SOLIDE":"MODEREE";
       lines.push("ACCELERATION EPS — "+acc+"\nEPS QoQ +"+f.epsQQ+"% · EPS This Year +"+f.epsThisY+"% · EPS Next Year +"+f.epsNextY+"%. Minervini exige cette triple acceleration — moins de 2% des actions y parviennent.");
     }
-    if (f.salesQQ!==null && f.salesQQ>0) {
-      const qual = f.salesQQ>50?"EXPLOSIVE":f.salesQQ>25?"FORTE":"CORRECTE";
-      const ventesAcc = (f.epsQQ!==null && f.epsQQ>0) ? "Ici, EPS et ventes accelerent ensemble : double validation." : "A surveiller : les EPS doivent suivre cette dynamique de ventes.";
-      lines.push("CROISSANCE DES VENTES — "+qual+"\nSales QoQ +"+f.salesQQ+"% confirme que la croissance vient de VRAIES ventes, pas de coupures de couts. "+ventesAcc);
+    if (f.salesQQ!==null) {
+      if (f.salesQQ>=25) {
+        const qual = f.salesQQ>50?"EXPLOSIVE":"FORTE";
+        const ventesAcc = (f.epsQQ!==null && f.epsQQ>0) ? "EPS et ventes accelerent ensemble : double validation de la qualite." : "A surveiller : les EPS doivent suivre cette dynamique.";
+        lines.push("CROISSANCE DES VENTES — "+qual+"\nSales QoQ +"+f.salesQQ+"% (>25%) confirme que la croissance vient de VRAIES ventes. "+ventesAcc);
+      } else if (f.salesQQ>0) {
+        lines.push("CROISSANCE DES VENTES — MODEREE (sous le seuil Minervini)\nSales QoQ +"+f.salesQQ+"% : c'est une croissance POSITIVE et saine, mais SOUS les 25% exiges par le screener strict Minervini. Ce n'est pas une baisse — l'entreprise grandit. Simplement, le rythme de vente n'atteint pas le seuil d'hyper-croissance. Les EPS (+"+(f.epsQQ!==null?f.epsQQ:"?")+"%) progressent plus vite, souvent grace aux marges. Pour le screener 1 (Pete, technique), aucun probleme. Pour Minervini, ce critere precis n'est juste pas rempli.");
+      } else {
+        lines.push("VENTES EN BAISSE — VIGILANCE\nSales QoQ "+f.salesQQ+"% est negatif ce trimestre. Les revenus reculent : signal de prudence, meme si les EPS tiennent (marges/rachats).");
+      }
     }
     if (f.epsSurpr!==null && f.salesSurpr!==null && f.epsSurpr>0 && f.salesSurpr>0) {
       lines.push("BOTH POSITIVE SURPRISE — EFFET CASCADE\nEPS Surprise +"+f.epsSurpr+"% · Revenue Surprise +"+f.salesSurpr+"%. (1) les algos detectent → (2) les analystes relevent leurs cibles → (3) les fonds augmentent leur allocation → (4) le prix monte 10-30%.");
@@ -237,6 +245,56 @@ function sectorOfTicker(f, groups) {
   return { ...g, rank, total: groups.byMonth.length };
 }
 
+function convictionScore(f, secInfo, s1passed, s1total, s2passed, s2total) {
+  let score = 0;
+  // Secteur (25 pts) — le filtre n1 de Pete
+  if (secInfo) { if (secInfo.rank<=3) score+=25; else if (secInfo.rank<=6) score+=10; }
+  // Technique Pete (25 pts) — proportionnel
+  score += Math.round((s1passed/s1total)*25);
+  // Fondamental Minervini (25 pts)
+  const fondPassed = s2passed - s1passed;
+  const fondTotal = s2total - s1total;
+  if (fondTotal>0) score += Math.round((fondPassed/fondTotal)*25);
+  // Smart money / qualite (25 pts)
+  let sm = 0;
+  if (f.instTrans!==null && f.instTrans>0) sm+=7;
+  if (f.epsSurpr!==null && f.salesSurpr!==null && f.epsSurpr>0 && f.salesSurpr>0) sm+=7;
+  if (f.change!==null && f.change>=2) sm+=6;
+  if (f.rsi!==null && f.rsi<70) sm+=5;
+  score += sm;
+  if (score>100) score=100;
+  let label, color;
+  if (score>=85) { label="CONVICTION TRES FORTE"; color="#34d399"; }
+  else if (score>=70) { label="CONVICTION FORTE"; color="#a3e635"; }
+  else if (score>=55) { label="CONVICTION MOYENNE"; color="#fbbf24"; }
+  else { label="CONVICTION FAIBLE"; color="#f87171"; }
+  return { score, label, color };
+}
+
+function BullFlagSVG() {
+  return (
+    <svg viewBox="0 0 320 200" style={{width:"100%", height:"auto", background:"#0a0e16", borderRadius:8, border:"1px solid #1a2230"}}>
+      <line x1="20" y1="180" x2="60" y2="80" stroke="#34d399" strokeWidth="3" />
+      <text x="22" y="195" fill="#34d399" fontSize="8" fontWeight="bold">LE MAT</text>
+      <line x1="60" y1="80" x2="130" y2="100" stroke="#38bdf8" strokeWidth="2" strokeDasharray="3,2" />
+      <line x1="60" y1="100" x2="130" y2="120" stroke="#38bdf8" strokeWidth="2" strokeDasharray="3,2" />
+      <polyline points="60,80 75,108 90,92 105,116 120,100 130,110" fill="none" stroke="#1f3864" strokeWidth="2.5" />
+      <text x="68" y="138" fill="#38bdf8" fontSize="8" fontWeight="bold">DRAPEAU</text>
+      <text x="62" y="148" fill="#64748b" fontSize="6.5">(volume baisse)</text>
+      <circle cx="130" cy="110" r="5" fill="#d4af37" stroke="#1f3864" strokeWidth="1.5" />
+      <line x1="130" y1="110" x2="200" y2="30" stroke="#34d399" strokeWidth="3" />
+      <text x="160" y="35" fill="#34d399" fontSize="8" fontWeight="bold">BREAKOUT</text>
+      <text x="158" y="45" fill="#64748b" fontSize="6.5">(gros volume)</text>
+      <line x1="130" y1="110" x2="130" y2="30" stroke="#d4af37" strokeWidth="1.5" strokeDasharray="4,3" />
+      <text x="135" y="60" fill="#d4af37" fontSize="7.5" fontWeight="bold">OBJECTIF</text>
+      <text x="135" y="70" fill="#d4af37" fontSize="6.5">= hauteur</text>
+      <text x="135" y="79" fill="#d4af37" fontSize="6.5">du mat</text>
+      <line x1="60" y1="130" x2="230" y2="130" stroke="#f87171" strokeWidth="1.3" strokeDasharray="2,2" />
+      <text x="232" y="133" fill="#f87171" fontSize="7" fontWeight="bold">STOP</text>
+    </svg>
+  );
+}
+
 function Row({ c }) {
   return (
     <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"3px 0", borderBottom:"1px solid #1e293b"}}>
@@ -286,8 +344,9 @@ function StockAnalyseView() {
     const s2all = [...tech, ...fond];
     const s2passed = s2all.filter(c=>c.ok).length;
     const s2total = s2all.length;
+    const conviction = convictionScore(f, secInfo, s1passed, s1total, s2passed, s2total);
     setRes({
-      ticker: tk, f, tech, fond, secInfo,
+      ticker: tk, f, tech, fond, secInfo, conviction,
       s1passed, s1total, s2passed, s2total,
       these: autoThese(f, 2, secInfo), vig: autoVigilance(f), valo: valorisation(f),
     });
@@ -362,9 +421,9 @@ function StockAnalyseView() {
       {res?.ticker && (() => {
         const s1pct = Math.round(res.s1passed/res.s1total*100);
         const s2pct = Math.round(res.s2passed/res.s2total*100);
-        const verdictOf = (pct) => pct>=85 ? {t:"✅ VALIDE", c:GREEN, bg:"#052010"} : pct>=65 ? {t:"⚠️ PARTIEL", c:AMBER, bg:"#1a1500"} : {t:"❌ NON", c:RED, bg:"#200505"};
-        const v1 = verdictOf(s1pct);
-        const v2 = verdictOf(s2pct);
+        const verdictOf = (passed, total) => passed===total ? {t:"✅ VALIDÉ", c:GREEN, bg:"#052010"} : (total-passed)===1 ? {t:"❌ 1 manque", c:AMBER, bg:"#1a1500"} : {t:"❌ NON", c:RED, bg:"#200505"};
+        const v1 = verdictOf(res.s1passed, res.s1total);
+        const v2 = verdictOf(res.s2passed, res.s2total);
         return (
         <div>
           <div style={{textAlign:"center", marginBottom:10}}>
@@ -395,6 +454,20 @@ function StockAnalyseView() {
               <div style={{fontSize:9, color:TEXT_DIM, marginTop:2}}>{res.s2passed}/{res.s2total} ({s2pct}%)</div>
             </div>
           </div>
+
+          {res.conviction && (
+            <div style={{padding:"12px 14px", background:"#0a0e16", borderRadius:10, marginBottom:12, border:"1px solid "+res.conviction.color+"44"}}>
+              <div style={{display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6}}>
+                <span style={{fontSize:10, color:res.conviction.color, fontWeight:800, letterSpacing:0.5}}>🎯 SCORE DE CONVICTION</span>
+                <span style={{fontSize:18, color:res.conviction.color, fontWeight:900}}>{res.conviction.score}<span style={{fontSize:11, color:TEXT_DIM}}>/100</span></span>
+              </div>
+              <div style={{height:8, background:"#1a2230", borderRadius:4, overflow:"hidden", marginBottom:5}}>
+                <div style={{height:"100%", width:res.conviction.score+"%", background:res.conviction.color, borderRadius:4}}></div>
+              </div>
+              <div style={{fontSize:9, color:res.conviction.color, fontWeight:700, textAlign:"center"}}>{res.conviction.label}</div>
+              <div style={{fontSize:7.5, color:"#64748b", textAlign:"center", marginTop:4, lineHeight:1.4}}>Secteur 25 · Technique 25 · Fondamental 25 · Smart money 25</div>
+            </div>
+          )}
 
           <div style={{padding:"10px 12px", background:"#0a1220", borderRadius:8, marginBottom:10}}>
             <div style={{fontSize:10, color:BLUE, fontWeight:700, marginBottom:6}}>⚙️ TECHNIQUE — base Pete (Screener 1)</div>
@@ -440,7 +513,19 @@ function StockAnalyseView() {
                   <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>{s.hyp}</div>
                 </div>
               ))}
-              {res.valo.rr && <div style={{fontSize:10, color:TEXT2, marginTop:6, padding:"6px 8px", background:"#0a1810", borderRadius:6}}>Ratio R/R : <b style={{color: res.valo.rr>=3?GREEN:AMBER}}>{res.valo.rr}:1</b> <span style={{color:TEXT_DIM}}>(gain ${res.valo.baseGain} / risque ${res.valo.risque}, stop ${res.valo.stop})</span></div>}
+              {res.valo.rrBase && (
+                <div style={{marginTop:6, padding:"7px 9px", background:"#0a1810", borderRadius:6}}>
+                  <div style={{display:"flex", justifyContent:"space-between", marginBottom:3}}>
+                    <span style={{fontSize:9, color:TEXT_DIM}}>R/R Base Case (réaliste)</span>
+                    <span style={{fontSize:10, color: res.valo.rrBase>=3?GREEN:AMBER, fontWeight:800}}>{res.valo.rrBase}:1</span>
+                  </div>
+                  <div style={{display:"flex", justifyContent:"space-between"}}>
+                    <span style={{fontSize:9, color:TEXT_DIM}}>R/R Bull Case (optimiste)</span>
+                    <span style={{fontSize:10, color: res.valo.rrBull>=3?GREEN:AMBER, fontWeight:800}}>{res.valo.rrBull}:1</span>
+                  </div>
+                  <div style={{fontSize:7.5, color:"#64748b", marginTop:4, lineHeight:1.4}}>Risque ${res.valo.risque} (stop ${res.valo.stop}) · gain Base ${res.valo.gainBase} / Bull ${res.valo.gainBull}. {res.valo.rrBase>=3?"✅ Base Case respecte le 3:1.":"⚠️ Base Case sous 3:1 — le Bull Case doit justifier l'entrée."}</div>
+                </div>
+              )}
             </div>
           )}
 
@@ -508,19 +593,8 @@ L'effet cascade : (1) les algos détectent, (2) les analystes relèvent leurs ci
       </Accordion>
 
       <Accordion icon="🚩" titre="LE BULL FLAG EN WEEKLY — TON ENTRÉE" color={GOLD} open={a6} setOpen={setA6}>
-{`        OBJECTIF (hauteur du mat)
-              ^             /
-              |            /  <- BREAKOUT
-              |           /      (gros volume)
-          ___________    /
-         /  DRAPEAU  \\  o  <- entree
-    /\\  /  (volume    \\/
-   /  \\/    baisse)    
-  /  LE MAT            ---- stop (sous le drapeau)
- /  (forte
-/    hausse)
-
-Ton entrée se fait sur un Bull Flag (drapeau haussier), surtout en WEEKLY (position trading, semaines à mois).
+<div style={{marginBottom:10}}><BullFlagSVG /></div>
+{`Ton entrée se fait sur un Bull Flag (drapeau haussier), surtout en WEEKLY (position trading, semaines à mois).
 
 LE MÂT : forte hausse initiale, quasi verticale (le carburant).
 LE DRAPEAU : consolidation en pente légèrement descendante, encadrée par 2 droites parallèles. Le volume DIMINUE.
