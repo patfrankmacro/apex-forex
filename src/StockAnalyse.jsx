@@ -24,6 +24,19 @@ function grabPrice(txt) {
   return null;
 }
 
+function grab52(txt, label) {
+  // "52W High\n168.00 6.41%" -> on veut le 2e nombre (le %), pas le prix
+  const ls = txt.split(/\r?\n/);
+  for (let i = 0; i < ls.length - 1; i++) {
+    if (ls[i].trim() === label) {
+      const nums = ls[i+1].trim().match(/-?[0-9]+(?:\.[0-9]+)?/g);
+      if (nums && nums.length >= 2) return parseFloat(nums[1]);
+      if (nums && nums.length === 1) return parseFloat(nums[0]);
+    }
+  }
+  return null;
+}
+
 function grabGrowth(txt, label) {
   const esc = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const re = new RegExp(esc + "\\s*[\\r\\n]*\\s*(-?[0-9]+(?:\\.[0-9]+)?)\\s*%", "gi");
@@ -53,7 +66,7 @@ function analyse(raw, manualTicker) {
     perfYear: grab(t, "Perf Year"), perfQuart: grab(t, "Perf Quarter"), sma200: grab(t, "SMA200"), sma50: grab(t, "SMA50"),
     rsi: grab(t, "RSI \\(14\\)"), change: grab(t, "Change"), epsYYTTM: grab(t, "EPS Y/Y TTM"),
     salesYYTTM: grab(t, "Sales Y/Y TTM"), roe: grab(t, "ROE"), debteq: grab(t, "Debt/Eq"),
-    atr: grab(t, "ATR (14)"), beta: grab(t, "Beta"), w52high: grab(t, "52W High"), w52low: grab(t, "52W Low"),
+    atr: grab(t, "ATR (14)"), beta: grab(t, "Beta"), w52high: grab52(t, "52W High"), w52low: grab52(t, "52W Low"),
     epsNextY: grabGrowth(t, "EPS next Y"),
     fwdPE: grab(t, "Forward P/E"),
     peg: grab(t, "PEG"),
@@ -98,6 +111,7 @@ function checksFondamental(f) {
     C("Sales Q/Q > 25%", f.salesQQ, f.salesQQ!==null && f.salesQQ>25, f.salesQQ!==null?"+"+f.salesQQ+"%":"?"),
     C("Both Positive Surprise", f.epsSurpr, f.epsSurpr!==null && f.salesSurpr!==null && f.epsSurpr>0 && f.salesSurpr>0, (f.epsSurpr!==null?f.epsSurpr+"%":"?")+" / "+(f.salesSurpr!==null?f.salesSurpr+"%":"?")),
     C("Inst. Own > 10%", f.instOwn, f.instOwn!==null && f.instOwn>10, f.instOwn!==null?f.instOwn+"%":"?"),
+    C("Prix < 25% du 52W High", f.w52high, f.w52high!==null && f.w52high<=25 && f.w52high>=0, f.w52high!==null?"à "+f.w52high+"% du sommet":"?"),
   ];
 }
 
@@ -325,7 +339,8 @@ function StockAnalyseView() {
   const [res, setRes] = useState(null);
   const [a1,setA1]=useState(false),[a2,setA2]=useState(false),[a3,setA3]=useState(false),
         [a4,setA4]=useState(false),[a5,setA5]=useState(false),[a6,setA6]=useState(false),
-        [a7,setA7]=useState(false),[a8,setA8]=useState(false),[a9,setA9]=useState(false);
+        [a7,setA7]=useState(false),[a8,setA8]=useState(false),[a9,setA9]=useState(false),
+        [a10,setA10]=useState(false);
 
   const scanGroups = () => {
     if (!groupsRaw.trim()) { setGroupsRes(null); return; }
@@ -603,6 +618,35 @@ LE BREAKOUT : cassure de la droite haute sur GROS volume weekly.
 Plan : Entrée à la cassure. Stop sous le drapeau. Objectif = hauteur du mât projetée depuis le breakout, affinée avec Fibonacci.
 
 Pourquoi weekly : filtre le bruit, le volume hebdo confirme l'engagement institutionnel.`}
+      </Accordion>
+
+      <Accordion icon="🕯️" titre="L'INSIDE CANDLE — LE SETUP DE PETE" color={PURPLE} open={a10} setOpen={setA10}>
+{`L'inside candle est le signal d'entrée court terme de Pete Renzulli. Attention : Finviz ne le donne PAS — tu le repères à l'oeil sur le chart.
+
+QU'EST-CE QUE C'EST ?
+Une bougie dont le range (haut ET bas) est entierement CONTENU dans la bougie precedente. Le marche fait une pause, il se comprime.
+
+   |        Bougie mere (grande)
+   |####|
+   |####|   |        <- inside candle
+   |####|   |##|        (contenue dedans)
+   |####|   |##|
+   |
+
+POURQUOI C'EST PUISSANT ?
+La compression = les vendeurs s'epuisent, l'energie s'accumule. Quand le prix CASSE le haut de la bougie mere sur volume -> mouvement explosif. C'est le mini-equivalent du Bull Flag, mais sur 1-2 bougies.
+
+LA RECETTE COMPLETE DE PETE :
+1. INSIDE CANDLE = le setup (compression, point d'entree net)
+2. ATR = mesure la volatilite pour placer ton stop et ton objectif au bon endroit
+3. PATIENCE = attends ~15 min apres l'ouverture que le marche revele sa direction. Ne saute jamais dans les 2 premieres minutes (FOMO = tu achetes le plus haut).
+4. BEST IDEA ONLY = ne trade QUE ta meilleure idee du jour. Pas 10 trades mediocres — 1 seul trade A+.
+
+LES FOOTPRINTS DU SMART MONEY (ce que Pete cherche) :
+- Accumulation silencieuse : montee par paliers reguliers, jamais en explosion.
+- Pullbacks rachetes : chaque repli est immediatement absorbe (les fonds defendent leurs niveaux).
+- Cloture dans le haut de la bougie : ils ont tenu l'offre toute la journee.
+- Volume sur les hausses, faible sur les baisses : signature de l'accumulation.`}
       </Accordion>
 
       <Accordion icon="🏦" titre="COMMENT LES FONDS ANALYSENT" color={BLUE} open={a7} setOpen={setA7}>
