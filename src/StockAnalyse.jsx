@@ -50,10 +50,10 @@ function analyse(raw, manualTicker) {
     relvol: grab(t, "Rel Volume"), recom: grab(t, "Recom"), epsQQ: grab(t, "EPS Q/Q"),
     epsThisY: grab(t, "EPS this Y"), salesQQ: grab(t, "Sales Q/Q"), instOwn: grab(t, "Inst Own"),
     instTrans: grab(t, "Inst Trans"), insiderTrans: grab(t, "Insider Trans"), perfHalfY: grab(t, "Perf Half Y"),
-    perfYear: grab(t, "Perf Year"), perfQuart: grab(t, "Perf Quart"), sma200: grab(t, "SMA200"), sma50: grab(t, "SMA50"),
+    perfYear: grab(t, "Perf Year"), perfQuart: grab(t, "Perf Quarter"), sma200: grab(t, "SMA200"), sma50: grab(t, "SMA50"),
     rsi: grab(t, "RSI \\(14\\)"), change: grab(t, "Change"), epsYYTTM: grab(t, "EPS Y/Y TTM"),
     salesYYTTM: grab(t, "Sales Y/Y TTM"), roe: grab(t, "ROE"), debteq: grab(t, "Debt/Eq"),
-    atr: grab(t, "ATR"), beta: grab(t, "Beta"), w52high: grab(t, "52W High"), w52low: grab(t, "52W Low"),
+    atr: grab(t, "ATR (14)"), beta: grab(t, "Beta"), w52high: grab(t, "52W High"), w52low: grab(t, "52W Low"),
     epsNextY: grabGrowth(t, "EPS next Y"),
     fwdPE: grab(t, "Forward P/E"),
     peg: grab(t, "PEG"),
@@ -68,7 +68,9 @@ function analyse(raw, manualTicker) {
   f.salesSurpr = surpr && surpr[2] ? parseFloat(surpr[2]) : null;
   const secList = ["Technology","Industrials","Financial","Basic Materials","Healthcare","Real Estate","Utilities","Consumer Cyclical","Communication Services","Consumer Defensive","Energy"];
   f.sector = null;
-  for (const s of secList) { if (new RegExp(s,"i").test(t)) { f.sector = s; break; } }
+  const head = t.split(/\r?\n/).slice(0,12).join(" ");
+  for (const s of secList) { if (new RegExp(s,"i").test(head)) { f.sector = s; break; } }
+  if (!f.sector) { for (const s of secList) { if (new RegExp(s,"i").test(t)) { f.sector = s; break; } } }
   return { ticker, f };
 }
 
@@ -506,7 +508,19 @@ L'effet cascade : (1) les algos détectent, (2) les analystes relèvent leurs ci
       </Accordion>
 
       <Accordion icon="🚩" titre="LE BULL FLAG EN WEEKLY — TON ENTRÉE" color={GOLD} open={a6} setOpen={setA6}>
-{`Ton entrée se fait sur un Bull Flag (drapeau haussier), surtout en WEEKLY (position trading, semaines à mois).
+{`        OBJECTIF (hauteur du mat)
+              ^             /
+              |            /  <- BREAKOUT
+              |           /      (gros volume)
+          ___________    /
+         /  DRAPEAU  \\  o  <- entree
+    /\\  /  (volume    \\/
+   /  \\/    baisse)    
+  /  LE MAT            ---- stop (sous le drapeau)
+ /  (forte
+/    hausse)
+
+Ton entrée se fait sur un Bull Flag (drapeau haussier), surtout en WEEKLY (position trading, semaines à mois).
 
 LE MÂT : forte hausse initiale, quasi verticale (le carburant).
 LE DRAPEAU : consolidation en pente légèrement descendante, encadrée par 2 droites parallèles. Le volume DIMINUE.
