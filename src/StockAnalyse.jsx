@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 const TEXT = "#cbd5e1", TEXT_DIM = "#94a3b8", TEXT2 = "#e2e8f0";
-const GREEN = "#34d399", RED = "#f87171", AMBER = "#fbbf24", BLUE = "#38bdf8", PURPLE = "#c084fc";
+const GREEN = "#34d399", RED = "#f87171", AMBER = "#fbbf24", BLUE = "#38bdf8", PURPLE = "#c084fc", GOLD = "#d4af37";
 
 function grab(txt, label) {
   const esc = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -14,7 +14,6 @@ function grab(txt, label) {
   return v;
 }
 
-// Pour les metriques presentes 2x (valeur $ ET croissance %) : prend l'occurrence avec %
 function grabPrice(txt) {
   const ls = txt.split(/\r?\n/);
   for (let i = 0; i < ls.length - 1; i++) {
@@ -39,10 +38,8 @@ function analyse(raw, manualTicker) {
   if (manualTicker && manualTicker.trim()) {
     ticker = manualTicker.trim().toUpperCase();
   } else {
-    // Essai 1 : URL dans le texte
     const m1 = t.match(/finviz\.com\/stock\?t=([A-Za-z]+)/i);
     if (m1) ticker = m1[1].toUpperCase();
-    // Essai 2 : cherche le ticker dans l'URL du texte colle
     else {
       const m2 = t.match(/stock\?t=([A-Z]{1,6})/i);
       if (m2) ticker = m2[1].toUpperCase();
@@ -53,9 +50,10 @@ function analyse(raw, manualTicker) {
     relvol: grab(t, "Rel Volume"), recom: grab(t, "Recom"), epsQQ: grab(t, "EPS Q/Q"),
     epsThisY: grab(t, "EPS this Y"), salesQQ: grab(t, "Sales Q/Q"), instOwn: grab(t, "Inst Own"),
     instTrans: grab(t, "Inst Trans"), insiderTrans: grab(t, "Insider Trans"), perfHalfY: grab(t, "Perf Half Y"),
-    perfYear: grab(t, "Perf Year"), sma200: grab(t, "SMA200"), sma50: grab(t, "SMA50"),
+    perfYear: grab(t, "Perf Year"), perfQuart: grab(t, "Perf Quart"), sma200: grab(t, "SMA200"), sma50: grab(t, "SMA50"),
     rsi: grab(t, "RSI \\(14\\)"), change: grab(t, "Change"), epsYYTTM: grab(t, "EPS Y/Y TTM"),
     salesYYTTM: grab(t, "Sales Y/Y TTM"), roe: grab(t, "ROE"), debteq: grab(t, "Debt/Eq"),
+    atr: grab(t, "ATR"), beta: grab(t, "Beta"), w52high: grab(t, "52W High"), w52low: grab(t, "52W Low"),
     epsNextY: grabGrowth(t, "EPS next Y"),
     fwdPE: grab(t, "Forward P/E"),
     peg: grab(t, "PEG"),
@@ -68,150 +66,173 @@ function analyse(raw, manualTicker) {
   const surpr = t.match(/EPS\/Sales Surpr\.?\s*[\r\n]*\s*(-?[0-9.]+)%?\s*(-?[0-9.]+)?/i);
   f.epsSurpr = surpr ? parseFloat(surpr[1]) : null;
   f.salesSurpr = surpr && surpr[2] ? parseFloat(surpr[2]) : null;
+  const secList = ["Technology","Industrials","Financial","Basic Materials","Healthcare","Real Estate","Utilities","Consumer Cyclical","Communication Services","Consumer Defensive","Energy"];
+  f.sector = null;
+  for (const s of secList) { if (new RegExp(s,"i").test(t)) { f.sector = s; break; } }
   return { ticker, f };
 }
 
 const C = (label, val, ok, detail) => ({ label, val, ok, detail });
 
-function checks(f) {
-  const desc = [
-    C("Market Cap > 300M", f.mktcap, f.mktcap!==null && f.mktcap>300, f.mktcap!==null?(f.mktcap>=1000?(f.mktcap/1000).toFixed(2)+"B":f.mktcap.toFixed(0)+"M"):"?"),
-    C("Price > $5", f.price, f.price!==null && f.price>5, f.price!==null?"$"+f.price:"?"),
-    C("Avg Volume > 200K", f.avgvol, f.avgvol!==null && f.avgvol>0.2, f.avgvol!==null?f.avgvol.toFixed(2)+"M":"?"),
-    C("Rel Volume > 1", f.relvol, f.relvol!==null && f.relvol>1, f.relvol!==null?f.relvol.toFixed(2)+"x":"?"),
-    C("Strong Buy (Recom < 2)", f.recom, f.recom!==null && f.recom<2, f.recom!==null?f.recom.toFixed(2):"?"),
+function checksTechnique(f) {
+  return [
+    C("Price > $15", f.price, f.price!==null && f.price>15, f.price!==null?"$"+f.price:"?"),
+    C("Avg Volume > 2M", f.avgvol, f.avgvol!==null && f.avgvol>2, f.avgvol!==null?f.avgvol.toFixed(2)+"M":"?"),
+    C("ATR > 1.5", f.atr, f.atr!==null && f.atr>1.5, f.atr!==null?f.atr.toFixed(2):"?"),
+    C("Beta > 1", f.beta, f.beta!==null && f.beta>1, f.beta!==null?f.beta.toFixed(2):"?"),
+    C("Perf Quarter Up", f.perfQuart, f.perfQuart!==null && f.perfQuart>0, f.perfQuart!==null?(f.perfQuart>0?"+":"")+f.perfQuart+"%":"?"),
+    C("Change Up (jour)", f.change, f.change!==null && f.change>0, f.change!==null?(f.change>0?"+":"")+f.change+"%":"?"),
+    C("SMA50 > SMA200 (Golden Cross)", f.sma50, f.sma50!==null && f.sma200!==null && f.sma50>0 && f.sma200>0, (f.sma50!==null?"SMA50 "+(f.sma50>0?"+":"")+f.sma50+"%":"?")),
+    C("Prix > SMA200 (Stage 2)", f.sma200, f.sma200!==null && f.sma200>0, f.sma200!==null?(f.sma200>0?"+":"")+f.sma200+"%":"?"),
+    C("52W High/Low > 30%", f.w52low, f.w52low!==null && f.w52low>30, f.w52low!==null?"+"+f.w52low+"%":"?"),
   ];
-  const fond = [
+}
+
+function checksFondamental(f) {
+  return [
+    C("EPS this Year > 25%", f.epsThisY, f.epsThisY!==null && f.epsThisY>25, f.epsThisY!==null?"+"+f.epsThisY+"%":"?"),
+    C("EPS next Year > 25%", f.epsNextY, f.epsNextY!==null && f.epsNextY>25, f.epsNextY!==null?"+"+f.epsNextY+"%":"?"),
     C("EPS Q/Q > 25%", f.epsQQ, f.epsQQ!==null && f.epsQQ>25, f.epsQQ!==null?"+"+f.epsQQ+"%":"?"),
-    C("EPS this Y > 25%", f.epsThisY, f.epsThisY!==null && f.epsThisY>25, f.epsThisY!==null?"+"+f.epsThisY+"%":"?"),
-    C("EPS next Y > 25%", f.epsNextY, f.epsNextY!==null && f.epsNextY>25, f.epsNextY!==null?"+"+f.epsNextY+"%":"?"),
     C("Sales Q/Q > 25%", f.salesQQ, f.salesQQ!==null && f.salesQQ>25, f.salesQQ!==null?"+"+f.salesQQ+"%":"?"),
+    C("Both Positive Surprise", f.epsSurpr, f.epsSurpr!==null && f.salesSurpr!==null && f.epsSurpr>0 && f.salesSurpr>0, (f.epsSurpr!==null?f.epsSurpr+"%":"?")+" / "+(f.salesSurpr!==null?f.salesSurpr+"%":"?")),
     C("Inst. Own > 10%", f.instOwn, f.instOwn!==null && f.instOwn>10, f.instOwn!==null?f.instOwn+"%":"?"),
-    C("Inst. Trans positif", f.instTrans, f.instTrans!==null && f.instTrans>0, f.instTrans!==null?(f.instTrans>0?"+":"")+f.instTrans+"%":"?"),
-    C("Both Surprise positif", f.epsSurpr, f.epsSurpr!==null && f.salesSurpr!==null && f.epsSurpr>0 && f.salesSurpr>0, (f.epsSurpr!==null?f.epsSurpr+"%":"?")+" / "+(f.salesSurpr!==null?f.salesSurpr+"%":"?")),
   ];
-  const tech = [
-    C("Perf 6M > 30%", f.perfHalfY, f.perfHalfY!==null && f.perfHalfY>30, f.perfHalfY!==null?"+"+f.perfHalfY+"%":"?"),
-    C("Perf 1Y > 20%", f.perfYear, f.perfYear!==null && f.perfYear>20, f.perfYear!==null?"+"+f.perfYear+"%":"?"),
-    C("Prix > SMA200", f.sma200, f.sma200!==null && f.sma200>0, f.sma200!==null?(f.sma200>0?"+":"")+f.sma200+"%":"?"),
-    C("Prix > SMA50", f.sma50, f.sma50!==null && f.sma50>0, f.sma50!==null?(f.sma50>0?"+":"")+f.sma50+"%":"?"),
-    C("Change up (jour)", f.change, f.change!==null && f.change>0, f.change!==null?(f.change>0?"+":"")+f.change+"%":"?"),
-  ];
-  return { desc, fond, tech };
 }
 
-function vigilance(f) {
-  const v = [];
-  if (f.insiderTrans!==null && f.insiderTrans<0) v.push("Insider Trans "+f.insiderTrans+"% — les dirigeants vendent (a surveiller, pas eliminatoire).");
-  if (f.rsi!==null && f.rsi>70) v.push("RSI "+f.rsi+" — proche/en surachat. Risque de repli court terme : attends un pullback pour entrer.");
-  if (f.debteq!==null && f.debteq>1) v.push("Debt/Eq "+f.debteq+" — endettement eleve, verifie la solidite du bilan.");
-  return v;
-}
-
-
-// Valorisation institutionnelle : croise plusieurs methodes a partir des vrais multiples Finviz
 function valorisation(f) {
   const price = f.price;
-  const epsN = f.epsNextYval; // EPS prevu N+1 en $
+  const epsN = f.epsNextYval;
   const fwdPE = f.fwdPE;
   const ps = f.ps;
-  const salesM = f.salesAbs; // en millions
-  const shs = f.shsOut; // en millions
+  const salesM = f.salesAbs;
+  const shs = f.shsOut;
   if (!price || !epsN) return null;
-  const stop = +(price * 0.92).toFixed(2); // -8%
+  const stop = +(price * 0.92).toFixed(2);
   const methodes = [];
-  // 1. Forward P/E : EPS prevu x P/E actuel
   if (fwdPE) methodes.push({ nom: "Forward P/E", calc: "EPS $"+epsN+" x P/E "+fwdPE, cible: +(epsN*fwdPE).toFixed(2) });
-  // 2. Price/Sales : ventes x P/S / actions
   if (ps && salesM && shs) methodes.push({ nom: "Price/Sales", calc: "Ventes x P/S "+ps+" / "+shs+"M actions", cible: +((salesM*ps)/shs).toFixed(2) });
-  // 3. Target analystes (consensus Finviz)
   if (f.targetPrice) methodes.push({ nom: "Consensus analystes", calc: "Target Price Finviz", cible: +f.targetPrice.toFixed(2) });
-  // 4. PEG : si PEG dispo, prix justifie = EPS x (PEG x croissance)
   if (f.peg && f.epsNextY && f.peg > 0) methodes.push({ nom: "PEG", calc: "EPS $"+epsN+" x PEG "+f.peg+" x croiss "+f.epsNextY+"%", cible: +(epsN*f.peg*(f.epsNextY)).toFixed(2) });
-  // Fourchette
   const cibles = methodes.map(m=>m.cible).filter(x=>x>0 && isFinite(x));
   const low = cibles.length ? Math.min(...cibles) : null;
   const high = cibles.length ? Math.max(...cibles) : null;
-  // 3 scenarios bases sur le forward P/E reel
-  // EPS N+2 = EPS N+1 x (1 + epsNextY/100) pour projeter encore un an
   const epsF = f.epsNextYval && f.epsNextYval > 0 ? f.epsNextYval : epsN * 1.25;
-  const growthRate = f.epsNextY && f.epsNextY > 0 ? f.epsNextY/100 : 0.25;
+  let growthRate = f.epsNextY && f.epsNextY > 0 ? f.epsNextY/100 : 0.25;
+  if (growthRate > 0.5) growthRate = 0.5;
   const epsF2 = +(epsF * (1 + growthRate)).toFixed(2);
-  // P/E cible : Forward P/E actuel comme reference de marche
   const basePE = fwdPE || (price && epsF ? price/epsF : 25);
-  // Bull : EPS N+2 x PE actuel x 1.3 (acceleration + prime)
-  // Base : EPS N+2 x PE actuel (croissance continue, meme multiple)
-  // Bear : EPS N+1 x PE x 0.65 (deception)
   const scenarios = [
-    { nom: "BULL", hyp: "EPS continuent d'accelerer (+"+Math.round(growthRate*100)+"%) + marche paie une prime", pe: +(basePE*1.3).toFixed(0), prix: +(epsF2*basePE*1.3).toFixed(2), c: "#34d399" },
-    { nom: "BASE", hyp: "EPS N+2 atteints (+" +Math.round(growthRate*100)+"%), meme P/E qu'aujourd'hui", pe: +basePE.toFixed(0), prix: +(epsF2*basePE).toFixed(2), c: "#fbbf24" },
-    { nom: "BEAR", hyp: "Croissance decoit, multiples comprimes", pe: +(basePE*0.65).toFixed(0), prix: +(epsF*basePE*0.65).toFixed(2), c: "#f87171" },
+    { nom: "BULL", hyp: "EPS continuent d'accelerer (+"+Math.round(growthRate*100)+"%) + le marche paie une prime", pe: +(basePE*1.3).toFixed(0), prix: +(epsF2*basePE*1.3).toFixed(2), c: GREEN },
+    { nom: "BASE", hyp: "EPS N+2 atteints (+"+Math.round(growthRate*100)+"%), meme P/E qu'aujourd'hui", pe: +basePE.toFixed(0), prix: +(epsF2*basePE).toFixed(2), c: AMBER },
+    { nom: "BEAR", hyp: "Croissance decoit, multiples comprimes", pe: +(basePE*0.65).toFixed(0), prix: +(epsF*basePE*0.65).toFixed(2), c: RED },
   ];
-  // R/R sur le meilleur objectif realiste (Bull Case ou Target analystes)
   const bullTarget = scenarios[0].prix;
   const analystTarget = f.targetPrice || 0;
-  const objectif = Math.max(bullTarget, analystTarget > price ? analystTarget : 0, bullTarget);
+  const objectif = Math.max(bullTarget, analystTarget > price ? analystTarget : 0);
   const baseGain = objectif - price;
   const risque = price - stop;
-  const rr = risque>0 ? +(baseGain/risque).toFixed(1) : null;
+  let rr = risque>0 ? +(baseGain/risque).toFixed(1) : null;
+  if (rr && rr > 20) rr = 20;
   return { price, epsN, stop, methodes, low, high, scenarios, rr, baseGain: +baseGain.toFixed(2), risque: +risque.toFixed(2) };
+}
+
+function autoThese(f, mode, secInfo) {
+  const lines = [];
+  if (secInfo) {
+    if (secInfo.rank <= 3) {
+      lines.push("✅ SECTEUR EN TENDANCE — FEU VERT\nLe secteur "+secInfo.name+" est classe #"+secInfo.rank+"/"+secInfo.total+" sur 1 mois (+"+secInfo.month+"%) et +"+secInfo.quart+"% sur 3 mois. C'est un secteur LEADER : le smart money y deplace du capital. Regle Pete respectee — tu chasses dans le bon groupe.");
+    } else if (secInfo.rank <= 6) {
+      lines.push("⚠️ SECTEUR MOYEN — PRUDENCE\nLe secteur "+secInfo.name+" est classe #"+secInfo.rank+"/"+secInfo.total+" sur 1 mois (+"+secInfo.month+"%). Ni leader, ni a la traine. Privilegie les actions des secteurs du top 3.");
+    } else {
+      lines.push("❌ SECTEUR FAIBLE — PAS DE TRADE (regle Pete)\nLe secteur "+secInfo.name+" est classe #"+secInfo.rank+"/"+secInfo.total+" sur 1 mois ("+secInfo.month+"%). Le smart money QUITTE ce groupe. On EVITE — cherche dans les secteurs en tete du classement.");
+    }
+  } else {
+    lines.push("ℹ️ SECTEUR NON VERIFIE\nScanne d'abord la section GROUPES (en haut) pour savoir si "+(f.sector?("le secteur "+f.sector):"le secteur de cette action")+" est en tendance. Regle Pete : pas de secteur fort = pas de trade.");
+  }
+  if (f.change!==null && f.change>0) {
+    lines.push("ENERGIE INSTITUTIONNELLE — LE CARBURANT\nL'action monte aujourd'hui (+"+f.change+"%). Une cloture forte au-dessus de l'ouverture (Change from Open +2%) revele que les gros acheteurs ont tenu l'offre toute la journee. Ce sont les grosses bougies vertes pleines — le carburant d'un mouvement explosif.");
+  }
+  if (f.sma200!==null && f.sma200>0 && f.sma50!==null && f.sma50>0) {
+    lines.push("TENDANCE STAGE 2 CONFIRMEE\nPrix au-dessus de la SMA200 (+"+f.sma200+"%) et SMA50 alignee : signature d'une action en Stage 2 selon Minervini/Weinstein. Les institutions accumulent, la tendance de fond est haussiere.");
+  }
+  if (mode === 2) {
+    if (f.epsQQ!==null && f.epsThisY!==null && f.epsNextY!==null && f.epsQQ>0 && f.epsThisY>0 && f.epsNextY>0) {
+      const acc = f.epsQQ>50?"EXPLOSIVE":f.epsQQ>25?"SOLIDE":"MODEREE";
+      lines.push("ACCELERATION EPS — "+acc+"\nEPS QoQ +"+f.epsQQ+"% · EPS This Year +"+f.epsThisY+"% · EPS Next Year +"+f.epsNextY+"%. Minervini exige cette triple acceleration — moins de 2% des actions y parviennent.");
+    }
+    if (f.salesQQ!==null && f.salesQQ>0) {
+      const qual = f.salesQQ>50?"EXPLOSIVE":f.salesQQ>25?"FORTE":"CORRECTE";
+      const ventesAcc = (f.epsQQ!==null && f.epsQQ>0) ? "Ici, EPS et ventes accelerent ensemble : double validation." : "A surveiller : les EPS doivent suivre cette dynamique de ventes.";
+      lines.push("CROISSANCE DES VENTES — "+qual+"\nSales QoQ +"+f.salesQQ+"% confirme que la croissance vient de VRAIES ventes, pas de coupures de couts. "+ventesAcc);
+    }
+    if (f.epsSurpr!==null && f.salesSurpr!==null && f.epsSurpr>0 && f.salesSurpr>0) {
+      lines.push("BOTH POSITIVE SURPRISE — EFFET CASCADE\nEPS Surprise +"+f.epsSurpr+"% · Revenue Surprise +"+f.salesSurpr+"%. (1) les algos detectent → (2) les analystes relevent leurs cibles → (3) les fonds augmentent leur allocation → (4) le prix monte 10-30%.");
+    }
+    if (f.instTrans!==null && f.instTrans>0) {
+      const intensite = f.instTrans>10?"ACCUMULATION FORTE (+10%)":"ACCUMULATION EN COURS";
+      lines.push("INST. TRANSACTIONS +"+f.instTrans+"% — "+intensite+"\nLes fonds ont AUGMENTE leur position de "+f.instTrans+"%. Quand le smart money accumule en silence, c'est le signal le plus fiable. Ils achetent progressivement sur plusieurs semaines.");
+    }
+  }
+  lines.push("VERIFIE LE CLUSTER SECTORIEL\nRegle Pete : si plusieurs actions de la MEME industrie sortent ensemble dans ton scan (ex: 3-4 semi-conducteurs), c'est la preuve que les institutions accumulent tout le groupe. C'est la que sont les trades les plus explosifs.");
+  if (lines.length===0) return "Donnees insuffisantes. Verifie que tu as colle le tableau complet de Finviz.";
+  return lines.join("\n\n---\n\n");
 }
 
 function autoVigilance(f) {
   const lines = [];
-  if (f.insiderTrans!==null && f.insiderTrans<-20) lines.push("Insider Trans "+f.insiderTrans+"% → les DIRIGEANTS vendent massivement. Ils connaissent mieux que quiconque l'avenir de l'entreprise. A surveiller de pres.");
-  if (f.rsi!==null && f.rsi>70) lines.push("RSI "+f.rsi+" → zone de surachat (>70). Risque de correction technique a court terme. Attends un repli avant d'entrer.");
-  if (f.rsi!==null && f.rsi>65 && f.rsi<=70) lines.push("RSI "+f.rsi+" → proche de la zone de surachat (70). Peu de marge. Surveille une consolidation avant le breakout.");
-  const profitM = f.netMargin || null;
-  if (f.roe!==null && f.roe<10) lines.push("ROE "+f.roe+"% → rendement sur capital faible (<10%). La rentabilite reste fragile — surveille l'evolution des marges.");
-  if (f.debteq!==null && f.debteq>1) lines.push("Debt/Equity "+f.debteq+" → endettement eleve. En cas de ralentissement, la dette peut peser sur la croissance.");
-  if (f.instTrans!==null && f.instTrans<0) lines.push("Inst. Trans "+f.instTrans+"% → les FONDS institutionnels reduisent leur position. Le smart money sort — surveille si ca continue.");
-  if (f.relvol!==null && f.relvol<1.5) lines.push("Rel Volume "+f.relvol+"x → volume relatif faible. Le breakout n'est pas encore confirme par un volume fort.");
-  if (lines.length===0) lines.push("Aucun signal de vigilance majeur detecte sur les donnees disponibles. Reste vigilant sur le chart (VCP, volume).");
+  if (f.insiderTrans!==null && f.insiderTrans<-20) lines.push("Insider Trans "+f.insiderTrans+"% → les DIRIGEANTS vendent massivement. A surveiller de pres.");
+  else if (f.insiderTrans!==null && f.insiderTrans<0) lines.push("Insider Trans "+f.insiderTrans+"% → ventes de dirigeants. A surveiller.");
+  if (f.rsi!==null && f.rsi>70) lines.push("RSI "+f.rsi+" → surachat (>70). Risque de repli. Attends un pullback / une consolidation du drapeau avant d'entrer.");
+  else if (f.rsi!==null && f.rsi>65) lines.push("RSI "+f.rsi+" → proche surachat (70). Surveille une consolidation.");
+  if (f.roe!==null && f.roe<10) lines.push("ROE "+f.roe+"% → rendement sur capital faible (<10%). Rentabilite fragile.");
+  if (f.debteq!==null && f.debteq>1) lines.push("Debt/Equity "+f.debteq+" → endettement eleve. Vulnerable en cas de ralentissement.");
+  if (f.instTrans!==null && f.instTrans<0) lines.push("Inst. Trans "+f.instTrans+"% → les FONDS reduisent leur position. Le smart money sort.");
+  if (f.relvol!==null && f.relvol<1.5) lines.push("Rel Volume "+f.relvol+"x → volume relatif faible. Le breakout n'est pas confirme par un gros volume.");
+  if (lines.length===0) lines.push("Aucun signal de vigilance majeur. Reste vigilant sur le chart (Bull Flag, volume du breakout).");
   return lines.join("\n\n");
 }
 
-function autoThese(f) {
-  const lines = [];
-
-  // 1. ACCELERATION EPS
-  if (f.epsQQ!==null && f.epsThisY!==null && f.epsNextY!==null && f.epsQQ>0 && f.epsThisY>0 && f.epsNextY>0) {
-    const acc = f.epsQQ>50?"EXPLOSIVE":f.epsQQ>25?"SOLIDE":"MODEREE";
-    const det = f.epsQQ>50?"Les algorithmes institutionnels le detectent en temps reel et declenchent des ordres automatiques.":"Confirme que la machine de croissance est en marche et que les analystes vont relever leurs estimations.";
-    lines.push("ACCELERATION EPS — "+acc+"\nEPS QoQ +"+f.epsQQ+"% (ce trimestre vs trimestre precedent) · EPS This Year +"+f.epsThisY+"% (tendance annuelle confirmee) · EPS Next Year +"+f.epsNextY+"% (visibilite future validee par les analystes).\n"+det+" Minervini exige cette triple acceleration — moins de 2% des actions y parviennent.");
+function parseGroups(raw) {
+  const lines = raw.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  const sectors = [];
+  for (const ln of lines) {
+    const parts = ln.split(/\t+|\s{2,}/).map(p=>p.trim()).filter(Boolean);
+    if (parts.length < 5) continue;
+    let idx = 0;
+    if (/^[0-9]+$/.test(parts[0])) idx = 1;
+    const name = parts[idx];
+    if (!name || /perf|name|volume/i.test(name)) continue;
+    const nums = parts.slice(idx+1).map(p=>{
+      const m = p.match(/(-?[0-9]+(?:\.[0-9]+)?)%/);
+      return m ? parseFloat(m[1]) : null;
+    }).filter(x=>x!==null);
+    if (nums.length < 3) continue;
+    sectors.push({ name, week: nums[0], month: nums[1], quart: nums[2] });
   }
+  return sectors;
+}
 
-  // 2. VENTES
-  if (f.salesQQ!==null && f.salesQQ>0) {
-    const qual = f.salesQQ>50?"EXPLOSIVE":f.salesQQ>25?"FORTE":"CORRECTE";
-    lines.push("CROISSANCE DES VENTES — "+qual+"\nSales QoQ +"+f.salesQQ+"% confirme que la croissance des EPS vient de VRAIES ventes supplementaires, pas de coupures de couts. Un fonds institutionnel refuse d'investir si les EPS croissent mais pas les ventes. Ici les deux accelerent ensemble : double validation de la qualite fondamentale.");
+function analyseGroups(sectors) {
+  if (!sectors.length) return null;
+  const byMonth = [...sectors].sort((a,b)=>b.month-a.month);
+  const top3 = byMonth.slice(0,3);
+  const bottom3 = byMonth.slice(-3).reverse();
+  const def = sectors.find(s=>/defensive/i.test(s.name));
+  const tech = sectors.find(s=>/technolog/i.test(s.name));
+  let regime = "NEUTRE";
+  if (tech && def) {
+    if (tech.month > def.month + 3) regime = "RISK-ON";
+    else if (def.month > tech.month + 3) regime = "RISK-OFF";
   }
+  return { byMonth, top3, bottom3, regime };
+}
 
-  // 3. BOTH POSITIVE
-  if (f.epsSurpr!==null && f.salesSurpr!==null && f.epsSurpr>0 && f.salesSurpr>0) {
-    lines.push("BOTH POSITIVE SURPRISE — EFFET CASCADE DECLENCHE\nEPS Surprise +"+f.epsSurpr+"% · Revenue Surprise +"+f.salesSurpr+"%.\nCe qui se passe dans les minutes qui suivent : (1) Les algorithmes detectent la double surprise → (2) Les analystes relevent leurs estimations → (3) Les fonds augmentent leur allocation → (4) Le prix monte 10-30% rapidement. Notre screener capture le debut de ce cycle.");
-  }
-
-  // 4. ROE
-  if (f.roe!==null && f.roe>17) {
-    lines.push("ROE "+f.roe+"% — AU-DESSUS DU SEUIL MINERVINI (17%)\nPour chaque 100$ investis par les actionnaires, l'entreprise genere "+f.roe+"$ de profit net. Les fonds institutionnels comparent ce ratio entre toutes les entreprises du secteur. Un ROE superieur signal un avantage competitif durable et une qualite de management rare.");
-  }
-
-  // 5. BILAN
-  if (f.debteq!==null && f.debteq>=0 && f.debteq<0.3) {
-    lines.push("BILAN SAIN — Debt/Equity "+f.debteq+"\nQuasi zero dette. L'entreprise se finance par sa propre croissance. En cas de ralentissement ou de hausse des taux, elle n'est pas vulnerable. Les fonds institutionnels evitent les entreprises sur-endettees — un bilan sain est un critere eliminatoire pour beaucoup de gestionnaires.");
-  } else if (f.debteq!==null && f.debteq>=0.3 && f.debteq<1) {
-    lines.push("DETTE MODEREE — Debt/Equity "+f.debteq+"\nNiveau acceptable mais a surveiller. Si la croissance ralentit, la dette peut devenir un fardeau. Les fonds tolerent ce niveau si les EPS justifient l'endettement.");
-  }
-
-  // 6. INST TRANS
-  if (f.instTrans!==null && f.instTrans>0) {
-    const intensite = f.instTrans>10?"ACCUMULATION FORTE (+10%)":"ACCUMULATION EN COURS";
-    lines.push("INST. TRANSACTIONS +"+f.instTrans+"% — "+intensite+"\nLes fonds institutionnels (BlackRock, Vanguard, Fidelity...) ont AUGMENTE leur position de "+f.instTrans+"%. Ces equipes gerent des milliards avec des analystes et modeles inaccessibles au public. Quand le smart money accumule en silence — c'est le signal le plus fiable qui existe. Ils achetent progressivement sur plusieurs semaines pour ne pas faire monter le prix : c'est exactement ce qui cree le VCP sur le chart.");
-  }
-
-  if (lines.length===0) return "Donnees insuffisantes. Verifie que tu as colle le tableau complet de Finviz.";
-  return lines.join("\n\n---\n\n");
+function sectorOfTicker(f, groups) {
+  if (!groups || !f.sector) return null;
+  const g = groups.byMonth.find(s=>s.name.toLowerCase().includes(f.sector.toLowerCase()) || f.sector.toLowerCase().includes(s.name.toLowerCase()));
+  if (!g) return null;
+  const rank = groups.byMonth.indexOf(g)+1;
+  return { ...g, rank, total: groups.byMonth.length };
 }
 
 function Row({ c }) {
@@ -223,48 +244,112 @@ function Row({ c }) {
   );
 }
 
+function Accordion({ icon, titre, color, open, setOpen, children }) {
+  return (
+    <div style={{marginBottom:7, background:"#0a1018", borderRadius:8, border:"1px solid #1a2230", overflow:"hidden"}}>
+      <div onClick={()=>setOpen(!open)} style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 12px", cursor:"pointer"}}>
+        <span style={{fontSize:10, color:color, fontWeight:800, letterSpacing:0.5}}>{icon} {titre}</span>
+        <span style={{fontSize:11, color:color}}>{open?"▲":"▼"}</span>
+      </div>
+      {open && <div style={{padding:"0 12px 12px 12px", fontSize:9, color:TEXT, lineHeight:1.65, whiteSpace:"pre-wrap"}}>{children}</div>}
+    </div>
+  );
+}
+
 function StockAnalyseView() {
   const [raw, setRaw] = useState("");
   const [ticker, setTicker] = useState("");
-  const [catalyseur, setCatalyseur] = useState("");
-  const [theseGrowth, setTheseGrowth] = useState("");
-  const [risques, setRisques] = useState("");
-  const [openThese, setOpenThese] = useState(false);
+  const [groupsRaw, setGroupsRaw] = useState("");
+  const [groupsRes, setGroupsRes] = useState(null);
+  const [openGroups, setOpenGroups] = useState(false);
   const [res, setRes] = useState(null);
-  const [openStrat, setOpenStrat] = useState(false);
-  const [openRisk, setOpenRisk] = useState(false);
-  const [openVcp, setOpenVcp] = useState(false);
-  const [openCascade, setOpenCascade] = useState(false);
-  const [openFonds, setOpenFonds] = useState(false);
-  const [openHigh, setOpenHigh] = useState(false);
-  const [openType, setOpenType] = useState(false);
-  const [openRoutine, setOpenRoutine] = useState(false);
-  const [openFiltres, setOpenFiltres] = useState(false);
+  const [a1,setA1]=useState(false),[a2,setA2]=useState(false),[a3,setA3]=useState(false),
+        [a4,setA4]=useState(false),[a5,setA5]=useState(false),[a6,setA6]=useState(false),
+        [a7,setA7]=useState(false),[a8,setA8]=useState(false),[a9,setA9]=useState(false);
+
+  const scanGroups = () => {
+    if (!groupsRaw.trim()) { setGroupsRes(null); return; }
+    const sectors = parseGroups(groupsRaw);
+    setGroupsRes(analyseGroups(sectors));
+  };
 
   const run = () => {
     if (!raw.trim()) { setRes({error:"Colle d'abord le tableau de stats Finviz de l'action."}); return; }
     const { ticker: tk, f } = analyse(raw, ticker);
-    const ch = checks(f);
-    const all = [...ch.desc, ...ch.fond, ...ch.tech];
-    const passed = all.filter(c=>c.ok).length;
-    const total = all.length;
-    setRes({ ticker: tk, f, ch, passed, total, vig: vigilance(f), valo: valorisation(f) });
+    const secInfo = sectorOfTicker(f, groupsRes);
+    const tech = checksTechnique(f);
+    const s1passed = tech.filter(c=>c.ok).length;
+    const s1total = tech.length;
+    const fond = checksFondamental(f);
+    const s2all = [...tech, ...fond];
+    const s2passed = s2all.filter(c=>c.ok).length;
+    const s2total = s2all.length;
+    setRes({
+      ticker: tk, f, tech, fond, secInfo,
+      s1passed, s1total, s2passed, s2total,
+      these: autoThese(f, 2, secInfo), vig: autoVigilance(f), valo: valorisation(f),
+    });
   };
 
   return (
     <div style={{maxWidth:540, margin:"0 auto", padding:"0 4px"}}>
       <div style={{textAlign:"center", marginBottom:10}}>
         <div style={{fontSize:15, color:PURPLE, fontWeight:900, letterSpacing:1.5, marginBottom:5}}>📊 STOCK ANALYSE</div>
-        <div style={{fontSize:9, color:PURPLE+"aa", fontWeight:700, letterSpacing:2}}>METHODE MINERVINI SEPA · SCREENER FINVIZ</div>
+        <div style={{fontSize:9, color:PURPLE+"aa", fontWeight:700, letterSpacing:1}}>SECTEUR → 2 SCREENERS → BULL FLAG · PETE + MINERVINI</div>
       </div>
 
       <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:10, padding:"8px 10px", background:"#0d0a18", borderRadius:8, border:"1px solid #2a1f3a"}}>
-        Va sur <b style={{color:PURPLE}}>finviz.com/stock?t=TICKER</b>, copie le tableau de stats complet (Market Cap, EPS, SMA200, Volume...) et colle-le ci-dessous. L'app verifie les filtres SEPA de Minervini et te donne le verdict.
+        Va sur <b style={{color:PURPLE}}>finviz.com/stock?t=TICKER</b>, copie le tableau de stats complet et colle-le ci-dessous. L'app analyse les <b style={{color:BLUE}}>2 screeners d'un coup</b> : Technique (Pete) + Technique & Fondamental (Minervini).
       </div>
 
-      <input value={ticker} onChange={e=>setTicker(e.target.value)} placeholder="⚠️ TICKER OBLIGATOIRE (ex: ASYS, RSI, BTSG...)"
+      <div style={{marginBottom:10, background:"#0a1018", borderRadius:8, border:"1px solid #1a2230", overflow:"hidden"}}>
+        <div onClick={()=>setOpenGroups(!openGroups)} style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 12px", cursor:"pointer"}}>
+          <span style={{fontSize:10, color:GOLD, fontWeight:800, letterSpacing:0.5}}>🔄 1. SCAN SECTEURS (GROUPS) — à faire en premier</span>
+          <span style={{fontSize:11, color:GOLD}}>{openGroups?"▲":"▼"}</span>
+        </div>
+        {openGroups && (
+          <div style={{padding:"0 12px 12px 12px"}}>
+            <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:8}}>
+              Va sur <b style={{color:GOLD}}>finviz.com/groups</b> (Sector, trié par Perf Month), copie le tableau et colle-le ici.
+            </div>
+            <textarea value={groupsRaw} onChange={e=>setGroupsRaw(e.target.value)} placeholder="Colle le tableau Groups Finviz (Name, Perf Week, Perf Month, Perf Quart...)"
+              style={{width:"100%", minHeight:70, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:8, padding:10, fontSize:8.5, fontFamily:"monospace", boxSizing:"border-box", marginBottom:8}} />
+            <button onClick={scanGroups} style={{width:"100%", padding:"9px", background:GOLD, color:"#1a1505", border:"none", borderRadius:8, fontSize:11, fontWeight:900, letterSpacing:0.5, cursor:"pointer"}}>📊 SCANNER LES SECTEURS</button>
+            <a href="https://finviz.com/groups?g=sector&v=140&o=-perf4w" target="_blank" rel="noreferrer" style={{display:"block", textAlign:"center", fontSize:9, color:GOLD, marginTop:6}}>🔗 Ouvrir Groups Finviz ↗</a>
+            {groupsRes && (
+              <div style={{marginTop:10}}>
+                <div style={{padding:"8px 10px", borderRadius:8, marginBottom:8, textAlign:"center", background: groupsRes.regime==="RISK-ON"?"#052010":groupsRes.regime==="RISK-OFF"?"#200505":"#1a1500", border:"1px solid "+(groupsRes.regime==="RISK-ON"?GREEN:groupsRes.regime==="RISK-OFF"?RED:AMBER)+"55"}}>
+                  <span style={{fontSize:11, fontWeight:800, color: groupsRes.regime==="RISK-ON"?GREEN:groupsRes.regime==="RISK-OFF"?RED:AMBER}}>
+                    {groupsRes.regime==="RISK-ON"?"🟢 RISK-ON — cycliques mènent":groupsRes.regime==="RISK-OFF"?"🔴 RISK-OFF — défensifs mènent":"🟡 RÉGIME NEUTRE"}
+                  </span>
+                </div>
+                <div style={{padding:"8px 10px", background:"#052010", borderRadius:8, marginBottom:6, border:"1px solid #14321f"}}>
+                  <div style={{fontSize:9, color:GREEN, fontWeight:800, marginBottom:4}}>🏆 TOP 3 — chasse ici</div>
+                  {groupsRes.top3.map((s,i)=>(
+                    <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
+                      <span style={{fontSize:9, color:TEXT2}}>{i+1}. {s.name}</span>
+                      <span style={{fontSize:8.5, color:GREEN, fontWeight:700}}>1M +{s.month}% · 3M +{s.quart}%</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{padding:"8px 10px", background:"#200505", borderRadius:8, border:"1px solid #3a1f1f"}}>
+                  <div style={{fontSize:9, color:RED, fontWeight:800, marginBottom:4}}>🚫 BOTTOM 3 — évite</div>
+                  {groupsRes.bottom3.map((s,i)=>(
+                    <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
+                      <span style={{fontSize:9, color:TEXT2}}>{s.name}</span>
+                      <span style={{fontSize:8.5, color:RED, fontWeight:700}}>1M {s.month>0?"+":""}{s.month}% · 3M {s.quart>0?"+":""}{s.quart}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <input value={ticker} onChange={e=>setTicker(e.target.value)} placeholder="⚠️ TICKER OBLIGATOIRE (ex: ENTG, ALAB, RSI...)"
         style={{width:"100%", background:"#0a0a12", color:"#c084fc", border:"1px solid #2a1f3a", borderRadius:8, padding:"9px 10px", fontSize:12, fontWeight:800, letterSpacing:1, fontFamily:"monospace", boxSizing:"border-box", marginBottom:8, textTransform:"uppercase"}} />
-      <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici le tableau de stats Finviz (P/E, EPS Q/Q, SMA200, Inst Trans...)"
+      <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici le tableau de stats Finviz (Price, ATR, Beta, EPS Q/Q, SMA200...)"
         style={{width:"100%", minHeight:90, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:8, padding:10, fontSize:9, fontFamily:"monospace", boxSizing:"border-box", marginBottom:8}} />
 
       <button onClick={run} style={{width:"100%", padding:"11px", background:PURPLE, color:"#1a0a2a", border:"none", borderRadius:8, fontSize:12, fontWeight:900, letterSpacing:1, cursor:"pointer", marginBottom:6}}>⚡ ANALYSER</button>
@@ -273,209 +358,205 @@ function StockAnalyseView() {
       {res?.error && <div style={{fontSize:9, color:AMBER, padding:"10px 12px", background:"#1a1500", borderRadius:8, lineHeight:1.5}}>{res.error}</div>}
 
       {res?.ticker && (() => {
-        const pct = Math.round(res.passed/res.total*100);
-        const verdict = pct>=85 ? {t:"✅ CANDIDATE SEPA", c:GREEN, bg:"#052010"} : pct>=65 ? {t:"⚠️ PARTIELLE — analyse fine", c:AMBER, bg:"#1a1500"} : {t:"❌ NE PASSE PAS", c:RED, bg:"#200505"};
+        const s1pct = Math.round(res.s1passed/res.s1total*100);
+        const s2pct = Math.round(res.s2passed/res.s2total*100);
+        const verdictOf = (pct) => pct>=85 ? {t:"✅ VALIDE", c:GREEN, bg:"#052010"} : pct>=65 ? {t:"⚠️ PARTIEL", c:AMBER, bg:"#1a1500"} : {t:"❌ NON", c:RED, bg:"#200505"};
+        const v1 = verdictOf(s1pct);
+        const v2 = verdictOf(s2pct);
         return (
         <div>
-          <div style={{padding:"12px 14px", background:verdict.bg, borderRadius:10, border:"1px solid "+verdict.c+"55", marginBottom:12, textAlign:"center"}}>
-            <div style={{fontSize:16, color:TEXT2, fontWeight:900, marginBottom:3}}>{res.ticker}</div>
-            <div style={{fontSize:13, color:verdict.c, fontWeight:800, marginBottom:4}}>{verdict.t}</div>
-            <div style={{fontSize:10, color:TEXT_DIM}}>{res.passed}/{res.total} filtres ({pct}%)</div>
+          <div style={{textAlign:"center", marginBottom:10}}>
+            <div style={{fontSize:18, color:TEXT2, fontWeight:900}}>{res.ticker}</div>
+            {res.secInfo ? (
+              <div style={{display:"inline-block", marginTop:4, padding:"3px 10px", borderRadius:20, fontSize:9, fontWeight:800,
+                background: res.secInfo.rank<=3?"#052010":"#200505",
+                color: res.secInfo.rank<=3?GREEN:RED,
+                border:"1px solid "+(res.secInfo.rank<=3?GREEN:RED)+"55"}}>
+                {res.secInfo.rank<=3?"✅":"❌"} {res.secInfo.name} · #{res.secInfo.rank}/{res.secInfo.total} secteurs
+              </div>
+            ) : (
+              <div style={{display:"inline-block", marginTop:4, padding:"3px 10px", borderRadius:20, fontSize:9, fontWeight:700, background:"#1a1500", color:AMBER, border:"1px solid "+AMBER+"44"}}>
+                ℹ️ Scanne les SECTEURS (en haut) pour valider la tendance
+              </div>
+            )}
+          </div>
+
+          <div style={{display:"flex", gap:8, marginBottom:12}}>
+            <div style={{flex:1, padding:"10px 8px", background:v1.bg, borderRadius:10, border:"1px solid "+v1.c+"55", textAlign:"center"}}>
+              <div style={{fontSize:9, color:BLUE, fontWeight:800, marginBottom:3}}>⚙️ S1 · TECHNIQUE</div>
+              <div style={{fontSize:11, color:v1.c, fontWeight:800}}>{v1.t}</div>
+              <div style={{fontSize:9, color:TEXT_DIM, marginTop:2}}>{res.s1passed}/{res.s1total} ({s1pct}%)</div>
+            </div>
+            <div style={{flex:1, padding:"10px 8px", background:v2.bg, borderRadius:10, border:"1px solid "+v2.c+"55", textAlign:"center"}}>
+              <div style={{fontSize:9, color:GREEN, fontWeight:800, marginBottom:3}}>📈 S2 · TECH + FONDA</div>
+              <div style={{fontSize:11, color:v2.c, fontWeight:800}}>{v2.t}</div>
+              <div style={{fontSize:9, color:TEXT_DIM, marginTop:2}}>{res.s2passed}/{res.s2total} ({s2pct}%)</div>
+            </div>
           </div>
 
           <div style={{padding:"10px 12px", background:"#0a1220", borderRadius:8, marginBottom:10}}>
-            <div style={{fontSize:10, color:BLUE, fontWeight:700, marginBottom:6}}>📋 DESCRIPTIFS — le terrain de chasse</div>
-            {res.ch.desc.map((c,i)=><Row key={i} c={c} />)}
-          </div>
-          <div style={{padding:"10px 12px", background:"#0a1220", borderRadius:8, marginBottom:10}}>
-            <div style={{fontSize:10, color:GREEN, fontWeight:700, marginBottom:6}}>📈 FONDAMENTAUX — l'acceleration</div>
-            {res.ch.fond.map((c,i)=><Row key={i} c={c} />)}
-          </div>
-          <div style={{padding:"10px 12px", background:"#0a1220", borderRadius:8, marginBottom:10}}>
-            <div style={{fontSize:10, color:AMBER, fontWeight:700, marginBottom:6}}>📉 TECHNIQUES — la tendance</div>
-            {res.ch.tech.map((c,i)=><Row key={i} c={c} />)}
+            <div style={{fontSize:10, color:BLUE, fontWeight:700, marginBottom:6}}>⚙️ TECHNIQUE — base Pete (Screener 1)</div>
+            {res.tech.map((c,i)=><Row key={i} c={c} />)}
           </div>
 
-          {res.vig.length>0 && (
-            <div style={{padding:"10px 12px", background:"#1a1500", borderRadius:8, marginBottom:10, border:"1px solid #3a2a1f"}}>
-              <div style={{fontSize:10, color:AMBER, fontWeight:700, marginBottom:5}}>⚠️ POINTS DE VIGILANCE</div>
-              {res.vig.map((v,i)=><div key={i} style={{fontSize:8.5, color:TEXT, lineHeight:1.55, marginBottom:3}}>• {v}</div>)}
+          <div style={{padding:"10px 12px", background:"#0a1220", borderRadius:8, marginBottom:10}}>
+            <div style={{fontSize:10, color:GREEN, fontWeight:700, marginBottom:6}}>📈 FONDAMENTAL — couche Minervini (Screener 2)</div>
+            {res.fond.map((c,i)=><Row key={i} c={c} />)}
+          </div>
+
+          <div style={{padding:"10px 12px", background:"#0a1810", borderRadius:8, marginBottom:10, border:"1px solid #14321f"}}>
+            <div style={{fontSize:10, color:GREEN, fontWeight:700, marginBottom:6}}>🧠 THÈSE — POURQUOI LE SMART MONEY EST LÀ</div>
+            <div style={{fontSize:9, color:TEXT, lineHeight:1.65, whiteSpace:"pre-wrap"}}>{res.these}</div>
+          </div>
+
+          <div style={{padding:"10px 12px", background:"#1a1500", borderRadius:8, marginBottom:10, border:"1px solid #3a2a1f"}}>
+            <div style={{fontSize:10, color:AMBER, fontWeight:700, marginBottom:6}}>⚠️ VIGILANCE</div>
+            <div style={{fontSize:9, color:TEXT, lineHeight:1.65, whiteSpace:"pre-wrap"}}>{res.vig}</div>
+          </div>
+
+          {res.valo && (
+            <div style={{padding:"10px 12px", background:"#0a1220", borderRadius:8, marginBottom:10, border:"1px solid #1a2a3a"}}>
+              <div style={{fontSize:10, color:BLUE, fontWeight:700, marginBottom:8}}>💰 VALORISATION — 4 MÉTHODES</div>
+              {res.valo.methodes.map((m,i)=>(
+                <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"3px 0", borderBottom:"1px solid #1e293b"}}>
+                  <span style={{fontSize:8.5, color:TEXT_DIM}}>{m.nom} <span style={{color:"#475569"}}>({m.calc})</span></span>
+                  <span style={{fontSize:9, color:BLUE, fontWeight:700}}>${m.cible}</span>
+                </div>
+              ))}
+              {res.valo.low && <div style={{fontSize:9, color:TEXT2, marginTop:6}}>Fourchette : <b style={{color:GREEN}}>${res.valo.low}</b> — <b style={{color:GREEN}}>${res.valo.high}</b></div>}
             </div>
           )}
 
-          <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
-            <div style={{fontSize:10, color:PURPLE, fontWeight:700, marginBottom:5}}>🔍 À VÉRIFIER À L'ŒIL (Finviz ne le donne pas)</div>
-            <div style={{fontSize:8.5, color:TEXT, lineHeight:1.55, marginBottom:3}}>• <b>Le VCP</b> : sur le chart, cherche 3-4 contractions de moins en moins profondes, volume qui baisse. C'est LA signature de l'accumulation institutionnelle.</div>
-            <div style={{fontSize:8.5, color:TEXT, lineHeight:1.55, marginBottom:3}}>• <b>50-Day New High</b> : le prix casse-t-il son plus haut des 50 derniers jours sur gros volume ? = le breakout.</div>
-            <div style={{fontSize:8.5, color:TEXT, lineHeight:1.55}}>• <b>Golden Cross</b> : SMA50 réellement au-dessus de SMA200 sur le chart.</div>
-          </div>
-
-          <div style={{padding:"10px 12px", background:"#052010", borderRadius:8, marginBottom:14, border:"1px solid #1a3a2a"}}>
-            <div style={{fontSize:10, color:GREEN, fontWeight:700, marginBottom:5}}>🎯 SI TU ENTRES — LES RÈGLES DE RISQUE</div>
-            <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}>Stop loss <b style={{color:RED}}>-7 à -8%</b> sous l'entrée, sans exception · Ratio R/R <b style={{color:GREEN}}>min 3:1</b> (stop -8% = objectif +24%) · Position <b>max 10-15%</b> du portefeuille · Jamais moyenner à la baisse · Entre <b>au breakout du VCP</b>, jamais avant.</div>
-          </div>
           {res.valo && (
-          <div style={{padding:"12px 14px", background:"#0d0a18", borderRadius:10, marginBottom:14, border:"1px solid #2a1f3a"}}>
-            <div style={{fontSize:11, color:PURPLE, fontWeight:800, marginBottom:8, textAlign:"center"}}>🏛️ THÈSE INSTITUTIONNELLE — {res.ticker}</div>
-
-            <div style={{fontSize:9.5, color:PURPLE, fontWeight:700, marginBottom:5}}>💰 VALORISATION — 4 méthodes croisées</div>
-            {res.valo.methodes.map((m,i)=>(
-              <div key={i} style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"3px 0", borderBottom:"1px solid #1e293b"}}>
-                <span style={{fontSize:8, color:TEXT_DIM}}>{m.nom} <span style={{color:"#64748b"}}>({m.calc})</span></span>
-                <span style={{fontSize:9, color:TEXT2, fontWeight:700}}>${m.cible}</span>
-              </div>
-            ))}
-            {res.valo.low!==null && <div style={{fontSize:8.5, color:GREEN, marginTop:5, fontWeight:600, lineHeight:1.5}}>→ Valeur converge entre ${res.valo.low} et ${res.valo.high} · prix actuel ${res.valo.price}</div>}
-
-            <div style={{fontSize:9.5, color:PURPLE, fontWeight:700, marginTop:10, marginBottom:5}}>🎲 LES 3 SCÉNARIOS</div>
-            {res.valo.scenarios.map((s,i)=>(
-              <div key={i} style={{padding:"6px 8px", background:"#0a0a12", borderRadius:5, marginBottom:4, borderLeft:"3px solid "+s.c}}>
-                <div style={{display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-                  <span style={{fontSize:9, color:s.c, fontWeight:800}}>{s.nom} CASE</span>
-                  <span style={{fontSize:9.5, color:TEXT2, fontWeight:700}}>${s.prix} <span style={{fontSize:7.5, color:TEXT_DIM}}>(P/E {s.pe}x)</span></span>
+            <div style={{padding:"10px 12px", background:"#0a1220", borderRadius:8, marginBottom:10, border:"1px solid #1a2a3a"}}>
+              <div style={{fontSize:10, color:PURPLE, fontWeight:700, marginBottom:8}}>🎯 3 SCÉNARIOS</div>
+              {res.valo.scenarios.map((s,i)=>(
+                <div key={i} style={{marginBottom:7}}>
+                  <div style={{display:"flex", justifyContent:"space-between"}}>
+                    <span style={{fontSize:10, color:s.c, fontWeight:800}}>{s.nom} — ${s.prix} <span style={{color:TEXT_DIM, fontWeight:400}}>(P/E {s.pe})</span></span>
+                  </div>
+                  <div style={{fontSize:8, color:TEXT_DIM, lineHeight:1.4}}>{s.hyp}</div>
                 </div>
-                <div style={{fontSize:7.5, color:TEXT_DIM, lineHeight:1.4, marginTop:2}}>{s.hyp}</div>
-                <div style={{fontSize:7.5, color: s.prix>res.valo.price?GREEN:RED, marginTop:2, fontWeight:600}}>{s.prix>res.valo.price?"+":""}{(((s.prix-res.valo.price)/res.valo.price)*100).toFixed(0)}% vs prix actuel</div>
-              </div>
-            ))}
-
-            <div style={{fontSize:9, color:TEXT, padding:"7px 9px", background:"#052010", borderRadius:5, marginTop:6, lineHeight:1.5, fontWeight:600}}>
-              📐 Ratio R/R (Bull/Target) : <b style={{color: res.valo.rr>=3?GREEN:AMBER}}>{res.valo.rr}:1</b> — gain potentiel +${res.valo.baseGain} vs risque -${res.valo.risque} (stop ${res.valo.stop}). {res.valo.rr>=3?"✅ Respecte le minimum 3:1 de Minervini.":"⚠️ Sous le 3:1 — le Bull Case pourrait justifier, sinon passe."}
+              ))}
+              {res.valo.rr && <div style={{fontSize:10, color:TEXT2, marginTop:6, padding:"6px 8px", background:"#0a1810", borderRadius:6}}>Ratio R/R : <b style={{color: res.valo.rr>=3?GREEN:AMBER}}>{res.valo.rr}:1</b> <span style={{color:TEXT_DIM}}>(gain ${res.valo.baseGain} / risque ${res.valo.risque}, stop ${res.valo.stop})</span></div>}
             </div>
+          )}
 
-            <div style={{fontSize:9.5, color:PURPLE, fontWeight:700, marginTop:12, marginBottom:5}}>✍️ TA THÈSE — remplis le qualitatif</div>
-            <div style={{fontSize:7.5, color:TEXT_DIM, marginBottom:4}}>L'app calcule les chiffres. À toi d'écrire l'histoire (comme un analyste).</div>
-            <textarea value={catalyseur} onChange={e=>setCatalyseur(e.target.value)} placeholder="LE CATALYSEUR MACRO — pourquoi maintenant ? (nouveau marché, loi, produit, contrat...)"
-              style={{width:"100%", minHeight:42, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:6, padding:8, fontSize:8.5, fontFamily:"inherit", boxSizing:"border-box", marginBottom:5}} />
-            {res.valo && autoThese(res.f) && (
-              <div style={{width:"100%", background:"#051a05", border:"1px solid #1a3a1a", borderRadius:6, padding:8, fontSize:8.5, color:GREEN, lineHeight:1.6, marginBottom:5, whiteSpace:"pre-wrap", fontFamily:"inherit"}}>
-                <span style={{fontSize:8, color:"#34d39988", fontWeight:700, display:"block", marginBottom:4}}>📈 THÈSE DE CROISSANCE — générée automatiquement</span>
-                {autoThese(res.f)}
+          {res.f.price && (
+            <div style={{padding:"10px 12px", background:"#13100a", borderRadius:8, marginBottom:12, border:"1px solid "+GOLD+"44"}}>
+              <div style={{fontSize:10, color:GOLD, fontWeight:700, marginBottom:6}}>🚩 PLAN BULL FLAG (WEEKLY)</div>
+              <div style={{fontSize:9, color:TEXT, lineHeight:1.7}}>
+                <b style={{color:GOLD}}>Entrée :</b> cassure du haut du drapeau sur bougie weekly forte + gros volume.{"\n"}
+                <b style={{color:RED}}>Stop :</b> sous le bas du drapeau (~${(res.f.price*0.92).toFixed(2)}, repère -8%).{"\n"}
+                <b style={{color:GREEN}}>Objectif 1 :</b> projeter la hauteur du mât depuis le breakout.{"\n"}
+                <b style={{color:BLUE}}>Objectif 2 :</b> affiner avec les niveaux de Fibonacci.
               </div>
-            )}
-            <textarea value={theseGrowth} onChange={e=>setTheseGrowth(e.target.value)} placeholder="Ajoute ici le catalyseur business spécifique (levier opérationnel, expansion géo, nouveau produit...)"
-              style={{width:"100%", minHeight:36, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:6, padding:8, fontSize:8.5, fontFamily:"inherit", boxSizing:"border-box", marginBottom:5}} />
-            {res.valo && autoVigilance(res.f) && (
-              <div style={{width:"100%", background:"#1a0505", border:"1px solid #3a1a1a", borderRadius:6, padding:8, fontSize:8.5, color:"#f87171", lineHeight:1.6, marginBottom:5, whiteSpace:"pre-wrap", fontFamily:"inherit"}}>
-                <span style={{fontSize:8, color:"#f8717188", fontWeight:700, display:"block", marginBottom:4}}>⚠️ VIGILANCE — generee automatiquement</span>
-                {autoVigilance(res.f)}
-              </div>
-            )}
-            <textarea value={risques} onChange={e=>setRisques(e.target.value)} placeholder="Ajoute ici les risques business specifiques (concurrence, reglementation, dilution...)"
-              style={{width:"100%", minHeight:36, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:6, padding:8, fontSize:8.5, fontFamily:"inherit", boxSizing:"border-box", marginBottom:5}} />
-            <div style={{fontSize:7.5, color:TEXT_DIM, lineHeight:1.45, fontStyle:"italic"}}>La thèse tient tant que : (1) les EPS continuent d'accélérer, (2) les Inst. Trans restent positifs, (3) le prix reste au-dessus de la SMA200. Si une de ces 3 conditions casse → réduis ou coupe.</div>
-          </div>
+            </div>
           )}
         </div>
         );
       })()}
 
-      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
-        <div onClick={()=>setOpenStrat(!openStrat)} style={{fontSize:11, color:GREEN, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <span>🏛️ LA MÉTHODE SEPA — LES 4 PILIERS</span><span style={{fontSize:13}}>{openStrat?"▲":"▼"}</span>
-        </div>
-        {openStrat && <div style={{marginTop:8}}>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}>Mark Minervini a gagné le US Investing Championship avec +155% à +334%/an. Sa méthode SEPA trouve les actions explosives AVANT que les gros fonds les découvrent.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:GREEN}}>1. Fondamentaux en accélération</b> — des EPS qui croissent de plus en plus vite, trimestre après trimestre.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:GREEN}}>2. Catalyseur réel</b> — nouveau produit, contrat majeur, entrée dans un indice, changement de direction.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:GREEN}}>3. Technique Stage 2</b> — prix en tendance haussière, au-dessus de toutes les moyennes mobiles.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}><b style={{color:GREEN}}>4. Point d'entrée précis</b> — acheter exactement au breakout du VCP, jamais avant.</div>
-        </div>}
-      </div>
+      <div style={{marginTop:16, marginBottom:6, fontSize:10, color:PURPLE, fontWeight:800, letterSpacing:1, textAlign:"center"}}>📚 LA MÉTHODE — PETE + MINERVINI</div>
 
-      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
-        <div onClick={()=>setOpenVcp(!openVcp)} style={{fontSize:11, color:AMBER, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <span>📐 LE VCP — LE SECRET DE MINERVINI</span><span style={{fontSize:13}}>{openVcp?"▲":"▼"}</span>
-        </div>
-        {openVcp && <div style={{marginTop:8}}>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}>Le VCP (Volatility Contraction Pattern) est le seul élément que Finviz ne détecte pas — tu le cherches à l'œil sur le chart.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}>Série de contractions de moins en moins profondes (-15%, -10%, -6%, -3%). Le volume diminue à chaque contraction : les vendeurs s'épuisent, les institutionnels accumulent en silence. Puis BREAKOUT avec volume 2-3x la moyenne.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:AMBER}}>Durée</b> : 3 à 8 semaines minimum — plus long = meilleur setup. Le prix reste au-dessus de SMA50 et SMA200 pendant toute la phase.</div>
-          <div style={{fontSize:8, color:GREEN, lineHeight:1.55, padding:"6px 8px", background:"#052010", borderRadius:5, fontWeight:600}}>💡 Le VCP EST la signature graphique de l'accumulation institutionnelle : quand un fonds absorbe l'offre sur des semaines, la volatilité se contracte. Quand il a fini, la moindre demande fait exploser le prix.</div>
-        </div>}
-      </div>
+      <Accordion icon="🏛️" titre="LES 2 SCREENERS — POURQUOI DEUX" color={BLUE} open={a1} setOpen={setA1}>
+{`Les deux sont également valables — ils font deux jobs complémentaires.
 
-      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
-        <div onClick={()=>setOpenCascade(!openCascade)} style={{fontSize:11, color:GREEN, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <span>⚡ L'EFFET CASCADE — BOTH POSITIVE SURPRISE</span><span style={{fontSize:13}}>{openCascade?"▲":"▼"}</span>
-        </div>
-        {openCascade && <div style={{marginTop:8}}>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}>Le filtre le plus puissant : l'entreprise bat SIMULTANÉMENT ses prévisions d'EPS ET de ventes. Pas juste la croissance — la SURPRISE par rapport aux attentes des analystes.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:RED}}>EPS surprise seul</b> = l'entreprise a coupé ses coûts pour battre les EPS, mais les ventes déçoivent. Signal faible et trompeur.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:RED}}>Revenue surprise seul</b> = les ventes surprennent mais les bénéfices déçoivent. Problème de marges. Signal ambigu.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}><b style={{color:GREEN}}>BOTH POSITIVE</b> = croissance réelle et saine. Le signal le plus puissant du marché.</div>
-          <div style={{fontSize:8, color:GREEN, lineHeight:1.6, padding:"7px 9px", background:"#052010", borderRadius:5, fontWeight:600}}>La cascade : 1) Les algos détectent la double surprise → 2) Les analystes relèvent leurs estimations futures → 3) Les fonds augmentent leur allocation → 4) Le prix monte 10-30% rapidement. Le screener capture le DÉBUT de ce cycle.</div>
-        </div>}
-      </div>
+SCREENER 1 — TECHNIQUE PUR (Pete) : approche complète et autosuffisante. Rotation sectorielle + momentum + smart money. 11 filtres (Price>$15, Vol>2M, ATR>1.5, Beta>1, Change from Open +2%, 20-Day High, SMA50>SMA200, Price>SMA200...). Sort des trades explosifs à elle seule.
 
-      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
-        <div onClick={()=>setOpenFonds(!openFonds)} style={{fontSize:11, color:BLUE, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <span>🏦 COMMENT LES FONDS INSTITUTIONNELS ANALYSENT</span><span style={{fontSize:13}}>{openFonds?"▲":"▼"}</span>
-        </div>
-        {openFonds && <div style={{marginTop:8}}>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}>Pour suivre les institutionnels, il faut penser comme eux. Leur processus exact — que le screener reproduit :</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:BLUE}}>1. Screening quantitatif</b> sur +8000 actions → EPS QoQ/YoY &gt;25%, Sales &gt;25%, SMA200+. Filtre 99% des actions.</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:BLUE}}>2. Vérif double surprise</b> → Both Positive EPS &amp; Revenue. Confirme une croissance réelle, pas artificielle.</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:BLUE}}>3. Analyse dynamique institutionnelle</b> → Inst. Trans positif, Inst. Own &gt;10%. Suit l'argent intelligent qui accumule.</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:BLUE}}>4. Validation consensus analyste</b> → Strong Buy. Confirmation externe indépendante.</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:BLUE}}>5. Vérif liquidité</b> → Avg Vol &gt;200K, Price &gt;$5, Rel Vol &gt;1. Entrée/sortie sans impact prix.</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:BLUE}}>6. Timing technique</b> → SMA50&gt;SMA200, Prix&gt;SMA200, 50-Day High. Entrée au meilleur moment.</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6}}><b style={{color:BLUE}}>7. Accumulation silencieuse</b> → ils achètent sur 3-8 semaines. C'est là que le VCP se forme sur le chart.</div>
-        </div>}
-      </div>
+SCREENER 2 — TECH + FONDAMENTAL (Pete + Minervini) : la même base technique, PLUS la couche fondamentale (EPS This Y/Next Y/QoQ >25%, Sales QoQ >25%, Both Positive, Inst Own >10%). Minervini ajoute du pouce — une dimension de conviction.`}
+      </Accordion>
 
-      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
-        <div onClick={()=>setOpenHigh(!openHigh)} style={{fontSize:11, color:AMBER, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <span>🎯 LE 50-DAY NEW HIGH — LE SIGNAL DE BREAKOUT</span><span style={{fontSize:13}}>{openHigh?"▲":"▼"}</span>
-        </div>
-        {openHigh && <div style={{marginTop:8}}>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}>Le filtre que la plupart des screeners publics n'incluent pas. Il confirme que le breakout est réel et que le momentum institutionnel est au maximum.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:AMBER}}>Pourquoi 50 jours et pas 20 ?</b> 20 jours = 4 semaines = résistance faible, beaucoup de faux signaux. 50 jours = 10 semaines = résistance MAJEURE brisée, signal fiable, et c'est ce que les algos institutionnels sont programmés pour acheter.</div>
-          <div style={{fontSize:8, color:AMBER, lineHeight:1.6, padding:"7px 9px", background:"#1a1500", borderRadius:5, fontWeight:600}}>La séquence parfaite : Phase 1 accumulation silencieuse → Phase 2 contraction VCP (volume baisse) → Phase 3 50-Day New High → Phase 4 BREAKOUT explosif (volume 2-3x). Le point d'entrée Minervini.</div>
-        </div>}
-      </div>
+      <Accordion icon="🔄" titre="ROTATION SECTORIELLE TOP-DOWN" color={GREEN} open={a2} setOpen={setA2}>
+{`La smart money déplace d'énormes capitaux d'un secteur à l'autre. Approche descendante (Pete) :
 
-      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
-        <div onClick={()=>setOpenType(!openType)} style={{fontSize:11, color:PURPLE, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <span>⚖️ MINERVINI — TRADER OU INVESTISSEUR ?</span><span style={{fontSize:13}}>{openType?"▲":"▼"}</span>
-        </div>
-        {openType && <div style={{marginTop:8}}>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}>« Je suis un investisseur de croissance avec une discipline et une précision de trader. » Il sélectionne comme un investisseur (fondamentaux solides) mais exécute et gère le risque comme un trader (stop strict, entrée précise, sortie sans émotion).</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:PURPLE}}>Horizon</b> : 3 semaines à 12 mois (entre le day trader en minutes et le buy &amp; hold en années).</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:PURPLE}}>Stop loss</b> : 7-8% strict (le day trader &lt;1%, le buy &amp; hold aucun).</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:PURPLE}}>Sélection</b> : Fondamentaux + Technique (pas l'un sans l'autre).</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}><b style={{color:PURPLE}}>Entrée</b> : point pivot précis (le breakout du VCP), jamais au hasard.</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6}}><b style={{color:PURPLE}}>Marché baissier</b> : il réduit l'exposition et passe en cash (ne garde pas tout comme le buy &amp; hold).</div>
-        </div>}
-      </div>
+1. MACRO — Groups Finviz, Performance. Trie par "Month" (= 21 jours de bourse). Identifie le secteur n°1.
+2. MESO — Dans ce secteur, trouve l'industrie qui domine.
+3. MICRO — Isole les 10-15 leaders de cette industrie.
 
-      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:10, border:"1px solid #2a1f3a"}}>
-        <div onClick={()=>setOpenRoutine(!openRoutine)} style={{fontSize:11, color:GREEN, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <span>📅 LA ROUTINE QUOTIDIENNE</span><span style={{fontSize:13}}>{openRoutine?"▲":"▼"}</span>
-        </div>
-        {openRoutine && <div style={{marginTop:8}}>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:GREEN}}>9h-10h</b> : ouvre le screener avant/pendant l'ouverture du marché US.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:GREEN}}>Interprète le nombre de résultats</b> : 0-3 = marché difficile, prudence · 4-8 = conditions idéales · 9+ = marché fort, sois sélectif.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:6}}><b style={{color:GREEN}}>Vérifie le chart manuellement</b> : cherche le VCP sur chaque candidate, attends le breakout (le volume doit exploser).</div>
-          <div style={{fontSize:8.5, color:AMBER, fontWeight:700, marginBottom:4}}>Les 3 questions pour chaque action :</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}>1. Les EPS accélèrent-ils depuis au moins 2 trimestres consécutifs ?</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:3}}>2. Le chart montre-t-il un VCP avec volume décroissant ?</div>
-          <div style={{fontSize:8, color:TEXT, lineHeight:1.6, marginBottom:6}}>3. Le rapport risque/rendement est-il d'au moins 3:1 ?</div>
-          <div style={{fontSize:8, color:RED, lineHeight:1.6, padding:"7px 9px", background:"#200505", borderRadius:5, fontWeight:600}}>⚠️ Règle absolue : le screener trouve les candidates, ce n'est PAS un signal d'achat automatique. Chaque action doit passer ton analyse manuelle du chart.</div>
-        </div>}
-      </div>
+Regarde sur 1 mois ET 3 mois : un secteur top sur les deux = leadership confirmé. On ne trade QUE dans les secteurs en tête — comme Pete.`}
+      </Accordion>
 
-      <div style={{padding:"10px 12px", background:"#0d0a18", borderRadius:8, marginBottom:20, border:"1px solid #2a1f3a"}}>
-        <div onClick={()=>setOpenRisk(!openRisk)} style={{fontSize:11, color:RED, fontWeight:700, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <span>🛡️ GESTION DU RISQUE — LES RÈGLES ABSOLUES</span><span style={{fontSize:13}}>{openRisk?"▲":"▼"}</span>
-        </div>
-        {openRisk && <div style={{marginTop:8}}>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:RED}}>Stop loss -7 à -8%</b> sous l'entrée. Sans exception. Une perte de 8% se récupère ; une perte de 50% demande +100% pour s'en remettre.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:RED}}>Ratio R/R min 3:1</b>. Stop -8% = objectif min +24%. Sinon, passe à la suivante.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:RED}}>Position max 10-15%</b> du portefeuille sur une seule action. 5 à 10 positions max.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6, marginBottom:4}}><b style={{color:RED}}>Ne jamais moyenner à la baisse</b>. Le marché te dit que tu avais tort — écoute-le, coupe.</div>
-          <div style={{fontSize:8.5, color:TEXT, lineHeight:1.6}}><b style={{color:RED}}>Trailing stop</b> : quand l'action monte de 20-30%, remonte ton stop pour protéger les gains.</div>
-        </div>}
+      <Accordion icon="⚡" titre="LE CHANGE FROM OPEN +2% — LE CARBURANT" color={AMBER} open={a3} setOpen={setA3}>
+{`Le critère le plus puissant de Pete pour mesurer l'implication institutionnelle DANS la journée.
+
+Change from Open = (Clôture − Ouverture) / Ouverture × 100. Critère : >= +2%.
+
+Si une action ne fait que monter depuis l'ouverture jusqu'à clôturer +2%, la Smart Money a "tenu l'offre" et acheté toute la journée. Ça crée de grosses bougies vertes pleines — le "Fuel".
+
+Bougie pleine = accumulation continue. Gap qui retombe = faux signal.`}
+      </Accordion>
+
+      <Accordion icon="🎯" titre="LE CLUSTER SECTORIEL — SIGNAL ULTIME" color={PURPLE} open={a4} setOpen={setA4}>
+{`Quand plusieurs actions de la MÊME industrie sortent ensemble dans ton scan (ex: 3-4 semi-conducteurs), c'est la preuve que les institutions accumulent tout le groupe.
+
+Exemple : un scan qui sort ALAB, MU, CRDO, SNDK, ENTG, TSM — presque tous semi-conducteurs = rotation institutionnelle majeure.
+
+Comment l'exploiter : repère l'industrie la plus représentée, confirme dans Groups (1m + 3m), croise avec le Screener 2, prends position sur les 2-4 meilleurs Bull Flags du cluster.`}
+      </Accordion>
+
+      <Accordion icon="📈" titre="BOTH POSITIVE SURPRISE — EFFET CASCADE" color={GREEN} open={a5} setOpen={setA5}>
+{`Ce filtre mesure la SURPRISE vs les attentes des analystes.
+
+EPS seul : l'entreprise coupe ses coûts pour battre les EPS mais les ventes déçoivent. Faible.
+Revenue seul : ventes surprennent mais bénéfices déçoivent. Marges. Ambigu.
+BOTH POSITIVE : bat SIMULTANÉMENT EPS et ventes = croissance réelle. Le plus puissant.
+
+L'effet cascade : (1) les algos détectent, (2) les analystes relèvent leurs cibles, (3) les fonds augmentent l'allocation, (4) le prix monte 10-30%.`}
+      </Accordion>
+
+      <Accordion icon="🚩" titre="LE BULL FLAG EN WEEKLY — TON ENTRÉE" color={GOLD} open={a6} setOpen={setA6}>
+{`Ton entrée se fait sur un Bull Flag (drapeau haussier), surtout en WEEKLY (position trading, semaines à mois).
+
+LE MÂT : forte hausse initiale, quasi verticale (le carburant).
+LE DRAPEAU : consolidation en pente légèrement descendante, encadrée par 2 droites parallèles. Le volume DIMINUE.
+LE BREAKOUT : cassure de la droite haute sur GROS volume weekly.
+
+Plan : Entrée à la cassure. Stop sous le drapeau. Objectif = hauteur du mât projetée depuis le breakout, affinée avec Fibonacci.
+
+Pourquoi weekly : filtre le bruit, le volume hebdo confirme l'engagement institutionnel.`}
+      </Accordion>
+
+      <Accordion icon="🏦" titre="COMMENT LES FONDS ANALYSENT" color={BLUE} open={a7} setOpen={setA7}>
+{`Les fonds (BlackRock, Vanguard, Fidelity, T. Rowe...) gèrent des milliards avec des analystes inaccessibles au public.
+
+Ils ne peuvent pas tout mettre sur une action : ils achètent les 3-5 meilleures d'un secteur en rotation. Si tu détiens une action de qualité d'un secteur en rotation, tu bénéficies de leurs flux d'achat.
+
+Ils achètent progressivement sur plusieurs semaines pour ne pas faire monter le prix — c'est ce qui crée la consolidation (le drapeau). Inst. Trans positif = ils accumulent maintenant.`}
+      </Accordion>
+
+      <Accordion icon="🛡️" titre="GESTION DU RISQUE — RÈGLES ABSOLUES" color={RED} open={a8} setOpen={setA8}>
+{`Minervini : "Les gagnants coupent leurs pertes vite et laissent courir leurs gains."
+
+• Stop Loss : -7 à -8% sous l'entrée, sans exception.
+• Ratio R/R : minimum 3:1. Stop -8% = objectif minimum +24%.
+• Taille position : max 10-15% du portefeuille sur une action.
+• Nombre de positions : 5 à 10 max.
+• Ne jamais moyenner à la baisse.
+• Trailing stop : quand +20-30%, remonte ton stop.
+• Marché baissier : réduis l'exposition / passe en cash.`}
+      </Accordion>
+
+      <Accordion icon="📅" titre="LA ROUTINE QUOTIDIENNE" color={AMBER} open={a9} setOpen={setA9}>
+{`CHAQUE SEMAINE (week-end / lundi) :
+• Groups Finviz : classe les secteurs sur 1m et 3m. Top 3 confirmé.
+• Fore vers l'industrie dominante.
+
+CHAQUE MATIN :
+• Screener 1 (Pete) : repère les CLUSTERS.
+• Screener 2 (Minervini) : croise pour la couche fondamentale.
+• Analyse les charts weekly : cherche les Bull Flags. Note la droite haute.
+• Pose tes alertes sur le niveau de breakout.
+
+AVANT CHAQUE ENTRÉE — 4 questions :
+1. Secteur dans le top 1m + 3m ?
+2. Cluster (plusieurs actions de l'industrie) ?
+3. Bull Flag weekly prêt à casser sur gros volume ?
+4. R/R >= 3:1 avec mon stop ?`}
+      </Accordion>
+
+      <div style={{fontSize:8, color:TEXT_DIM, textAlign:"center", marginTop:14, marginBottom:8, lineHeight:1.5}}>
+        ⚠️ Document éducatif. Pas un conseil financier.{"\n"}Création Patrice Bonneau · Méthode Pete + Minervini
       </div>
     </div>
   );
