@@ -63,7 +63,7 @@ function analyse(raw, manualTicker) {
     relvol: grab(t, "Rel Volume"), recom: grab(t, "Recom"), epsQQ: grab(t, "EPS Q/Q"),
     epsThisY: grab(t, "EPS this Y"), salesQQ: grab(t, "Sales Q/Q"), instOwn: grab(t, "Inst Own"),
     instTrans: grab(t, "Inst Trans"), insiderTrans: grab(t, "Insider Trans"), perfHalfY: grab(t, "Perf Half Y"),
-    perfYear: grab(t, "Perf Year"), perfQuart: grab(t, "Perf Quarter"), sma200: grab(t, "SMA200"), sma50: grab(t, "SMA50"),
+    perfYear: grab(t, "Perf Year"), perfQuart: grab(t, "Perf Quarter"), perfMonth: grab(t, "Perf Month"), sma200: grab(t, "SMA200"), sma50: grab(t, "SMA50"), sma20: grab(t, "SMA20"),
     rsi: grab(t, "RSI \\(14\\)"), change: grab(t, "Change"), epsYYTTM: grab(t, "EPS Y/Y TTM"),
     salesYYTTM: grab(t, "Sales Y/Y TTM"), roe: grab(t, "ROE"), debteq: grab(t, "Debt/Eq"),
     atr: grab(t, "ATR (14)"), beta: grab(t, "Beta"), w52high: grab52(t, "52W High"), w52low: grab52(t, "52W Low"),
@@ -91,12 +91,15 @@ const C = (label, val, ok, detail) => ({ label, val, ok, detail });
 
 function checksTechnique(f) {
   return [
+    C("Market Cap > $10B (Large)", f.mktcap, f.mktcap!==null && f.mktcap>10000, f.mktcap!==null?(f.mktcap>=1000?(f.mktcap/1000).toFixed(1)+"B":f.mktcap.toFixed(0)+"M"):"?"),
     C("Price > $15", f.price, f.price!==null && f.price>15, f.price!==null?"$"+f.price:"?"),
     C("Avg Volume > 2M", f.avgvol, f.avgvol!==null && f.avgvol>2, f.avgvol!==null?f.avgvol.toFixed(2)+"M":"?"),
     C("ATR > 1.5", f.atr, f.atr!==null && f.atr>1.5, f.atr!==null?f.atr.toFixed(2):"?"),
     C("Beta > 1", f.beta, f.beta!==null && f.beta>1, f.beta!==null?f.beta.toFixed(2):"?"),
-    C("Perf Quarter Up", f.perfQuart, f.perfQuart!==null && f.perfQuart>0, f.perfQuart!==null?(f.perfQuart>0?"+":"")+f.perfQuart+"%":"?"),
+    C("Perf Quarter > 20%", f.perfQuart, f.perfQuart!==null && f.perfQuart>20, f.perfQuart!==null?(f.perfQuart>0?"+":"")+f.perfQuart+"%":"?"),
+    C("Perf Month Up", f.perfMonth, f.perfMonth!==null && f.perfMonth>0, f.perfMonth!==null?(f.perfMonth>0?"+":"")+f.perfMonth+"%":"?"),
     C("Change Up (jour)", f.change, f.change!==null && f.change>0, f.change!==null?(f.change>0?"+":"")+f.change+"%":"?"),
+    C("Prix > SMA20 (court terme)", f.sma20, f.sma20!==null && f.sma20>0, f.sma20!==null?(f.sma20>0?"+":"")+f.sma20+"%":"?"),
     C("SMA50 > SMA200 (Golden Cross)", f.sma50, f.sma50!==null && f.sma200!==null && f.sma50>0 && f.sma200>0, (f.sma50!==null?"SMA50 "+(f.sma50>0?"+":"")+f.sma50+"%":"?")),
     C("Prix > SMA200 (Stage 2)", f.sma200, f.sma200!==null && f.sma200>0, f.sma200!==null?(f.sma200>0?"+":"")+f.sma200+"%":"?"),
     C("52W High/Low > 30%", f.w52low, f.w52low!==null && f.w52low>30, f.w52low!==null?"+"+f.w52low+"%":"?"),
