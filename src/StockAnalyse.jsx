@@ -234,7 +234,10 @@ function parseGroups(raw) {
       return m ? parseFloat(m[1]) : null;
     }).filter(x=>x!==null);
     if (nums.length < 3) continue;
-    sectors.push({ name, week: nums[0], month: nums[1], quart: nums[2] });
+    // Finviz Groups: Perf Week, Perf Month, Perf Quart, Perf Half, Perf Year, Perf YTD, AvgVol, RelVol, Change...
+    // Change (1 jour) = avant-dernier nombre si beaucoup de colonnes, sinon on prend nums[2] en repli
+    const oneDay = nums.length >= 9 ? nums[8] : (nums.length>=7 ? nums[nums.length-1] : null);
+    sectors.push({ name, week: nums[0], month: nums[1], quart: nums[2], oneDay });
   }
   return sectors;
 }
@@ -251,7 +254,13 @@ function analyseGroups(sectors) {
     if (tech.month > def.month + 3) regime = "RISK-ON";
     else if (def.month > tech.month + 3) regime = "RISK-OFF";
   }
-  return { byMonth, top3, bottom3, regime };
+  // LESS BEARISH : court terme (5j) s'ameliore alors que moyen terme (21j) est faible/negatif
+  // = retournement precoce, le smart money commence a revenir AVANT que ce soit evident
+  const lessBearish = sectors.filter(s => s.month < 3 && s.week > 0 && s.week > s.month).sort((a,b)=>b.week-a.week);
+  // EPUISEMENT : secteur en tete (top par mois) mais dont le court terme (5j) ralentit fortement vs le rythme moyen
+  // rythme hebdo theorique = month/3 (3 semaines dans un mois ~21j). Si week << ce rythme = essoufflement
+  const exhausted = top3.filter(s => s.month > 5 && s.week < (s.month/3)*0.6);
+  return { byMonth, top3, bottom3, regime, lessBearish, exhausted };
 }
 
 function sectorOfTicker(f, groups) {
@@ -429,22 +438,58 @@ function StockAnalyseView() {
                 </div>
                 <div style={{padding:"8px 10px", background:"#052010", borderRadius:8, marginBottom:6, border:"1px solid #14321f"}}>
                   <div style={{fontSize:9, color:GREEN, fontWeight:800, marginBottom:4}}>🏆 TOP 3 — chasse ici</div>
+                  <div style={{display:"flex", justifyContent:"space-between", padding:"1px 0", borderBottom:"1px solid #14321f"}}>
+                    <span style={{fontSize:7.5, color:TEXT_DIM, flex:2}}>Secteur</span>
+                    <span style={{fontSize:7.5, color:TEXT_DIM, flex:1, textAlign:"right"}}>5j</span>
+                    <span style={{fontSize:7.5, color:TEXT_DIM, flex:1, textAlign:"right"}}>21j</span>
+                    <span style={{fontSize:7.5, color:TEXT_DIM, flex:1, textAlign:"right"}}>3M</span>
+                  </div>
                   {groupsRes.top3.map((s,i)=>(
                     <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
-                      <span style={{fontSize:9, color:TEXT2}}>{i+1}. {s.name}</span>
-                      <span style={{fontSize:8.5, color:GREEN, fontWeight:700}}>1M +{s.month}% · 3M +{s.quart}%</span>
+                      <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{i+1}. {s.name}</span>
+                      <span style={{fontSize:8, color:s.week>0?GREEN:RED, flex:1, textAlign:"right"}}>{s.week>0?"+":""}{s.week}%</span>
+                      <span style={{fontSize:8, color:GREEN, fontWeight:700, flex:1, textAlign:"right"}}>+{s.month}%</span>
+                      <span style={{fontSize:8, color:TEXT_DIM, flex:1, textAlign:"right"}}>+{s.quart}%</span>
                     </div>
                   ))}
                 </div>
-                <div style={{padding:"8px 10px", background:"#200505", borderRadius:8, border:"1px solid #3a1f1f"}}>
+                <div style={{padding:"8px 10px", background:"#200505", borderRadius:8, marginBottom:6, border:"1px solid #3a1f1f"}}>
                   <div style={{fontSize:9, color:RED, fontWeight:800, marginBottom:4}}>🚫 BOTTOM 3 — évite</div>
                   {groupsRes.bottom3.map((s,i)=>(
                     <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
-                      <span style={{fontSize:9, color:TEXT2}}>{s.name}</span>
-                      <span style={{fontSize:8.5, color:RED, fontWeight:700}}>1M {s.month>0?"+":""}{s.month}% · 3M {s.quart>0?"+":""}{s.quart}%</span>
+                      <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{s.name}</span>
+                      <span style={{fontSize:8, color:s.week>0?GREEN:RED, flex:1, textAlign:"right"}}>{s.week>0?"+":""}{s.week}%</span>
+                      <span style={{fontSize:8, color:RED, fontWeight:700, flex:1, textAlign:"right"}}>{s.month>0?"+":""}{s.month}%</span>
+                      <span style={{fontSize:8, color:TEXT_DIM, flex:1, textAlign:"right"}}>{s.quart>0?"+":""}{s.quart}%</span>
                     </div>
                   ))}
                 </div>
+                {groupsRes.lessBearish && groupsRes.lessBearish.length>0 && (
+                  <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:8, marginBottom:6, border:"1px solid "+AMBER+"44"}}>
+                    <div style={{fontSize:9, color:AMBER, fontWeight:800, marginBottom:3}}>🔄 RETOURNEMENT PRÉCOCE (Less Bearish)</div>
+                    <div style={{fontSize:7.5, color:TEXT_DIM, marginBottom:5, lineHeight:1.4}}>Pete : "avant d'être haussier, un secteur devient MOINS baissier". Court terme (5j) qui s'améliore alors que le mois est encore faible = le smart money commence à revenir AVANT tout le monde.</div>
+                    {groupsRes.lessBearish.map((s,i)=>(
+                      <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
+                        <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{s.name}</span>
+                        <span style={{fontSize:8, color:GREEN, fontWeight:700, flex:1, textAlign:"right"}}>5j +{s.week}%</span>
+                        <span style={{fontSize:8, color:TEXT_DIM, flex:1, textAlign:"right"}}>21j {s.month>0?"+":""}{s.month}%</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {groupsRes.exhausted && groupsRes.exhausted.length>0 && (
+                  <div style={{padding:"8px 10px", background:"#1a0a14", borderRadius:8, border:"1px solid "+PURPLE+"44"}}>
+                    <div style={{fontSize:9, color:PURPLE, fontWeight:800, marginBottom:3}}>⚡ ÉPUISEMENT (momentum ralentit)</div>
+                    <div style={{fontSize:7.5, color:TEXT_DIM, marginBottom:5, lineHeight:1.4}}>Secteur encore en tête mais dont le rythme court terme (5j) ralentit fortement vs le mois. Hausses de plus en plus faibles = essoufflement. Remonte tes trailing stops sur ces secteurs.</div>
+                    {groupsRes.exhausted.map((s,i)=>(
+                      <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
+                        <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{s.name}</span>
+                        <span style={{fontSize:8, color:AMBER, flex:1, textAlign:"right"}}>5j +{s.week}%</span>
+                        <span style={{fontSize:8, color:TEXT_DIM, flex:1, textAlign:"right"}}>21j +{s.month}%</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
