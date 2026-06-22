@@ -581,8 +581,8 @@ function StockAnalyseView() {
   };
 
   return (
-    <div style={{maxWidth:540, margin:"0 auto", padding:"0 4px"}}>
-      <style>{`@keyframes floatBubble{0%{transform:translateY(0)}50%{transform:translateY(-7px)}100%{transform:translateY(0)}}@keyframes glowB{0%,100%{box-shadow:0 0 8px #c9a84c66}50%{box-shadow:0 0 18px #c9a84ccc}}`}</style>
+    <div className="sa-wrap">
+      <style>{`@keyframes floatBubble{0%{transform:translateY(0)}50%{transform:translateY(-7px)}100%{transform:translateY(0)}}@keyframes glowB{0%,100%{box-shadow:0 0 8px #c9a84c66}50%{box-shadow:0 0 18px #c9a84ccc}}.sa-wrap{max-width:540px;margin:0 auto;padding:0 4px}@media(min-width:900px){.sa-wrap{max-width:1100px;padding:0 24px}}`}</style>
       <a href="/guide.html" target="_blank" rel="noreferrer" style={{display:"flex", alignItems:"center", gap:8, justifyContent:"center", margin:"0 auto 12px", padding:"10px 16px", background:"linear-gradient(135deg,#1a1500,#10141c)", border:"1px solid #c9a84c", borderRadius:30, textDecoration:"none", width:"fit-content", animation:"floatBubble 3s ease-in-out infinite, glowB 2.5s ease-in-out infinite"}}>
         <span style={{fontSize:18}}>📚</span>
         <span style={{fontSize:11, fontWeight:800, color:"#c9a84c", letterSpacing:0.5}}>GUIDE COMPLET PETE + MINERVINI</span>
