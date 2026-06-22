@@ -237,10 +237,22 @@ function parseGroups(raw) {
     // Finviz Groups: Perf Week, Perf Month, Perf Quart, Perf Half, Perf Year, Perf YTD, AvgVol, RelVol, Change...
     // Change (1 jour) = avant-dernier nombre si beaucoup de colonnes, sinon on prend nums[2] en repli
     const oneDay = nums.length >= 9 ? nums[8] : (nums.length>=7 ? nums[nums.length-1] : null);
-    // Rel Volume = avant-dernier ratio (pas un %) ; on le cherche dans la ligne brute
-    const relM = ln.match(/\b([0-9]\.[0-9]{1,2})\b/g);
-    const relVol = relM && relM.length ? parseFloat(relM[relM.length-1]) : null;
-    sectors.push({ name, week: nums[0], month: nums[1], quart: nums[2], oneDay, relVol });
+    // Rel Volume = le ratio (sans %) qui suit immediatement l'Avg Volume (un nombre en B/M/K)
+    let relVol = null;
+    const allm = [...ln.matchAll(/(-?[0-9]+(?:\.[0-9]+)?)(%|B|M|K)?/g)];
+    for (let k=1;k<allm.length;k++){
+      const prevSuf = allm[k-1][2];
+      const curSuf = allm[k][2];
+      if ((prevSuf==="B"||prevSuf==="M"||prevSuf==="K") && !curSuf){
+        relVol = parseFloat(allm[k][1]); break;
+      }
+    }
+    // Avg Volume = 1er nombre en B/M/K ; Volume (du jour) = dernier nombre en B/M/K
+    const volNums = allm.filter(m=>m[2]==="B"||m[2]==="M"||m[2]==="K");
+    const toM = (m)=> m[2]==="B"?parseFloat(m[1])*1000 : m[2]==="K"?parseFloat(m[1])/1000 : parseFloat(m[1]);
+    const avgVol = volNums.length>=1 ? toM(volNums[0]) : null;
+    const volume = volNums.length>=2 ? toM(volNums[volNums.length-1]) : null;
+    sectors.push({ name, week: nums[0], month: nums[1], quart: nums[2], oneDay, relVol, avgVol, volume });
   }
   return sectors;
 }
@@ -499,7 +511,8 @@ function StockAnalyseView() {
                         {open && (
                           <div style={{padding:"6px 8px 8px 8px", fontSize:7.5, color:TEXT, lineHeight:1.6, background:"#0d1420", borderRadius:6, marginBottom:4}}>
                             <div style={{color:fc, fontWeight:700, marginBottom:3}}>{emoji} {s.flux} — rang #{s.rank}/{groupsRes.enriched.length}</div>
-                            <div style={{marginBottom:3}}>📅 21j <b>{s.month>0?"+":""}{s.month}%</b> (fond) · 📆 5j <b>{s.week>0?"+":""}{s.week}%</b> (direction) · ☀️ 1j <b>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay+"%":"—"}</b> (pouls){s.relVol!=null?" · 🔊 RelVol "+s.relVol+"x":""}</div>
+                            <div style={{marginBottom:3}}>📅 21j <b>{s.month>0?"+":""}{s.month}%</b> (fond) · 📆 5j <b>{s.week>0?"+":""}{s.week}%</b> (direction) · ☀️ 1j <b>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay+"%":"—"}</b> (pouls)</div>
+                            <div style={{marginBottom:3, color:TEXT_DIM}}>{s.relVol!=null?"🔊 RelVol "+s.relVol+"x":""}{s.avgVol!=null?" · 📊 Vol moy "+(s.avgVol>=1000?(s.avgVol/1000).toFixed(2)+"B":s.avgVol.toFixed(0)+"M"):""}{s.volume!=null?" · 📈 Vol jour "+(s.volume>=1000?(s.volume/1000).toFixed(2)+"B":s.volume.toFixed(0)+"M"):""}{s.avgVol!=null&&s.volume!=null?" ("+(s.volume/s.avgVol>=1.2?"⬆ "+(s.volume/s.avgVol).toFixed(1)+"x la moyenne, forte participation":s.volume/s.avgVol<0.8?"⬇ sous la moyenne, peu d'intérêt":"≈ normal")+")":""}</div>
                             <div style={{color:TEXT_DIM}}>{
                               s.code==="acc" ? "Les 3 horizons alignes a la hausse : le smart money charge ce secteur. CHASSE tes actions ici — courant porteur maximal." :
                               s.code==="ess" ? "Fond solide mais le court terme ralentit (ou jour rouge). La hausse se fatigue. Ne chasse pas, attends que ca se confirme." :
