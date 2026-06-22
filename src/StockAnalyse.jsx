@@ -245,8 +245,7 @@ function parseGroups(raw) {
 function analyseGroups(sectors) {
   if (!sectors.length) return null;
   const byMonth = [...sectors].sort((a,b)=>b.month-a.month);
-  const top3 = byMonth.slice(0,3);
-  const bottom3 = byMonth.slice(-3).reverse();
+  // regime risk-on/off
   const def = sectors.find(s=>/defensive/i.test(s.name));
   const tech = sectors.find(s=>/technolog/i.test(s.name));
   let regime = "NEUTRE";
@@ -254,18 +253,39 @@ function analyseGroups(sectors) {
     if (tech.month > def.month + 3) regime = "RISK-ON";
     else if (def.month > tech.month + 3) regime = "RISK-OFF";
   }
-  // LESS BEARISH : court terme (5j) s'ameliore alors que moyen terme (21j) est faible/negatif
-  // = retournement precoce, le smart money commence a revenir AVANT que ce soit evident
-  const lessBearish = sectors.filter(s => s.month < 3 && s.week > 0 && s.week > s.month).sort((a,b)=>b.week-a.week);
-  // EPUISEMENT : secteur en tete (top par mois) mais dont le court terme (5j) ralentit fortement vs le rythme moyen
-  // rythme hebdo theorique = month/3 (3 semaines dans un mois ~21j). Si week << ce rythme = essoufflement
-  const exhausted = top3.filter(s => s.month > 5 && s.week < (s.month/3)*0.6);
-  // ACCELERATION : 21j deja positif ET 5j encore plus fort que le rythme moyen = la hausse s'intensifie (ENTRE en tendance)
-  const rythme = (s) => s.month/3; // rythme hebdo theorique
-  const accelerating = sectors.filter(s => s.month > 2 && s.week > rythme(s)*1.3).sort((a,b)=>b.week-a.week);
-  // DEBUT RETOURNEMENT BAISSIER : 21j encore positif MAIS 5j devenu negatif = le smart money commence a sortir (SORT de tendance)
-  const turningDown = sectors.filter(s => s.month > 0 && s.week < 0).sort((a,b)=>a.week-b.week);
-  return { byMonth, top3, bottom3, regime, lessBearish, exhausted, accelerating, turningDown };
+  // FLUX par secteur (lecture 21j + 5j + 1j ensemble, comme Pete)
+  const maxAbs = Math.max(...byMonth.map(s=>Math.abs(s.month)), 1);
+  const enriched = byMonth.map(s => {
+    const rythme = s.month/3; // rythme hebdo theorique sur 21j
+    const oneDay = s.oneDay!=null ? s.oneDay : 0;
+    let flux, code, dir;
+    // direction court terme
+    if (s.week > rythme*1.05) dir = "up";
+    else if (s.week < rythme*0.6) dir = "down";
+    else dir = "flat";
+    if (s.month >= 2) {
+      // secteur en tendance de fond positive
+      if (dir==="up" && oneDay >= 0) { flux="ACCUMULATION"; code="acc"; }
+      else { flux="ESSOUFFLEMENT"; code="ess"; }
+    } else if (s.month <= -4) {
+      flux = (oneDay < -0.5 && s.week < 0) ? "CAPITULATION" : "DISTRIBUTION";
+      code = "dist";
+      // mais si le court terme repasse nettement positif sur un fond tres negatif = rotation entrante
+      if (s.week > 0 && oneDay > 0) { flux="ROTATION ENTRANTE"; code="rot"; }
+    } else {
+      // fond faible/neutre (-4 a +2)
+      if (s.week > 0.5) { flux="ROTATION ENTRANTE"; code="rot"; }
+      else if (s.week < -1) { flux="DISTRIBUTION"; code="dist"; }
+      else if (Math.abs(s.month) < 0.3) { flux="SANS FLUX"; code="dead"; }
+      else { flux="CONSOLIDATION"; code="cons"; }
+    }
+    const barLen = Math.round((Math.abs(s.month)/maxAbs)*8);
+    return { ...s, flux, code, dir, bar: barLen };
+  });
+  const buy = enriched.filter(s=>s.code==="acc");
+  const watch = enriched.filter(s=>s.code==="rot");
+  const avoid = enriched.filter(s=>s.code==="dist");
+  return { byMonth, enriched, regime, buy, watch, avoid };
 }
 
 function sectorOfTicker(f, groups) {
@@ -441,84 +461,49 @@ function StockAnalyseView() {
                     {groupsRes.regime==="RISK-ON"?"🟢 RISK-ON — cycliques mènent":groupsRes.regime==="RISK-OFF"?"🔴 RISK-OFF — défensifs mènent":"🟡 RÉGIME NEUTRE"}
                   </span>
                 </div>
-                <div style={{padding:"8px 10px", background:"#052010", borderRadius:8, marginBottom:6, border:"1px solid #14321f"}}>
-                  <div style={{fontSize:9, color:GREEN, fontWeight:800, marginBottom:4}}>🏆 TOP 3 — chasse ici</div>
-                  <div style={{display:"flex", justifyContent:"space-between", padding:"1px 0", borderBottom:"1px solid #14321f"}}>
-                    <span style={{fontSize:7.5, color:TEXT_DIM, flex:2}}>Secteur</span>
-                    <span style={{fontSize:7.5, color:TEXT_DIM, flex:1, textAlign:"right"}}>5j</span>
-                    <span style={{fontSize:7.5, color:TEXT_DIM, flex:1, textAlign:"right"}}>21j</span>
-                    <span style={{fontSize:7.5, color:TEXT_DIM, flex:1, textAlign:"right"}}>1j</span>
+
+                {/* TABLEAU UNIQUE — flux par secteur */}
+                <div style={{padding:"8px 8px", background:"#0a1018", borderRadius:8, marginBottom:8, border:"1px solid #1a2230"}}>
+                  <div style={{display:"flex", fontSize:7, color:TEXT_DIM, fontWeight:700, padding:"0 0 4px 0", borderBottom:"1px solid #1a2230"}}>
+                    <span style={{flex:2.2}}>SECTEUR</span>
+                    <span style={{flex:1.6, textAlign:"right"}}>21j</span>
+                    <span style={{flex:1, textAlign:"right"}}>5j</span>
+                    <span style={{flex:1, textAlign:"right"}}>1j</span>
+                    <span style={{flex:2, textAlign:"right"}}>FLUX</span>
                   </div>
-                  {groupsRes.top3.map((s,i)=>(
-                    <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
-                      <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{i+1}. {s.name}</span>
-                      <span style={{fontSize:8, color:s.week>0?GREEN:RED, flex:1, textAlign:"right"}}>{s.week>0?"+":""}{s.week}%</span>
-                      <span style={{fontSize:8, color:GREEN, fontWeight:700, flex:1, textAlign:"right"}}>+{s.month}%</span>
-                      <span style={{fontSize:8, color:(s.oneDay!=null&&s.oneDay<0)?RED:TEXT_DIM, flex:1, textAlign:"right"}}>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay+"%":"—"}</span>
-                    </div>
-                  ))}
+                  {groupsRes.enriched.map((s,i)=>{
+                    const fc = s.code==="acc"?GREEN : s.code==="rot"?AMBER : s.code==="dist"?RED : s.code==="ess"?"#fb923c" : TEXT_DIM;
+                    const emoji = s.code==="acc"?"💰" : s.code==="rot"?"🌱" : s.code==="dist"?"🩸" : s.code==="ess"?"⏸" : s.code==="dead"?"💤":"➡️";
+                    const arrow = s.dir==="up"?"▲":s.dir==="down"?"▼":"─";
+                    return (
+                      <div key={i} style={{display:"flex", alignItems:"center", padding:"3px 0", borderBottom:"1px solid #141c28"}}>
+                        <span style={{flex:2.2, fontSize:8, color:TEXT2}}>{s.name}</span>
+                        <span style={{flex:1.6, textAlign:"right", display:"flex", alignItems:"center", justifyContent:"flex-end", gap:3}}>
+                          <span style={{display:"inline-block", height:5, width:(s.bar*3)+"px", background:fc, borderRadius:2}}></span>
+                          <span style={{fontSize:8, color:fc, fontWeight:700}}>{s.month>0?"+":""}{s.month}%</span>
+                        </span>
+                        <span style={{flex:1, textAlign:"right", fontSize:7.5, color: s.dir==="up"?GREEN:s.dir==="down"?RED:TEXT_DIM}}>{arrow}{s.week>0?"+":""}{s.week}</span>
+                        <span style={{flex:1, textAlign:"right", fontSize:7.5, color:(s.oneDay!=null&&s.oneDay<0)?RED:TEXT_DIM}}>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay:"—"}</span>
+                        <span style={{flex:2, textAlign:"right", fontSize:7, color:fc, fontWeight:700}}>{emoji} {s.flux}</span>
+                      </div>
+                    );
+                  })}
                 </div>
-                <div style={{padding:"8px 10px", background:"#200505", borderRadius:8, marginBottom:6, border:"1px solid #3a1f1f"}}>
-                  <div style={{fontSize:9, color:RED, fontWeight:800, marginBottom:4}}>🚫 BOTTOM 3 — évite</div>
-                  {groupsRes.bottom3.map((s,i)=>(
-                    <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
-                      <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{s.name}</span>
-                      <span style={{fontSize:8, color:s.week>0?GREEN:RED, flex:1, textAlign:"right"}}>{s.week>0?"+":""}{s.week}%</span>
-                      <span style={{fontSize:8, color:RED, fontWeight:700, flex:1, textAlign:"right"}}>{s.month>0?"+":""}{s.month}%</span>
-                      <span style={{fontSize:8, color:(s.oneDay!=null&&s.oneDay<0)?RED:TEXT_DIM, flex:1, textAlign:"right"}}>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay+"%":"—"}</span>
-                    </div>
-                  ))}
-                </div>
-                {groupsRes.lessBearish && groupsRes.lessBearish.length>0 && (
-                  <div style={{padding:"8px 10px", background:"#1a1500", borderRadius:8, marginBottom:6, border:"1px solid "+AMBER+"44"}}>
-                    <div style={{fontSize:9, color:AMBER, fontWeight:800, marginBottom:3}}>🔄 RETOURNEMENT PRÉCOCE (Less Bearish)</div>
-                    <div style={{fontSize:7.5, color:TEXT_DIM, marginBottom:5, lineHeight:1.4}}>Pete : "avant d'être haussier, un secteur devient MOINS baissier". Court terme (5j) qui s'améliore alors que le mois est encore faible = le smart money commence à revenir AVANT tout le monde.</div>
-                    {groupsRes.lessBearish.map((s,i)=>(
-                      <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
-                        <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{s.name}</span>
-                        <span style={{fontSize:8, color:GREEN, fontWeight:700, flex:1, textAlign:"right"}}>5j +{s.week}%</span>
-                        <span style={{fontSize:8, color:TEXT_DIM, flex:1, textAlign:"right"}}>21j {s.month>0?"+":""}{s.month}%</span>
-                      </div>
-                    ))}
+
+                {/* 3 BLOCS D'ACTION */}
+                {groupsRes.buy.length>0 && (
+                  <div style={{padding:"7px 10px", background:"#052010", borderRadius:8, marginBottom:5, border:"1px solid #14321f"}}>
+                    <div style={{fontSize:9, color:GREEN, fontWeight:800}}>💰 CHASSE ICI — {groupsRes.buy.map(s=>s.name).join(" · ")}</div>
                   </div>
                 )}
-                {groupsRes.exhausted && groupsRes.exhausted.length>0 && (
-                  <div style={{padding:"8px 10px", background:"#1a0a14", borderRadius:8, border:"1px solid "+PURPLE+"44"}}>
-                    <div style={{fontSize:9, color:PURPLE, fontWeight:800, marginBottom:3}}>⚡ ÉPUISEMENT (momentum ralentit)</div>
-                    <div style={{fontSize:7.5, color:TEXT_DIM, marginBottom:5, lineHeight:1.4}}>Secteur encore en tête mais dont le rythme court terme (5j) ralentit fortement vs le mois. Hausses de plus en plus faibles = essoufflement. Remonte tes trailing stops sur ces secteurs.</div>
-                    {groupsRes.exhausted.map((s,i)=>(
-                      <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
-                        <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{s.name}</span>
-                        <span style={{fontSize:8, color:AMBER, flex:1, textAlign:"right"}}>5j +{s.week}%</span>
-                        <span style={{fontSize:8, color:TEXT_DIM, flex:1, textAlign:"right"}}>21j +{s.month}%</span>
-                      </div>
-                    ))}
+                {groupsRes.watch.length>0 && (
+                  <div style={{padding:"7px 10px", background:"#1a1500", borderRadius:8, marginBottom:5, border:"1px solid "+AMBER+"44"}}>
+                    <div style={{fontSize:9, color:AMBER, fontWeight:800}}>🌱 SURVEILLE — {groupsRes.watch.map(s=>s.name).join(" · ")}</div>
                   </div>
                 )}
-                {groupsRes.accelerating && groupsRes.accelerating.length>0 && (
-                  <div style={{padding:"8px 10px", background:"#052010", borderRadius:8, marginBottom:6, marginTop:6, border:"1px solid "+GREEN+"55"}}>
-                    <div style={{fontSize:9, color:GREEN, fontWeight:800, marginBottom:3}}>🟢 ACCÉLÉRATION (entre en tendance — acheter)</div>
-                    <div style={{fontSize:7.5, color:TEXT_DIM, marginBottom:5, lineHeight:1.4}}>Le 21j est déjà positif ET le 5j est encore plus fort que le rythme du mois. La hausse s'intensifie : le smart money charge ce secteur MAINTENANT. C'est ici que tu cherches tes actions.</div>
-                    {groupsRes.accelerating.map((s,i)=>(
-                      <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
-                        <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{s.name}</span>
-                        <span style={{fontSize:8, color:GREEN, fontWeight:700, flex:1, textAlign:"right"}}>5j +{s.week}%</span>
-                        <span style={{fontSize:8, color:TEXT_DIM, flex:1, textAlign:"right"}}>21j +{s.month}%</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {groupsRes.turningDown && groupsRes.turningDown.length>0 && (
-                  <div style={{padding:"8px 10px", background:"#200505", borderRadius:8, border:"1px solid "+RED+"55"}}>
-                    <div style={{fontSize:9, color:RED, fontWeight:800, marginBottom:3}}>🔴 RETOURNEMENT BAISSIER (sort de tendance — alléger)</div>
-                    <div style={{fontSize:7.5, color:TEXT_DIM, marginBottom:5, lineHeight:1.4}}>Le 21j est encore positif MAIS le 5j est devenu négatif. Le smart money commence à SORTIR avant tout le monde. Si tu détiens une action de ce secteur : remonte ton stop ou allège.</div>
-                    {groupsRes.turningDown.map((s,i)=>(
-                      <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
-                        <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{s.name}</span>
-                        <span style={{fontSize:8, color:RED, fontWeight:700, flex:1, textAlign:"right"}}>5j {s.week}%</span>
-                        <span style={{fontSize:8, color:TEXT_DIM, flex:1, textAlign:"right"}}>21j +{s.month}%</span>
-                      </div>
-                    ))}
+                {groupsRes.avoid.length>0 && (
+                  <div style={{padding:"7px 10px", background:"#200505", borderRadius:8, border:"1px solid #3a1f1f"}}>
+                    <div style={{fontSize:9, color:RED, fontWeight:800}}>🩸 ÉVITE — {groupsRes.avoid.map(s=>s.name).join(" · ")}</div>
                   </div>
                 )}
               </div>
