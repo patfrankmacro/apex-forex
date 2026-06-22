@@ -257,6 +257,62 @@ function parseGroups(raw) {
   return sectors;
 }
 
+function parseStockList(txt) {
+  // Vue "Performance" Finviz, format vertical (1 valeur par ligne) OU tabulaire.
+  // Colonnes: No Ticker Week Month Quart Half YTD Year 3Y 5Y 10Y VolW VolM AvgVol RelVol Price Change Volume
+  const lines = txt.split(/\r?\n/).map(l=>l.trim());
+  const rows = [];
+  const toVol = (x)=>{ if(!x) return null; const u=String(x).slice(-1); let v=parseFloat(String(x).replace(/,/g,'')); if(u==='B')v*=1000; if(u==='K')v/=1000; return isNaN(v)?null:v; };
+  const toN = (x)=>{ if(x==null) return null; const v=parseFloat(String(x).replace('%','').replace(/,/g,'')); return isNaN(v)?null:v; };
+  // --- Format vertical : un ticker seul sur une ligne, suivi de ~17 valeurs ---
+  let i=0;
+  while(i<lines.length){
+    if(/^[A-Z]{1,5}$/.test(lines[i]) && /^-?[0-9]/.test(lines[i+1]||'')){
+      const v=[]; let j=i+1;
+      while(j<lines.length && v.length<17 && /^-?[0-9.,]+%?$|^-$|^[0-9.,]+[BMK]$/.test(lines[j])){ v.push(lines[j]); j++; }
+      if(v.length>=15){
+        rows.push({ ticker:lines[i], week:toN(v[0]), month:toN(v[1]), quart:toN(v[2]),
+          volWk:toN(v[9]), volMo:toN(v[10]), avgVol:toVol(v[11]), relVol:toN(v[12]),
+          price:toN(v[13]), change:toN(v[14]), volume:toVol(v[15]) });
+        i=j; continue;
+      }
+    }
+    i++;
+  }
+  // --- Format tabulaire fallback ---
+  if(rows.length===0){
+    for(const ln of lines){
+      const t=ln.split(/\t|\s{2,}/).map(x=>x.trim()).filter(Boolean);
+      if(t.length>=16 && /^[0-9]+$/.test(t[0]) && /^[A-Z]{1,5}$/.test(t[1])){
+        rows.push({ ticker:t[1], week:toN(t[2]), month:toN(t[3]), quart:toN(t[4]),
+          volWk:toN(t[11]), volMo:toN(t[12]), avgVol:toVol(t[13]), relVol:toN(t[14]),
+          price:toN(t[15]), change:toN(t[16]), volume:toVol(t[17]) });
+      }
+    }
+  }
+  const seen=new Set(); return rows.filter(r=>{ if(seen.has(r.ticker))return false; seen.add(r.ticker); return true; });
+}
+
+function rankStocks(rows) {
+  // Classement "comme Pete" : leaders en force relative, 3 horizons alignes, pas trop etendu, gros volume institutionnel
+  return rows.map(r=>{
+    let score=0; const why=[]; const flags=[];
+    // 1. FORCE DE FOND (month / 21j) — coeur de la relative strength (O'Neil/Pete)
+    if(r.month!=null){ if(r.month>50){score+=22;why.push("force de fond exceptionnelle (+"+r.month+"% sur 21j)");} else if(r.month>25){score+=16;why.push("forte tendance de fond");} else if(r.month>10){score+=9;} else {score+=3;} }
+    // 2. ACCELERATION 3 horizons : 5j ramene au rythme du mois + 1j positif
+    if(r.month!=null && r.week!=null){ const rythme=r.month/4.3; if(r.week>=rythme*1.05){score+=18;why.push("momentum 5j qui ACCELERE");} else if(r.week>0){score+=9;flags.push("5j positif mais ralentit");} else {score-=8;flags.push("5j NEGATIF — momentum court terme casse");} }
+    if(r.change!=null){ if(r.change>0){score+=8;} else {score-=6;flags.push("rouge aujourd'hui");} }
+    // 3. PENALITE SUR-EXTENSION (Pete: ne chasse pas l'etendu)
+    if(r.quart!=null){ if(r.quart>200){score-=16;flags.push("TRES etendu (+"+r.quart+"% sur 3 mois) — risque d'acheter le sommet");} else if(r.quart>150){score-=8;flags.push("etendu (+"+r.quart+"% sur 3 mois)");} else if(r.quart>=40){score+=8;why.push("tendance solide sans sur-extension");} }
+    // 4. VOLUME INSTITUTIONNEL REEL ($ echange = price x volume)
+    const dollarVol = (r.price!=null && r.volume!=null) ? r.price*r.volume : null;
+    if(dollarVol!=null){ if(dollarVol>20e9){score+=16;why.push("volume institutionnel ENORME ($"+(dollarVol/1e9).toFixed(0)+"B)");} else if(dollarVol>5e9){score+=12;why.push("gros volume institutionnel ($"+(dollarVol/1e9).toFixed(1)+"B)");} else if(dollarVol>1e9){score+=6;} else {score-=4;flags.push("volume $ faible — moins institutionnel");} }
+    // 5. RELVOL (activite du jour)
+    if(r.relVol!=null){ if(r.relVol>=1.8){score+=8;why.push("RelVol eleve ("+r.relVol+"x) = institutions actives aujourd'hui");} else if(r.relVol>=1.2){score+=4;} }
+    return { ...r, score:Math.max(0,Math.round(score)), why, flags, dollarVol };
+  }).sort((a,b)=>b.score-a.score);
+}
+
 function analyseGroups(sectors) {
   if (!sectors.length) return null;
   const byMonth = [...sectors].sort((a,b)=>b.month-a.month);
@@ -414,6 +470,9 @@ function StockAnalyseView() {
   const [groupsRes, setGroupsRes] = useState(null);
   const [openGroups, setOpenGroups] = useState(false);
   const [selSector, setSelSector] = useState(null);
+  const [listRaw, setListRaw] = useState("");
+  const [listRes, setListRes] = useState(null);
+  const [openList, setOpenList] = useState(false);
   const [res, setRes] = useState(null);
   const [a1,setA1]=useState(false),[a2,setA2]=useState(false),[a3,setA3]=useState(false),
         [a4,setA4]=useState(false),[a5,setA5]=useState(false),[a6,setA6]=useState(false),
@@ -424,6 +483,11 @@ function StockAnalyseView() {
     if (!groupsRaw.trim()) { setGroupsRes(null); return; }
     const sectors = parseGroups(groupsRaw);
     setGroupsRes(analyseGroups(sectors));
+  };
+  const analyzeList = () => {
+    if (!listRaw.trim()) { setListRes(null); return; }
+    const rows = parseStockList(listRaw);
+    setListRes(rankStocks(rows));
   };
 
   const run = () => {
@@ -548,6 +612,47 @@ function StockAnalyseView() {
             )}
           </div>
         )}
+
+        {/* ===== CLASSEMENT ACTIONS (suivre la liquidite) ===== */}
+        <div style={{marginTop:14, border:"1px solid #2a3441", borderRadius:12, overflow:"hidden"}}>
+          <div onClick={()=>setOpenList(!openList)} style={{padding:"12px 14px", background:"#10141c", cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+            <span style={{fontSize:12, fontWeight:800, color:GOLD}}>🏦 2. CLASSER MES ACTIONS — suivre la liquidité</span>
+            <span style={{color:GOLD}}>{openList?"▲":"▼"}</span>
+          </div>
+          {openList && (
+            <div style={{padding:"12px 14px", background:"#0a0e16"}}>
+              <div style={{fontSize:9, color:TEXT_DIM, marginBottom:8, lineHeight:1.5}}>Colle la liste de ton screener Finviz (vue Performance). L'app classe tes actions du PLUS au MOINS institutionnel : force de fond, accélération 5j/21j/1j, volume en dollars (smart money), et pénalise les actions sur-étendues qu'il est trop tard pour chasser.</div>
+              <textarea value={listRaw} onChange={e=>setListRaw(e.target.value)} placeholder="Colle ici le tableau (No, Ticker, Perf Week, Perf Month, Perf Quart... Price, Change, Volume)" style={{width:"100%", minHeight:90, background:"#070a10", color:TEXT, border:"1px solid #2a3441", borderRadius:8, padding:8, fontSize:9, fontFamily:"monospace", boxSizing:"border-box"}} />
+              <button onClick={analyzeList} style={{width:"100%", marginTop:8, padding:"11px", background:GOLD, color:"#0a0e16", border:"none", borderRadius:8, fontSize:12, fontWeight:800, cursor:"pointer"}}>🏦 CLASSER LES ACTIONS</button>
+
+              {listRes && listRes.length>0 && (
+                <div style={{marginTop:12}}>
+                  <div style={{fontSize:9, color:TEXT_DIM, marginBottom:6}}>{listRes.length} actions classées — ordre de qualité institutionnelle (suis la liquidité de haut en bas) :</div>
+                  {listRes.map((r,i)=>{
+                    const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":(i+1)+".";
+                    const sc = r.score>=70?GREEN : r.score>=45?AMBER : r.score>=25?"#fb923c" : RED;
+                    return (
+                      <div key={i} style={{padding:"8px 10px", background:i<3?"#0d1a12":"#0d1420", borderRadius:8, marginBottom:5, border:"1px solid "+(i<3?"#16331f":"#1a2230")}}>
+                        <div style={{display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+                          <span style={{fontSize:12, fontWeight:800, color:TEXT}}>{medal} {r.ticker}</span>
+                          <span style={{fontSize:8, color:TEXT_DIM}}>${r.price!=null?r.price:"?"} · {r.dollarVol!=null?"$"+(r.dollarVol/1e9).toFixed(1)+"B échangés":""}</span>
+                          <div style={{display:"flex", alignItems:"center", gap:5}}>
+                            <div style={{width:50, height:6, background:"#1a2230", borderRadius:3, overflow:"hidden"}}><div style={{width:r.score+"%", height:"100%", background:sc}}></div></div>
+                            <span style={{fontSize:10, fontWeight:800, color:sc}}>{r.score}</span>
+                          </div>
+                        </div>
+                        <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:3}}>21j <b style={{color:r.month>0?GREEN:RED}}>{r.month>0?"+":""}{r.month}%</b> · 5j <b style={{color:r.week>0?GREEN:RED}}>{r.week>0?"+":""}{r.week}%</b> · 1j <b style={{color:r.change>0?GREEN:RED}}>{r.change>0?"+":""}{r.change}%</b> · 3M {r.quart>0?"+":""}{r.quart}%{r.relVol!=null?" · RelVol "+r.relVol+"x":""}</div>
+                        {r.why.length>0 && <div style={{fontSize:7.5, color:GREEN, marginTop:2}}>✓ {r.why.slice(0,2).join(" · ")}</div>}
+                        {r.flags.length>0 && <div style={{fontSize:7.5, color:AMBER, marginTop:2}}>⚠ {r.flags.slice(0,2).join(" · ")}</div>}
+                      </div>
+                    );
+                  })}
+                  <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:6, fontStyle:"italic"}}>⚠️ Vérifie le secteur de chaque action dans ton scan ci-dessus : ne chasse que celles dont le secteur est en 💰 ACCUMULATION. Pas un conseil financier.</div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <input value={ticker} onChange={e=>setTicker(e.target.value)} placeholder="⚠️ TICKER OBLIGATOIRE (ex: ENTG, ALAB, RSI...)"
