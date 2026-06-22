@@ -597,7 +597,7 @@ function StockAnalyseView() {
         Va sur <b style={{color:PURPLE}}>finviz.com/stock?t=TICKER</b>, copie le tableau de stats complet et colle-le ci-dessous. L'app analyse les <b style={{color:BLUE}}>2 screeners d'un coup</b> : Technique (Pete) + Technique & Fondamental (Minervini).
       </div>
 
-      <div style={{marginBottom:10, background:"#0a1018", borderRadius:8, border:"1px solid #1a2230", overflow:"hidden"}}>
+      <div style={{marginBottom:18, background:"#0a1018", borderRadius:12, border:"1px solid #2a3441", overflow:"hidden", boxShadow:"0 2px 12px #00000055"}}>
         <div onClick={()=>setOpenGroups(!openGroups)} style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 12px", cursor:"pointer"}}>
           <span style={{fontSize:10, color:GOLD, fontWeight:800, letterSpacing:0.5}}>🔄 1. SCAN SECTEURS (GROUPS) — à faire en premier</span>
           <span style={{fontSize:11, color:GOLD}}>{openGroups?"▲":"▼"}</span>
@@ -691,7 +691,7 @@ function StockAnalyseView() {
         )}
 
         {/* ===== CLASSEMENT ACTIONS (suivre la liquidite) ===== */}
-        <div style={{marginTop:14, border:"1px solid #2a3441", borderRadius:12, overflow:"hidden"}}>
+        <div style={{marginTop:18, marginBottom:18, border:"1px solid #2a3441", borderRadius:12, overflow:"hidden", boxShadow:"0 2px 12px #00000055"}}>
           <div onClick={()=>setOpenList(!openList)} style={{padding:"12px 14px", background:"#10141c", cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
             <span style={{fontSize:12, fontWeight:800, color:GOLD}}>🏦 2. CLASSER MES ACTIONS — suivre la liquidité</span>
             <span style={{color:GOLD}}>{openList?"▲":"▼"}</span>
@@ -928,7 +928,7 @@ Le 1j confirme que le secteur est encore vivant AUJOURD'HUI. Un secteur fort sur
 💰 ACCUMULATION = 21j fort + 5j accelere + 1j positif
 Les 3 alignes a la hausse. Le smart money charge MAINTENANT. C'est ICI qu'on chasse nos actions. Risque minimal, courant porteur maximal.
 
-⏸ ESSOUFFLEMENT = 21j fort MAIS 5j ralentit ou 1j negatif
+⏸ ESSOUFFLEMENT = 21j fort MAIS 5j devient negatif (le 1j seul ne compte pas)
 La fondation tient mais le flux faiblit. Pete dirait : ne chasse pas, la hausse se fatigue. On attend ou on surveille.
 
 🌱 ROTATION ENTRANTE = 21j faible/negatif MAIS 5j repasse positif
