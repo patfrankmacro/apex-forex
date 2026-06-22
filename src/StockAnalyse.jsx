@@ -323,47 +323,51 @@ function parseTechList(txt){
 }
 
 function rankStocks(rows, tech) {
-  // Fusionne Performance + Technical par ticker. Detecte l'ACCUMULATION INSTITUTIONNELLE deja commencee mais pas finie.
+  // CONVERGENCE MOMENTUM x VOLATILITE (Pete). Il faut etre fort sur les DEUX axes.
+  // Liquidite = filtre d'entree facon Pete (terrain institutionnel), pas un facteur de tri.
   return rows.map(r=>{
     const t = (tech && tech[r.ticker]) ? tech[r.ticker] : {};
     const price = r.price!=null?r.price : t.price;
     const change = r.change!=null?r.change : t.change;
-    let score=0; const why=[]; const flags=[];
+    const why=[]; const flags=[];
     const dollarVol = (price!=null && r.volume!=null) ? price*r.volume : null;
 
-    // 1) SEUIL DE LIQUIDITE (terrain institutionnel) — jusqu'a 20
-    if(dollarVol!=null){
-      if(dollarVol<1e9){ score-=20; flags.push("hors terrain institutionnel (<$1B/j)"); }
-      else if(dollarVol<3e9){ score+=8; }
-      else if(dollarVol<10e9){ score+=15; why.push("bonne liquidité ($"+(dollarVol/1e9).toFixed(1)+"B/j)"); }
-      else if(dollarVol<30e9){ score+=20; why.push("grosse liquidité institutionnelle ($"+(dollarVol/1e9).toFixed(0)+"B/j)"); }
-      else { score+=22; why.push("liquidité massive ($"+(dollarVol/1e9).toFixed(0)+"B/j)"); }
-    }
+    // ===== FILTRE LIQUIDITE (comme Pete: actions liquides/institutionnelles) =====
+    let liquide = true;
+    if(dollarVol!=null && dollarVol<1e9){ liquide=false; flags.push("hors terrain institutionnel (<$1B/j) — Pete exige des actions très liquides"); }
+    else if(dollarVol!=null && dollarVol>=20e9){ why.push("liquidité massive ($"+(dollarVol/1e9).toFixed(0)+"B/j)"); }
+    else if(dollarVol!=null && dollarVol>=5e9){ why.push("bonne liquidité institutionnelle ($"+(dollarVol/1e9).toFixed(1)+"B/j)"); }
 
-    // 2) FORCE DE FOND etablie = les fonds sont DEJA la — jusqu'a 14
-    if(r.month!=null){ if(r.month>40){score+=14;why.push("force de fond exceptionnelle (+"+r.month+"%/21j)");} else if(r.month>20){score+=10;why.push("forte tendance de fond");} else if(r.month>8){score+=6;} }
+    // ===== SCORE MOMENTUM (0-100) — le mois mene =====
+    let mom=0;
+    if(r.month!=null){ if(r.month>60)mom+=42; else if(r.month>40)mom+=36; else if(r.month>25)mom+=27; else if(r.month>12)mom+=16; else mom+=6; }
+    if(r.quart!=null){ if(r.quart>100)mom+=22; else if(r.quart>50)mom+=16; else if(r.quart>20)mom+=9; else mom+=3; }
+    if(r.month!=null && r.week!=null){ const ry=r.month/4.3; if(r.week>=ry*1.05)mom+=16; else if(r.week>0)mom+=7; else {mom-=12;flags.push("5j NÉGATIF — momentum cassé");} }
+    if(t.chgOpen!=null){ if(t.chgOpen>=5)mom+=14; else if(t.chgOpen>=2)mom+=9; else if(t.chgOpen>0)mom+=3; else {mom-=8;flags.push("clôture sous l'ouverture");} }
+    if(r.relVol!=null){ if(r.relVol>=1.8)mom+=6; else if(r.relVol>=1.2)mom+=3; }
+    if(change!=null && change<0){ mom-=5; }
+    mom = Math.max(0, Math.min(100, mom));
+    if(r.month!=null && r.month>40) why.push("LEADER du mois (+"+r.month+"%/21j)");
+    if(t.chgOpen!=null && t.chgOpen>=2) why.push("Change from Open +"+t.chgOpen+"% (carburant Pete)");
 
-    // 3) ACCUMULATION ENCORE ACTIVE (accelere, pas fini) — jusqu'a 16
-    if(r.month!=null && r.week!=null){ const ry=r.month/4.3; if(r.week>=ry*1.05){score+=16;why.push("momentum 5j ACCELERE = accumulation active");} else if(r.week>0){score+=8;flags.push("5j ralentit");} else {score-=10;flags.push("5j négatif");} }
+    // ===== SCORE VOLATILITE (0-100) — amplitude de mouvement =====
+    let vol=0;
+    const atrPct = (t.atr!=null && price!=null && price>0) ? (t.atr/price*100) : null;
+    if(atrPct!=null){ if(atrPct>=8)vol+=55; else if(atrPct>=6)vol+=45; else if(atrPct>=4)vol+=32; else if(atrPct>=2.5)vol+=18; else vol+=6; }
+    else vol+=25; // pas d'ATR fourni: neutre
+    if(t.beta!=null){ if(t.beta>=3.5)vol+=45; else if(t.beta>=2.5)vol+=38; else if(t.beta>=1.5)vol+=28; else if(t.beta>=1)vol+=15; else vol+=4; }
+    else vol+=20;
+    vol = Math.max(0, Math.min(100, vol));
+    if(atrPct!=null && atrPct>=6) why.push("forte amplitude (ATR "+atrPct.toFixed(1)+"%/j)");
+    if(t.beta!=null && t.beta>=1.5) why.push("Beta "+t.beta+" (volatil)");
 
-    // 4) CHANGE FROM OPEN — le carburant de Pete (bid tenu) — jusqu'a 10
-    if(t.chgOpen!=null){ if(t.chgOpen>=2){score+=10;why.push("Change from Open +"+t.chgOpen+"% = bid institutionnel tenu (carburant Pete)");} else if(t.chgOpen>0){score+=4;} else {score-=4;flags.push("clôture sous l'ouverture");} }
+    // ===== CONVERGENCE : moyenne geometrique (il faut les DEUX forts) =====
+    let score = Math.round(Math.sqrt(mom*vol));
+    if(!liquide) score = Math.round(score*0.55); // relegue les non-institutionnels facon Pete
+    if(mom<35) flags.push("momentum insuffisant");
+    if(vol<35) flags.push("volatilité insuffisante (bouge peu)");
 
-    // 5) STAGE 2 (SMA alignees) — jusqu'a 8
-    if(t.sma20!=null && t.sma50!=null && t.sma200!=null){ if(t.sma20>0 && t.sma50>0 && t.sma200>0){score+=8;why.push("Stage 2 confirmé (prix > SMA20/50/200)");} else if(t.sma200>0){score+=3;} }
-
-    // 6) LEADER proche du 52W High (Minervini) — jusqu'a 8
-    if(t.high52!=null){ if(t.high52<=5){score+=8;why.push("à "+t.high52+"% du sommet 52s = vrai leader");} else if(t.high52<=15){score+=4;} else if(t.high52>30){score-=4;flags.push("loin du sommet ("+t.high52+"%)");} }
-
-    // 7) RelVol institutions actives — jusqu'a 6
-    if(r.relVol!=null){ if(r.relVol>=1.8){score+=6;why.push("RelVol "+r.relVol+"x");} else if(r.relVol>=1.2){score+=3;} }
-
-    // === PENALITES (sur-extension / surchauffe = proche distribution) ===
-    if(r.quart!=null){ if(r.quart>250){score-=20;flags.push("extrêmement étendu (+"+r.quart+"%/3M) — proche distribution");} else if(r.quart>180){score-=12;flags.push("très étendu (+"+r.quart+"%/3M)");} else if(r.quart>120){score-=6;flags.push("étendu");} else if(r.quart>=40){score+=6;why.push("pas sur-étendu = accumulation saine");} }
-    if(t.rsi!=null){ if(t.rsi>75){score-=8;flags.push("RSI "+t.rsi+" = surchauffe court terme");} else if(t.rsi>70){score-=4;flags.push("RSI "+t.rsi+" élevé");} }
-    if(change!=null && change<0){ score-=4; flags.push("rouge aujourd'hui"); }
-
-    return { ...r, ...t, price, change, score:Math.max(0,Math.min(100,Math.round(score))), why, flags, dollarVol };
+    return { ...r, ...t, price, change, score, mom:Math.round(mom), vol:Math.round(vol), why, flags, dollarVol, liquide };
   }).sort((a,b)=>b.score-a.score);
 }
 
@@ -700,7 +704,12 @@ function StockAnalyseView() {
                             <span style={{fontSize:10, fontWeight:800, color:sc}}>{r.score}</span>
                           </div>
                         </div>
-                        <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:3}}>21j <b style={{color:r.month>0?GREEN:RED}}>{r.month>0?"+":""}{r.month}%</b> · 5j <b style={{color:r.week>0?GREEN:RED}}>{r.week>0?"+":""}{r.week}%</b> · 1j <b style={{color:r.change>0?GREEN:RED}}>{r.change>0?"+":""}{r.change}%</b> · 3M {r.quart>0?"+":""}{r.quart}%{r.relVol!=null?" · RelVol "+r.relVol+"x":""}</div>
+                        <div style={{display:"flex", gap:8, marginTop:3, marginBottom:1}}>
+                          <span style={{fontSize:7.5, color:r.mom>=60?GREEN:r.mom>=35?AMBER:RED, fontWeight:700}}>⚡ Momentum {r.mom}</span>
+                          <span style={{fontSize:7.5, color:r.vol>=60?GREEN:r.vol>=35?AMBER:RED, fontWeight:700}}>🌊 Volatilité {r.vol}</span>
+                          <span style={{fontSize:7, color:TEXT_DIM}}>(convergence = {r.score})</span>
+                        </div>
+                        <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:0}}>21j <b style={{color:r.month>0?GREEN:RED}}>{r.month>0?"+":""}{r.month}%</b> · 5j <b style={{color:r.week>0?GREEN:RED}}>{r.week>0?"+":""}{r.week}%</b> · 1j <b style={{color:r.change>0?GREEN:RED}}>{r.change>0?"+":""}{r.change}%</b> · 3M {r.quart>0?"+":""}{r.quart}%{r.relVol!=null?" · RelVol "+r.relVol+"x":""}</div>
                         {(r.chgOpen!=null||r.high52!=null||r.atr!=null||r.rsi!=null||r.beta!=null) && (
                           <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:2}}>{r.chgOpen!=null?"ChgOpen "+(r.chgOpen>0?"+":"")+r.chgOpen+"%":""}{r.high52!=null?" · à "+r.high52+"% du 52WH":""}{r.atr!=null?" · ATR "+r.atr:""}{r.beta!=null?" · β"+r.beta:""}{r.rsi!=null?" · RSI "+r.rsi:""}</div>
                         )}
