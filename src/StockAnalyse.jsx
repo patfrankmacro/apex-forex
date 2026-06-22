@@ -582,7 +582,7 @@ function StockAnalyseView() {
 
   return (
     <div className="sa-wrap">
-      <style>{`@keyframes floatBubble{0%{transform:translateY(0)}50%{transform:translateY(-7px)}100%{transform:translateY(0)}}@keyframes glowB{0%,100%{box-shadow:0 0 8px #c9a84c66}50%{box-shadow:0 0 18px #c9a84ccc}}.sa-wrap{max-width:540px;margin:0 auto;padding:0 4px}@media(min-width:900px){.sa-wrap{max-width:720px;padding:0 20px}}`}</style>
+      <style>{`@keyframes floatBubble{0%{transform:translateY(0)}50%{transform:translateY(-7px)}100%{transform:translateY(0)}}@keyframes glowB{0%,100%{box-shadow:0 0 8px #c9a84c66}50%{box-shadow:0 0 18px #c9a84ccc}}.sa-wrap{max-width:540px;margin:0 auto;padding:0 4px}@media(min-width:900px){.sa-wrap{max-width:1000px;padding:0 28px}}`}</style>
       <a href="/guide.html" target="_blank" rel="noreferrer" style={{display:"flex", alignItems:"center", gap:8, justifyContent:"center", margin:"0 auto 12px", padding:"10px 16px", background:"linear-gradient(135deg,#1a1500,#10141c)", border:"1px solid #c9a84c", borderRadius:30, textDecoration:"none", width:"fit-content", animation:"floatBubble 3s ease-in-out infinite, glowB 2.5s ease-in-out infinite"}}>
         <span style={{fontSize:18}}>📚</span>
         <span style={{fontSize:11, fontWeight:800, color:"#c9a84c", letterSpacing:0.5}}>GUIDE COMPLET PETE + MINERVINI</span>
@@ -597,10 +597,11 @@ function StockAnalyseView() {
         Va sur <b style={{color:PURPLE}}>finviz.com/stock?t=TICKER</b>, copie le tableau de stats complet et colle-le ci-dessous. L'app analyse les <b style={{color:BLUE}}>2 screeners d'un coup</b> : Technique (Pete) + Technique & Fondamental (Minervini).
       </div>
 
-      <div style={{marginBottom:18, background:"#0a1018", borderRadius:12, border:"1px solid #2a3441", overflow:"hidden", boxShadow:"0 2px 12px #00000055"}}>
-        <div onClick={()=>setOpenGroups(!openGroups)} style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 12px", cursor:"pointer"}}>
-          <span style={{fontSize:10, color:GOLD, fontWeight:800, letterSpacing:0.5}}>🔄 1. SCAN SECTEURS (GROUPS) — à faire en premier</span>
-          <span style={{fontSize:11, color:GOLD}}>{openGroups?"▲":"▼"}</span>
+      <div style={{marginBottom:16, background:"#121826", borderRadius:14, border:"1px solid #243044", overflow:"hidden", boxShadow:"0 4px 20px #00000066", borderLeft:"4px solid "+GOLD}}>
+        <div onClick={()=>setOpenGroups(!openGroups)} style={{display:"flex", alignItems:"center", gap:11, padding:"15px 15px", cursor:"pointer"}}>
+          <div style={{minWidth:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,"+GOLD+",#a8862f)", color:"#0a0e16", fontWeight:900, fontSize:13, display:"flex", alignItems:"center", justifyContent:"center"}}>1</div>
+          <span style={{flex:1, fontSize:12, color:GOLD, fontWeight:800, letterSpacing:0.3}}>🔄 SCAN SECTEURS (GROUPS) — à faire en premier</span>
+          <span style={{fontSize:12, color:GOLD}}>{openGroups?"▲":"▼"}</span>
         </div>
         {openGroups && (
           <div style={{padding:"0 12px 12px 12px"}}>
@@ -691,10 +692,11 @@ function StockAnalyseView() {
         )}
 
         {/* ===== CLASSEMENT ACTIONS (suivre la liquidite) ===== */}
-        <div style={{marginTop:18, marginBottom:18, border:"1px solid #2a3441", borderRadius:12, overflow:"hidden", boxShadow:"0 2px 12px #00000055"}}>
-          <div onClick={()=>setOpenList(!openList)} style={{padding:"12px 14px", background:"#10141c", cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-            <span style={{fontSize:12, fontWeight:800, color:GOLD}}>🏦 2. CLASSER MES ACTIONS — suivre la liquidité</span>
-            <span style={{color:GOLD}}>{openList?"▲":"▼"}</span>
+        <div style={{marginBottom:16, background:"#121826", borderRadius:14, border:"1px solid #243044", borderLeft:"4px solid "+GREEN, overflow:"hidden", boxShadow:"0 4px 20px #00000066"}}>
+          <div onClick={()=>setOpenList(!openList)} style={{padding:"15px 15px", cursor:"pointer", display:"flex", alignItems:"center", gap:11}}>
+            <div style={{minWidth:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,"+GREEN+",#1d8a5f)", color:"#0a0e16", fontWeight:900, fontSize:13, display:"flex", alignItems:"center", justifyContent:"center"}}>2</div>
+            <span style={{flex:1, fontSize:12, fontWeight:800, color:GREEN, letterSpacing:0.3}}>🏦 CLASSER MES ACTIONS — suivre la liquidité</span>
+            <span style={{fontSize:12, color:GREEN}}>{openList?"▲":"▼"}</span>
           </div>
           {openList && (
             <div style={{padding:"12px 14px", background:"#0a0e16"}}>
@@ -743,13 +745,19 @@ function StockAnalyseView() {
         </div>
       </div>
 
+      <div style={{marginBottom:16, background:"#121826", borderRadius:14, border:"1px solid #243044", borderLeft:"4px solid "+PURPLE, boxShadow:"0 4px 20px #00000066", padding:"15px 15px"}}>
+      <div style={{display:"flex", alignItems:"center", gap:11, marginBottom:11}}>
+        <div style={{minWidth:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,"+PURPLE+",#7a3fb0)", color:"#fff", fontWeight:900, fontSize:13, display:"flex", alignItems:"center", justifyContent:"center"}}>3</div>
+        <span style={{flex:1, fontSize:12, fontWeight:800, color:PURPLE, letterSpacing:0.3}}>🎯 ANALYSE INDIVIDUELLE</span>
+      </div>
       <input value={ticker} onChange={e=>setTicker(e.target.value)} placeholder="⚠️ TICKER OBLIGATOIRE (ex: ENTG, ALAB, RSI...)"
         style={{width:"100%", background:"#0a0a12", color:"#c084fc", border:"1px solid #2a1f3a", borderRadius:8, padding:"9px 10px", fontSize:12, fontWeight:800, letterSpacing:1, fontFamily:"monospace", boxSizing:"border-box", marginBottom:8, textTransform:"uppercase"}} />
       <textarea value={raw} onChange={e=>setRaw(e.target.value)} placeholder="Colle ici le tableau de stats Finviz (Price, ATR, Beta, EPS Q/Q, SMA200...)"
         style={{width:"100%", minHeight:90, background:"#0a0a12", color:TEXT2, border:"1px solid #2a1f3a", borderRadius:8, padding:10, fontSize:9, fontFamily:"monospace", boxSizing:"border-box", marginBottom:8}} />
 
       <button onClick={run} style={{width:"100%", padding:"11px", background:PURPLE, color:"#1a0a2a", border:"none", borderRadius:8, fontSize:12, fontWeight:900, letterSpacing:1, cursor:"pointer", marginBottom:6}}>⚡ ANALYSER</button>
-      <a href="https://finviz.com/screener.ashx" target="_blank" rel="noreferrer" style={{display:"block", textAlign:"center", fontSize:9, color:PURPLE, marginBottom:14}}>🔍 Ouvrir Finviz ↗</a>
+      <a href="https://finviz.com/screener.ashx" target="_blank" rel="noreferrer" style={{display:"block", textAlign:"center", fontSize:9, color:PURPLE}}>🔍 Ouvrir Finviz ↗</a>
+      </div>
 
       {res?.error && <div style={{fontSize:9, color:AMBER, padding:"10px 12px", background:"#1a1500", borderRadius:8, lineHeight:1.5}}>{res.error}</div>}
 
