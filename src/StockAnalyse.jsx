@@ -701,7 +701,7 @@ function StockAnalyseView() {
           </div>
           {openList && (
             <div style={{padding:"12px 14px", background:"#0a0e16"}}>
-              <div style={{fontSize:9, color:TEXT_DIM, marginBottom:8, lineHeight:1.5}}>Colle la liste de ton screener Finviz (vue Performance). L'app classe tes actions du PLUS au MOINS institutionnel : force de fond, accélération 5j/21j/1j, volume en dollars (smart money), et pénalise les actions sur-étendues qu'il est trop tard pour chasser.</div>
+              <div style={{fontSize:9, color:TEXT_DIM, marginBottom:8, lineHeight:1.5}}>Colle 2 vues Finviz : ① Performance et ② Technical. L'app fusionne par ticker et classe par CONVERGENCE Momentum × Volatilité — il faut être fort sur les DEUX axes. Momentum = 3 mois (tendance de fond) + 21j (le cœur) + 5j (accélération) + Change from Open. Volatilité = ATR% + Beta. Filtre liquidité : sous ~1 milliard/jour échangé, l'action est reléguée (trop petite pour les gros fonds).</div>
               <div style={{fontSize:8.5, color:GOLD, marginBottom:3, fontWeight:700}}>① Vue PERFORMANCE</div>
               <textarea value={listRaw} onChange={e=>setListRaw(e.target.value)} placeholder="Colle la vue Performance (Ticker, Perf Week, Month, Quart... Price, Change, Volume)" style={{width:"100%", minHeight:70, background:"#070a10", color:TEXT, border:"1px solid #2a3441", borderRadius:8, padding:8, fontSize:9, fontFamily:"monospace", boxSizing:"border-box"}} />
               <div style={{fontSize:8.5, color:GOLD, margin:"8px 0 3px", fontWeight:700}}>② Vue TECHNICAL (optionnel mais recommandé — Beta, ATR, SMA, 52W High, Change from Open, RSI)</div>
@@ -915,11 +915,11 @@ SCREENER 2 — TECH + FONDAMENTAL (Pete + Minervini) : la même base technique, 
 2. MESO — Dans ce secteur, trouve l'industrie qui domine.
 3. MICRO — Isole les 10-15 leaders de cette industrie.
 
-Regarde sur 1 mois ET 3 mois : un secteur top sur les deux = leadership confirmé. On ne trade QUE dans les secteurs en tête — comme Pete.`}
+Lis le secteur sur 4 horizons : 3 mois (la tendance de fond, l'ancrage) + 21j (le coeur, la colonne maitresse) + 5j (l'acceleration recente) + 1j (le pouls du jour, mineur). Un secteur fort sur le 3 mois ET le 21j avec un 5j positif = ACCUMULATION confirmee. On ne trade QUE dans ces secteurs — comme Pete.`}
       </Accordion>
 
-      <Accordion icon="🌊" titre="LIRE LE FLOW INSTITUTIONNEL (5j / 21j / 1j)" color={GREEN} open={a11} setOpen={setA11}>
-{`Le scan secteurs en haut classe les 11 secteurs comme le "Daily Ticker" de Pete. Voici comment LIRE le flux d'argent institutionnel a travers les 3 horizons, et pourquoi chacun compte.
+      <Accordion icon="🌊" titre="LIRE LE FLOW INSTITUTIONNEL (3M / 21j / 5j / 1j)" color={GREEN} open={a11} setOpen={setA11}>
+{`Le scan secteurs en haut classe les 11 secteurs comme le "Daily Ticker" de Pete. On lit le flux sur 4 horizons : le 3 MOIS donne la tendance de fond (l'ancrage), le 21j est le coeur, le 5j l'acceleration, le 1j le pouls. Voici la psychologie de chacun.
 
 ━━━ LES 3 HORIZONS ET LEUR PSYCHOLOGIE ━━━
 
@@ -954,22 +954,6 @@ La regle d'or de Pete : "Start with the sector. Find the leaders."
 3. Les fonds ne peuvent pas tout acheter : ils concentrent sur les 3-5 meilleurs secteurs. Si ton action est dans un de ces secteurs, tu surfes sur LEURS milliards.
 
 En resume : le secteur d'abord, l'action ensuite. Le flux institutionnel se lit dans la convergence des 3 horizons. Pas de secteur fort = pas de trade.`}
-      </Accordion>
-
-      <Accordion icon="🌊" titre="LES 5 STATUTS DE FLUX SECTORIEL" color={BLUE} open={a12} setOpen={setA12}>
-{`Le scan secteurs classe chaque secteur en 5 statuts selon le flux institutionnel. Le 1 mois (21j) mene, le 5j confirme, le 1j n'est qu'un pouls mineur (un seul jour rouge ne fait jamais basculer un secteur fort).
-
-💰 ACCUMULATION = 21j fort + 5j positif. Le smart money charge encore. C'est ICI qu'on chasse.
-
-⏸ ESSOUFFLEMENT = 21j fort MAIS 5j devient negatif. Le flux court terme se retourne vraiment. On attend.
-
-🌱 ROTATION ENTRANTE = 21j faible/negatif MAIS 5j repasse positif. Le "less bearish" de Pete. Watchlist.
-
-🩸 DISTRIBUTION / CAPITULATION = 21j qui faiblit + 5j negatif. Le smart money sort. On evite.
-
-💤 SANS FLUX / CONSOLIDATION = neutre, pas de direction claire.
-
-Regle d'or : on n'achete QUE dans les secteurs en ACCUMULATION. 3 actions sur 4 suivent leur secteur.`}
       </Accordion>
 
       <Accordion icon="🏦" titre="CLASSER LES ACTIONS — CONVERGENCE MOMENTUM x VOLATILITE" color={GOLD} open={a13} setOpen={setA13}>
@@ -1070,7 +1054,7 @@ Ils achètent progressivement sur plusieurs semaines pour ne pas faire monter le
 
       <Accordion icon="📅" titre="LA ROUTINE QUOTIDIENNE" color={AMBER} open={a9} setOpen={setA9}>
 {`CHAQUE SEMAINE (week-end / lundi) :
-• Groups Finviz : classe les secteurs sur 1m et 3m. Top 3 confirmé.
+• Groups Finviz : classe les secteurs sur 3 mois (tendance de fond) + 21j (coeur) + 5j (acceleration). Repere les secteurs en ACCUMULATION.
 • Fore vers l'industrie dominante.
 
 CHAQUE MATIN :
@@ -1080,7 +1064,7 @@ CHAQUE MATIN :
 • Pose tes alertes sur le niveau de breakout.
 
 AVANT CHAQUE ENTRÉE — 4 questions :
-1. Secteur dans le top 1m + 3m ?
+1. Secteur en ACCUMULATION (3 mois + 21j forts, 5j positif) ?
 2. Cluster (plusieurs actions de l'industrie) ?
 3. Bull Flag weekly prêt à casser sur gros volume ?
 4. R/R >= 3:1 avec mon stop ?`}
