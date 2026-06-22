@@ -522,12 +522,12 @@ function Row({ c }) {
 
 function Accordion({ icon, titre, color, open, setOpen, children }) {
   return (
-    <div style={{marginBottom:7, background:"#0a1018", borderRadius:8, border:"1px solid #1a2230", overflow:"hidden"}}>
-      <div onClick={()=>setOpen(!open)} style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 12px", cursor:"pointer"}}>
-        <span style={{fontSize:10, color:color, fontWeight:800, letterSpacing:0.5}}>{icon} {titre}</span>
+    <div style={{marginBottom:9, background:"#121826", borderRadius:12, border:"1px solid #243044", borderLeft:"3px solid "+color, overflow:"hidden", boxShadow:open?"0 4px 16px #00000055":"none"}}>
+      <div onClick={()=>setOpen(!open)} style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"13px 14px", cursor:"pointer"}}>
+        <span style={{fontSize:11, color:color, fontWeight:800, letterSpacing:0.3}}>{icon} {titre}</span>
         <span style={{fontSize:11, color:color}}>{open?"▲":"▼"}</span>
       </div>
-      {open && <div style={{padding:"0 12px 12px 12px", fontSize:9, color:TEXT, lineHeight:1.65, whiteSpace:"pre-wrap"}}>{children}</div>}
+      {open && <div style={{padding:"0 14px 14px 14px", fontSize:10, color:TEXT, lineHeight:1.7, whiteSpace:"pre-wrap"}}>{children}</div>}
     </div>
   );
 }
@@ -547,7 +547,8 @@ function StockAnalyseView() {
   const [a1,setA1]=useState(false),[a2,setA2]=useState(false),[a3,setA3]=useState(false),
         [a4,setA4]=useState(false),[a5,setA5]=useState(false),[a6,setA6]=useState(false),
         [a7,setA7]=useState(false),[a8,setA8]=useState(false),[a9,setA9]=useState(false),
-        [a10,setA10]=useState(false),[a11,setA11]=useState(false);
+        [a10,setA10]=useState(false),[a11,setA11]=useState(false),
+        [a12,setA12]=useState(false),[a13,setA13]=useState(false);
 
   const scanGroups = () => {
     if (!groupsRaw.trim()) { setGroupsRes(null); return; }
@@ -929,11 +930,11 @@ C'est la colonne MAITRESSE, celle qui classe le tableau. Un fonds institutionnel
 Le 5j dit si la tendance ACCELERE ou RALENTIT. On le compare au rythme du 21j : un mois a +9% = environ +3%/semaine en rythme normal. Si le 5j fait MIEUX que ce rythme -> l'argent afflue encore plus vite (acceleration). S'il fait moins -> le flux se tarit (essoufflement). C'est le signal d'alerte precoce.
 
 ☀️ 1 JOUR (aujourd'hui) — LE POULS
-Le 1j confirme que le secteur est encore vivant AUJOURD'HUI. Un secteur fort sur 21j et 5j mais ROUGE aujourd'hui = prudence, le momentum cale a l'instant T. C'est le filtre final avant d'acheter : on n'entre pas un jour ou le secteur saigne.
+Le 1j est juste le POULS du jour. Un secteur fort sur 21j et 5j reste en accumulation meme avec un 1j legerement rouge — un seul jour ne casse pas une tendance. Le 1j ne fait JAMAIS basculer un statut a lui seul, il ajoute juste une nuance.
 
 ━━━ COMMENT LIRE LE FLUX (la logique de Pete) ━━━
 
-💰 ACCUMULATION = 21j fort + 5j accelere + 1j positif
+💰 ACCUMULATION = 21j fort + 5j positif (le 1j est un detail)
 Les 3 alignes a la hausse. Le smart money charge MAINTENANT. C'est ICI qu'on chasse nos actions. Risque minimal, courant porteur maximal.
 
 ⏸ ESSOUFFLEMENT = 21j fort MAIS 5j devient negatif (le 1j seul ne compte pas)
@@ -953,6 +954,34 @@ La regle d'or de Pete : "Start with the sector. Find the leaders."
 3. Les fonds ne peuvent pas tout acheter : ils concentrent sur les 3-5 meilleurs secteurs. Si ton action est dans un de ces secteurs, tu surfes sur LEURS milliards.
 
 En resume : le secteur d'abord, l'action ensuite. Le flux institutionnel se lit dans la convergence des 3 horizons. Pas de secteur fort = pas de trade.`}
+      </Accordion>
+
+      <Accordion icon="🌊" titre="LES 5 STATUTS DE FLUX SECTORIEL" color={BLUE} open={a12} setOpen={setA12}>
+{`Le scan secteurs classe chaque secteur en 5 statuts selon le flux institutionnel. Le 1 mois (21j) mene, le 5j confirme, le 1j n'est qu'un pouls mineur (un seul jour rouge ne fait jamais basculer un secteur fort).
+
+💰 ACCUMULATION = 21j fort + 5j positif. Le smart money charge encore. C'est ICI qu'on chasse.
+
+⏸ ESSOUFFLEMENT = 21j fort MAIS 5j devient negatif. Le flux court terme se retourne vraiment. On attend.
+
+🌱 ROTATION ENTRANTE = 21j faible/negatif MAIS 5j repasse positif. Le "less bearish" de Pete. Watchlist.
+
+🩸 DISTRIBUTION / CAPITULATION = 21j qui faiblit + 5j negatif. Le smart money sort. On evite.
+
+💤 SANS FLUX / CONSOLIDATION = neutre, pas de direction claire.
+
+Regle d'or : on n'achete QUE dans les secteurs en ACCUMULATION. 3 actions sur 4 suivent leur secteur.`}
+      </Accordion>
+
+      <Accordion icon="🏦" titre="CLASSER LES ACTIONS — CONVERGENCE MOMENTUM x VOLATILITE" color={GOLD} open={a13} setOpen={setA13}>
+{`Apres avoir trouve les secteurs en ACCUMULATION, l'outil "2. CLASSER MES ACTIONS" classe tes candidates. Le but : suivre les big boys APRES leur mouvement, sur des actions qui poussent encore.
+
+LE PRINCIPE — etre fort sur DEUX axes a la fois. Une action n'est en tete que si elle combine un fort MOMENTUM et une forte VOLATILITE. C'est une convergence (moyenne geometrique) : si un seul des deux axes est faible, le score chute.
+
+⚡ SCORE MOMENTUM : 1 mois (21j) = le coeur, poids le plus fort. 3 mois = ancrage de solidite. 5j = acceleration recente. Change from Open = le carburant de Pete (bid tenu aujourd'hui). RelVol = institutions actives.
+
+🌊 SCORE VOLATILITE : fidele aux filtres de Pete (ATR > 1.5, Beta > 1). ATR rapporte au prix = combien l'action bouge par jour en %. Beta = reactivite vs le marche. Plus c'est haut, plus le gain rapide est possible — mais seulement si le momentum est haussier.
+
+FILTRE LIQUIDITE : comme Pete l'exige (Market Cap > 10 milliards, Avg Vol > 2M). Volume en dollars (prix x volume). Sous ~1 milliard/jour, l'action est trop petite pour les gros fonds — releguee.`}
       </Accordion>
 
       <Accordion icon="⚡" titre="LE CHANGE FROM OPEN +2% — LE CARBURANT" color={AMBER} open={a3} setOpen={setA3}>
