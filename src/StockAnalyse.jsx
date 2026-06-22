@@ -385,27 +385,35 @@ function analyseGroups(sectors) {
     if (tech.month > def.month + 3) regime = "RISK-ON";
     else if (def.month > tech.month + 3) regime = "RISK-OFF";
   }
-  // FLUX par secteur (lecture 21j + 5j + 1j ensemble, comme Pete)
+  // FLUX par secteur. Hierarchie : 3 mois = tendance de fond, 21j = coeur, 5j = acceleration, 1j = pouls MINEUR.
+  // Le 1j ne fait JAMAIS basculer un statut a lui seul (un jour rouge = du bruit).
   const maxAbs = Math.max(...byMonth.map(s=>Math.abs(s.month)), 1);
   const enriched = byMonth.map(s => {
-    const rythme = s.month/3; // rythme hebdo theorique sur 21j
+    const rythme = s.month/4.3; // rythme hebdo theorique sur 21j (4.3 semaines/mois)
+    const quart = s.quart!=null ? s.quart : null; // 3 mois = tendance de fond
     const oneDay = s.oneDay!=null ? s.oneDay : 0;
     let flux, code, dir;
-    // direction court terme
-    if (s.week > rythme*1.05) dir = "up";
-    else if (s.week < rythme*0.6) dir = "down";
-    else dir = "flat";
+    // direction du 5j vs le rythme du mois
+    if (s.week >= rythme*1.05) dir = "up";        // accelere
+    else if (s.week < 0) dir = "down";            // se retourne
+    else dir = "flat";                            // ralentit mais tient
+    const fondPositif = (s.month > 0) && (quart==null || quart > 0); // 21j ET 3 mois alignes haussiers
+
     if (s.month >= 2) {
-      // secteur en tendance de fond positive
-      if (dir==="up" && oneDay >= 0) { flux="ACCUMULATION"; code="acc"; }
-      else { flux="ESSOUFFLEMENT"; code="ess"; }
+      // TENDANCE DE FOND POSITIVE (21j fort)
+      if (s.week >= 0) {
+        // 5j positif (accelere OU tient) => le smart money charge encore. Le 1j n'a aucun pouvoir ici.
+        flux="ACCUMULATION"; code="acc";
+      } else {
+        // 5j VRAIMENT negatif => la le flux court terme se retourne = essoufflement reel
+        flux="ESSOUFFLEMENT"; code="ess";
+      }
     } else if (s.month <= -4) {
-      flux = (oneDay < -0.5 && s.week < 0) ? "CAPITULATION" : "DISTRIBUTION";
-      code = "dist";
-      // mais si le court terme repasse nettement positif sur un fond tres negatif = rotation entrante
-      if (s.week > 0 && oneDay > 0) { flux="ROTATION ENTRANTE"; code="rot"; }
+      // TENDANCE DE FOND NEGATIVE
+      if (s.week > 0) { flux="ROTATION ENTRANTE"; code="rot"; } // less bearish (5j repasse positif)
+      else { flux = (s.week < -3) ? "CAPITULATION" : "DISTRIBUTION"; code="dist"; }
     } else {
-      // fond faible/neutre (-4 a +2)
+      // FOND FAIBLE/NEUTRE (-4 a +2)
       if (s.week > 0.5) { flux="ROTATION ENTRANTE"; code="rot"; }
       else if (s.week < -1) { flux="DISTRIBUTION"; code="dist"; }
       else if (Math.abs(s.month) < 0.3) { flux="SANS FLUX"; code="dead"; }
