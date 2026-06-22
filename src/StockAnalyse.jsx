@@ -402,7 +402,7 @@ function StockAnalyseView() {
   const [a1,setA1]=useState(false),[a2,setA2]=useState(false),[a3,setA3]=useState(false),
         [a4,setA4]=useState(false),[a5,setA5]=useState(false),[a6,setA6]=useState(false),
         [a7,setA7]=useState(false),[a8,setA8]=useState(false),[a9,setA9]=useState(false),
-        [a10,setA10]=useState(false);
+        [a10,setA10]=useState(false),[a11,setA11]=useState(false);
 
   const scanGroups = () => {
     if (!groupsRaw.trim()) { setGroupsRes(null); return; }
@@ -676,6 +676,44 @@ SCREENER 2 — TECH + FONDAMENTAL (Pete + Minervini) : la même base technique, 
 3. MICRO — Isole les 10-15 leaders de cette industrie.
 
 Regarde sur 1 mois ET 3 mois : un secteur top sur les deux = leadership confirmé. On ne trade QUE dans les secteurs en tête — comme Pete.`}
+      </Accordion>
+
+      <Accordion icon="🌊" titre="LIRE LE FLOW INSTITUTIONNEL (5j / 21j / 1j)" color={GREEN} open={a11} setOpen={setA11}>
+{`Le scan secteurs en haut classe les 11 secteurs comme le "Daily Ticker" de Pete. Voici comment LIRE le flux d'argent institutionnel a travers les 3 horizons, et pourquoi chacun compte.
+
+━━━ LES 3 HORIZONS ET LEUR PSYCHOLOGIE ━━━
+
+📅 21 JOURS (1 mois) — LA TENDANCE DE FOND
+C'est la colonne MAITRESSE, celle qui classe le tableau. Un fonds institutionnel met des SEMAINES a batir une position (il ne peut pas acheter des milliards d'un coup sans faire exploser le prix). Le 21j revele cette accumulation lente et lourde. Un secteur fort sur 21j = le smart money y est deja installe. C'est la fondation.
+
+📆 5 JOURS (1 semaine) — LA DIRECTION RECENTE
+Le 5j dit si la tendance ACCELERE ou RALENTIT. On le compare au rythme du 21j : un mois a +9% = environ +3%/semaine en rythme normal. Si le 5j fait MIEUX que ce rythme -> l'argent afflue encore plus vite (acceleration). S'il fait moins -> le flux se tarit (essoufflement). C'est le signal d'alerte precoce.
+
+☀️ 1 JOUR (aujourd'hui) — LE POULS
+Le 1j confirme que le secteur est encore vivant AUJOURD'HUI. Un secteur fort sur 21j et 5j mais ROUGE aujourd'hui = prudence, le momentum cale a l'instant T. C'est le filtre final avant d'acheter : on n'entre pas un jour ou le secteur saigne.
+
+━━━ COMMENT LIRE LE FLUX (la logique de Pete) ━━━
+
+💰 ACCUMULATION = 21j fort + 5j accelere + 1j positif
+Les 3 alignes a la hausse. Le smart money charge MAINTENANT. C'est ICI qu'on chasse nos actions. Risque minimal, courant porteur maximal.
+
+⏸ ESSOUFFLEMENT = 21j fort MAIS 5j ralentit ou 1j negatif
+La fondation tient mais le flux faiblit. Pete dirait : ne chasse pas, la hausse se fatigue. On attend ou on surveille.
+
+🌱 ROTATION ENTRANTE = 21j faible/negatif MAIS 5j repasse positif
+Le fameux "less bearish" de Pete : avant d'etre haussier, un secteur devient d'abord MOINS baissier. Les premiers capitaux reviennent en douce. On met en WATCHLIST — pas encore d'achat, mais on prepare.
+
+🩸 DISTRIBUTION / CAPITULATION = 21j qui faiblit + 5j negatif
+Le smart money SORT. Meme une belle action de ce secteur nage a contre-courant. On EVITE totalement.
+
+━━━ LEQUEL CHOISIR POUR UN TRADE ━━━
+
+La regle d'or de Pete : "Start with the sector. Find the leaders."
+1. On achete UNIQUEMENT dans les secteurs 💰 ACCUMULATION (les 3 horizons alignes).
+2. Pourquoi c'est crucial : 3 actions sur 4 suivent leur secteur. Une action geniale dans un secteur en DISTRIBUTION va galerer ; une action moyenne dans un secteur en ACCUMULATION sera portee par le flux institutionnel.
+3. Les fonds ne peuvent pas tout acheter : ils concentrent sur les 3-5 meilleurs secteurs. Si ton action est dans un de ces secteurs, tu surfes sur LEURS milliards.
+
+En resume : le secteur d'abord, l'action ensuite. Le flux institutionnel se lit dans la convergence des 3 horizons. Pas de secteur fort = pas de trade.`}
       </Accordion>
 
       <Accordion icon="⚡" titre="LE CHANGE FROM OPEN +2% — LE CARBURANT" color={AMBER} open={a3} setOpen={setA3}>
