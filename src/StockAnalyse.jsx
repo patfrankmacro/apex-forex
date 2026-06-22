@@ -340,9 +340,25 @@ function rankStocks(rows, tech) {
 
     // ===== SCORE MOMENTUM (0-100) — le mois mene =====
     let mom=0;
+    // 1 MOIS = le coeur (poids le plus fort)
     if(r.month!=null){ if(r.month>60)mom+=42; else if(r.month>40)mom+=36; else if(r.month>25)mom+=27; else if(r.month>12)mom+=16; else mom+=6; }
-    if(r.quart!=null){ if(r.quart>100)mom+=22; else if(r.quart>50)mom+=16; else if(r.quart>20)mom+=9; else mom+=3; }
-    if(r.month!=null && r.week!=null){ const ry=r.month/4.3; if(r.week>=ry*1.05)mom+=16; else if(r.week>0)mom+=7; else {mom-=12;flags.push("5j NÉGATIF — momentum cassé");} }
+    // 5 JOURS = acceleration recente (determine si l'accumulation CONTINUE)
+    let accelere = false;
+    if(r.month!=null && r.week!=null){ const ry=r.month/4.3; if(r.week>=ry*1.05){mom+=16;accelere=true;} else if(r.week>0){mom+=7;} else {mom-=12;flags.push("5j NÉGATIF — momentum cassé");} }
+    else if(r.week!=null && r.week>0){ mom+=7; accelere=true; }
+    // 3 MOIS = ancrage de solidite, MAIS conditionnel a l'acceleration recente (sinon = trop tard)
+    if(r.quart!=null){
+      if(accelere){
+        // l'accumulation continue : le 3 mois confirme la solidite = bonus plein
+        if(r.quart>100)mom+=18; else if(r.quart>50)mom+=13; else if(r.quart>20)mom+=8; else mom+=2;
+        if(r.quart>50) why.push("tendance solide (3M +"+r.quart+"%) + accélération = accumulation en cours");
+      } else {
+        // 3 mois fort MAIS momentum recent qui faiblit = signal "trop tard"
+        if(r.quart>150){ mom+=2; flags.push("3M +"+r.quart+"% mais 5j ne suit plus — possible TROP TARD (accumulation finie)"); }
+        else if(r.quart>50){ mom+=5; }
+        else mom+=2;
+      }
+    }
     if(t.chgOpen!=null){ if(t.chgOpen>=5)mom+=14; else if(t.chgOpen>=2)mom+=9; else if(t.chgOpen>0)mom+=3; else {mom-=8;flags.push("clôture sous l'ouverture");} }
     if(r.relVol!=null){ if(r.relVol>=1.8)mom+=6; else if(r.relVol>=1.2)mom+=3; }
     if(change!=null && change<0){ mom-=5; }
