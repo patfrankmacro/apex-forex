@@ -293,23 +293,77 @@ function parseStockList(txt) {
   const seen=new Set(); return rows.filter(r=>{ if(seen.has(r.ticker))return false; seen.add(r.ticker); return true; });
 }
 
-function rankStocks(rows) {
-  // Classement "comme Pete" : leaders en force relative, 3 horizons alignes, pas trop etendu, gros volume institutionnel
+function parseTechList(txt){
+  // Vue Technical Finviz: No Ticker Beta ATR SMA20 SMA50 SMA200 52WHigh 52WLow RSI Price Change ChgOpen Gap Volume
+  const lines = txt.split(/\r?\n/).map(l=>l.trim());
+  const out = {};
+  const toN=(x)=>{ if(x==null)return null; const v=parseFloat(String(x).replace('%','').replace(/,/g,'')); return isNaN(v)?null:v; };
+  let i=0;
+  while(i<lines.length){
+    if(/^[A-Z]{1,5}$/.test(lines[i]) && /^-?[0-9]/.test(lines[i+1]||'')){
+      const v=[]; let j=i+1;
+      while(j<lines.length && v.length<14 && /^-?[0-9.,]+%?$|^-$/.test(lines[j])){ v.push(lines[j]); j++; }
+      if(v.length>=13){
+        out[lines[i]] = { beta:toN(v[0]), atr:toN(v[1]), sma20:toN(v[2]), sma50:toN(v[3]), sma200:toN(v[4]), high52:toN(v[5]), low52:toN(v[6]), rsi:toN(v[7]), price:toN(v[8]), change:toN(v[9]), chgOpen:toN(v[10]), gap:toN(v[11]) };
+        i=j; continue;
+      }
+    }
+    i++;
+  }
+  // tabulaire fallback
+  if(Object.keys(out).length===0){
+    for(const ln of lines){
+      const t=ln.split(/\t|\s{2,}/).map(x=>x.trim()).filter(Boolean);
+      if(t.length>=14 && /^[0-9]+$/.test(t[0]) && /^[A-Z]{1,5}$/.test(t[1])){
+        out[t[1]]={ beta:toN(t[2]), atr:toN(t[3]), sma20:toN(t[4]), sma50:toN(t[5]), sma200:toN(t[6]), high52:toN(t[7]), low52:toN(t[8]), rsi:toN(t[9]), price:toN(t[10]), change:toN(t[11]), chgOpen:toN(t[12]), gap:toN(t[13]) };
+      }
+    }
+  }
+  return out;
+}
+
+function rankStocks(rows, tech) {
+  // Fusionne Performance + Technical par ticker. Detecte l'ACCUMULATION INSTITUTIONNELLE deja commencee mais pas finie.
   return rows.map(r=>{
+    const t = (tech && tech[r.ticker]) ? tech[r.ticker] : {};
+    const price = r.price!=null?r.price : t.price;
+    const change = r.change!=null?r.change : t.change;
     let score=0; const why=[]; const flags=[];
-    // 1. FORCE DE FOND (month / 21j) — coeur de la relative strength (O'Neil/Pete)
-    if(r.month!=null){ if(r.month>50){score+=22;why.push("force de fond exceptionnelle (+"+r.month+"% sur 21j)");} else if(r.month>25){score+=16;why.push("forte tendance de fond");} else if(r.month>10){score+=9;} else {score+=3;} }
-    // 2. ACCELERATION 3 horizons : 5j ramene au rythme du mois + 1j positif
-    if(r.month!=null && r.week!=null){ const rythme=r.month/4.3; if(r.week>=rythme*1.05){score+=18;why.push("momentum 5j qui ACCELERE");} else if(r.week>0){score+=9;flags.push("5j positif mais ralentit");} else {score-=8;flags.push("5j NEGATIF — momentum court terme casse");} }
-    if(r.change!=null){ if(r.change>0){score+=8;} else {score-=6;flags.push("rouge aujourd'hui");} }
-    // 3. PENALITE SUR-EXTENSION (Pete: ne chasse pas l'etendu)
-    if(r.quart!=null){ if(r.quart>200){score-=16;flags.push("TRES etendu (+"+r.quart+"% sur 3 mois) — risque d'acheter le sommet");} else if(r.quart>150){score-=8;flags.push("etendu (+"+r.quart+"% sur 3 mois)");} else if(r.quart>=40){score+=8;why.push("tendance solide sans sur-extension");} }
-    // 4. VOLUME INSTITUTIONNEL REEL ($ echange = price x volume)
-    const dollarVol = (r.price!=null && r.volume!=null) ? r.price*r.volume : null;
-    if(dollarVol!=null){ if(dollarVol>20e9){score+=16;why.push("volume institutionnel ENORME ($"+(dollarVol/1e9).toFixed(0)+"B)");} else if(dollarVol>5e9){score+=12;why.push("gros volume institutionnel ($"+(dollarVol/1e9).toFixed(1)+"B)");} else if(dollarVol>1e9){score+=6;} else {score-=4;flags.push("volume $ faible — moins institutionnel");} }
-    // 5. RELVOL (activite du jour)
-    if(r.relVol!=null){ if(r.relVol>=1.8){score+=8;why.push("RelVol eleve ("+r.relVol+"x) = institutions actives aujourd'hui");} else if(r.relVol>=1.2){score+=4;} }
-    return { ...r, score:Math.max(0,Math.round(score)), why, flags, dollarVol };
+    const dollarVol = (price!=null && r.volume!=null) ? price*r.volume : null;
+
+    // 1) SEUIL DE LIQUIDITE (terrain institutionnel) — jusqu'a 20
+    if(dollarVol!=null){
+      if(dollarVol<1e9){ score-=20; flags.push("hors terrain institutionnel (<$1B/j)"); }
+      else if(dollarVol<3e9){ score+=8; }
+      else if(dollarVol<10e9){ score+=15; why.push("bonne liquidité ($"+(dollarVol/1e9).toFixed(1)+"B/j)"); }
+      else if(dollarVol<30e9){ score+=20; why.push("grosse liquidité institutionnelle ($"+(dollarVol/1e9).toFixed(0)+"B/j)"); }
+      else { score+=22; why.push("liquidité massive ($"+(dollarVol/1e9).toFixed(0)+"B/j)"); }
+    }
+
+    // 2) FORCE DE FOND etablie = les fonds sont DEJA la — jusqu'a 14
+    if(r.month!=null){ if(r.month>40){score+=14;why.push("force de fond exceptionnelle (+"+r.month+"%/21j)");} else if(r.month>20){score+=10;why.push("forte tendance de fond");} else if(r.month>8){score+=6;} }
+
+    // 3) ACCUMULATION ENCORE ACTIVE (accelere, pas fini) — jusqu'a 16
+    if(r.month!=null && r.week!=null){ const ry=r.month/4.3; if(r.week>=ry*1.05){score+=16;why.push("momentum 5j ACCELERE = accumulation active");} else if(r.week>0){score+=8;flags.push("5j ralentit");} else {score-=10;flags.push("5j négatif");} }
+
+    // 4) CHANGE FROM OPEN — le carburant de Pete (bid tenu) — jusqu'a 10
+    if(t.chgOpen!=null){ if(t.chgOpen>=2){score+=10;why.push("Change from Open +"+t.chgOpen+"% = bid institutionnel tenu (carburant Pete)");} else if(t.chgOpen>0){score+=4;} else {score-=4;flags.push("clôture sous l'ouverture");} }
+
+    // 5) STAGE 2 (SMA alignees) — jusqu'a 8
+    if(t.sma20!=null && t.sma50!=null && t.sma200!=null){ if(t.sma20>0 && t.sma50>0 && t.sma200>0){score+=8;why.push("Stage 2 confirmé (prix > SMA20/50/200)");} else if(t.sma200>0){score+=3;} }
+
+    // 6) LEADER proche du 52W High (Minervini) — jusqu'a 8
+    if(t.high52!=null){ if(t.high52<=5){score+=8;why.push("à "+t.high52+"% du sommet 52s = vrai leader");} else if(t.high52<=15){score+=4;} else if(t.high52>30){score-=4;flags.push("loin du sommet ("+t.high52+"%)");} }
+
+    // 7) RelVol institutions actives — jusqu'a 6
+    if(r.relVol!=null){ if(r.relVol>=1.8){score+=6;why.push("RelVol "+r.relVol+"x");} else if(r.relVol>=1.2){score+=3;} }
+
+    // === PENALITES (sur-extension / surchauffe = proche distribution) ===
+    if(r.quart!=null){ if(r.quart>250){score-=20;flags.push("extrêmement étendu (+"+r.quart+"%/3M) — proche distribution");} else if(r.quart>180){score-=12;flags.push("très étendu (+"+r.quart+"%/3M)");} else if(r.quart>120){score-=6;flags.push("étendu");} else if(r.quart>=40){score+=6;why.push("pas sur-étendu = accumulation saine");} }
+    if(t.rsi!=null){ if(t.rsi>75){score-=8;flags.push("RSI "+t.rsi+" = surchauffe court terme");} else if(t.rsi>70){score-=4;flags.push("RSI "+t.rsi+" élevé");} }
+    if(change!=null && change<0){ score-=4; flags.push("rouge aujourd'hui"); }
+
+    return { ...r, ...t, price, change, score:Math.max(0,Math.min(100,Math.round(score))), why, flags, dollarVol };
   }).sort((a,b)=>b.score-a.score);
 }
 
@@ -471,6 +525,7 @@ function StockAnalyseView() {
   const [openGroups, setOpenGroups] = useState(false);
   const [selSector, setSelSector] = useState(null);
   const [listRaw, setListRaw] = useState("");
+  const [techRaw, setTechRaw] = useState("");
   const [listRes, setListRes] = useState(null);
   const [openList, setOpenList] = useState(false);
   const [res, setRes] = useState(null);
@@ -487,7 +542,8 @@ function StockAnalyseView() {
   const analyzeList = () => {
     if (!listRaw.trim()) { setListRes(null); return; }
     const rows = parseStockList(listRaw);
-    setListRes(rankStocks(rows));
+    const tech = techRaw.trim() ? parseTechList(techRaw) : null;
+    setListRes(rankStocks(rows, tech));
   };
 
   const run = () => {
@@ -622,7 +678,10 @@ function StockAnalyseView() {
           {openList && (
             <div style={{padding:"12px 14px", background:"#0a0e16"}}>
               <div style={{fontSize:9, color:TEXT_DIM, marginBottom:8, lineHeight:1.5}}>Colle la liste de ton screener Finviz (vue Performance). L'app classe tes actions du PLUS au MOINS institutionnel : force de fond, accélération 5j/21j/1j, volume en dollars (smart money), et pénalise les actions sur-étendues qu'il est trop tard pour chasser.</div>
-              <textarea value={listRaw} onChange={e=>setListRaw(e.target.value)} placeholder="Colle ici le tableau (No, Ticker, Perf Week, Perf Month, Perf Quart... Price, Change, Volume)" style={{width:"100%", minHeight:90, background:"#070a10", color:TEXT, border:"1px solid #2a3441", borderRadius:8, padding:8, fontSize:9, fontFamily:"monospace", boxSizing:"border-box"}} />
+              <div style={{fontSize:8.5, color:GOLD, marginBottom:3, fontWeight:700}}>① Vue PERFORMANCE</div>
+              <textarea value={listRaw} onChange={e=>setListRaw(e.target.value)} placeholder="Colle la vue Performance (Ticker, Perf Week, Month, Quart... Price, Change, Volume)" style={{width:"100%", minHeight:70, background:"#070a10", color:TEXT, border:"1px solid #2a3441", borderRadius:8, padding:8, fontSize:9, fontFamily:"monospace", boxSizing:"border-box"}} />
+              <div style={{fontSize:8.5, color:GOLD, margin:"8px 0 3px", fontWeight:700}}>② Vue TECHNICAL (optionnel mais recommandé — Beta, ATR, SMA, 52W High, Change from Open, RSI)</div>
+              <textarea value={techRaw} onChange={e=>setTechRaw(e.target.value)} placeholder="Colle la vue Technical (Ticker, Beta, ATR, SMA20/50/200, 52W High, RSI, Price, Change, Change from Open, Gap, Volume)" style={{width:"100%", minHeight:70, background:"#070a10", color:TEXT, border:"1px solid #2a3441", borderRadius:8, padding:8, fontSize:9, fontFamily:"monospace", boxSizing:"border-box"}} />
               <button onClick={analyzeList} style={{width:"100%", marginTop:8, padding:"11px", background:GOLD, color:"#0a0e16", border:"none", borderRadius:8, fontSize:12, fontWeight:800, cursor:"pointer"}}>🏦 CLASSER LES ACTIONS</button>
 
               {listRes && listRes.length>0 && (
@@ -642,6 +701,9 @@ function StockAnalyseView() {
                           </div>
                         </div>
                         <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:3}}>21j <b style={{color:r.month>0?GREEN:RED}}>{r.month>0?"+":""}{r.month}%</b> · 5j <b style={{color:r.week>0?GREEN:RED}}>{r.week>0?"+":""}{r.week}%</b> · 1j <b style={{color:r.change>0?GREEN:RED}}>{r.change>0?"+":""}{r.change}%</b> · 3M {r.quart>0?"+":""}{r.quart}%{r.relVol!=null?" · RelVol "+r.relVol+"x":""}</div>
+                        {(r.chgOpen!=null||r.high52!=null||r.atr!=null||r.rsi!=null||r.beta!=null) && (
+                          <div style={{fontSize:7.5, color:TEXT_DIM, marginTop:2}}>{r.chgOpen!=null?"ChgOpen "+(r.chgOpen>0?"+":"")+r.chgOpen+"%":""}{r.high52!=null?" · à "+r.high52+"% du 52WH":""}{r.atr!=null?" · ATR "+r.atr:""}{r.beta!=null?" · β"+r.beta:""}{r.rsi!=null?" · RSI "+r.rsi:""}</div>
+                        )}
                         {r.why.length>0 && <div style={{fontSize:7.5, color:GREEN, marginTop:2}}>✓ {r.why.slice(0,2).join(" · ")}</div>}
                         {r.flags.length>0 && <div style={{fontSize:7.5, color:AMBER, marginTop:2}}>⚠ {r.flags.slice(0,2).join(" · ")}</div>}
                       </div>
