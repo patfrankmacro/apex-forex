@@ -237,7 +237,10 @@ function parseGroups(raw) {
     // Finviz Groups: Perf Week, Perf Month, Perf Quart, Perf Half, Perf Year, Perf YTD, AvgVol, RelVol, Change...
     // Change (1 jour) = avant-dernier nombre si beaucoup de colonnes, sinon on prend nums[2] en repli
     const oneDay = nums.length >= 9 ? nums[8] : (nums.length>=7 ? nums[nums.length-1] : null);
-    sectors.push({ name, week: nums[0], month: nums[1], quart: nums[2], oneDay });
+    // Rel Volume = avant-dernier ratio (pas un %) ; on le cherche dans la ligne brute
+    const relM = ln.match(/\b([0-9]\.[0-9]{1,2})\b/g);
+    const relVol = relM && relM.length ? parseFloat(relM[relM.length-1]) : null;
+    sectors.push({ name, week: nums[0], month: nums[1], quart: nums[2], oneDay, relVol });
   }
   return sectors;
 }
@@ -281,7 +284,7 @@ function analyseGroups(sectors) {
     }
     const barLen = Math.round((Math.abs(s.month)/maxAbs)*8);
     return { ...s, flux, code, dir, bar: barLen };
-  });
+  }).map((s,i)=>({ ...s, rank: i+1 }));
   const buy = enriched.filter(s=>s.code==="acc");
   const watch = enriched.filter(s=>s.code==="rot");
   const avoid = enriched.filter(s=>s.code==="dist");
@@ -398,6 +401,7 @@ function StockAnalyseView() {
   const [groupsRaw, setGroupsRaw] = useState("");
   const [groupsRes, setGroupsRes] = useState(null);
   const [openGroups, setOpenGroups] = useState(false);
+  const [selSector, setSelSector] = useState(null);
   const [res, setRes] = useState(null);
   const [a1,setA1]=useState(false),[a2,setA2]=useState(false),[a3,setA3]=useState(false),
         [a4,setA4]=useState(false),[a5,setA5]=useState(false),[a6,setA6]=useState(false),
@@ -464,27 +468,48 @@ function StockAnalyseView() {
 
                 {/* TABLEAU UNIQUE — flux par secteur */}
                 <div style={{padding:"8px 8px", background:"#0a1018", borderRadius:8, marginBottom:8, border:"1px solid #1a2230"}}>
+                  <div style={{fontSize:7, color:TEXT_DIM, marginBottom:4, fontStyle:"italic"}}>👆 Tape un secteur pour voir le détail · 🔥 = volume institutionnel élevé</div>
                   <div style={{display:"flex", fontSize:7, color:TEXT_DIM, fontWeight:700, padding:"0 0 4px 0", borderBottom:"1px solid #1a2230"}}>
-                    <span style={{flex:2.2}}>SECTEUR</span>
+                    <span style={{flex:0.4}}>#</span>
+                    <span style={{flex:2}}>SECTEUR</span>
                     <span style={{flex:1.6, textAlign:"right"}}>21j</span>
                     <span style={{flex:1, textAlign:"right"}}>5j</span>
-                    <span style={{flex:1, textAlign:"right"}}>1j</span>
+                    <span style={{flex:0.9, textAlign:"right"}}>1j</span>
                     <span style={{flex:2, textAlign:"right"}}>FLUX</span>
                   </div>
                   {groupsRes.enriched.map((s,i)=>{
                     const fc = s.code==="acc"?GREEN : s.code==="rot"?AMBER : s.code==="dist"?RED : s.code==="ess"?"#fb923c" : TEXT_DIM;
                     const emoji = s.code==="acc"?"💰" : s.code==="rot"?"🌱" : s.code==="dist"?"🩸" : s.code==="ess"?"⏸" : s.code==="dead"?"💤":"➡️";
                     const arrow = s.dir==="up"?"▲":s.dir==="down"?"▼":"─";
+                    const hot = s.relVol!=null && s.relVol>=1.8;
+                    const open = selSector===s.name;
                     return (
-                      <div key={i} style={{display:"flex", alignItems:"center", padding:"3px 0", borderBottom:"1px solid #141c28"}}>
-                        <span style={{flex:2.2, fontSize:8, color:TEXT2}}>{s.name}</span>
-                        <span style={{flex:1.6, textAlign:"right", display:"flex", alignItems:"center", justifyContent:"flex-end", gap:3}}>
-                          <span style={{display:"inline-block", height:5, width:(s.bar*3)+"px", background:fc, borderRadius:2}}></span>
-                          <span style={{fontSize:8, color:fc, fontWeight:700}}>{s.month>0?"+":""}{s.month}%</span>
-                        </span>
-                        <span style={{flex:1, textAlign:"right", fontSize:7.5, color: s.dir==="up"?GREEN:s.dir==="down"?RED:TEXT_DIM}}>{arrow}{s.week>0?"+":""}{s.week}</span>
-                        <span style={{flex:1, textAlign:"right", fontSize:7.5, color:(s.oneDay!=null&&s.oneDay<0)?RED:TEXT_DIM}}>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay:"—"}</span>
-                        <span style={{flex:2, textAlign:"right", fontSize:7, color:fc, fontWeight:700}}>{emoji} {s.flux}</span>
+                      <div key={i} style={{borderBottom:"1px solid #141c28"}}>
+                        <div onClick={()=>setSelSector(open?null:s.name)} style={{display:"flex", alignItems:"center", padding:"3px 0", cursor:"pointer"}}>
+                          <span style={{flex:0.4, fontSize:7, color:TEXT_DIM}}>{s.rank}</span>
+                          <span style={{flex:2, fontSize:8, color:TEXT2}}>{s.name}{hot?" 🔥":""}</span>
+                          <span style={{flex:1.6, textAlign:"right", display:"flex", alignItems:"center", justifyContent:"flex-end", gap:3}}>
+                            <span style={{display:"inline-block", height:5, width:(s.bar*3)+"px", background:fc, borderRadius:2}}></span>
+                            <span style={{fontSize:8, color:fc, fontWeight:700}}>{s.month>0?"+":""}{s.month}%</span>
+                          </span>
+                          <span style={{flex:1, textAlign:"right", fontSize:7.5, color: s.dir==="up"?GREEN:s.dir==="down"?RED:TEXT_DIM}}>{arrow}{s.week>0?"+":""}{s.week}</span>
+                          <span style={{flex:0.9, textAlign:"right", fontSize:7.5, color:(s.oneDay!=null&&s.oneDay<0)?RED:TEXT_DIM}}>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay:"—"}</span>
+                          <span style={{flex:2, textAlign:"right", fontSize:7, color:fc, fontWeight:700}}>{emoji} {s.flux}</span>
+                        </div>
+                        {open && (
+                          <div style={{padding:"6px 8px 8px 8px", fontSize:7.5, color:TEXT, lineHeight:1.6, background:"#0d1420", borderRadius:6, marginBottom:4}}>
+                            <div style={{color:fc, fontWeight:700, marginBottom:3}}>{emoji} {s.flux} — rang #{s.rank}/{groupsRes.enriched.length}</div>
+                            <div style={{marginBottom:3}}>📅 21j <b>{s.month>0?"+":""}{s.month}%</b> (fond) · 📆 5j <b>{s.week>0?"+":""}{s.week}%</b> (direction) · ☀️ 1j <b>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay+"%":"—"}</b> (pouls){s.relVol!=null?" · 🔊 RelVol "+s.relVol+"x":""}</div>
+                            <div style={{color:TEXT_DIM}}>{
+                              s.code==="acc" ? "Les 3 horizons alignes a la hausse : le smart money charge ce secteur. CHASSE tes actions ici — courant porteur maximal." :
+                              s.code==="ess" ? "Fond solide mais le court terme ralentit (ou jour rouge). La hausse se fatigue. Ne chasse pas, attends que ca se confirme." :
+                              s.code==="rot" ? "Less bearish : le fond est faible mais le 5j repasse positif. Premiers capitaux qui reviennent. WATCHLIST, pas encore d'achat." :
+                              s.code==="dist" ? "Le flux se tarit, le smart money sort. Meme une belle action ici nage a contre-courant. EVITE." :
+                              s.code==="dead" ? "Aucun flux directionnel net. Secteur sans interet institutionnel pour l'instant." :
+                              "Range neutre, pas de direction claire."
+                            }{hot?" 🔥 RelVol eleve = activite institutionnelle inhabituelle aujourd'hui.":""}</div>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
