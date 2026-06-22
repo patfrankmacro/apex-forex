@@ -260,7 +260,12 @@ function analyseGroups(sectors) {
   // EPUISEMENT : secteur en tete (top par mois) mais dont le court terme (5j) ralentit fortement vs le rythme moyen
   // rythme hebdo theorique = month/3 (3 semaines dans un mois ~21j). Si week << ce rythme = essoufflement
   const exhausted = top3.filter(s => s.month > 5 && s.week < (s.month/3)*0.6);
-  return { byMonth, top3, bottom3, regime, lessBearish, exhausted };
+  // ACCELERATION : 21j deja positif ET 5j encore plus fort que le rythme moyen = la hausse s'intensifie (ENTRE en tendance)
+  const rythme = (s) => s.month/3; // rythme hebdo theorique
+  const accelerating = sectors.filter(s => s.month > 2 && s.week > rythme(s)*1.3).sort((a,b)=>b.week-a.week);
+  // DEBUT RETOURNEMENT BAISSIER : 21j encore positif MAIS 5j devenu negatif = le smart money commence a sortir (SORT de tendance)
+  const turningDown = sectors.filter(s => s.month > 0 && s.week < 0).sort((a,b)=>a.week-b.week);
+  return { byMonth, top3, bottom3, regime, lessBearish, exhausted, accelerating, turningDown };
 }
 
 function sectorOfTicker(f, groups) {
@@ -442,14 +447,14 @@ function StockAnalyseView() {
                     <span style={{fontSize:7.5, color:TEXT_DIM, flex:2}}>Secteur</span>
                     <span style={{fontSize:7.5, color:TEXT_DIM, flex:1, textAlign:"right"}}>5j</span>
                     <span style={{fontSize:7.5, color:TEXT_DIM, flex:1, textAlign:"right"}}>21j</span>
-                    <span style={{fontSize:7.5, color:TEXT_DIM, flex:1, textAlign:"right"}}>3M</span>
+                    <span style={{fontSize:7.5, color:TEXT_DIM, flex:1, textAlign:"right"}}>1j</span>
                   </div>
                   {groupsRes.top3.map((s,i)=>(
                     <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
                       <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{i+1}. {s.name}</span>
                       <span style={{fontSize:8, color:s.week>0?GREEN:RED, flex:1, textAlign:"right"}}>{s.week>0?"+":""}{s.week}%</span>
                       <span style={{fontSize:8, color:GREEN, fontWeight:700, flex:1, textAlign:"right"}}>+{s.month}%</span>
-                      <span style={{fontSize:8, color:TEXT_DIM, flex:1, textAlign:"right"}}>+{s.quart}%</span>
+                      <span style={{fontSize:8, color:(s.oneDay!=null&&s.oneDay<0)?RED:TEXT_DIM, flex:1, textAlign:"right"}}>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay+"%":"—"}</span>
                     </div>
                   ))}
                 </div>
@@ -460,7 +465,7 @@ function StockAnalyseView() {
                       <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{s.name}</span>
                       <span style={{fontSize:8, color:s.week>0?GREEN:RED, flex:1, textAlign:"right"}}>{s.week>0?"+":""}{s.week}%</span>
                       <span style={{fontSize:8, color:RED, fontWeight:700, flex:1, textAlign:"right"}}>{s.month>0?"+":""}{s.month}%</span>
-                      <span style={{fontSize:8, color:TEXT_DIM, flex:1, textAlign:"right"}}>{s.quart>0?"+":""}{s.quart}%</span>
+                      <span style={{fontSize:8, color:(s.oneDay!=null&&s.oneDay<0)?RED:TEXT_DIM, flex:1, textAlign:"right"}}>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay+"%":"—"}</span>
                     </div>
                   ))}
                 </div>
@@ -485,6 +490,32 @@ function StockAnalyseView() {
                       <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
                         <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{s.name}</span>
                         <span style={{fontSize:8, color:AMBER, flex:1, textAlign:"right"}}>5j +{s.week}%</span>
+                        <span style={{fontSize:8, color:TEXT_DIM, flex:1, textAlign:"right"}}>21j +{s.month}%</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {groupsRes.accelerating && groupsRes.accelerating.length>0 && (
+                  <div style={{padding:"8px 10px", background:"#052010", borderRadius:8, marginBottom:6, marginTop:6, border:"1px solid "+GREEN+"55"}}>
+                    <div style={{fontSize:9, color:GREEN, fontWeight:800, marginBottom:3}}>🟢 ACCÉLÉRATION (entre en tendance — acheter)</div>
+                    <div style={{fontSize:7.5, color:TEXT_DIM, marginBottom:5, lineHeight:1.4}}>Le 21j est déjà positif ET le 5j est encore plus fort que le rythme du mois. La hausse s'intensifie : le smart money charge ce secteur MAINTENANT. C'est ici que tu cherches tes actions.</div>
+                    {groupsRes.accelerating.map((s,i)=>(
+                      <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
+                        <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{s.name}</span>
+                        <span style={{fontSize:8, color:GREEN, fontWeight:700, flex:1, textAlign:"right"}}>5j +{s.week}%</span>
+                        <span style={{fontSize:8, color:TEXT_DIM, flex:1, textAlign:"right"}}>21j +{s.month}%</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {groupsRes.turningDown && groupsRes.turningDown.length>0 && (
+                  <div style={{padding:"8px 10px", background:"#200505", borderRadius:8, border:"1px solid "+RED+"55"}}>
+                    <div style={{fontSize:9, color:RED, fontWeight:800, marginBottom:3}}>🔴 RETOURNEMENT BAISSIER (sort de tendance — alléger)</div>
+                    <div style={{fontSize:7.5, color:TEXT_DIM, marginBottom:5, lineHeight:1.4}}>Le 21j est encore positif MAIS le 5j est devenu négatif. Le smart money commence à SORTIR avant tout le monde. Si tu détiens une action de ce secteur : remonte ton stop ou allège.</div>
+                    {groupsRes.turningDown.map((s,i)=>(
+                      <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"2px 0"}}>
+                        <span style={{fontSize:8.5, color:TEXT2, flex:2}}>{s.name}</span>
+                        <span style={{fontSize:8, color:RED, fontWeight:700, flex:1, textAlign:"right"}}>5j {s.week}%</span>
                         <span style={{fontSize:8, color:TEXT_DIM, flex:1, textAlign:"right"}}>21j +{s.month}%</span>
                       </div>
                     ))}
