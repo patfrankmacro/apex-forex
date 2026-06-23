@@ -917,7 +917,7 @@ SCREENER 2 — TECH + FONDAMENTAL (Pete + Minervini) : la même base technique, 
 2. MESO — Dans ce secteur, trouve l'industrie qui domine.
 3. MICRO — Isole les 10-15 leaders de cette industrie.
 
-Lis le secteur sur 4 horizons : 3 mois (la tendance de fond, l'ancrage) + 21j (le coeur, la colonne maitresse) + 5j (l'acceleration recente) + 1j (le pouls du jour, mineur). Un secteur fort sur le 3 mois ET le 21j avec un 5j positif = ACCUMULATION confirmee. On ne trade QUE dans ces secteurs — comme Pete.`}
+Lis le secteur sur 4 horizons : 3 mois (la tendance de fond, l'ancrage) + 21j (le coeur, la colonne maitresse) + 5j (l'acceleration recente) + 1j (le pouls du jour, mineur). Un secteur fort sur le 3 mois ET le 21j = ACCUMULATION confirmee (le 5j et le 1j ne sont que des nuances, ils ne changent pas le statut). On ne trade QUE dans ces secteurs — comme Pete.`}
       </Accordion>
 
       <Accordion icon="🌊" titre="LIRE LE FLOW INSTITUTIONNEL (3M / 21j / 5j / 1j)" color={GREEN} open={a11} setOpen={setA11}>
@@ -929,24 +929,24 @@ Lis le secteur sur 4 horizons : 3 mois (la tendance de fond, l'ancrage) + 21j (l
 C'est la colonne MAITRESSE, celle qui classe le tableau. Un fonds institutionnel met des SEMAINES a batir une position (il ne peut pas acheter des milliards d'un coup sans faire exploser le prix). Le 21j revele cette accumulation lente et lourde. Un secteur fort sur 21j = le smart money y est deja installe. C'est la fondation.
 
 📆 5 JOURS (1 semaine) — LA DIRECTION RECENTE
-Le 5j dit si la tendance ACCELERE ou RALENTIT. On le compare au rythme du 21j : un mois a +9% = environ +3%/semaine en rythme normal. Si le 5j fait MIEUX que ce rythme -> l'argent afflue encore plus vite (acceleration). S'il fait moins -> le flux se tarit (essoufflement). C'est le signal d'alerte precoce.
+Le 5j dit si la tendance ACCELERE ou RALENTIT. On le compare au rythme du 21j : un mois a +9% = environ +3%/semaine en rythme normal. Si le 5j fait MIEUX que le rythme du mois -> l'argent afflue encore plus vite (acceleration). S'il fait moins -> le secteur respire (une semaine molle). Mais attention : le 5j ne fait JAMAIS basculer le statut a lui seul — c'est le 21j et le 3 mois qui commandent. Le 5j n'est qu'une nuance.
 
 ☀️ 1 JOUR (aujourd'hui) — LE POULS
 Le 1j est juste le POULS du jour. Un secteur fort sur 21j et 5j reste en accumulation meme avec un 1j legerement rouge — un seul jour ne casse pas une tendance. Le 1j ne fait JAMAIS basculer un statut a lui seul, il ajoute juste une nuance.
 
 ━━━ COMMENT LIRE LE FLUX (la logique de Pete) ━━━
 
-💰 ACCUMULATION = 21j fort + 5j positif (le 1j est un detail)
-Les 3 alignes a la hausse. Le smart money charge MAINTENANT. C'est ICI qu'on chasse nos actions. Risque minimal, courant porteur maximal.
+💰 ACCUMULATION = 3 mois positif + 21j fort (le 5j/1j sont des nuances)
+Les 2 piliers tiennent : la tendance de fond longue (3 mois) ET le coeur (21j) sont haussiers. Une semaine rouge (5j negatif) n'est qu'une RESPIRATION, pas un essoufflement. C'est ICI qu'on chasse. Le smart money construit sur des semaines : le statut reste stable jour apres jour.
 
-⏸ ESSOUFFLEMENT = 21j fort MAIS 5j devient negatif (le 1j seul ne compte pas)
-La fondation tient mais le flux faiblit. Pete dirait : ne chasse pas, la hausse se fatigue. On attend ou on surveille.
+⏸ ESSOUFFLEMENT = le 21j RALENTIT (passe sous +2%) alors que le 3 mois tient encore
+Ce n'est PAS une simple semaine rouge : c'est le coeur (21j) qui se tasse vraiment. La fondation longue (3 mois) tient encore. On attend, on ne chasse plus.
 
 🌱 ROTATION ENTRANTE = 21j faible/negatif MAIS 5j repasse positif
 Le fameux "less bearish" de Pete : avant d'etre haussier, un secteur devient d'abord MOINS baissier. Les premiers capitaux reviennent en douce. On met en WATCHLIST — pas encore d'achat, mais on prepare.
 
-🩸 DISTRIBUTION / CAPITULATION = 21j qui faiblit + 5j negatif
-Le smart money SORT. Meme une belle action de ce secteur nage a contre-courant. On EVITE totalement.
+🩸 DISTRIBUTION / CAPITULATION = le 3 mois lui-meme passe NEGATIF (le fond se retourne)
+Quand meme le 3 mois devient negatif, le smart money sort vraiment (CAPITULATION si le 21j s'effondre). On EVITE totalement.
 
 ━━━ LEQUEL CHOISIR POUR UN TRADE ━━━
 
@@ -1066,7 +1066,7 @@ CHAQUE MATIN :
 • Pose tes alertes sur le niveau de breakout.
 
 AVANT CHAQUE ENTRÉE — 4 questions :
-1. Secteur en ACCUMULATION (3 mois + 21j forts, 5j positif) ?
+1. Secteur en ACCUMULATION (3 mois + 21j forts) ?
 2. Cluster (plusieurs actions de l'industrie) ?
 3. Bull Flag weekly prêt à casser sur gros volume ?
 4. R/R >= 3:1 avec mon stop ?`}
