@@ -376,7 +376,10 @@ function rankStocks(rows, tech) {
 
 function analyseGroups(sectors) {
   if (!sectors.length) return null;
-  const byMonth = [...sectors].sort((a,b)=>b.month-a.month);
+  // TRI "comme Pete" : score combine 3M + 21j (ou sont VRAIMENT installees les institutions + dynamique actuelle).
+  // Le 3M (sur 63j) est ramene a un rythme mensuel (/3) pour etre comparable au 21j, puis additionne.
+  const sectorScore = (x) => ((x.quart!=null?x.quart:x.month*2.5)/3) + x.month;
+  const byMonth = [...sectors].sort((a,b)=>sectorScore(b)-sectorScore(a));
   // regime risk-on/off
   const def = sectors.find(s=>/defensive/i.test(s.name));
   const tech = sectors.find(s=>/technolog/i.test(s.name));
