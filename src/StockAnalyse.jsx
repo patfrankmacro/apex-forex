@@ -173,18 +173,26 @@ function valorisation(f) {
 function autoThese(f, mode, secInfo) {
   const lines = [];
   if (secInfo) {
-    if (secInfo.rank <= 3) {
-      lines.push("✅ SECTEUR EN TENDANCE — FEU VERT\nLe secteur "+secInfo.name+" est classe #"+secInfo.rank+"/"+secInfo.total+" sur 1 mois (+"+secInfo.month+"%) et +"+secInfo.quart+"% sur 3 mois. C'est un secteur LEADER : le smart money y deplace du capital. Regle Pete respectee — tu chasses dans le bon groupe.");
-    } else if (secInfo.rank <= 6) {
-      lines.push("⚠️ SECTEUR MOYEN — PRUDENCE\nLe secteur "+secInfo.name+" est classe #"+secInfo.rank+"/"+secInfo.total+" sur 1 mois (+"+secInfo.month+"%). Ni leader, ni a la traine. Privilegie les actions des secteurs du top 3.");
+    const sName = secInfo.name, sRank = secInfo.rank, sTot = secInfo.total;
+    const sM = secInfo.month, sQ = secInfo.quart;
+    const ctx = "Le secteur "+sName+" est classe #"+sRank+"/"+sTot+" (3 mois "+(sQ>0?"+":"")+sQ+"% · 21j "+(sM>0?"+":"")+sM+"%). ";
+    // On lit le VRAI statut de flux du secteur, pas juste le rang.
+    if (secInfo.code === "acc") {
+      lines.push("✅ SECTEUR EN ACCUMULATION — FEU VERT\n"+ctx+"Le 3 mois (fondation) ET le 21j (flux actif) sont alignes a la hausse : le smart money charge ENCORE ce groupe. Regle Pete respectee — tu chasses dans le bon secteur.");
+    } else if (secInfo.code === "profit") {
+      lines.push("🔴 SECTEUR EN PRISE DE PROFIT — EVITE\n"+ctx+"Gros 3 mois mais le 21j cale et le court terme decroche : les institutions ALLEGENT en haut (distribution de sommet). Meme une bonne action ici nage a contre-courant. On attend qu'un nouveau cycle reparte.");
+    } else if (secInfo.code === "ess") {
+      lines.push("⚠️ SECTEUR EN ESSOUFFLEMENT — PRUDENCE\n"+ctx+"La fondation 3 mois tient mais le 21j (le flux actif) ralentit. La hausse se fatigue. Ne chasse pas, attends que le flux se reconfirme.");
+    } else if (secInfo.code === "rot") {
+      lines.push("🌱 SECTEUR EN ROTATION ENTRANTE — WATCHLIST\n"+ctx+"Le fond est encore faible mais le court terme repasse positif (less bearish). Les premiers capitaux reviennent. Surveille — pas encore d'achat.");
     } else {
-      lines.push("❌ SECTEUR FAIBLE — PAS DE TRADE (regle Pete)\nLe secteur "+secInfo.name+" est classe #"+secInfo.rank+"/"+secInfo.total+" sur 1 mois ("+secInfo.month+"%). Le smart money QUITTE ce groupe. On EVITE — cherche dans les secteurs en tete du classement.");
+      lines.push("❌ SECTEUR EN DISTRIBUTION — PAS DE TRADE (regle Pete)\n"+ctx+"Le smart money QUITTE ce groupe. On EVITE — cherche dans les secteurs en ACCUMULATION (en tete du scan).");
     }
   } else {
     lines.push("ℹ️ SECTEUR NON VERIFIE\nScanne d'abord la section GROUPES (en haut) pour savoir si "+(f.sector?("le secteur "+f.sector):"le secteur de cette action")+" est en tendance. Regle Pete : pas de secteur fort = pas de trade.");
   }
   if (f.change!==null && f.change>0) {
-    lines.push("ENERGIE INSTITUTIONNELLE — LE CARBURANT\nL'action monte aujourd'hui (+"+f.change+"%). Une cloture forte au-dessus de l'ouverture (Change from Open +2%) revele que les gros acheteurs ont tenu l'offre toute la journee. Ce sont les grosses bougies vertes pleines — le carburant d'un mouvement explosif.");
+    lines.push("ENERGIE INSTITUTIONNELLE — LE CARBURANT\nL'action monte aujourd'hui (+"+f.change+"%). Pour confirmer le carburant Pete, verifie le Change from Open sur le chart : une cloture +2% au-dessus de l'ouverture = les gros acheteurs ont tenu l'offre toute la journee (grosse bougie verte pleine). C'est ce qui distingue une vraie accumulation d'un simple gap qui retombe.");
   }
   if (f.sma200!==null && f.sma200>0 && f.sma50!==null && f.sma50>0) {
     lines.push("TENDANCE STAGE 2 CONFIRMEE\nPrix au-dessus de la SMA200 (+"+f.sma200+"%) et SMA50 alignee : signature d'une action en Stage 2 selon Minervini/Weinstein. Les institutions accumulent, la tendance de fond est haussiere.");
