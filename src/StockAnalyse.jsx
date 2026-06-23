@@ -399,23 +399,25 @@ function analyseGroups(sectors) {
     else dir = "flat";                            // ralentit mais tient
     const fondPositif = (s.month > 0) && (quart==null || quart > 0); // 21j ET 3 mois alignes haussiers
 
-    if (s.month >= 2) {
-      // TENDANCE DE FOND POSITIVE (21j fort)
-      if (s.week >= 0) {
-        // 5j positif (accelere OU tient) => le smart money charge encore. Le 1j n'a aucun pouvoir ici.
-        flux="ACCUMULATION"; code="acc";
-      } else {
-        // 5j VRAIMENT negatif => la le flux court terme se retourne = essoufflement reel
-        flux="ESSOUFFLEMENT"; code="ess";
-      }
-    } else if (s.month <= -4) {
-      // TENDANCE DE FOND NEGATIVE
-      if (s.week > 0) { flux="ROTATION ENTRANTE"; code="rot"; } // less bearish (5j repasse positif)
-      else { flux = (s.week < -3) ? "CAPITULATION" : "DISTRIBUTION"; code="dist"; }
+    // LOGIQUE STABLE A 2 PILIERS : le 3 mois (tendance de fond longue) + le 21j (coeur) COMMANDENT.
+    // Le 5j et le 1j ne sont que des nuances : ils ne font JAMAIS basculer le statut a eux seuls.
+    // Le smart money construit ses positions sur des SEMAINES — le statut ne doit pas changer chaque jour.
+    const q = quart!=null ? quart : s.month*2.5; // estimation du 3 mois si absent
+    if (q > 0 && s.month >= 2) {
+      // LES 2 PILIERS TIENNENT (3 mois positif + 21j fort) => ACCUMULATION, point.
+      // Une semaine rouge (5j negatif) n'est qu'une respiration, pas un essoufflement.
+      flux="ACCUMULATION"; code="acc";
+    } else if (q > 0 && s.month > 0 && s.month < 2) {
+      // Le 3 mois tient encore mais le 21j RALENTIT nettement => signal precoce d'essoufflement.
+      flux="ESSOUFFLEMENT"; code="ess";
+    } else if (q <= 0 && s.month <= -4) {
+      // La tendance de fond longue S'EST RETOURNEE (3 mois negatif) + 21j tres faible => le smart money sort.
+      if (s.week > 1) { flux="ROTATION ENTRANTE"; code="rot"; } // premiers capitaux qui reviennent
+      else { flux = (s.month < -8) ? "CAPITULATION" : "DISTRIBUTION"; code="dist"; }
     } else {
-      // FOND FAIBLE/NEUTRE (-4 a +2)
-      if (s.week > 0.5) { flux="ROTATION ENTRANTE"; code="rot"; }
-      else if (s.week < -1) { flux="DISTRIBUTION"; code="dist"; }
+      // ZONE DE TRANSITION (fond qui hesite)
+      if (q > 0 && s.week > 0.5) { flux="ROTATION ENTRANTE"; code="rot"; } // 3 mois positif + 5j repart
+      else if (s.month <= -2) { flux="DISTRIBUTION"; code="dist"; }
       else if (Math.abs(s.month) < 0.3) { flux="SANS FLUX"; code="dead"; }
       else { flux="CONSOLIDATION"; code="cons"; }
     }
