@@ -628,11 +628,12 @@ function StockAnalyseView() {
                   <div style={{fontSize:7, color:TEXT_DIM, marginBottom:4, fontStyle:"italic"}}>👆 Tape un secteur pour voir le détail · 🔥 = volume institutionnel élevé</div>
                   <div style={{display:"flex", fontSize:7, color:TEXT_DIM, fontWeight:700, padding:"0 0 4px 0", borderBottom:"1px solid #1a2230"}}>
                     <span style={{flex:0.4}}>#</span>
-                    <span style={{flex:2}}>SECTEUR</span>
-                    <span style={{flex:1.6, textAlign:"right"}}>21j</span>
-                    <span style={{flex:1, textAlign:"right"}}>5j</span>
-                    <span style={{flex:0.9, textAlign:"right"}}>1j</span>
-                    <span style={{flex:2, textAlign:"right"}}>FLUX</span>
+                    <span style={{flex:1.8}}>SECTEUR</span>
+                    <span style={{flex:0.9, textAlign:"right"}}>3M</span>
+                    <span style={{flex:1.5, textAlign:"right"}}>21j</span>
+                    <span style={{flex:0.9, textAlign:"right"}}>5j</span>
+                    <span style={{flex:0.8, textAlign:"right"}}>1j</span>
+                    <span style={{flex:1.9, textAlign:"right"}}>FLUX</span>
                   </div>
                   {groupsRes.enriched.map((s,i)=>{
                     const fc = s.code==="acc"?GREEN : s.code==="rot"?AMBER : s.code==="dist"?RED : s.code==="ess"?"#fb923c" : TEXT_DIM;
@@ -644,19 +645,20 @@ function StockAnalyseView() {
                       <div key={i} style={{borderBottom:"1px solid #141c28"}}>
                         <div onClick={()=>setSelSector(open?null:s.name)} style={{display:"flex", alignItems:"center", padding:"3px 0", cursor:"pointer"}}>
                           <span style={{flex:0.4, fontSize:7, color:TEXT_DIM}}>{s.rank}</span>
-                          <span style={{flex:2, fontSize:8, color:TEXT2}}>{s.name}{hot?" 🔥":""}</span>
-                          <span style={{flex:1.6, textAlign:"right", display:"flex", alignItems:"center", justifyContent:"flex-end", gap:3}}>
+                          <span style={{flex:1.8, fontSize:8, color:TEXT2}}>{s.name}{hot?" 🔥":""}</span>
+                          <span style={{flex:0.9, textAlign:"right", fontSize:7.5, color:(s.quart!=null&&s.quart>0)?GREEN:RED, fontWeight:700}}>{s.quart!=null?(s.quart>0?"+":"")+s.quart:"—"}</span>
+                          <span style={{flex:1.5, textAlign:"right", display:"flex", alignItems:"center", justifyContent:"flex-end", gap:3}}>
                             <span style={{display:"inline-block", height:5, width:(s.bar*3)+"px", background:fc, borderRadius:2}}></span>
                             <span style={{fontSize:8, color:fc, fontWeight:700}}>{s.month>0?"+":""}{s.month}%</span>
                           </span>
                           <span style={{flex:1, textAlign:"right", fontSize:7.5, color: s.dir==="up"?GREEN:s.dir==="down"?RED:TEXT_DIM}}>{arrow}{s.week>0?"+":""}{s.week}</span>
-                          <span style={{flex:0.9, textAlign:"right", fontSize:7.5, color:(s.oneDay!=null&&s.oneDay<0)?RED:TEXT_DIM}}>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay:"—"}</span>
-                          <span style={{flex:2, textAlign:"right", fontSize:7, color:fc, fontWeight:700}}>{emoji} {s.flux}</span>
+                          <span style={{flex:0.8, textAlign:"right", fontSize:7.5, color:(s.oneDay!=null&&s.oneDay<0)?RED:TEXT_DIM}}>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay:"—"}</span>
+                          <span style={{flex:1.9, textAlign:"right", fontSize:7, color:fc, fontWeight:700}}>{emoji} {s.flux}</span>
                         </div>
                         {open && (
                           <div style={{padding:"6px 8px 8px 8px", fontSize:7.5, color:TEXT, lineHeight:1.6, background:"#0d1420", borderRadius:6, marginBottom:4}}>
                             <div style={{color:fc, fontWeight:700, marginBottom:3}}>{emoji} {s.flux} — rang #{s.rank}/{groupsRes.enriched.length}</div>
-                            <div style={{marginBottom:3}}>📅 21j <b>{s.month>0?"+":""}{s.month}%</b> (fond) · 📆 5j <b>{s.week>0?"+":""}{s.week}%</b> (direction) · ☀️ 1j <b>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay+"%":"—"}</b> (pouls)</div>
+                            <div style={{marginBottom:3}}>🗓️ 3M <b>{s.quart!=null?(s.quart>0?"+":"")+s.quart+"%":"—"}</b> (tendance de fond) · 📅 21j <b>{s.month>0?"+":""}{s.month}%</b> (coeur) · 📆 5j <b>{s.week>0?"+":""}{s.week}%</b> (accel) · ☀️ 1j <b>{s.oneDay!=null?(s.oneDay>0?"+":"")+s.oneDay+"%":"—"}</b> (pouls)</div>
                             <div style={{marginBottom:3, color:TEXT_DIM}}>{s.relVol!=null?"🔊 RelVol "+s.relVol+"x":""}{s.avgVol!=null?" · 📊 Vol moy "+(s.avgVol>=1000?(s.avgVol/1000).toFixed(2)+"B":s.avgVol.toFixed(0)+"M"):""}{s.volume!=null?" · 📈 Vol jour "+(s.volume>=1000?(s.volume/1000).toFixed(2)+"B":s.volume.toFixed(0)+"M"):""}{s.avgVol!=null&&s.volume!=null?" ("+(s.volume/s.avgVol>=1.2?"⬆ "+(s.volume/s.avgVol).toFixed(1)+"x la moyenne, forte participation":s.volume/s.avgVol<0.8?"⬇ sous la moyenne, peu d'intérêt":"≈ normal")+")":""}</div>
                             <div style={{color:TEXT_DIM}}>{
                               s.code==="acc" ? "Les 3 horizons alignes a la hausse : le smart money charge ce secteur. CHASSE tes actions ici — courant porteur maximal." :
