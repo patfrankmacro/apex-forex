@@ -81,9 +81,22 @@ function analyse(raw, manualTicker) {
   f.salesSurpr = surpr && surpr[2] ? parseFloat(surpr[2]) : null;
   const secList = ["Technology","Industrials","Financial","Basic Materials","Healthcare","Real Estate","Utilities","Consumer Cyclical","Communication Services","Consumer Defensive","Energy"];
   f.sector = null;
-  const head = t.split(/\r?\n/).slice(0,12).join(" ");
-  for (const s of secList) { if (new RegExp(s,"i").test(head)) { f.sector = s; break; } }
-  if (!f.sector) { for (const s of secList) { if (new RegExp(s,"i").test(t)) { f.sector = s; break; } } }
+  // Le vrai secteur Finviz est sur une ligne avec des separateurs " • " (ex: "Healthcare • Health Information Services • USA • Large").
+  // On la cible en priorite pour eviter les faux matchs (ex: l'onglet "Financials" contient "Financial").
+  const lines2 = t.split(/\r?\n/);
+  const secLine = lines2.find(l => /•|·/.test(l) && secList.some(sec => new RegExp("(^|•|·|\\s)"+sec+"(\\s*•|\\s*·|$)","i").test(l)));
+  if (secLine) {
+    for (const sec of secList) { if (new RegExp("(^|•|·|\\s)"+sec+"(\\s*•|\\s*·|$)","i").test(secLine)) { f.sector = sec; break; } }
+  }
+  // Fallback : chercher un secteur en mot ENTIER (\b) dans tout le texte, en evitant "Financials" (pluriel = onglet)
+  if (!f.sector) {
+    for (const sec of secList) {
+      const re = new RegExp("\\b"+sec+"\\b","i");
+      // pour Financial, exiger qu'il ne soit pas suivi de "s" (eviter "Financials")
+      const reStrict = sec==="Financial" ? /\bFinancial\b(?!s)/i : re;
+      if (reStrict.test(t)) { f.sector = sec; break; }
+    }
+  }
   return { ticker, f };
 }
 
