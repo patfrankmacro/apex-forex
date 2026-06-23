@@ -376,9 +376,17 @@ function rankStocks(rows, tech) {
 
 function analyseGroups(sectors) {
   if (!sectors.length) return null;
-  // TRI "comme Pete" : score combine 3M + 21j (ou sont VRAIMENT installees les institutions + dynamique actuelle).
-  // Le 3M (sur 63j) est ramene a un rythme mensuel (/3) pour etre comparable au 21j, puis additionne.
-  const sectorScore = (x) => ((x.quart!=null?x.quart:x.month*2.5)/3) + x.month;
+  // TRI "SUIVRE LE FLUX ACTIF" : on veut les secteurs ou le smart money pousse ENCORE, pas ceux qu'il quitte.
+  // Le 21j DOMINE (le momentum actif, ce que font les institutions maintenant). Le 5j confirme l'acceleration recente.
+  // Le 3M sert de VALIDATION directionnelle (fondation saine ou non), avec bonus PLAFONNE : il ne propulse JAMAIS
+  // en tete un secteur dont le 21j cale (ex: gros 3M en distribution de sommet = le smart money prend ses profits).
+  const sectorScore = (x) => {
+    const q = x.quart!=null ? x.quart : x.month*2.5;   // 3 mois (validation directionnelle)
+    const m = x.month;                                  // 21j (le flux actif, DOMINANT)
+    const w = x.week!=null ? x.week : 0;                // 5j (acceleration recente)
+    const bonus3M = Math.max(-3, Math.min(3, q*0.3));   // bonus/penalite 3M plafonne a +/-3
+    return m*4.0 + w*1.5 + bonus3M;                     // 21j domine + 5j + validation 3M plafonnee
+  };
   const byMonth = [...sectors].sort((a,b)=>sectorScore(b)-sectorScore(a));
   // regime risk-on/off
   const def = sectors.find(s=>/defensive/i.test(s.name));
@@ -410,6 +418,10 @@ function analyseGroups(sectors) {
       // LES 2 PILIERS TIENNENT (3 mois positif + 21j fort) => ACCUMULATION, point.
       // Une semaine rouge (5j negatif) n'est qu'une respiration, pas un essoufflement.
       flux="ACCUMULATION"; code="acc";
+    } else if (q >= 15 && s.month < 2 && s.week < -2) {
+      // GROS 3 mois (institutions installees haut) MAIS le 21j cale ET le 5j decroche fort
+      // => le smart money PREND SES PROFITS en haut. Distribution de sommet, on n'entre PAS.
+      flux="PRISE DE PROFIT"; code="profit";
     } else if (q > 0 && s.month > 0 && s.month < 2) {
       // Le 3 mois tient encore mais le 21j RALENTIT nettement => signal precoce d'essoufflement.
       flux="ESSOUFFLEMENT"; code="ess";
@@ -639,8 +651,8 @@ function StockAnalyseView() {
                     <span style={{flex:1.9, textAlign:"right"}}>FLUX</span>
                   </div>
                   {groupsRes.enriched.map((s,i)=>{
-                    const fc = s.code==="acc"?GREEN : s.code==="rot"?AMBER : s.code==="dist"?RED : s.code==="ess"?"#fb923c" : TEXT_DIM;
-                    const emoji = s.code==="acc"?"💰" : s.code==="rot"?"🌱" : s.code==="dist"?"🩸" : s.code==="ess"?"⏸" : s.code==="dead"?"💤":"➡️";
+                    const fc = s.code==="acc"?GREEN : s.code==="rot"?AMBER : s.code==="dist"?RED : s.code==="profit"?"#f87171" : s.code==="ess"?"#fb923c" : TEXT_DIM;
+                    const emoji = s.code==="acc"?"💰" : s.code==="rot"?"🌱" : s.code==="dist"?"🩸" : s.code==="profit"?"🔴" : s.code==="ess"?"⏸" : s.code==="dead"?"💤":"➡️";
                     const arrow = s.dir==="up"?"▲":s.dir==="down"?"▼":"─";
                     const hot = s.relVol!=null && s.relVol>=1.8;
                     const open = selSector===s.name;
@@ -665,6 +677,7 @@ function StockAnalyseView() {
                             <div style={{marginBottom:3, color:TEXT_DIM}}>{s.relVol!=null?"🔊 RelVol "+s.relVol+"x":""}{s.avgVol!=null?" · 📊 Vol moy "+(s.avgVol>=1000?(s.avgVol/1000).toFixed(2)+"B":s.avgVol.toFixed(0)+"M"):""}{s.volume!=null?" · 📈 Vol jour "+(s.volume>=1000?(s.volume/1000).toFixed(2)+"B":s.volume.toFixed(0)+"M"):""}{s.avgVol!=null&&s.volume!=null?" ("+(s.volume/s.avgVol>=1.2?"⬆ "+(s.volume/s.avgVol).toFixed(1)+"x la moyenne, forte participation":s.volume/s.avgVol<0.8?"⬇ sous la moyenne, peu d'intérêt":"≈ normal")+")":""}</div>
                             <div style={{color:TEXT_DIM}}>{
                               s.code==="acc" ? "Les 3 horizons alignes a la hausse : le smart money charge ce secteur. CHASSE tes actions ici — courant porteur maximal." :
+                              s.code==="profit" ? "GROS 3 mois (les institutions y ont accumule et sont assises sur de gros gains) MAIS le 21j cale et le 5j decroche fort : elles PRENNENT LEURS PROFITS en haut. C'est de la distribution de sommet, pas de l'accumulation. On n'entre PAS — on attend que ca se stabilise ou qu'un nouveau cycle reparte." :
                               s.code==="ess" ? "Fond solide mais le court terme ralentit (ou jour rouge). La hausse se fatigue. Ne chasse pas, attends que ca se confirme." :
                               s.code==="rot" ? "Less bearish : le fond est faible mais le 5j repasse positif. Premiers capitaux qui reviennent. WATCHLIST, pas encore d'achat." :
                               s.code==="dist" ? "Le flux se tarit, le smart money sort. Meme une belle action ici nage a contre-courant. EVITE." :
