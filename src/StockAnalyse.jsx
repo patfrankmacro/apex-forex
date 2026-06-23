@@ -960,6 +960,9 @@ Les 2 piliers tiennent : la tendance de fond longue (3 mois) ET le coeur (21j) s
 ⏸ ESSOUFFLEMENT = le 21j RALENTIT (passe sous +2%) alors que le 3 mois tient encore
 Ce n'est PAS une simple semaine rouge : c'est le coeur (21j) qui se tasse vraiment. La fondation longue (3 mois) tient encore. On attend, on ne chasse plus.
 
+🔴 PRISE DE PROFIT = GROS 3 mois (>+15%) MAIS le 21j cale ET le 5j decroche fort
+Les institutions ont accumule il y a des semaines, elles sont assises sur de gros gains, et maintenant elles ALLEGENT en haut. C'est de la distribution de sommet : le gros 3 mois est leur ANCIENNE action, pas leur action actuelle. On n'entre PAS — on attend qu'un nouveau cycle reparte. (Exemple typique : un secteur a +26% sur 3 mois mais qui reflue depuis 3 semaines.)
+
 🌱 ROTATION ENTRANTE = 21j faible/negatif MAIS 5j repasse positif
 Le fameux "less bearish" de Pete : avant d'etre haussier, un secteur devient d'abord MOINS baissier. Les premiers capitaux reviennent en douce. On met en WATCHLIST — pas encore d'achat, mais on prepare.
 
@@ -973,7 +976,17 @@ La regle d'or de Pete : "Start with the sector. Find the leaders."
 2. Pourquoi c'est crucial : 3 actions sur 4 suivent leur secteur. Une action geniale dans un secteur en DISTRIBUTION va galerer ; une action moyenne dans un secteur en ACCUMULATION sera portee par le flux institutionnel.
 3. Les fonds ne peuvent pas tout acheter : ils concentrent sur les 3-5 meilleurs secteurs. Si ton action est dans un de ces secteurs, tu surfes sur LEURS milliards.
 
-En resume : le secteur d'abord, l'action ensuite. Le flux institutionnel se lit dans la convergence des 3 horizons. Pas de secteur fort = pas de trade.`}
+━━━ COMMENT LE TABLEAU EST CLASSE ━━━
+
+Le tableau ne trie pas par la plus grosse position de fond, mais par le FLUX ACTIF : ou le smart money pousse ENCORE maintenant.
+
+• Le 21j DOMINE le classement (poids le plus fort) : c'est le momentum institutionnel actif, ce que font les fonds en ce moment.
+• Le 5j confirme l'acceleration recente (poids moyen).
+• Le 3 mois VALIDE la direction de fond (bonus plafonne) : il garantit que la tendance longue est saine, mais il ne propulse JAMAIS en tete un secteur dont le 21j cale.
+
+Pourquoi : un secteur avec un enorme 3 mois mais un 21j qui ralentit, c'est de la PRISE DE PROFIT (le smart money sort par le haut), pas de l'accumulation. Le classement le fait donc descendre, meme si sa position de fond est grosse. On suit l'argent qui ENTRE, pas celui qui SORT.
+
+En resume : le secteur d'abord, l'action ensuite. On chasse dans les secteurs en ACCUMULATION (3 mois + 21j alignes, le flux pousse encore). Pas de secteur fort = pas de trade.`}
       </Accordion>
 
       <Accordion icon="🏦" titre="CLASSER LES ACTIONS — CONVERGENCE MOMENTUM x VOLATILITE" color={GOLD} open={a13} setOpen={setA13}>
